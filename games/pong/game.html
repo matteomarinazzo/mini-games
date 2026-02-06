@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pong - Jeu</title>
+    <link rel="stylesheet" href="css/game.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏓</text></svg>"
+    />
+  </head>
+  <body>
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-player player1">
+        <div class="player-name">Joueur 1</div>
+        <div class="player-lives" id="player1Lives"></div>
+      </div>
+
+      <div class="hud-center">
+        <div class="score-display">
+          <span class="score" id="score1">0</span>
+          <span class="separator">:</span>
+          <span class="score" id="score2">0</span>
+        </div>
+      </div>
+
+      <div class="hud-player player2">
+        <div class="player-name" id="player2Name">Joueur 2</div>
+        <div class="player-lives" id="player2Lives"></div>
+      </div>
+    </div>
+
+    <!-- Game Container -->
+    <div class="game-container">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Touch controls pour mobile -->
+      <div class="touch-controls" id="touchControls">
+        <div class="touch-area player1-touch" id="player1Touch">
+        </div>
+        <div class="touch-area player2-touch" id="player2Touch">
+        </div>
+      </div>
+
+      <!-- Overlay de pause -->
+      <div class="game-overlay" id="pauseOverlay" style="display: none;">
+        <div class="overlay-content">
+          <h2>⏸️ Pause</h2>
+          <button class="btn-primary" id="resumeBtn">Reprendre</button>
+          <button class="btn-secondary" id="restartBtn">Recommencer</button>
+          <button class="btn-secondary" id="menuBtn">Menu</button>
+        </div>
+      </div>
+
+      <!-- Overlay de game over -->
+      <div class="game-overlay" id="gameOverOverlay" style="display: none;">
+        <div class="overlay-content">
+          <h2 id="winnerTitle">🏆 Victoire !</h2>
+          <p class="winner-text" id="winnerText"></p>
+          <p class="final-score">Score final: <span id="finalScore1">0</span> - <span id="finalScore2">0</span></p>
+          <button class="btn-primary" id="retryBtn">Rejouer</button>
+          <button class="btn-secondary" id="menuBtn2">Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Info -->
+    <div class="controls-info" id="controlsInfo">
+      <!-- Sera rempli dynamiquement selon l'orientation -->
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+  </body>
+</html>

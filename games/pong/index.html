@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pong</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏓</text></svg>"
+    />
+  </head>
+  <body>
+    <!-- Bouton Accueil -->
+    <a href="../../index.html" class="home-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Accueil</span>
+    </a>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Menu principal -->
+    <div class="container" id="menuContainer">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">🏓</div>
+          <h1>Pong</h1>
+        </div>
+        <p class="subtitle">Configurez votre partie de Pong classique !</p>
+      </div>
+
+      <div class="config-container">
+        <div class="config-card">
+          <div class="config-header">
+            <h2>⚙️ Configuration de la partie</h2>
+            <p>Personnalisez votre expérience de jeu</p>
+          </div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">🎮</span>
+              <span>Mode de jeu</span>
+            </label>
+            <div class="radio-grid">
+              <label class="radio-card">
+                <input type="radio" name="gameMode" value="pvp" checked />
+                <div class="radio-content">
+                  <div class="radio-icon">👥</div>
+                  <div class="radio-label">2 Joueurs</div>
+                  <div class="radio-description">Jouez contre un ami</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="gameMode" value="ai" />
+                <div class="radio-content">
+                  <div class="radio-icon">🤖</div>
+                  <div class="radio-label">Contre IA</div>
+                  <div class="radio-description">Défiez l'ordinateur</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="config-divider"></div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">🔄</span>
+              <span>Orientation des plateformes</span>
+            </label>
+            <div class="radio-grid">
+              <label class="radio-card">
+                <input type="radio" name="orientation" id="orientationVertical" value="vertical" checked />
+                <div class="radio-content">
+                  <div class="radio-icon">↔️</div>
+                  <div class="radio-label">Vertical</div>
+                  <div class="radio-description">Gauche ↔ Droite</div>
+                  <div class="controls-hint">W/S et ↑/↓</div>
+                  <div class="mobile-warning">Indisponible sur mobile</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="orientation" id="orientationHorizontal" value="horizontal" />
+                <div class="radio-content">
+                  <div class="radio-icon">↕️</div>
+                  <div class="radio-label">Horizontal</div>
+                  <div class="radio-description">Haut ↕ Bas</div>
+                  <div class="controls-hint">A/D et ←/→</div>
+                  <div class="mobile-warning">Indisponible sur mobile</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="config-divider"></div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">📏</span>
+              <span>Taille des plateformes</span>
+            </label>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="paddleSize" 
+                min="60" 
+                max="140" 
+                value="100" 
+                class="slider"
+              />
+              <span class="slider-value" id="sizeValue">100</span>
+            </div>
+            <p class="config-hint">
+              Plus petite = plus difficile, plus grande = plus facile
+            </p>
+          </div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">⚡</span>
+              <span>Vitesse de la balle</span>
+            </label>
+            <div class="radio-grid">
+              <label class="radio-card">
+                <input type="radio" name="ballSpeed" value="slow" />
+                <div class="radio-content">
+                  <div class="radio-icon">🐢</div>
+                  <div class="radio-label">Lente</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="ballSpeed" value="normal" checked />
+                <div class="radio-content">
+                  <div class="radio-icon">🏃</div>
+                  <div class="radio-label">Normale</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="ballSpeed" value="fast" />
+                <div class="radio-content">
+                  <div class="radio-icon">⚡</div>
+                  <div class="radio-label">Rapide</div>
+                </div>
+              </label>
+
+              <label class="radio-card">
+                <input type="radio" name="ballSpeed" value="insane" />
+                <div class="radio-content">
+                  <div class="radio-icon">🚀</div>
+                  <div class="radio-label">Folle</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <h3>🎯 Aperçu de la configuration</h3>
+            <div class="preview-canvas" id="previewCanvas">
+              <div class="preview-paddle left" id="previewPaddleLeft"></div>
+              <div class="preview-paddle right" id="previewPaddleRight"></div>
+              <div class="preview-ball"></div>
+            </div>
+            <div class="preview-info">
+              <div class="info-item">
+                <span class="info-label">Mode:</span>
+                <span class="info-value" id="modePreview">2 Joueurs</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Orientation:</span>
+                <span class="info-value" id="orientationPreview">Vertical</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Taille:</span>
+                <span class="info-value" id="paddleSizePreview">100px</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="start-button" id="startGameBtn">
+            🎮 Commencer la partie
+          </button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Marquez des points en envoyant la balle dans le camp adverse !</p>
+      </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+  </body>
+</html>

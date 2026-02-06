@@ -1,0 +1,57 @@
+{
+  "snow-digger": {
+    "path": "./games/snow-digger/index.html",
+    "name": "Snow Digger",
+    "emoji": "❄️",
+    "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
+    "tags": ["🪏 Pelle", "❄️ Neige", "🎮 Clicker"],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "morpion": {
+    "path": "./games/morpion/index.html",
+    "name": "Morpion",
+    "emoji": "⭕",
+    "description": "Le jeu classique revisité ! Affronte l'IA ou un ami.",
+    "tags": ["🧠 Stratégie", "👥 Multijoueur", "⚡ Rapide"],
+    "badge": "classic",
+    "badgeText": "Classique",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "billard": {
+    "path": "./games/billard/index.html",
+    "name": "Billard",
+    "emoji": "🎱",
+    "description": "Le jeu classique !",
+    "tags": ["🎯 Précision", "👥 Multijoueur", "⚡ Rapide"],
+    "badge": "classic",
+    "badgeText": "Classique",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "casse-briques": {
+    "path": "./games/casse-briques/index.html",
+    "name": "Casse-Briques",
+    "emoji": "🧱",
+    "description": "Le jeu classique !",
+    "tags": ["🧠 Réflexe", "🎯 Précision", "⚡ Rapide", "👤 Solo"],
+    "badge": "classic",
+    "badgeText": "Classique",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "pong": {
+    "path": "./games/pong/index.html",
+    "name": "Pong",
+    "emoji": "🏓",
+    "description": "Le jeu classique !",
+    "tags": ["🧠 Réflexe", "👥 Multijoueur", "⚡ Rapide"],
+    "badge": "classic",
+    "badgeText": "Classique",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  }
+}

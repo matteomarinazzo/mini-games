@@ -1,0 +1,331 @@
+/* rating-modal.css - Styles pour la modal de notation */
+
+/* Modal Overlay */
+.rating-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.rating-modal.show {
+  opacity: 1;
+}
+
+/* Modal Content */
+.rating-modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s ease-out;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.rating-modal.show .rating-modal-content {
+  transform: scale(1);
+}
+
+/* Close Button */
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #666;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(90deg);
+}
+
+/* Modal Title */
+.rating-modal-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3436;
+  text-align: center;
+}
+
+.modal-subtitle {
+  text-align: center;
+  color: #636e72;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+/* Star Rating Input */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 10px;
+  margin: 30px 0;
+  font-size: 50px;
+}
+
+.star-rating input[type="radio"] {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  color: #dfe6e9;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffd43b;
+  transform: scale(1.1);
+}
+
+.star-rating input[type="radio"]:checked ~ label {
+  color: #ffd43b;
+}
+
+.star-rating label:active {
+  transform: scale(0.95);
+}
+
+/* Modal Stats */
+.modal-stats {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  color: white;
+}
+
+.modal-stats p {
+  margin: 8px 0;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-stats strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cancel {
+  background: #f8f9fa;
+  color: #636e72;
+}
+
+.btn-cancel:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success Message */
+.success-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 48px;
+  color: white;
+  animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-message h3 {
+  color: #51cf66;
+  margin-bottom: 10px;
+}
+
+.success-message p {
+  color: #636e72;
+}
+
+.success-subtitle {
+  font-size: 13px;
+  color: #51cf66 !important;
+  margin-top: 5px;
+}
+
+.modal-info {
+  text-align: center;
+  font-size: 12px;
+  color: #636e72;
+  margin-top: 20px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Rating Count on Cards */
+.rating-count {
+  font-size: 12px;
+  color: #636e72;
+  margin-left: 5px;
+}
+
+/* Responsive */
+@media (max-aspect-ratio: 1/1) {
+  .rating-modal-content {
+    width: 90%;
+    max-width: 100%;
+    padding: 30px 20px;
+  }
+
+  /* Close Button */
+  .modal-close {
+    width: clamp(40px, 6vw, 120px);
+    height: clamp(40px, 6vw, 120px);
+    font-size: clamp(40px, 4vw, 120px);
+  }
+
+  /* Modal Title */
+  .rating-modal-content h3 {
+    font-size: 6vw;
+  }
+
+  .modal-subtitle {
+    font-size: 4vw;
+  }
+
+  .modal-info {
+    font-size: 2vw;
+  }
+
+  /* Star Rating Input */
+  .star-rating {
+    font-size: 8vw;
+  }
+
+  .star-rating input[type="radio"] {
+    display: none;
+  }
+
+  /* Modal Stats */
+  .modal-stats p {
+    margin: 8px 0;
+    font-size: 3vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-stats strong {
+    font-size: 3vw;
+  }
+
+  /* Modal Buttons */
+  .modal-buttons button {
+    font-size: 3vw;
+
+  }
+
+  /* Success Message */
+  .success-icon {
+    width: clamp(40px, 6vw, 120px);
+    height: clamp(40px, 6vw, 120px);
+    font-size: clamp(40px, 4vw, 120px);
+  }
+
+  @keyframes successPop {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .success-message h3 {
+    font-size: 6vw;
+  }
+
+  .success-message p {
+    font-size: 3vw;
+  }
+
+  .success-subtitle {
+    font-size: 4vw;
+  }
+}

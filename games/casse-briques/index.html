@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Casse-Briques</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🧱</text></svg>"
+    />
+  </head>
+  <body>
+    <!-- Bouton Accueil -->
+    <a href="../../index.html" class="home-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Accueil</span>
+    </a>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Menu principal -->
+    <div class="container" id="menuContainer">
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">🧱</div>
+          <h1>Casse-Briques</h1>
+        </div>
+        <p class="subtitle">Configurez votre partie et détruisez tous les briques !</p>
+      </div>
+
+      <div class="config-container">
+        <div class="config-card">
+          <div class="config-header">
+            <h2>⚙️ Configuration de la grille</h2>
+            <p>Définissez la taille de la zone de jeu</p>
+          </div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">📏</span>
+              <span>Largeur (nombre de briques)</span>
+            </label>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="gridWidth" 
+                min="5" 
+                max="15" 
+                value="10" 
+                class="slider"
+              />
+              <span class="slider-value" id="widthValue">10</span>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">📐</span>
+              <span>Hauteur (nombre de rangées)</span>
+            </label>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="gridHeight" 
+                min="3" 
+                max="10" 
+                value="6" 
+                class="slider"
+              />
+              <span class="slider-value" id="heightValue">6</span>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">💪</span>
+              <span>Résistance des briques (contacts requis)</span>
+            </label>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="brickLives" 
+                min="1" 
+                max="5" 
+                value="1" 
+                class="slider"
+              />
+              <span class="slider-value" id="livesValue">1</span>
+            </div>
+            <p class="config-hint">
+              Les briques changeront de couleur à chaque contact
+            </p>
+          </div>
+
+          <div class="config-divider"></div>
+
+          <div class="config-section">
+            <label class="config-label">
+              <span class="label-icon">🎮</span>
+              <span>Difficulté</span>
+            </label>
+            <div class="radio-grid">
+              <label class="radio-card">
+                <input type="radio" name="difficulty" value="easy" checked />
+                <div class="radio-content">
+                  <div class="radio-icon">😊</div>
+                  <div class="radio-label">Facile</div>
+                  <div class="radio-description">Balle lente, raquette large</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="difficulty" value="medium" />
+                <div class="radio-content">
+                  <div class="radio-icon">😐</div>
+                  <div class="radio-label">Moyen</div>
+                  <div class="radio-description">Vitesse normale</div>
+                </div>
+              </label>
+              
+              <label class="radio-card">
+                <input type="radio" name="difficulty" value="hard" />
+                <div class="radio-content">
+                  <div class="radio-icon">😰</div>
+                  <div class="radio-label">Difficile</div>
+                  <div class="radio-description">Balle rapide, raquette étroite</div>
+                </div>
+              </label>
+
+              <label class="radio-card">
+                <input type="radio" name="difficulty" value="insane" />
+                <div class="radio-content">
+                  <div class="radio-icon">💀</div>
+                  <div class="radio-label">Extrême</div>
+                  <div class="radio-description">Pour les pros !</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <h3>📊 Aperçu de la configuration</h3>
+            <div class="preview-grid" id="previewGrid"></div>
+            <div class="preview-stats">
+              <div class="stat-preview">
+                <span class="stat-icon">🧱</span>
+                <span class="stat-text">
+                  <strong id="totalBricks">60</strong> briques au total
+                </span>
+              </div>
+              <div class="stat-preview">
+                <span class="stat-icon">🎯</span>
+                <span class="stat-text">
+                  <strong id="totalHits">60</strong> contacts nécessaires
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button class="start-button" id="startGameBtn">
+            🎮 Commencer la partie
+          </button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Détruisez toutes les briques sans laisser tomber la balle !</p>
+      </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+  </body>
+</html>

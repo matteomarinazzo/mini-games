@@ -1,0 +1,736 @@
+/* ========================================
+   VARIABLES & RESET
+======================================== */
+:root {
+  --primary: #667eea;
+  --primary-dark: #5568d3;
+  --secondary: #764ba2;
+  --accent: #f093fb;
+  --success: #51cf66;
+  --danger: #ff6b6b;
+  --warning: #ffd43b;
+  --dark: #1a1a2e;
+  --dark-light: #16213e;
+  --light: #f8f9fa;
+  --text: #2d3436;
+  --text-light: #636e72;
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --radius: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Poppins",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ========================================
+   ANIMATED BACKGROUND
+======================================== */
+.bg-animation {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  animation: float 20s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  bottom: -10%;
+  right: -10%;
+  animation-delay: 7s;
+}
+
+.blob-3 {
+  width: 450px;
+  height: 450px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 14s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 30px) scale(0.9);
+  }
+}
+
+/* ========================================
+   CONTAINER
+======================================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+.header {
+  padding: 60px 0 40px;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+  animation: slideDown 0.8s ease-out;
+}
+
+.logo-icon {
+  font-size: 64px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.header h1 {
+  font-size: 56px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  animation: fadeIn 1s ease-out 0.3s both;
+}
+
+/* ========================================
+   STATS BAR
+======================================== */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 60px;
+  animation: slideUp 0.8s ease-out 0.2s both;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ========================================
+   GAMES GRID
+======================================== */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+/* ========================================
+   GAME CARD
+======================================== */
+.game-card {
+  background: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  animation: fadeInUp 0.6s ease-out both;
+  position: relative;
+}
+
+.game-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.game-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.game-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.game-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+}
+
+.game-card.coming-soon {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.game-card.coming-soon:hover {
+  transform: translateY(0);
+}
+
+/* Card Header */
+.card-header {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.badge-new {
+  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badge-popular {
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+}
+
+.badge-classic {
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+}
+
+.badge-soon {
+  background: rgba(255, 212, 59, 0.9);
+  color: var(--dark);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Card Image */
+.card-image {
+  position: relative;
+  height: 220px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  transition: var(--transition);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.game-card:hover .card-image img {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.9) 0%,
+    rgba(118, 75, 162, 0.9) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.game-card:hover .card-overlay {
+  opacity: 1;
+}
+
+.play-button {
+  transform: scale(0.8);
+  transition: var(--transition);
+}
+
+.game-card:hover .play-button {
+  transform: scale(1);
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Coming Soon Content */
+.coming-soon-content {
+  text-align: center;
+}
+
+.coming-soon-icon {
+  font-size: 80px;
+  margin-bottom: 10px;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.coming-soon-content h4 {
+  color: var(--text-light);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Card Content */
+.card-content {
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.card-description {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 6px 12px;
+  background: var(--light);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 0 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  color: #ffd43b;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.rating-text {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.btn-play,
+.btn-notify {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-play:hover,
+.btn-notify:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-notify {
+  background: linear-gradient(135deg, var(--warning) 0%, #ffa94d 100%);
+  box-shadow: 0 4px 15px rgba(255, 212, 59, 0.3);
+}
+
+.btn-notify:hover {
+  box-shadow: 0 6px 20px rgba(255, 212, 59, 0.4);
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+.footer {
+  padding: 40px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer p {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.footer-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.separator {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-links a {
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.social-links a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px) scale(1.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Couleurs spécifiques aux réseaux sociaux */
+.social-links a:nth-child(1):hover {
+  background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+  border-color: transparent;
+}
+
+.social-links a:nth-child(2):hover {
+  background: #333;
+}
+
+.social-links a:nth-child(3):hover {
+  background: #5865f2;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-aspect-ratio: 1/1) {
+  .header h1 {
+    font-size: 10vw;
+  }
+
+  .logo-icon {
+    font-size: 10vw;
+  }
+
+  .subtitle {
+    font-size: 4vw;
+  }
+
+  .stats-bar {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .stat-number {
+    font-size: 4vw;
+  }
+
+  .stat-label {
+    font-size: 4vw;
+  }
+
+  /* ========================================
+     GAMES GRID
+  ======================================== */
+  .games-grid {
+    grid-template-columns: 1fr;/*repeat(2, 1fr);*/
+    gap: 20px;
+  }
+
+  .game-card {
+    aspect-ratio: 9/10;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-image {
+    height: 60vh;
+  }
+
+  .card-image img {
+    width: 60%;
+    height: 60%;
+  }
+
+  .card-content {
+    flex: 1; /* Le texte prend le reste de la place */
+  }
+
+  .badge {
+    font-size: 2.5vw;
+  }
+
+  .card-title {
+    font-size: 4vw;
+  }
+
+  .card-description {
+    font-size: 3.8vw;
+  }
+
+  .tag {
+    font-size: 3.5vw;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .stars,
+  .rating-text {
+    font-size: 4vw;
+  }
+
+  .btn-play,
+  .btn-notify {
+    height: 100%;
+    width: 100%;
+    font-size: 4vw;
+  }
+  
+  .coming-soon-icon {
+    font-size: 20vw;
+    margin-bottom: 10px;
+    animation: rotate 3s linear infinite;
+  }
+
+  .coming-soon-content h4 {
+    font-size: 4vw;
+  }
+
+  /* ========================================
+     FOOTER
+  ======================================== */
+  .container p {
+    font-size: 3.2vw;
+  }
+
+  .footer-link {
+    font-size: 3vw;
+  }
+
+  .separator {
+    font-size: 3vw;
+  }
+
+  .social-links {
+    padding: 5%;
+    display: flex; /* Aligne les icônes horizontalement */
+    justify-content: center; /* Optionnel : centre les icônes horizontalement */
+    gap: 3vw; /* Crée l'espace entre les icônes (ici 32px environ) */
+  }
+
+  .social-links a {
+    font-size: 3vw;
+    display: inline-block;
+  }
+
+  .social-links svg {
+    /* Le SVG prend toute la place du lien parent (3vw) */
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}

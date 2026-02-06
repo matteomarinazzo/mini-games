@@ -1,0 +1,619 @@
+/* ========================================
+   THEME HIVER / NEIGE
+======================================== */
+:root {
+  --white: #ffffff;
+  --snow: #f8f9fa;
+  --ice-blue: #e6f7ff;
+  --frost-blue: #4a9fff;
+  --arctic-blue: #2c5282;
+  --shadow-blue: rgba(44, 82, 130, 0.15);
+  --glacier: rgba(255, 255, 255, 0.9);
+  --border-ice: rgba(255, 255, 255, 0.25);
+  --text-dark: #2c3e50;
+  --text-light: #4a5568;
+  --success: #38a169;
+  --gold: #d69e2e;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   RESET & BASE
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, sans-serif;
+  touch-action: none; /* ✅ Réactive le none pour empêcher le scroll */
+  user-select: none;
+  height: 100%;
+  color: var(--text-dark);
+}
+
+body {
+  cursor: none;
+  position: relative;
+}
+
+/* ========================================
+   CANVAS
+======================================== */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+}
+
+/* ========================================
+   MENU PRINCIPAL (HAUT)
+======================================== */
+#menuOptions {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+  background: var(--glacier);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-ice);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: var(--shadow);
+}
+
+#menuOptions button {
+  background: var(--white);
+  border: 2px solid var(--frost-blue);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--arctic-blue);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+#menuOptions button:hover {
+  background: var(--ice-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-blue);
+}
+
+#menuOptions button:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   BOUTON PLEIN ÉCRAN (À côté de Paramètres)
+======================================== */
+
+#fullscreenBtn:hover {
+  background: var(--ice-blue);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(74, 159, 255, 0.3);
+}
+
+/* Positionnement spécifique quand le menu paramètres est ouvert */
+#menuParams[style*="display: block"] ~ #fullscreenBtn {
+  right: 330px; /* Pour ne pas chevaucher le menu paramètres */
+}
+
+/* ========================================
+   MENU UPGRADES (BAS)
+======================================== */
+#menuUpgrades {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 12px;
+  max-width: 90%;
+  box-shadow: var(--shadow);
+}
+
+#menuUpgrades button {
+  background: linear-gradient(
+    135deg,
+    var(--frost-blue) 0%,
+    var(--arctic-blue) 100%
+  );
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+  overflow: hidden;
+}
+
+#menuUpgrades button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(74, 159, 255, 0.3);
+}
+
+#menuUpgrades button:active::after {
+  content: "❄️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+#menuUpgrades button:disabled {
+  background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ========================================
+   MENU PARAMÈTRES
+======================================== */
+#menuParams {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 300px;
+  max-height: 75vh;
+  overflow-y: auto;
+  background: var(--glacier);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-ice);
+  border-radius: 20px;
+  padding: 24px;
+  z-index: 20;
+  box-shadow: var(--shadow);
+}
+
+#menuParams h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: var(--arctic-blue);
+  text-align: center;
+  border-bottom: 2px solid var(--frost-blue);
+  padding-bottom: 12px;
+}
+
+#menuParams label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+#menuParams input[type="number"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px;
+  background: var(--white);
+  border: 2px solid var(--ice-blue);
+  border-radius: 10px;
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+#menuParams input[type="number"]:focus {
+  outline: none;
+  border-color: var(--frost-blue);
+  box-shadow: 0 0 0 3px rgba(74, 159, 255, 0.15);
+}
+
+#menuParams input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.2);
+}
+
+#menuParams hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border-ice),
+    transparent
+  );
+  margin: 20px 0;
+}
+
+#menuParams button {
+  width: 100%;
+  padding: 12px;
+  background: var(--frost-blue);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 10px;
+}
+
+#menuParams button:hover {
+  background: var(--arctic-blue);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   INDICATEURS DE CAMÉRA - CORRIGÉ
+======================================== */
+#cameraHints {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.arrow {
+  display: none;
+  position: absolute;
+  font-size: 36px;
+  color: var(--white); /* AJOUTÉ : couleur blanche pour visibilité */
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* AJOUTÉ : ombre portée */
+  opacity: 0;
+  animation: pulse 2s ease-in-out infinite; /* CORRIGÉ : animation pulse au lieu de snowDrift */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.arrow.up {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrow.down {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrow.left {
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+}
+
+.arrow.right {
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+/* Animation pulse originale */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* Pour les flèches gauche/droite */
+.arrow.left,
+.arrow.right {
+  animation-name: pulseLR;
+}
+
+@keyframes pulseLR {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-50%) scale(1.1);
+  }
+}
+
+/* ========================================
+   PANELS UI (STATS & UPGRADES)
+======================================== */
+.ui-panel {
+  position: fixed;
+  top: 20px;
+  background: var(--glacier);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-ice);
+  border-radius: 16px;
+  padding: 16px;
+  z-index: 10;
+  box-shadow: var(--shadow);
+  min-width: 200px;
+}
+
+.left-panel {
+  left: 20px;
+}
+
+.right-panel {
+  right: 20px;
+}
+
+.ui-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ui-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--arctic-blue);
+  font-family: "Courier New", monospace;
+}
+
+.gold {
+  color: var(--gold);
+}
+
+#ui-skier-status {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-ice);
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* ========================================
+   ÉTATS & ANIMATIONS
+======================================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#menuOptions,
+#menuUpgrades,
+.ui-panel,
+#fullscreenBtn {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Flocons de neige subtils (optionnel) */
+body::after {
+  content: "❄️";
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  opacity: 0.3;
+  z-index: 2;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+/* Scrollbar élégante */
+#menuParams::-webkit-scrollbar {
+  width: 6px;
+}
+
+#menuParams::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+#menuParams::-webkit-scrollbar-thumb {
+  background: var(--frost-blue);
+  border-radius: 10px;
+}
+
+/* ========================================
+   RESPONSIVE MOBILE
+======================================== */
+@media (max-aspect-ratio: 1/1) {
+  /* Menu principal */
+  #menuOptions {
+    top: 2vh;
+    padding: 1.5vw;
+    gap: 2vw;
+    border-radius: 3vw;
+  }
+
+  #menuOptions button {
+    padding: 10px 20px;
+    font-size: 3vw;
+    border-radius: 2.5vw;
+  }
+
+  /* Menu upgrades (bas) */
+  #menuUpgrades {
+    bottom: 2vh;
+    padding: 2vw;
+    gap: 2vw;
+    border-radius: 4vw;
+    max-width: 95%;
+  }
+
+  #menuUpgrades button {
+    padding: 2.5vw 3.5vw;
+    font-size: 3.2vw;
+    min-width: 28vw;
+    border-radius: 2.5vw;
+  }
+
+  /* Panels UI (stats) */
+  .ui-panel {
+    position: fixed;
+    top: 2vh;
+    padding: 2.5vw;
+    border-radius: 3vw;
+    width: 20vw !important; /* ← 10% de la largeur */
+    min-width: 10vw !important; /* ← Minimum 10% */
+    max-width: 20vw !important; /* ← Maximum 10% */
+    background: var(--glacier);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-ice);
+    box-shadow: var(--shadow);
+    z-index: 10;
+  }
+
+  .left-panel {
+    left: 2vw;
+  }
+
+  .right-panel {
+    right: 2vw;
+  }
+
+  .ui-row {
+    margin-bottom: 3vw;
+    flex-direction: column; /* ← Colonne au lieu de ligne */
+    align-items: flex-start; /* ← Aligné à gauche */
+    gap: 0.5vw; /* ← Petit espace entre label et valeur */
+  }
+
+  .label {
+    font-size: 2vw;
+  }
+
+  .value {
+    font-size: 2.5vw; /* ← Plus gros car en dessous */
+  }
+
+  #ui-skier-status {
+    margin-top: 2.5vw;
+    padding-top: 2.5vw;
+    font-size: 2.8vw;
+  }
+
+  /* Menu paramètres */
+  #menuParams {
+    top: 14vh;
+    right: 2vw;
+    width: 60vw;
+    max-height: 70vh;
+    padding: 4vw;
+    border-radius: 4vw;
+  }
+
+  #menuParams h3 {
+    font-size: 3vw;
+    margin-bottom: 3vw;
+    padding-bottom: 2.5vw;
+  }
+
+  #menuParams label {
+    font-size: 3.2vw;
+    margin-bottom: 2.5vw;
+  }
+
+  #menuParams input[type="number"] {
+    padding: 2.5vw;
+    font-size: 3.5vw;
+    border-radius: 2vw;
+  }
+
+  #menuParams input[type="checkbox"] {
+    margin-right: 2vw;
+    transform: scale(1.5);
+  }
+
+  #menuParams hr {
+    margin: 3.5vw 0;
+  }
+
+  #menuParams button {
+    padding: 3vw;
+    font-size: 3.5vw;
+    border-radius: 2.5vw;
+    margin-top: 2vw;
+  }
+
+  /* Flèches directionnelles */
+  .arrow {
+    font-size: 8vw;
+  }
+
+  .arrow.up {
+    top: 3vh;
+  }
+
+  .arrow.down {
+    bottom: 3vh;
+  }
+
+  .arrow.left {
+    left: 2vw;
+  }
+
+  .arrow.right {
+    right: 2vw;
+  }
+
+  /* Ajustements pour le modal close */
+  .modal-close {
+    top: 3vw;
+    right: 3vw;
+    font-size: 8vw;
+    width: 10vw;
+    height: 10vw;
+  }
+}

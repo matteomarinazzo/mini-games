@@ -171,7 +171,6 @@ body {
   backdrop-filter: blur(20px);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  margin-bottom: 60px;
   animation: slideUp 0.8s ease-out 0.2s both;
 }
 
@@ -192,6 +191,69 @@ body {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
+}
+
+/* ========================================
+   BARRE DE RECHERCHE
+======================================== */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin: 30px auto 30px;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  animation: fadeIn 1s ease-out 0.5s both;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 14px 50px 14px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  font-size: 15px;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+}
+
+.search-bar input:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.search-bar input:hover:not(:focus) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Icône loupe intégrée */
+.search-bar::after {
+  content: "🔍";
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus-within::after {
+  opacity: 0.8;
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* ========================================
@@ -216,6 +278,10 @@ body {
   transition: var(--transition);
   animation: fadeInUp 0.6s ease-out both;
   position: relative;
+}
+
+.game-card.is-hidden-desktop {
+  display: none;
 }
 
 .game-card:nth-child(1) {
@@ -629,10 +695,35 @@ body {
   }
 
   /* ========================================
+   BARRE DE RECHERCHE
+  ======================================== */
+  .search-bar {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 90%;
+    max-width: 500px;
+    margin: 20px auto 30px;
+  }
+
+  .search-bar input {
+    font-size: 3.5vw;
+    padding: 12px 45px 12px 16px;
+  }
+
+  .search-bar input:focus {
+    width: 100%;
+  }
+
+  .search-bar::after {
+    font-size: 3.5vw;
+  }
+
+  /* ========================================
      GAMES GRID
   ======================================== */
   .games-grid {
-    grid-template-columns: 1fr;/*repeat(2, 1fr);*/
+    grid-template-columns: 1fr; /*repeat(2, 1fr);*/
     gap: 20px;
   }
 
@@ -641,6 +732,15 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+  }
+
+  .game-card.is-hidden {
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+    height: 0;
+    margin: 0;
+    padding: 0;
   }
 
   .card-image {
@@ -689,7 +789,7 @@ body {
     width: 100%;
     font-size: 4vw;
   }
-  
+
   .coming-soon-icon {
     font-size: 20vw;
     margin-bottom: 10px;

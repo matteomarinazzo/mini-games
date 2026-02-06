@@ -15,14 +15,17 @@ export async function initRatingSystem() {
   setupRatingListeners();
 }
 
-// Charger et afficher les notes
 async function loadAndDisplayRatings() {
-  const games = ["snow-digger", "morpion", "casse-briques", "pong"];
+  const gameCards = document.querySelectorAll(
+    ".game-card[data-game]:not(.coming-soon)",
+  );
 
-  for (const gameId of games) {
+  for (const card of gameCards) {
+    const gameId = card.dataset.game;
+    if (!gameId) continue;
+
     const ratingData = await getRating(gameId);
     updateRatingDisplay(gameId, ratingData);
-
     listenToRatingChanges(gameId);
   }
 }

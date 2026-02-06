@@ -16,13 +16,12 @@ fetch("./assets/data/games.json")
     console.log("Jeux chargés :", games);
 
     // Génère les cartes dynamiquement
-    generateGameCards(); // ✅ ICI
-    //initGameCards();     // ✅ ICI aussi si besoin
+    generateGameCards();
+    initRatingSystem();
   })
   .catch((err) => {
     console.error(err);
   });
-
 
 // Initialisation
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initNotifyButtons();
   addScrollAnimations();
-  initRatingSystem();
 });
 
 // Générer les cartes de jeux dynamiquement
@@ -71,6 +69,8 @@ function createGameCard(gameId, game) {
   const card = document.createElement("div");
   card.className = "game-card";
   card.dataset.game = gameId;
+
+  card.dataset.tags = game.tags.join(" ").toLowerCase();
 
   // Déterminer la couleur du bouton play en fonction du badge
   let playButtonColor = "#667eea"; // Défaut pour "new"
@@ -322,6 +322,58 @@ function getGamesStats() {
       )[0]?.[0] || null,
   };
 }
+
+// Barre de recherche
+function filterGames() {
+  const query = document
+    .getElementById("searchInput")
+    .value.toLowerCase()
+    .trim();
+
+  const gameCards = document.querySelectorAll(".game-card");
+
+  const isMobile = window.matchMedia("(max-aspect-ratio: 1/1)").matches;
+
+  let visibleCount = 0;
+
+  gameCards.forEach((card) => {
+    const title =
+      card.querySelector(".card-title")?.textContent.toLowerCase() || "";
+    const desc =
+      card.querySelector(".card-description")?.textContent.toLowerCase() || "";
+    const tags = card.dataset.tags || "";
+
+    const match =
+      query === "" ||
+      title.includes(query) ||
+      desc.includes(query) ||
+      tags.includes(query);
+
+    if (match) {
+      card.classList.remove("is-hidden", "is-hidden-desktop");
+      visibleCount++;
+    } else {
+      if (isMobile) {
+        card.classList.add("is-hidden");
+        card.classList.remove("is-hidden-desktop");
+      } else {
+        card.classList.add("is-hidden-desktop");
+        card.classList.remove("is-hidden");
+      }
+    }
+  });
+
+  // ❌ on ne touche PLUS aux stats globales
+  // donc on ne modifie PAS gamesNumber ici
+}
+
+
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "searchInput") {
+    filterGames();
+  }
+});
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };

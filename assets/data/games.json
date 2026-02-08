@@ -21,6 +21,17 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+    "casino": {
+    "path": "./games/casino/index.html",
+    "name": "Casino",
+    "emoji": "🎰",
+    "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
+    "tags": ["💰 Argent", "🎲 Hasard", "🎮 Jeux", "👤 Solo"],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "morpion": {
     "path": "./games/morpion/index.html",
     "name": "Morpion",

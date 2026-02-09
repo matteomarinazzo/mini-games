@@ -2,9 +2,12 @@
 // STORAGE KEYS
 // ========================================
 const STORAGE_KEYS = {
-  MONEY: 'casino_money',
+  MONEY: 'global_money',
+  FUNFAIR_TICKETS: 'funfair_tickets',
   STATS: 'casino_stats',
-  INITIAL_BUDGET: 'casino_initial_budget'
+  FUNFAIR_STATS: 'funfair_stats',
+  INITIAL_BUDGET: 'global_initial_budget',
+
 };
 
 // ========================================
@@ -16,17 +19,17 @@ function showPopup(icon, title, message) {
   const titleEl = document.getElementById('popupTitle');
   const messageEl = document.getElementById('popupMessage');
   const button = document.getElementById('popupButton');
-  
+
   iconEl.textContent = icon;
   titleEl.textContent = title;
   messageEl.textContent = message;
-  
+
   overlay.classList.add('show');
-  
+
   button.onclick = () => {
     overlay.classList.remove('show');
   };
-  
+
   overlay.onclick = (e) => {
     if (e.target === overlay) {
       overlay.classList.remove('show');
@@ -92,7 +95,7 @@ const GAMES = {
 // ========================================
 function init() {
   const money = getMoney();
-  
+
   if (money !== null) {
     // L'utilisateur a déjà de l'argent
     showGamesMenu();
@@ -132,7 +135,7 @@ function handleSetBudget() {
   const budget = parseInt(selectedBudget.value);
   setMoney(budget);
   setInitialBudget(budget);
-  
+
   showGamesMenu();
 }
 
@@ -143,7 +146,7 @@ function showGamesMenu() {
   configContainer.style.display = 'none';
   gamesContainer.style.display = 'block';
   moneyDisplay.style.display = 'flex';
-  
+
   updateMoneyDisplay();
   updateStats();
 }
@@ -167,7 +170,7 @@ function startGame(gameType) {
 
   // Sauvegarder le type de jeu
   sessionStorage.setItem('casino_current_game', gameType);
-  
+
   // Rediriger vers la page de jeu
   window.location.href = 'game.html';
 }
@@ -181,25 +184,27 @@ function handleReset() {
   const titleEl = document.getElementById('popupTitle');
   const messageEl = document.getElementById('popupMessage');
   const button = document.getElementById('popupButton');
-  
+
   iconEl.textContent = '⚠️';
   titleEl.textContent = 'Recommencer ?';
   messageEl.textContent = 'Êtes-vous sûr de vouloir recommencer ? Toutes vos données seront perdues.';
   button.textContent = 'Oui, recommencer';
-  
+
   overlay.classList.add('show');
-  
+
   button.onclick = () => {
     localStorage.removeItem(STORAGE_KEYS.MONEY);
     localStorage.removeItem(STORAGE_KEYS.STATS);
     localStorage.removeItem(STORAGE_KEYS.INITIAL_BUDGET);
-    
+    localStorage.removeItem(STORAGE_KEYS.FUNFAIR_TICKETS);
+    localStorage.removeItem(STORAGE_KEYS.FUNFAIR_STATS);
+
     overlay.classList.remove('show');
     button.textContent = 'OK';
-    
+
     showBudgetSelection();
   };
-  
+
   overlay.onclick = (e) => {
     if (e.target === overlay) {
       overlay.classList.remove('show');
@@ -213,7 +218,7 @@ function handleReset() {
 // ========================================
 function updateStats() {
   const stats = getStats();
-  
+
   totalGamesEl.textContent = stats.totalGames;
   totalWinsEl.textContent = stats.totalWins;
   totalEarningsEl.textContent = `${stats.totalEarnings}€`;
@@ -221,16 +226,28 @@ function updateStats() {
 }
 
 function getStats() {
-  const stats = localStorage.getItem(STORAGE_KEYS.STATS);
-  if (!stats) {
-    return {
-      totalGames: 0,
-      totalWins: 0,
-      totalEarnings: 0,
-      biggestWin: 0
-    };
+  const statsString = localStorage.getItem(STORAGE_KEYS.STATS);
+
+  // Default structure
+  const defaults = {
+    totalGames: 0,
+    totalWins: 0,
+    totalEarnings: 0,
+    biggestWin: 0
+  };
+
+  if (!statsString) {
+    return defaults;
   }
-  return JSON.parse(stats);
+
+  try {
+    const parsed = JSON.parse(statsString);
+    console.log("Loaded casino stats:", parsed);
+    return { ...defaults, ...parsed };
+  } catch (e) {
+    console.error("Error parsing casino stats:", e);
+    return defaults;
+  }
 }
 
 // ========================================

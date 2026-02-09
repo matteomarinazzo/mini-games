@@ -21,12 +21,23 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
-    "casino": {
+  "casino": {
     "path": "./games/casino/index.html",
     "name": "Casino",
     "emoji": "🎰",
     "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
     "tags": ["💰 Argent", "🎲 Hasard", "🎮 Jeux", "👤 Solo"],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "funfair": {
+    "path": "./games/funfair/index.html",
+    "name": "Funfair Frenzy",
+    "emoji": "🎡",
+    "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
+    "tags": ["🎟️ Tickets", "🎯 Adresse", "🎮 Jeux", "👤 Solo"],
     "badge": "new",
     "badgeText": "Nouveau",
     "rating": "0",

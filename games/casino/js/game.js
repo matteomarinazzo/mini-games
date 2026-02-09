@@ -2,7 +2,7 @@
 // STORAGE KEYS
 // ========================================
 const STORAGE_KEYS = {
-  MONEY: "casino_money",
+  MONEY: "global_money",
   STATS: "casino_stats",
 };
 
@@ -313,13 +313,13 @@ function generateScratchSymbols() {
     symbols.push(winSymbol, winSymbol, winSymbol);
 
     const otherSymbols = SCRATCH_CONFIG.symbols.filter((s) => s !== winSymbol);
-    
+
     const fillCounts = {};
     while (symbols.length < 9) {
       const randomSymbol = otherSymbols[Math.floor(Math.random() * otherSymbols.length)];
-      
+
       if (!fillCounts[randomSymbol]) fillCounts[randomSymbol] = 0;
-      
+
       if (fillCounts[randomSymbol] < 2) {
         symbols.push(randomSymbol);
         fillCounts[randomSymbol]++;

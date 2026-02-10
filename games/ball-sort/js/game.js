@@ -138,7 +138,7 @@ async function handleTubeClick(index) {
 function liftTopBall(tubeIndex) {
   const balls = document
     .querySelectorAll(".tube")
-    [tubeIndex].querySelectorAll(".ball");
+  [tubeIndex].querySelectorAll(".ball");
   if (balls.length === 0) return;
   const heightAnimation =
     (config.ballsPerTube - balls.length + 1) * ballsSize + 10;
@@ -148,7 +148,7 @@ function liftTopBall(tubeIndex) {
 function lowerTopBall(tubeIndex) {
   const balls = document
     .querySelectorAll(".tube")
-    [tubeIndex].querySelectorAll(".ball");
+  [tubeIndex].querySelectorAll(".ball");
   if (balls.length > 0) {
     balls[balls.length - 1].style.transform = "translateY(0)";
   }
@@ -184,16 +184,6 @@ async function simplePour(fromIndex, toIndex) {
   // Hauteur au-dessus du tube de destination (comme liftTopBall)
   const ballsInToTube = gameState.tubes[toIndex].length;
   const heightAboveToTube = ballsSize + 10;
-  console.log(
-    "Height above toTube:",
-    heightAboveToTube,
-    config.ballsPerTube,
-    "-",
-    ballsInToTube,
-    "x",
-    ballsSize,
-    "+10",
-  );
   const hoverY = toTubeBodyRect.top - heightAboveToTube;
 
   // Position finale dans le tube

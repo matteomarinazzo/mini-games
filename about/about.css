@@ -68,10 +68,12 @@
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -130,15 +132,19 @@
 .content-section:nth-child(1) {
   animation-delay: 0.1s;
 }
+
 .content-section:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .content-section:nth-child(3) {
   animation-delay: 0.3s;
 }
+
 .content-section:nth-child(4) {
   animation-delay: 0.4s;
 }
+
 .content-section:nth-child(5) {
   animation-delay: 0.5s;
 }
@@ -395,47 +401,63 @@
     top: 10px;
     left: 10px;
     padding: 10px 16px;
-    font-size: 3vw;
+    font-size: 14px;
+    /* au lieu de 3vw */
   }
 
   .about-header {
-    padding: 80px 0 40px;
+    padding: 60px 0 30px;
+  }
+
+  .status-badge {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
   }
 
   .page-title {
-    font-size: 8vw;
+    font-size: 28px;
+    /* au lieu de 32px si trop grand sur mobile */
   }
 
   .page-subtitle {
-    font-size: 6vw;
+    font-size: 20px;
+    /* au lieu de 6vw */
   }
 
   .avatar {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
   }
 
   .avatar-emoji {
-    font-size: 5vw;
+    font-size: 24px;
+    /* au lieu de 5vw */
   }
 
   .content-section {
-    padding: 30px 20px;
+    padding: 20px 16px;
   }
 
   .content-section h2,
   .section-icon {
-    display: flex;
+    font-size: 18px;
+    /* au lieu de 4vw */
     justify-content: center;
-    font-size: 4vw;
   }
 
   .content-section h3 {
-    font-size: 3.5vw;
+    font-size: 16px;
+    /* au lieu de 3.5vw */
   }
 
   .content-section p {
-    font-size: 3vw;
+    font-size: 14px;
+    /* au lieu de 3vw */
   }
 
   .tech-grid,
@@ -446,15 +468,18 @@
   .stat-icon,
   .tech-icon,
   .section-icon {
-    font-size: 5vw;
+    font-size: 24px;
+    /* au lieu de 5vw */
   }
 
   .stat-value {
-    font-size: 4vw;
+    font-size: 18px;
+    /* au lieu de 4vw */
   }
 
   .stat-label {
-    font-size: 3.5vw;
+    font-size: 16px;
+    /* au lieu de 3.5vw */
   }
 
   .cta-buttons {
@@ -463,21 +488,25 @@
 
   .cta-btn {
     width: 100%;
-    font-size: 4vw;
+    font-size: 16px;
+    /* au lieu de 4vw */
     justify-content: center;
   }
 
   .cta-btn svg {
-    width: 4%;
-    height: 4%;
+    width: 16px;
+    /* au lieu de 4% */
+    height: 16px;
   }
 }
 
+/* Animation fadeInUp reste inchangée */
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

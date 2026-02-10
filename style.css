@@ -89,13 +89,16 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 30px) scale(0.9);
   }
@@ -135,10 +138,12 @@ body {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -287,9 +292,11 @@ body {
 .game-card:nth-child(1) {
   animation-delay: 0.1s;
 }
+
 .game-card:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .game-card:nth-child(3) {
   animation-delay: 0.3s;
 }
@@ -350,10 +357,12 @@ body {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -385,11 +394,9 @@ body {
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.9) 0%,
-    rgba(118, 75, 162, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.9) 0%,
+      rgba(118, 75, 162, 0.9) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -415,9 +422,11 @@ body {
   0% {
     transform: scale(0);
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
   }
@@ -438,6 +447,7 @@ body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -628,6 +638,7 @@ body {
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -639,6 +650,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -649,6 +661,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -659,6 +672,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -670,167 +684,141 @@ body {
 ======================================== */
 @media (max-aspect-ratio: 1/1) {
   .header h1 {
-    font-size: 10vw;
+    font-size: 32px;
+    /* au lieu de 10vw */
   }
 
   .logo-icon {
-    font-size: 10vw;
+    font-size: 32px;
   }
 
   .subtitle {
-    font-size: 4vw;
+    font-size: 16px;
   }
 
   .stats-bar {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   .stat-number {
-    font-size: 4vw;
+    font-size: 16px;
   }
 
   .stat-label {
-    font-size: 4vw;
+    font-size: 14px;
   }
 
   /* ========================================
-   BARRE DE RECHERCHE
+     BARRE DE RECHERCHE
   ======================================== */
   .search-bar {
-    position: relative;
-    top: auto;
-    right: auto;
     width: 90%;
-    max-width: 500px;
+    max-width: 400px;
     margin: 20px auto 30px;
   }
 
   .search-bar input {
-    font-size: 3.5vw;
-    padding: 12px 45px 12px 16px;
-  }
-
-  .search-bar input:focus {
-    width: 100%;
+    font-size: 14px;
+    padding: 10px 40px 10px 12px;
   }
 
   .search-bar::after {
-    font-size: 3.5vw;
+    font-size: 14px;
   }
 
   /* ========================================
      GAMES GRID
   ======================================== */
   .games-grid {
-    grid-template-columns: 1fr; /*repeat(2, 1fr);*/
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .game-card {
     aspect-ratio: 9/10;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-  }
-
-  .game-card.is-hidden {
-    visibility: hidden;
-    position: absolute;
-    pointer-events: none;
-    height: 0;
-    margin: 0;
-    padding: 0;
   }
 
   .card-image {
-    height: 60vh;
+    height: 220px;
   }
 
   .card-image img {
-    width: 60%;
-    height: 60%;
-  }
-
-  .card-content {
-    flex: 1; /* Le texte prend le reste de la place */
+    width: 30%;
+    height: auto;
   }
 
   .badge {
-    font-size: 2.5vw;
+    font-size: 12px;
   }
 
   .card-title {
-    font-size: 4vw;
+    font-size: 16px;
   }
 
   .card-description {
-    font-size: 3.8vw;
+    font-size: 14px;
   }
 
   .tag {
-    font-size: 3.5vw;
+    font-size: 10px;
   }
 
   .card-footer {
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     align-items: stretch;
   }
 
   .stars,
   .rating-text {
-    font-size: 4vw;
+    font-size: 14px;
   }
 
   .btn-play,
   .btn-notify {
-    height: 100%;
-    width: 100%;
-    font-size: 4vw;
+    height: 40px;
+    font-size: 14px;
   }
 
   .coming-soon-icon {
-    font-size: 20vw;
-    margin-bottom: 10px;
-    animation: rotate 3s linear infinite;
+    font-size: 60px;
+    margin-bottom: 8px;
   }
 
   .coming-soon-content h4 {
-    font-size: 4vw;
+    font-size: 16px;
   }
 
   /* ========================================
      FOOTER
   ======================================== */
   .container p {
-    font-size: 3.2vw;
+    font-size: 14px;
   }
 
   .footer-link {
-    font-size: 3vw;
+    font-size: 13px;
   }
 
   .separator {
-    font-size: 3vw;
+    font-size: 13px;
   }
 
   .social-links {
-    padding: 5%;
-    display: flex; /* Aligne les icônes horizontalement */
-    justify-content: center; /* Optionnel : centre les icônes horizontalement */
-    gap: 3vw; /* Crée l'espace entre les icônes (ici 32px environ) */
+    padding: 4%;
+    gap: 20px;
+    justify-content: center;
   }
 
   .social-links a {
-    font-size: 3vw;
-    display: inline-block;
+    font-size: 14px;
   }
 
   .social-links svg {
-    /* Le SVG prend toute la place du lien parent (3vw) */
-    width: 100%;
-    height: 100%;
-    display: block;
+    width: 80%;
+    height: 80%;
   }
 }

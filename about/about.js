@@ -1,102 +1,5 @@
 // Importez les fonctions nécessaires de l'SDK Firebase
-import { database } from "../js/config/firebase-config.js";
-
-// Importez les fonctions Firebase nécessaires
-import {
-  ref,
-  get,
-  set,
-  runTransaction,
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
-
-
-// --- Fonctions utilitaires pour interagir avec Firebase RTDB ---
-
-/**
- * Récupère une statistique spécifique depuis /stats/<statName> dans Firebase RTDB.
- * @param {string} statName Le nom de la statistique à récupérer (ex: "totalPlayers").
- * @param {number} defaultValue La valeur par défaut à retourner si la statistique n'existe pas.
- * @returns {Promise<number>} La valeur de la statistique ou la valeur par défaut.
- */
-async function getFirebaseStat(statName, defaultValue = 0) {
-  try {
-    const statsRef = ref(database, `stats/${statName}`);
-    const snapshot = await get(statsRef);
-
-    if (snapshot.exists()) {
-      return snapshot.val();
-    }
-    console.log(
-      `ℹ️ Pas de données Firebase pour ${statName}, initialisation à 0.`,
-    );
-    return defaultValue;
-  } catch (error) {
-    console.error("Erreur lecture Firebase:", error);
-    return defaultValue;
-  }
-}
-
-/**
- * Définit une statistique spécifique dans /stats/<statName> dans Firebase RTDB.
- * Utile pour des mises à jour directes, pas des incrémentations.
- * @param {string} statName Le nom de la statistique à définir.
- * @param {any} value La valeur à assigner.
- * @returns {Promise<boolean>} True si la sauvegarde est réussie, false sinon.
- */
-async function setFirebaseStat(statName, value) {
-  try {
-    const statRef = ref(database, `stats/${statName}`);
-    await set(statRef, value);
-    console.log(
-      `Stat ${statName} mise à jour dans Firebase avec la valeur:`,
-      value,
-    );
-    return true;
-  } catch (error) {
-    console.error(
-      `Erreur lors de la sauvegarde de /stats/${statName} dans Firebase:`,
-      error,
-    );
-    return false;
-  }
-}
-
-/**
- * Incrémente une statistique spécifique dans /stats/<statName> de manière atomique.
- * Utilise une transaction pour éviter les problèmes de concurrence.
- * @param {string} statName Le nom de la statistique à incrémenter.
- * @param {number} incrementBy La valeur d'incrémentation (par défaut 1).
- * @returns {Promise<number|null>} La nouvelle valeur de la statistique ou null en cas d'erreur.
- */
-export async function incrementFirebaseStat(statName, incrementBy = 1) {
-  const statRef = ref(database, `stats/${statName}`);
-  try {
-    const { committed, snapshot } = await runTransaction(
-      statRef,
-      (currentData) => {
-        // Si le nœud n'existe pas, currentData sera null. Initialise à 0.
-        const newValue = (currentData || 0) + incrementBy;
-        return newValue;
-      },
-    );
-
-    if (committed) {
-      console.log(`Stat ${statName} incrémentée à ${snapshot.val()}.`);
-      return snapshot.val();
-    } else {
-      console.warn(`La transaction pour ${statName} n'a pas été commise.`);
-      return null;
-    }
-  } catch (error) {
-    console.error(
-      `Erreur lors de l'incrémentation de /stats/${statName} dans Firebase (transaction):`,
-      error,
-    );
-    return null;
-  }
-}
-
-// --- Fonctions de récupération des statistiques (remplacement de CounterAPI) ---
+import { incrementFirebaseStat, getFirebaseStat } from "../js/firebaseWrk.js"
 
 /**
  * Récupère le nombre total de joueurs depuis Firebase Realtime Database.
@@ -247,3 +150,19 @@ function addBackButtonTransition() {
     }, 300);
   });
 }
+
+async function displayAppVersion() {
+  try {
+    const res = await fetch('../assets/data/versions.json');
+    if (!res.ok) throw new Error("Impossible de charger versions.json");
+    const manifest = await res.json();
+    const version = manifest.currentVersion || "1.0.0";
+    const el = document.getElementById('app-version');
+    if (el) el.textContent = version;
+  } catch (e) {
+    console.warn("Impossible d'afficher la version :", e);
+  }
+}
+
+// Appel
+displayAppVersion();

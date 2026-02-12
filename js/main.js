@@ -367,7 +367,21 @@ function filterGames() {
   // donc on ne modifie PAS gamesNumber ici
 }
 
+async function displayAppVersion() {
+  try {
+    const res = await fetch('./assets/data/versions.json');
+    if (!res.ok) throw new Error("Impossible de charger versions.json");
+    const manifest = await res.json();
+    const version = manifest.currentVersion || "1.0.0";
+    const el = document.getElementById('app-version');
+    if (el) el.textContent = version;
+  } catch (e) {
+    console.warn("Impossible d'afficher la version :", e);
+  }
+}
 
+// Appel
+displayAppVersion();
 
 document.addEventListener("input", (e) => {
   if (e.target.id === "searchInput") {

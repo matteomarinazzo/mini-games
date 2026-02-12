@@ -1,0 +1,22 @@
+{
+    "currentVersion": "1.0.1",
+    "lastUpdate": "2026-02-12",
+    "history": [
+        {
+            "version": "1.0.1",
+            "date": "2026-02-12",
+            "changes": [
+                "Correction de bugs liaison index.html et about.html",
+                "Ajout du versionning"
+            ]
+        },
+        {
+            "version": "1.0.0",
+            "date": "2026-01-20",
+            "changes": [
+                "Création du site",
+                "Ajout de plusieurs jeux"
+            ]
+        }
+    ]
+}

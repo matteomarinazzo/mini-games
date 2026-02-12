@@ -1,8 +1,8 @@
-import { incrementFirebaseStat } from "../about/about.js"
+import { incrementFirebaseStat } from "./firebaseWrk.js"
 console.log("compte des minutes en cours")
 // On envoie le temps cumulé toutes les minutes
 setInterval(async () => {
-  
+
     try {
         // La fonction /add permet d'ajouter un nombre spécifique au compteur
         await incrementFirebaseStat("totalMinutesPlayed")

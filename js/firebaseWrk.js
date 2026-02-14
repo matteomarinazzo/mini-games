@@ -86,9 +86,6 @@ export async function saveRating(gameId, ratingData) {
     return true;
 }
 
-// ... Garde tes fonctions locales (getLocalRating, calculateAverage, etc.) inchangées en bas du fichier
-
-
 // Fallback: Obtenir depuis localStorage
 export function getLocalRating(gameId) {
     const ratings = JSON.parse(localStorage.getItem("gameRatings") || "{}");

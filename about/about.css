@@ -60,14 +60,41 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
-  animation: float 3s ease-in-out infinite;
+  animation: bounce 2s ease-in-out infinite;
 }
 
 .avatar-emoji {
   font-size: 60px;
 }
 
-@keyframes float {
+.status-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(207, 81, 102, 0.95);
+  box-shadow: 0 0 10px rgba(207, 81, 102, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
 
   0%,
   100% {
@@ -79,28 +106,21 @@
   }
 }
 
-.status-badge {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: rgba(81, 207, 102, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
 
-.status-dot {
-  width: 8px;
-  height: 8px;
-  background: white;
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .page-title {

@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="about.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../fonts.css" />
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>ℹ</text></svg>" />
 </head>
@@ -37,9 +37,9 @@
           <div class="avatar">
             <span class="avatar-emoji">🎮</span>
           </div>
-          <div class="status-badge">
-            <span class="status-dot"></span>
-            En ligne
+          <div class="status-badge" id="status-container">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Hors ligne</span>
           </div>
         </div>
         <h1 class="page-title">À propos de Mini Games</h1>
@@ -236,11 +236,6 @@
 
   <script type="module" src="../js/countPlayedTime.js"></script>
   <script type="module" src="about.js"></script>
-
-  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-    data-id="minigames" data-description="Support me on Buy me a coffee!"
-    data-message="Un café pour moi = plus de jeux pour toi ! ☕🎮" data-color="#BD5FFF" data-position="Right"
-    data-x_margin="18" data-y_margin="18"></script>
 </body>
 
 </html>

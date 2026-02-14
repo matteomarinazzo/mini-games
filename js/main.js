@@ -1,23 +1,21 @@
-import { initRatingSystem } from "./rating-system.js";
+//import { initRatingSystem } from "./rating-system.js";
+import { checkRealConnection } from './network.js';
+import { showBMC, hideBMC } from './BuyMeACoffee.js';
 
-// Configuration des jeux
-// Configuration complète des jeux
+
 var games = {};
 
 fetch("./assets/data/games.json")
   .then((res) => {
-    if (!res.ok) {
-      throw new Error("Erreur chargement games.json");
-    }
+    if (!res.ok) throw new Error("Erreur chargement games.json");
     return res.json();
   })
-  .then((data) => {
+  .then(async (data) => {
     games = data;
-    console.log("Jeux chargés :", games);
-
-    // Génère les cartes dynamiquement
     generateGameCards();
-    initRatingSystem();
+
+    // On lance la vérification initiale
+    await refreshStatus();
   })
   .catch((err) => {
     console.error(err);
@@ -26,13 +24,14 @@ fetch("./assets/data/games.json")
 // Initialisation
 document.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("isAlreadyCounted")) {
-    console.log("Nouvelle co");
+    console.log("Nouvelle connexion");
     localStorage.setItem("isAlreadyCounted", true);
     localStorage.setItem("isNewPlayer", true);
   }
 
   initNotifyButtons();
   addScrollAnimations();
+  displayAppVersion()
 });
 
 // Générer les cartes de jeux dynamiquement
@@ -380,9 +379,42 @@ async function displayAppVersion() {
   }
 }
 
-// Appel
-displayAppVersion();
+/*============================
+== REFRESH DU STATUS ET BMC ==
+============================*/
+async function refreshStatus() {
+  const isOnline = await checkRealConnection();
+  const statusBadge = document.querySelector(".status-badge");
+  const statusText = document.getElementById("status-text");
 
+  if (isOnline) {
+    console.log("🌐 Passage en ligne");
+    showBMC();
+
+    // Import dynamique Rating
+    import("./rating-system.js").then(m => m.initRatingSystem()).catch(() => { });
+
+    if (statusBadge && statusText) {
+      statusBadge.style.backgroundColor = "rgba(81, 207, 102, 0.95)";
+      statusBadge.style.boxShadow = "0 0 10px rgba(81, 207, 102, 0.95)";
+      statusText.innerText = "En ligne";
+    }
+  } else {
+    console.log("📡 Passage hors ligne");
+    hideBMC();
+
+    if (statusBadge && statusText) {
+      statusBadge.style.backgroundColor = "rgba(207, 81, 102, 0.95)";
+      statusBadge.style.boxShadow = "0 0 10px rgba(207, 81, 102, 0.95)";
+      statusText.innerText = "Hors ligne";
+    }
+  }
+}
+
+// Écouteurs d'événements système
+window.addEventListener('online', refreshStatus);
+window.addEventListener('offline', refreshStatus);
+window.addEventListener('load', refreshStatus);
 document.addEventListener("input", (e) => {
   if (e.target.id === "searchInput") {
     filterGames();

@@ -1,13 +1,26 @@
-import { incrementFirebaseStat } from "./firebaseWrk.js"
-console.log("compte des minutes en cours")
-// On envoie le temps cumulé toutes les minutes
+// countPlayedTime.js
+import { checkRealConnection } from "./network.js";
+console.log("🕒 Compteur de temps initialisé");
+
 setInterval(async () => {
+    // 1. On vérifie d'abord si on a internet SANS importer Firebase
+    const isOnline = await checkRealConnection();
+    if (!isOnline) {
+        console.log("📡 Hors-ligne : minute jouée non synchronisée.");
+        return;
+    }
 
     try {
-        // La fonction /add permet d'ajouter un nombre spécifique au compteur
-        await incrementFirebaseStat("totalMinutesPlayed")
-        console.log("minutes + 1")
+        // 2. On n'importe Firebase que SI on est en ligne et SEULEMENT maintenant
+        const { incrementFirebaseStat } = await import("./firebaseWrk.js");
+
+        const result = await incrementFirebaseStat("totalMinutesPlayed");
+
+        if (result) {
+            console.log("✅ Minute synchronisée sur Firebase");
+        }
     } catch (e) {
-        console.error("Erreur mise à jour temps global " + e);
+        // Si l'import ou la mise à jour échoue (ex: micro-coupure)
+        console.warn("⚠️ Échec synchro temps (Firebase indisponible)");
     }
-}, 60000); 
+}, 60000);

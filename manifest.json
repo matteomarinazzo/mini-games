@@ -1,0 +1,39 @@
+{
+  "name": "mini-games – Clique. Joue. Rejoue.",
+  "short_name": "mini-games",
+  "id": "mini-games.app",
+  "description": "Une collection de jeux addictifs pour tous !",
+  "lang": "fr",
+  "display": "standalone",
+  "start_url": ".",
+  "scope": ".",
+  "orientation": "any",
+  "background_color": "#7259b5",
+  "theme_color": "#7259b5",
+  "icons": [
+    {
+      "src": "assets/logos/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logos/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/logos/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logos/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

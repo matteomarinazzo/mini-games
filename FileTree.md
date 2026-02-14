@@ -1,6 +1,6 @@
 # File Tree: mini-games-plateform
 
-**Generated:** 2/7/2026, 5:42:39 PM
+**Generated:** 2/14/2026, 9:12:57 PM
 **Root Path:** `c:\Document\jeux\mini-games-plateform`
 
 ```
@@ -10,10 +10,19 @@
 │   └── 📄 about.js
 ├── 📁 assets
 │   ├── 📁 data
-│   │   └── ⚙️ games.json
+│   │   ├── ⚙️ games.json
+│   │   └── ⚙️ versions.json
+│   ├── 📁 fonts
+│   │   ├── 📄 poppins-v24-latin-600.woff2
+│   │   ├── 📄 poppins-v24-latin-700.woff2
+│   │   ├── 📄 poppins-v24-latin-800.woff2
+│   │   └── 📄 poppins-v24-latin-regular.woff2
 │   └── 📁 logos
 │       ├── 🖼️ ball-sort.png
+│       ├── 🖼️ casino.png
 │       ├── 🖼️ casse-briques.png
+│       ├── 🖼️ funfair.png
+│       ├── 🖼️ logo.png
 │       ├── 📄 morpion.pix2d
 │       ├── 🖼️ morpion.png
 │       ├── 🖼️ pong.png
@@ -21,6 +30,15 @@
 │       └── 🖼️ snow-digger.png
 ├── 📁 games
 │   ├── 📁 ball-sort
+│   │   ├── 📁 css
+│   │   │   ├── 🎨 game.css
+│   │   │   └── 🎨 style.css
+│   │   ├── 📁 js
+│   │   │   ├── 📄 game.js
+│   │   │   └── 📄 menu.js
+│   │   ├── 🌐 game.html
+│   │   └── 🌐 index.html
+│   ├── 📁 casino
 │   │   ├── 📁 css
 │   │   │   ├── 🎨 game.css
 │   │   │   └── 🎨 style.css
@@ -39,7 +57,7 @@
 │   │   │   └── 📄 menu.js
 │   │   ├── 🌐 game.html
 │   │   └── 🌐 index.html
-│   ├── 📁 dot-chaser
+│   ├── 📁 funfair
 │   │   ├── 📁 css
 │   │   │   ├── 🎨 game.css
 │   │   │   └── 🎨 style.css
@@ -151,14 +169,23 @@
 │   │   └── 📄 firebase-config.js
 │   ├── 📁 utils
 │   │   └── 📄 formatNumber.js
+│   ├── 📄 BuyMeACoffee.js
+│   ├── 📄 app.js
 │   ├── 📄 countPlayedTime.js
+│   ├── 📄 firebaseWrk.js
 │   ├── 📄 fullScreen.js
 │   ├── 📄 main.js
+│   ├── 📄 network.js
 │   └── 📄 rating-system.js
 ├── 📝 FIREBASE-SETUP.md
+├── 📝 FileTree.md
+├── 🎨 fonts.css
 ├── 🌐 index.html
+├── ⚙️ manifest.json
 ├── 🎨 rating-modal.css
-└── 🎨 style.css
+├── 🎨 style.css
+├── 📄 sw.js
+└── 📄 upload-ftp.ps1
 ```
 
 ---

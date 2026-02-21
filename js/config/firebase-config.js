@@ -3,6 +3,7 @@ import { checkRealConnection } from "../network.js";
 let app = null;
 let database = null;
 let dbFunctions = { ref: null, onValue: null, get: null, set: null, goOffline: null, goOnline: null, runTransaction: null };
+let auth = null;
 
 // Signal pour savoir quand Firebase est prêt
 let resolveReady;
@@ -20,7 +21,7 @@ async function initFirebase() {
   try {
     const fbApp = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js");
     const fbDb = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js");
-
+    const fbAuth = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js");
     /*
     // PROD
     const firebaseConfig = {
@@ -48,6 +49,11 @@ async function initFirebase() {
 
     app = fbApp.initializeApp(firebaseConfig);
     database = fbDb.getDatabase(app);
+    auth = fbAuth.getAuth(app);
+
+    // CONNEXION ANONYME AUTOMATIQUE
+    await fbAuth.signInAnonymously(auth);
+    console.log("👤 Connecté anonymement (UID:", auth.currentUser.uid, ")");
 
     // Sécurité supplémentaire : on force le mode offline si le ping échoue juste après l'init
     const stillOnline = await checkRealConnection();
@@ -64,6 +70,7 @@ async function initFirebase() {
     dbFunctions.goOffline = fbDb.goOffline;
     dbFunctions.goOnline = fbDb.goOnline;
     dbFunctions.runTransaction = fbDb.runTransaction;
+    dbFunctions.update = fbDb.update;
 
     console.log("🔥 Firebase chargé et prêt.");
     resolveReady(true);
@@ -82,9 +89,10 @@ window.addEventListener('offline', () => { if (database) dbFunctions.goOffline(d
 window.addEventListener('online', () => { if (database) dbFunctions.goOnline(database); else initFirebase(); });
 
 // On exporte tout d'ici !
-export { app, database };
+export { app, database, auth };
 export const getRef = () => dbFunctions.ref;
 export const getGet = () => dbFunctions.get;
 export const getSet = () => dbFunctions.set;
 export const getRunTransaction = () => dbFunctions.runTransaction;
 export const getOnValue = () => dbFunctions.onValue;
+export const getUpdate = () => dbFunctions.update;

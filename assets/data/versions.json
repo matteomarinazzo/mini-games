@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.1.1",
-    "lastUpdate": "2026-02-14",
+    "currentVersion": "1.2.20260216",
+    "lastUpdate": "2026-02-16",
     "history": [
+        {
+            "version": "1.2.20260216",
+            "date": "2026-02-16",
+            "changes": [
+                "Ajout du mode multijoueur pour le blackjack",
+                "Ajout de la gestion des rooms réutilisable pour d'autres jeux"
+            ]
+        },
         {
             "version": "1.1.1",
             "date": "2026-02-15",

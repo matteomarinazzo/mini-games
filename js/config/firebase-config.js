@@ -2,7 +2,7 @@
 import { checkRealConnection } from "../network.js";
 let app = null;
 let database = null;
-let dbFunctions = { ref: null, onValue: null, get: null, set: null, goOffline: null, goOnline: null, runTransaction: null };
+let dbFunctions = { ref: null, onValue: null, get: null, set: null, goOffline: null, goOnline: null, runTransaction: null, remove: null, update: null };
 let auth = null;
 
 // Signal pour savoir quand Firebase est prêt
@@ -71,6 +71,7 @@ async function initFirebase() {
     dbFunctions.goOnline = fbDb.goOnline;
     dbFunctions.runTransaction = fbDb.runTransaction;
     dbFunctions.update = fbDb.update;
+    dbFunctions.remove = fbDb.remove;
 
     console.log("🔥 Firebase chargé et prêt.");
     resolveReady(true);
@@ -96,3 +97,4 @@ export const getSet = () => dbFunctions.set;
 export const getRunTransaction = () => dbFunctions.runTransaction;
 export const getOnValue = () => dbFunctions.onValue;
 export const getUpdate = () => dbFunctions.update;
+export const getRemove = () => dbFunctions.remove;

@@ -2,38 +2,69 @@
 import { checkRealConnection } from "./network.js";
 console.log("🕒 Compteur de temps initialisé");
 
-setInterval(async () => {
+let counterInterval = null;
+
+// Fonction principale d’incrément / synchro
+async function incrementTime() {
     try {
         const isOnline = await checkRealConnection();
+
         if (isOnline) {
-            //  On n'importe Firebase que SI on est en ligne
+            // Import Firebase seulement si on est en ligne
             const { incrementFirebaseStat } = await import("./firebaseWrk.js");
 
-            // On ajoute les minutes stockées localement
+            // Envoyer d’abord les minutes stockées localement
             let incrementBy = Number(localStorage.getItem("minutesPlayed") || 0);
-            console.log(incrementBy);
 
             if (incrementBy > 0) {
                 await incrementFirebaseStat("totalMinutesPlayed", incrementBy);
-                console.log("✅ Minutes stockées localement sont synchronisées sur Firebase (" + incrementBy + " minutes)");
+                console.log(`✅ Minutes locales synchronisées sur Firebase (${incrementBy} minutes)`);
                 localStorage.removeItem("minutesPlayed");
             }
 
+            // Envoyer 1 minute en direct
             const result = await incrementFirebaseStat("totalMinutesPlayed");
-
-            if (result) {
-                console.log("✅ Minute synchronisée sur Firebase");
-            }
-        }
-        else {
-            // Sinon on stock localement
+            if (result) console.log("✅ Minute synchronisée sur Firebase");
+        } else {
+            // Sinon stocker localement
             let minutesPlayed = Number(localStorage.getItem("minutesPlayed") || 0);
             minutesPlayed++;
             localStorage.setItem("minutesPlayed", minutesPlayed);
             console.log("📡 Hors-ligne : minute jouée stockée localement.");
         }
     } catch (e) {
-        // Si l'import ou la mise à jour échoue (ex: micro-coupure)
-        console.warn("⚠️ Échec synchro temps (Firebase indisponible)");
+        console.warn("⚠️ Échec synchro temps (Firebase indisponible)", e);
     }
-}, 60000);
+}
+
+// Démarrer le compteur
+function startCounter() {
+    if (!counterInterval) {
+        counterInterval = setInterval(incrementTime, 60000); // toutes les minutes
+        console.log("▶️ Compteur démarré");
+    }
+}
+
+// Arrêter le compteur
+function stopCounter() {
+    if (counterInterval) {
+        clearInterval(counterInterval);
+        counterInterval = null;
+        console.log("⏸ Compteur mis en pause (onglet caché)");
+    }
+}
+
+// Contrôle de visibilité
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        stopCounter();
+    } else {
+        startCounter();
+    }
+});
+
+// Lancer au chargement si la page est visible
+if (!document.hidden) startCounter();
+
+// Export pour utilisation ailleurs si besoin
+export { incrementTime, startCounter, stopCounter };

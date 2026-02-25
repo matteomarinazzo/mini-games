@@ -4,7 +4,28 @@
     "name": "Snow Digger",
     "emoji": "❄️",
     "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
-    "tags": ["🪏 Pelle", "❄️ Neige", "🎮 Clicker", "👤 Solo"],
+    "tags": [
+      "🪏 Pelle",
+      "❄️ Neige",
+      "🎮 Clicker",
+      "👤 Solo"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "lostBelow": {
+    "path": "./games/lostBelow/index.html",
+    "name": "Lost Below",
+    "emoji": "🔦",
+    "description": "Survis aux profondeurs : explore la grotte, gère ta santé et trouve la sortie avant qu'il ne soit trop tard.",
+    "tags": [
+      "🔦 Survie",
+      "🧗 Exploration",
+      "🎲 Stratégie",
+      "👥 Multijoueur"
+    ],
     "badge": "new",
     "badgeText": "Nouveau",
     "rating": "0",
@@ -15,7 +36,12 @@
     "name": "Ball Sort",
     "emoji": "🧪",
     "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
-    "tags": ["🧠 Logique", "🧪 Puzzle", "🧩 Réflexion", "👤 Solo"],
+    "tags": [
+      "🧠 Logique",
+      "🧪 Puzzle",
+      "🧩 Réflexion",
+      "👤 Solo"
+    ],
     "badge": "new",
     "badgeText": "Nouveau",
     "rating": "0",
@@ -26,7 +52,12 @@
     "name": "Casino",
     "emoji": "🎰",
     "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
-    "tags": ["💰 Argent", "🎲 Hasard", "🎮 Jeux", "👤 Solo"],
+    "tags": [
+      "💰 Argent",
+      "🎲 Hasard",
+      "🎮 Jeux",
+      "👤 Solo"
+    ],
     "badge": "new",
     "badgeText": "Nouveau",
     "rating": "0",
@@ -37,7 +68,12 @@
     "name": "Funfair Frenzy",
     "emoji": "🎡",
     "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
-    "tags": ["🎟️ Tickets", "🎯 Adresse", "🎮 Jeux", "👤 Solo"],
+    "tags": [
+      "🎟️ Tickets",
+      "🎯 Adresse",
+      "🎮 Jeux",
+      "👤 Solo"
+    ],
     "badge": "new",
     "badgeText": "Nouveau",
     "rating": "0",
@@ -48,7 +84,11 @@
     "name": "Morpion",
     "emoji": "⭕",
     "description": "Le jeu classique revisité ! Affronte l'IA ou un ami.",
-    "tags": ["🧠 Stratégie", "👥 Multijoueur", "⚡ Rapide"],
+    "tags": [
+      "🧠 Stratégie",
+      "👥 Multijoueur",
+      "⚡ Rapide"
+    ],
     "badge": "classic",
     "badgeText": "Classique",
     "rating": "0",
@@ -59,7 +99,12 @@
     "name": "Casse-Briques",
     "emoji": "🧱",
     "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
-    "tags": ["🧠 Réflexe", "🎯 Précision", "⚡ Rapide", "👤 Solo"],
+    "tags": [
+      "🧠 Réflexe",
+      "🎯 Précision",
+      "⚡ Rapide",
+      "👤 Solo"
+    ],
     "badge": "classic",
     "badgeText": "Classique",
     "rating": "0",
@@ -70,7 +115,11 @@
     "name": "Pong",
     "emoji": "🏓",
     "description": "Le Pong original. Rapide, nerveux et toujours efficace.",
-    "tags": ["🧠 Réflexe", "👥 Multijoueur", "⚡ Rapide"],
+    "tags": [
+      "🧠 Réflexe",
+      "👥 Multijoueur",
+      "⚡ Rapide"
+    ],
     "badge": "classic",
     "badgeText": "Classique",
     "rating": "0",

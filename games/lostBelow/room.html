@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Salle d'attente - Lost Below</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔦</text></svg>" />
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .room-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .room-id-tag {
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 20px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            background: var(--light);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .player-item.is-leader {
+            border-color: var(--accent);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .leader-badge {
+            font-size: 12px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-waiting {
+            background: #eee;
+            color: #777;
+        }
+
+        .status-ready {
+            background: var(--success);
+            color: white;
+        }
+
+        .room-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🔦</div>
+                <h1>Lost Below</h1>
+            </div>
+        </div>
+
+        <div class="config-container">
+            <div class="config-card">
+                <div class="room-header">
+                    <h2>Salle d'attente</h2>
+                    <p>Partagez ce code avec vos amis :</p>
+                    <div id="roomIDDisplay" class="room-id-tag">------</div>
+                </div>
+
+                <div id="playerList" class="player-list">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="room-footer">
+                    <button id="readyBtn" class="lobby-btn btn-join">
+                        <span>Prêt ?</span>
+                    </button>
+                    <button id="startSetupBtn" class="lobby-btn btn-create" style="display: none;">
+                        <span>🔧 Configurer l'expédition</span>
+                    </button>
+                    <p id="waitingMessage" style="text-align: center; color: var(--text-light); font-size: 14px;">
+                        En attente des autres joueurs...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/room.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

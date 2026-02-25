@@ -353,13 +353,9 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-.game-card.coming-soon {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.game-card.coming-soon:hover {
-  transform: translateY(0);
+.game-card.random-game {
+  background: linear-gradient(135deg, white 0%, #fff5f5 100%);
+  border: 1px dashed var(--accent);
 }
 
 /* Card Header */
@@ -479,12 +475,12 @@ body {
   }
 }
 
-/* Coming Soon Content */
-.coming-soon-content {
+/* Random Game Content */
+.random-game-content {
   text-align: center;
 }
 
-.coming-soon-icon {
+.random-game-icon {
   font-size: 80px;
   margin-bottom: 10px;
   animation: rotate 3s linear infinite;
@@ -500,7 +496,7 @@ body {
   }
 }
 
-.coming-soon-content h4 {
+.random-game-content h4 {
   color: var(--text-light);
   font-size: 18px;
   font-weight: 600;
@@ -566,7 +562,7 @@ body {
 }
 
 .btn-play,
-.btn-notify {
+.btn-random {
   padding: 12px 28px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
@@ -580,18 +576,18 @@ body {
 }
 
 .btn-play:hover,
-.btn-notify:hover {
+.btn-random:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-.btn-notify {
-  background: linear-gradient(135deg, var(--warning) 0%, #ffa94d 100%);
-  box-shadow: 0 4px 15px rgba(255, 212, 59, 0.3);
+.btn-random {
+  background: linear-gradient(135deg, var(--accent) 0%, #f5576c 100%);
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
 }
 
-.btn-notify:hover {
-  box-shadow: 0 6px 20px rgba(255, 212, 59, 0.4);
+.btn-random:hover {
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
 }
 
 /* ========================================
@@ -744,6 +740,15 @@ body {
     padding: 4px 8px;
   }
 
+  .random-game-icon {
+    font-size: 60px;
+    margin-bottom: 8px;
+  }
+
+  .random-game-content h4 {
+    font-size: 16px;
+  }
+
   .status-dot {
     width: 6px;
     height: 6px;
@@ -835,17 +840,12 @@ body {
   }
 
   .btn-play,
-  .btn-notify {
+  .btn-random {
     height: 40px;
     font-size: 14px;
   }
 
-  .coming-soon-icon {
-    font-size: 60px;
-    margin-bottom: 8px;
-  }
-
-  .coming-soon-content h4 {
+  .random-game-icon {
     font-size: 16px;
   }
 

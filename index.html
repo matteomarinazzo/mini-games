@@ -8,6 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Mini Games : Une collection de jeux addictifs et gratuits. Jouez à la Roue de la Fortune, au Casino, au Snow
   Digger et bien plus, même hors-ligne !">
+  <meta name="keywords" content="mini jeux, jeux gratuits, jeux en ligne, jeux navigateur, jeux fun">
+  <meta property="og:title" content="Mini Games - Collection de jeux fun">
+  <meta property="og:description"
+    content="Mini Games : Une collection de jeux addictifs et gratuits. Jouez à la Roue de la Fortune, au Casino, au Snow Digger et bien plus !">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mini-games.ch/">
+  <meta property="og:image" content="https://mini-games.ch/assets/logos/logo.png">
+  <meta name="twitter:card" content="summary_large_image">
 
 
   <link rel="stylesheet" href="./style.css" />
@@ -23,6 +31,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="mini-games">
   <link rel="apple-touch-icon" href="./assets/logos/logo.png">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Mini Games",
+  "url": "https://mini-games.ch/",
+  "description": "Mini Games : Une collection de mini-jeux gratuits en ligne pour tous.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mini Games"
+  }
+}
+</script>
 </head>
 
 <body>
@@ -80,29 +102,29 @@
     <div class="games-grid">
       <!-- Cartes créées dynamiquement par JS -->
 
-      <!-- Coming Soon Card -->
-      <div class="game-card coming-soon">
+      <!-- Random Game Card -->
+      <div class="game-card random-game">
         <div class="card-header">
-          <span class="badge badge-soon">Bientôt</span>
+          <span class="badge badge-soon">DÉFI</span>
         </div>
         <div class="card-image">
-          <div class="coming-soon-content">
-            <div class="coming-soon-icon">🎲</div>
-            <h4>Plus de jeux arrivent !</h4>
+          <div class="random-game-content">
+            <div class="random-game-icon">🎲</div>
+            <h4>Tu ne sais pas à quoi jouer ?</h4>
           </div>
         </div>
         <div class="card-content">
-          <h3 class="card-title">??? Mystery Game</h3>
+          <h3 class="card-title">Jeu Aléatoire</h3>
           <p class="card-description">
-            Un nouveau jeu incroyable arrive très bientôt...
+            Laisse le hasard choisir ton prochain défi parmi tous nos jeux !
           </p>
           <div class="card-tags">
-            <span class="tag">🎯 Surprise</span>
-            <span class="tag">🚀 Soon</span>
+            <span class="tag">🎲 Hasard</span>
+            <span class="tag">⚡ Instantané</span>
           </div>
         </div>
         <div class="card-footer">
-          <button class="btn-notify">Me notifier</button>
+          <button class="btn-random">Lancer un défi !</button>
         </div>
       </div>
     </div>
@@ -153,6 +175,7 @@
   <script type="module" src="./js/countPlayedTime.js"></script>
 
   <script type="module" src="./js/app.js"></script>
+
 </body>
 
 </html>

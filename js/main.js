@@ -22,17 +22,60 @@ fetch("./assets/data/games.json")
   });
 
 // Initialisation
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   if (!localStorage.getItem("isAlreadyCounted")) {
     console.log("Nouvelle connexion");
     localStorage.setItem("isAlreadyCounted", true);
     localStorage.setItem("isNewPlayer", true);
+
+    const isOnline = await checkRealConnection();
+    console.log("isOnline : ", isOnline);
+
+    if (isOnline) {
+      try {
+        // Import dynamique pour ne pas charger Firebase si hors ligne
+        const { incrementFirebaseStat } = await import("../js/firebaseWrk.js");
+
+        // Gestion du nouveau joueur
+        if (localStorage.getItem("isNewPlayer")) {
+          await incrementFirebaseStat("totalPlayers");
+          localStorage.removeItem("isNewPlayer");
+        }
+      } catch (e) {
+        console.warn("⚠️ Erreur Firebase, passage aux valeurs par défaut", e);
+      }
+    }
   }
 
-  initNotifyButtons();
+  initRandomGameButton();
   addScrollAnimations();
   displayAppVersion()
 });
+
+// Initialiser le bouton de jeu aléatoire
+function initRandomGameButton() {
+  const randomBtn = document.querySelector(".btn-random");
+  if (!randomBtn) return;
+
+  randomBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    const gameIds = Object.keys(games);
+    if (gameIds.length === 0) return;
+
+    const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
+
+    // Petit effet visuel sur le bouton
+    randomBtn.innerHTML = "🎲 Tirage...";
+    randomBtn.style.background = "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
+
+    if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+    setTimeout(() => {
+      launchGame(randomId);
+    }, 600);
+  });
+}
 
 // Générer les cartes de jeux dynamiquement
 function generateGameCards() {
@@ -41,7 +84,7 @@ function generateGameCards() {
 
   // Supprimer toutes les cartes existantes sauf "Bientôt"
   const existingCards = document.querySelectorAll(
-    ".game-card:not(.coming-soon)",
+    ".game-card:not(.random-game)",
   );
   existingCards.forEach((card) => card.remove());
 
@@ -50,7 +93,7 @@ function generateGameCards() {
     const gameCard = createGameCard(gameId, game);
     gamesGrid.insertBefore(
       gameCard,
-      document.querySelector(".game-card.coming-soon"),
+      document.querySelector(".game-card.random-game"),
     );
   });
 
@@ -114,7 +157,7 @@ function createGameCard(gameId, game) {
 
 // Initialiser les éléments interactifs des cartes
 function initGameCards() {
-  const gameCards = document.querySelectorAll(".game-card:not(.coming-soon)");
+  const gameCards = document.querySelectorAll(".game-card:not(.random-game)");
 
   gameCards.forEach((card) => {
     const gameId = card.dataset.game;
@@ -180,43 +223,6 @@ function saveGameLaunch(gameId) {
   history[gameId].lastPlayed = new Date().toISOString();
 
   localStorage.setItem("gameHistory", JSON.stringify(history));
-}
-
-// Boutons "Me notifier"
-function initNotifyButtons() {
-  const notifyBtns = document.querySelectorAll(".btn-notify");
-
-  notifyBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-
-      // Animation de succès
-      btn.innerHTML = "✓ Notifié !";
-      btn.style.background =
-        "linear-gradient(135deg, #51cf66 0%, #40c057 100%)";
-
-      // Vibration si disponible
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-
-      // Sauvegarder dans localStorage
-      const notifications = JSON.parse(
-        localStorage.getItem("notifications") || "[]",
-      );
-      notifications.push({
-        timestamp: new Date().toISOString(),
-        type: "newGame",
-      });
-      localStorage.setItem("notifications", JSON.stringify(notifications));
-
-      // Reset après 2 secondes
-      setTimeout(() => {
-        btn.innerHTML = "Me notifier";
-        btn.style.background = "";
-      }, 2000);
-    });
-  });
 }
 
 // Animations au scroll

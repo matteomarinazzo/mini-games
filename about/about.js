@@ -17,13 +17,7 @@ async function startStats() {
   if (isOnline) {
     try {
       // Import dynamique pour ne pas charger Firebase si hors ligne
-      const { incrementFirebaseStat, getFirebaseStat } = await import("../js/firebaseWrk.js");
-
-      // Gestion du nouveau joueur
-      if (localStorage.getItem("isNewPlayer")) {
-        await incrementFirebaseStat("totalPlayers");
-        localStorage.removeItem("isNewPlayer");
-      }
+      const { getFirebaseStat } = await import("../js/firebaseWrk.js");
 
       // Récupération des données réelles
       playersCount = await getFirebaseStat("totalPlayers", 0);

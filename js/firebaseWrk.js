@@ -1,4 +1,4 @@
-import { database, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate } from "./config/firebase-config.js";
+import { database, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate, getRemove } from "./config/firebase-config.js";
 
 // Attendre que Firebase soit initialisé avant de faire quoi que ce soit
 async function waitForFirebase() {
@@ -12,7 +12,8 @@ const getDbTools = () => ({
     _set: getSet(),
     _run: getRunTransaction(),
     _onValue: getOnValue(),
-    _update: getUpdate()  // ✅ AJOUTÉ ICI
+    _update: getUpdate(),
+    _remove: getRemove(),
 });
 
 /*================ STATISTIQUES ================*/

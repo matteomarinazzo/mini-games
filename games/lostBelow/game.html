@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Lost Below - Jeu</title>
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Lost Below est un jeu coopératif d’exploration souterraine jouable en ligne. Explorez une grotte générée procéduralement, gérez vos ressources et trouvez la sortie avant qu’il ne soit trop tard." />
+  <meta name="keywords"
+    content="jeu coopératif, exploration, grotte, jeu stratégie, jeu navigateur, jeu en ligne, mini-games.ch, lost below" />
+  <meta name="author" content="Mini-Games.ch" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mini-games.ch/games/lostBelow/game.html" />
+
+  <!-- Open Graph (réseaux sociaux) -->
+  <meta property="og:title" content="Lost Below – Exploration coopérative" />
+  <meta property="og:description"
+    content="Explorez une grotte générée dynamiquement, survivez aux dangers et trouvez la sortie en coopération." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mini-games.ch/games/lostBelow/game.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/game.css" />
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔦</text></svg>" />
+</head>
+
+<body>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-left">
+      <button class="icon-button" id="rulesBtn" title="Règles">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+      </button>
+      <div class="round-display">
+        <span class="hud-label">Tour</span>
+        <span class="hud-value" id="roundNum">1</span>
+      </div>
+      <div class="layer-display">
+        <span class="hud-label">Niveau</span>
+        <span class="hud-value" id="layerNum">0</span>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div id="playersHud" class="players-hud"></div>
+    </div>
+
+    <div class="hud-right">
+      <button class="icon-button" id="pauseBtn" title="Pause">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="6" y="4" width="4" height="16" />
+          <rect x="14" y="4" width="4" height="16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- TURN BANNER -->
+  <div class="turn-banner" id="turnBanner"></div>
+
+  <!-- GAME AREA -->
+  <!-- Level Navigation Sidebar -->
+  <div id="levelNav" class="level-nav"></div>
+
+  <div class="game-area">
+    <div class="cave-grid" id="caveGrid"></div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="action-info" id="actionInfo">Chargement…</div>
+    <div class="action-buttons" id="actionButtons"></div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-panel" id="logPanel">
+    <div class="log-entries" id="logEntries"></div>
+  </div>
+
+  <!-- OVERLAYS -->
+  <div class="overlay" id="pauseOverlay" style="display:none;">
+    <div class="overlay-box">
+      <div class="overlay-icon">⏸</div>
+      <h2>Pause</h2>
+      <button class="btn-primary" id="resumeBtn">Reprendre</button>
+      <button class="btn-secondary" id="restartBtn">Recommencer</button>
+      <button class="btn-secondary" id="menuBtn">Menu principal</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="rulesOverlay" style="display:none;">
+    <div class="overlay-box">
+      <div class="overlay-icon">📖</div>
+      <h2>Règles du jeu</h2>
+      <div class="rules-tabs">
+        <button class="rules-tab-btn active">Mission</button>
+        <button class="rules-tab-btn">Exploration</button>
+        <button class="rules-tab-btn">Survie</button>
+        <button class="rules-tab-btn">Évènements</button>
+      </div>
+      <div class="rules-content">
+        <div id="rules-mission" class="rules-page active">
+          <p><strong>Objectif :</strong> Explorer la grotte et trouver la ou les <strong>SORTIES</strong>
+            avant
+            que le paquet de cartes ne soit épuisé.</p>
+          <p><strong>Conditions :</strong> Tous les joueurs encore vivants doivent atteindre <strong>UNE</strong> des
+            sorties pour
+            gagner.</p>
+          <p><strong>Évènements :</strong> À chaque fin de tour, une carte évènement est tirée (Séisme, Effondrement,
+            Obscurité...).
+          </p>
+        </div>
+        <div id="rules-exploration" class="rules-page">
+          <p><strong>Points d'Action (AP) :</strong> Chaque tour, vous recevez des points d'action (🟠 dans le HUD).
+          </p>
+          <p><strong>Révéler :</strong> Cliquez sur une tuile à côté d'un point doré (🟠) pour poser une nouvelle tuile
+            (1
+            AP). Si un
+            passage est ouvert, vous vous y déplacez automatiquement !</p>
+          <p><strong>Déplacement :</strong> Cliquez sur une case déjà révélée pour vous y rendre
+            (1 AP).</p>
+        </div>
+        <div id="rules-survie" class="rules-page">
+          <p><strong>Santé (HP) :</strong> Les traits rouges indiquent votre vie. À 0, vous mourez...</p>
+          <p><strong>Étages (Layer) :</strong> Certaines tuiles sont des escaliers (⬆️/⬇️). Elles permettent de changer
+            de
+            niveau. Le niveau actuel est affiché dans le HUD.</p>
+          <p><strong>Coopération :</strong> Plusieurs joueurs peuvent occuper la même case. L'entraide est la clé !</p>
+        </div>
+        <div id="rules-évènements" class="rules-page">
+          <p><strong>Séisme :</strong> Les secousses font s'écrouler les murs. Certains passages peuvent s'ouvrir ou se
+            fermer.</p>
+          <p><strong>Effondrement :</strong> Des rochers tombent du plafond. Les joueurs dans la zone perdent 1 HP ou un
+            nouveau passage s'ouvre !</p>
+          <p><strong>Obscurité :</strong> Les lampes vacillent. Seule la zone autour des joueurs reste visible pendant 2
+            tours.</p>
+          <p><strong>Éboulement :</strong> Un amas de pierres bloque un ou plusieurs passages de la tuile.</p>
+          <p><strong>Courant d'Air :</strong> Un vent glacial souffle dans les tunnels. Les joueurs dans la zone perdent
+            immédiatement 1 AP.</p>
+        </div>
+      </div>
+      <button class="btn-primary" id="closeRulesBtn" style="margin-top: 15px;">Fermer</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="hazardOverlay" style="display:none;">
+    <div class="hazard-card">
+      <div class="hazard-icon" id="hazardIcon">⚡</div>
+      <h2 id="hazardTitle">Danger !</h2>
+      <p id="hazardDesc">Quelque chose se prépare dans l'ombre...</p>
+      <div class="hazard-location" id="hazardLoc"></div>
+      <button class="btn-primary" id="hazardOkBtn">Continuer</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="winOverlay" style="display:none;">
+    <div class="overlay-box win">
+      <div class="overlay-icon">🎉</div>
+      <h2>Expédition réussie !</h2>
+      <p class="overlay-sub">L'équipe a trouvé la sortie.</p>
+      <div class="final-stats" id="finalStats"></div>
+      <button class="btn-primary" id="playAgainBtn">Rejouer</button>
+      <button class="btn-secondary" id="configBtn1">Configuration</button>
+      <button class="btn-secondary" id="menuBtn2">Menu principal</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="loseOverlay" style="display:none;">
+    <div class="overlay-box lose">
+      <div class="overlay-icon">💀</div>
+      <h2>Expédition échouée</h2>
+      <p class="overlay-sub" id="loseReason">L'équipe n'a pas survécu.</p>
+      <button class="btn-primary" id="retryBtn">Réessayer</button>
+      <button class="btn-secondary" id="configBtn2">Configuration</button>
+      <button class="btn-secondary" id="menuBtn3">Menu principal</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

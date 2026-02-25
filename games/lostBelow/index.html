@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Lost Below</title>
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Lost Below est un jeu coopératif d’exploration souterraine jouable en ligne. Explorez une grotte générée procéduralement, gérez vos ressources et trouvez la sortie avant qu’il ne soit trop tard." />
+  <meta name="keywords"
+    content="jeu coopératif, exploration, grotte, jeu stratégie, jeu navigateur, jeu en ligne, mini-games.ch, lost below" />
+  <meta name="author" content="Mini-Games.ch" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mini-games.ch/games/lostBelow/" />
+
+  <!-- Open Graph (réseaux sociaux) -->
+  <meta property="og:title" content="Lost Below – Exploration coopérative" />
+  <meta property="og:description"
+    content="Explorez une grotte générée dynamiquement, survivez aux dangers et trouvez la sortie en coopération." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mini-games.ch/games/lostBelow/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔦</text></svg>" />
+</head>
+
+<body>
+
+  <!-- Bouton Accueil -->
+  <a href="../../index.html" class="home-button">
+    <span>Accueil</span>
+  </a>
+
+  <div class="container" id="menuContainer">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">🔦</div>
+        <h1>Lost Below</h1>
+      </div>
+      <p class="subtitle">
+        Explorez les profondeurs. Survivez. Trouvez la sortie.
+      </p>
+    </div>
+
+    <!-- LOBBY -->
+    <div class="config-container">
+      <div class="config-card">
+
+        <div class="config-header">
+          <h2>🧭 Salon d'expédition</h2>
+          <p>Préparez-vous à descendre dans les profondeurs</p>
+        </div>
+
+        <div class="lobby-name-section">
+          <div class="input-group">
+            <span class="input-icon">👤</span>
+            <input type="text" id="playerNameInput" class="room-input" placeholder="VOTRE PRÉNOM" maxlength="15">
+          </div>
+        </div>
+
+        <div class="lobby-actions">
+          <button class="lobby-btn btn-create" id="createRoomBtn">
+            <span>➕ Créer une expédition</span>
+          </button>
+
+          <div class="lobby-divider">OU</div>
+
+          <div class="input-group">
+            <input type="text" id="roomInput" class="room-input" placeholder="CODE DE LA SALLE" maxlength="6">
+            <button class="lobby-btn btn-join" id="joinRoomBtn">
+              <span>🚪 Rejoindre</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        Lost Below – Jeu d’exploration coopératif en ligne sur mini-games.ch
+      </p>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/lobby.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+
+</body>
+
+</html>

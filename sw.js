@@ -148,6 +148,20 @@ const ASSETS_TO_CACHE = [
     'games/snow-digger/ressources/img/flocons/flocon8.png',
     'games/snow-digger/ressources/img/flocons/flocon9.png',
     'games/snow-digger/ressources/img/flocons/flocon10.png',
+
+    // Game: lostBelow
+    'games/lostBelow/index.html',
+    'games/lostBelow/game.html',
+    'games/lostBelow/room.html',
+    'games/lostBelow/setup.html',
+
+    'games/lostBelow/css/style.css',
+    'games/lostBelow/css/game.css',
+    'games/lostBelow/js/menu.js',
+    'games/lostBelow/js/game.js',
+    'games/lostBelow/js/lobby.js',
+    'games/lostBelow/js/room.js',
+    'games/lostBelow/js/setup.js'
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

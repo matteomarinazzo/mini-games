@@ -1,418 +1,460 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lucky Casino - Jeu</title>
-    <link rel="canonical" href="https://mini-games.ch/games/casino/game.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/game.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎰</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- Bouton Retour -->
-    <a href="index.html" class="home-button">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      <span>Retour</span>
-    </a>
 
-    <!-- Animated Background -->
-    <div class="bg-animation">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Lucky Casino - Jeu</title>
+  <link rel="canonical" href="https://mini-games.ch/games/casino/game.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎰</text></svg>" />
+</head>
+
+<body>
+  <!-- Bouton Retour -->
+  <a href="index.html" class="home-button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+    <span>Retour</span>
+  </a>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Game Container -->
+  <div class="container game-container">
+    <!-- Header avec argent -->
+    <div class="game-header">
+      <div class="money-display-game">
+        <span class="money-label">💰 Solde</span>
+        <span class="money-amount" id="gameMoney">0€</span>
+      </div>
+      <div class="game-title" id="gameTitle">🎮 Jeu</div>
+      <div class="bet-display">
+        <span class="bet-label">Mise</span>
+        <span class="bet-amount" id="betAmount">0€</span>
+      </div>
     </div>
 
-    <!-- Game Container -->
-    <div class="container game-container">
-      <!-- Header avec argent -->
-      <div class="game-header">
-        <div class="money-display-game">
-          <span class="money-label">💰 Solde</span>
-          <span class="money-amount" id="gameMoney">0€</span>
-        </div>
-        <div class="game-title" id="gameTitle">🎮 Jeu</div>
-        <div class="bet-display">
-          <span class="bet-label">Mise</span>
-          <span class="bet-amount" id="betAmount">0€</span>
-        </div>
+
+    <div id="roomMenu">
+      <!-- Page de base : juste deux boutons -->
+      <div id="baseMenu">
+        <button id="showJoinRoom">Rejoindre une room</button>
+        <button id="showCreateRoom">Créer une room</button>
       </div>
 
-      <!-- Zone de jeu pour SCRATCH CARD -->
-      <div class="game-zone" id="scratchGame" style="display: none;">
-        <div class="scratch-card">
-          <div class="scratch-header">
-            <h2>🎫 Ticket à gratter</h2>
-            <p>Grattez les 9 cases et trouvez 3 symboles identiques !</p>
-          </div>
-          
-          <div class="scratch-grid" id="scratchGrid">
-            <!-- Les cases seront générées par JS -->
-          </div>
-
-          <div class="scratch-controls">
-            <button class="action-button" id="revealAllBtn" style="display: none;">
-              👁️ Tout révéler
-            </button>
-            <button class="action-button primary" id="newScratchBtn" style="display: none;">
-              🎫 Nouveau ticket (5€)
-            </button>
-          </div>
-
-          <div class="result-message" id="scratchResult"></div>
-
-          <div class="paytable">
-            <h3>💰 Table des gains</h3>
-            <div class="paytable-grid">
-              <div class="paytable-item">
-                <span class="paytable-symbols">💎 × 3</span>
-                <span class="paytable-win">100€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">👑 × 3</span>
-                <span class="paytable-win">50€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">⭐ × 3</span>
-                <span class="paytable-win">25€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🍒 × 3</span>
-                <span class="paytable-win">15€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🍋 × 3</span>
-                <span class="paytable-win">10€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🔔 × 3 ou 💰 × 3</span>
-                <span class="paytable-win">5€</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Rejoindre room -->
+      <div id="joinRoomForm" style="display:none;">
+        <label>Nom :</label>
+        <input autofocus type="text" id="joinPlayerName" placeholder="John Doe" />
+        <br>
+        <label>ID de la room :</label>
+        <input type="text" id="joinRoomID" placeholder="1234" />
+        <br>
+        <button id="joinRoomBtnForm">Rejoindre</button>
+        <button id="cancelJoinBtn">❌ Annuler</button>
       </div>
 
-      <!-- Zone de jeu pour SLOT MACHINE -->
-      <div class="game-zone" id="slotsGame" style="display: none;">
-        <div class="slots-machine">
-          <div class="slots-header">
-            <h2>🎰 Machine à sous</h2>
-            <p>Alignez 3 symboles identiques pour gagner !</p>
-          </div>
-
-          <div class="slots-display">
-            <div class="slots-reels">
-              <div class="reel" id="reel1">
-                <div class="reel-strip"></div>
-              </div>
-              <div class="reel" id="reel2">
-                <div class="reel-strip"></div>
-              </div>
-              <div class="reel" id="reel3">
-                <div class="reel-strip"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="slots-controls">
-            <button class="action-button primary spin-button" id="spinBtn">
-              🎰 SPIN (2€)
-            </button>
-          </div>
-
-          <div class="result-message" id="slotsResult"></div>
-
-          <div class="paytable">
-            <h3>💰 Table des gains</h3>
-            <div class="paytable-grid">
-              <div class="paytable-item">
-                <span class="paytable-symbols">💎 💎 💎</span>
-                <span class="paytable-win">50€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">👑 👑 👑</span>
-                <span class="paytable-win">30€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">⭐ ⭐ ⭐</span>
-                <span class="paytable-win">20€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🍒 🍒 🍒</span>
-                <span class="paytable-win">10€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🍋 🍋 🍋</span>
-                <span class="paytable-win">5€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🔔 🔔 🔔</span>
-                <span class="paytable-win">4€</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Créer room -->
+      <div id="createRoomForm" style="display:none;">
+        <label>Nom :</label>
+        <input autofocus type="text" id="createPlayerName" placeholder="John Doe" />
+        <br>
+        <label>ID de la room :</label>
+        <input type="text" id="createRoomID" disabled />
+        <br>
+        <label>Nombre de joueurs :</label>
+        <input type="range" id="createSlider" min="1" max="5" value="1" />
+        <span id="sliderValue">1</span>
+        <button id="createRoomBtnForm">Créer la room</button>
+        <button id="cancelCreateBtn">❌ Annuler</button>
       </div>
+    </div>
 
-      <!-- Zone de jeu pour CARD CHANCE -->
-      <div class="game-zone" id="cardGame" style="display: none;">
-        <div class="card-game">
-          <div class="card-header">
-            <h2>🃏 Carte Chance</h2>
-            <p>Retournez une carte et découvrez votre gain !</p>
-          </div>
+    <!-- Lobby -->
+    <div id="gameLobby" style="display:none;">
+      <p id="lobbyStatus">En attente de joueurs...</p>
+      <ul id="playerList"></ul>
+      <!-- Optionnel si tu veux que le leader clique pour commencer -->
+      <!-- <button id="startGameBtn" style="display:none;">Commencer la partie</button> -->
+    </div>
 
-          <div class="card-display">
-            <div class="card-deck" id="cardDeck">
-              <!-- Les cartes seront générées par JS -->
-            </div>
-          </div>
-
-          <div class="card-controls">
-            <button class="action-button primary" id="newCardBtn" style="display: none;">
-              🃏 Nouvelle carte (10€)
-            </button>
-          </div>
-
-          <div class="result-message" id="cardResult"></div>
-
-          <div class="paytable">
-            <h3>💰 Table des gains</h3>
-            <div class="paytable-grid">
-              <div class="paytable-item">
-                <span class="paytable-symbols">🂡 As</span>
-                <span class="paytable-win">30€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🂮 Roi</span>
-                <span class="paytable-win">20€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🂭 Dame</span>
-                <span class="paytable-win">15€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🂫 Valet</span>
-                <span class="paytable-win">10€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">10 - 7</span>
-                <span class="paytable-win">5€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">6 - 2</span>
-                <span class="paytable-win">0€</span>
-              </div>
-            </div>
-          </div>
+    <!-- Zone de jeu pour SCRATCH CARD -->
+    <div class="game-zone" id="scratchGame" style="display: none;">
+      <div class="scratch-card">
+        <div class="scratch-header">
+          <h2>🎫 Ticket à gratter</h2>
+          <p>Grattez les 9 cases et trouvez 3 symboles identiques !</p>
         </div>
-      </div>
 
-      <!-- Zone de jeu pour WHEEL OF FORTUNE -->
-      <div class="game-zone" id="wheelGame" style="display: none;">
-        <div class="wheel-game">
-          <div class="wheel-header">
-            <h2>🎡 Roue de la Fortune</h2>
-            <p>Faites tourner la roue et tentez le jackpot !</p>
-          </div>
-
-          <div class="wheel-display">
-            <div class="wheel-container">
-              <div class="wheel-pointer">▼</div>
-              <canvas id="wheelCanvas" width="500" height="500"></canvas>
-            </div>
-          </div>
-
-          <div class="wheel-controls">
-            <button class="action-button primary spin-button" id="spinWheelBtn">
-              🎡 FAIRE TOURNER (50€)
-            </button>
-          </div>
-
-          <div class="result-message" id="wheelResult"></div>
-
-          <div class="paytable">
-            <h3>💰 Secteurs de la roue</h3>
-            <div class="paytable-grid wheel-prizes">
-              <div class="paytable-item">
-                <span class="paytable-symbols">💎 JACKPOT</span>
-                <span class="paytable-win">500€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">👑 Super</span>
-                <span class="paytable-win">100€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">⭐ Excellent</span>
-                <span class="paytable-win">50€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🎁 Bon</span>
-                <span class="paytable-win">30€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">💰 Moyen</span>
-                <span class="paytable-win">20€</span>
-              </div>
-              <div class="paytable-item">
-                <span class="paytable-symbols">🍀 Petit</span>
-                <span class="paytable-win">10€</span>
-              </div>
-            </div>
-          </div>
+        <div class="scratch-grid" id="scratchGrid">
+          <!-- Les cases seront générées par JS -->
         </div>
-      </div>
 
-      <!-- Zone de jeu pour CRASH ROCKET -->
-      <div class="game-zone" id="crashGame" style="display: none;">
-        <div class="crash-game">
-          <div class="crash-header">
-            <h2>🚀 Crash Rocket</h2>
-            <p>Récupérez vos gains avant l'explosion !</p>
-          </div>
-
-          <div class="crash-display">
-            <canvas id="crashCanvas" width="600" height="400"></canvas>
-            <div class="crash-multiplier" id="crashMultiplier">1.00x</div>
-          </div>
-
-          <div class="crash-controls">
-            <button class="action-button primary" id="crashBetBtn">
-              🚀 LANCER (20€)
-            </button>
-            <button class="action-button" id="crashCashoutBtn" style="display: none;">
-              💰 ENCAISSER
-            </button>
-          </div>
-
-          <div class="result-message" id="crashResult"></div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour BLACKJACK -->
-      <div class="game-zone" id="blackjackGame" style="display: none;">
-        <div class="blackjack-game">
-          <div class="blackjack-header">
-            <h2>🃏 Blackjack 21</h2>
-            <p>Battez la banque sans dépasser 21 !</p>
-          </div>
-
-          <div class="blackjack-table">
-            <div class="dealer-area">
-              <h3>🏛️ Banque <span id="dealerScore">0</span></h3>
-              <div class="cards-hand" id="dealerHand"></div>
-            </div>
-
-            <div class="player-area">
-              <h3>👤 Vous <span id="playerScore">0</span></h3>
-              <div class="cards-hand" id="playerHand"></div>
-            </div>
-          </div>
-
-          <div class="blackjack-controls">
-            <button class="action-button primary" id="bjDealBtn">
-              🎴 DISTRIBUER (25€)
-            </button>
-            <button class="action-button" id="bjHitBtn" style="display: none;">
-              ➕ TIRER
-            </button>
-            <button class="action-button" id="bjStandBtn" style="display: none;">
-              ✋ RESTER
-            </button>
-          </div>
-
-          <div class="result-message" id="blackjackResult"></div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour PLINKO -->
-      <div class="game-zone" id="plinkoGame" style="display: none;">
-        <div class="plinko-game">
-          <div class="plinko-header">
-            <h2>🔴 Plinko Drop</h2>
-            <p>Lâchez la bille et regardez-la tomber !</p>
-          </div>
-
-          <div class="plinko-display">
-            <canvas id="plinkoCanvas" width="600" height="500"></canvas>
-          </div>
-
-          <div class="plinko-controls">
-            <button class="action-button primary" id="plinkoDropBtn">
-              🔴 LÂCHER LA BILLE (5€)
-            </button>
-          </div>
-
-          <div class="result-message" id="plinkoResult"></div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour HI-LO -->
-      <div class="game-zone" id="hiloGame" style="display: none;">
-        <div class="hilo-game">
-          <div class="hilo-header">
-            <h2>⬆️⬇️ Hi-Lo</h2>
-            <p>Plus haut ou plus bas ? Enchaînez les victoires !</p>
-          </div>
-
-          <div class="hilo-display">
-            <div class="hilo-card-area">
-              <div class="hilo-card" id="hiloCurrentCard"></div>
-              <div class="hilo-streak">
-                Série: <span id="hiloStreak">0</span> | Gain actuel: <span id="hiloCurrentWin">0€</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="hilo-controls">
-            <button class="action-button" id="hiloHigherBtn" style="display: none;">
-              ⬆️ PLUS HAUT
-            </button>
-            <button class="action-button" id="hiloLowerBtn" style="display: none;">
-              ⬇️ PLUS BAS
-            </button>
-            <button class="action-button primary" id="hiloStartBtn">
-              🎴 COMMENCER (5€)
-            </button>
-            <button class="action-button" id="hiloCashoutBtn" style="display: none;">
-              💰 ENCAISSER
-            </button>
-          </div>
-
-          <div class="result-message" id="hiloResult"></div>
-        </div>
-      </div>
-
-      <!-- Message si pas assez d'argent -->
-      <div class="game-over" id="gameOver" style="display: none;">
-        <div class="game-over-card">
-          <div class="game-over-icon">😢</div>
-          <h2>Plus d'argent !</h2>
-          <p>Vous n'avez plus assez d'argent pour jouer.</p>
-          <button class="action-button primary" onclick="window.location.href='index.html'">
-            🔄 Retour au menu
+        <div class="scratch-controls">
+          <button class="action-button" id="revealAllBtn" style="display: none;">
+            👁️ Tout révéler
+          </button>
+          <button class="action-button primary" id="newScratchBtn" style="display: none;">
+            🎫 Nouveau ticket (5€)
           </button>
         </div>
+
+        <div class="result-message" id="scratchResult"></div>
+
+        <div class="paytable">
+          <h3>💰 Table des gains</h3>
+          <div class="paytable-grid">
+            <div class="paytable-item">
+              <span class="paytable-symbols">💎 × 3</span>
+              <span class="paytable-win">100€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">👑 × 3</span>
+              <span class="paytable-win">50€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">⭐ × 3</span>
+              <span class="paytable-win">25€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🍒 × 3</span>
+              <span class="paytable-win">15€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🍋 × 3</span>
+              <span class="paytable-win">10€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🔔 × 3 ou 💰 × 3</span>
+              <span class="paytable-win">5€</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Custom Popup -->
-    <div class="popup-overlay" id="popupOverlay">
-      <div class="popup-card">
-        <div class="popup-icon" id="popupIcon">⚠️</div>
-        <h3 class="popup-title" id="popupTitle">Attention</h3>
-        <p class="popup-message" id="popupMessage">Message</p>
-        <button class="popup-button" id="popupButton">OK</button>
+    <!-- Zone de jeu pour SLOT MACHINE -->
+    <div class="game-zone" id="slotsGame" style="display: none;">
+      <div class="slots-machine">
+        <div class="slots-header">
+          <h2>🎰 Machine à sous</h2>
+          <p>Alignez 3 symboles identiques pour gagner !</p>
+        </div>
+
+        <div class="slots-display">
+          <div class="slots-reels">
+            <div class="reel" id="reel1">
+              <div class="reel-strip"></div>
+            </div>
+            <div class="reel" id="reel2">
+              <div class="reel-strip"></div>
+            </div>
+            <div class="reel" id="reel3">
+              <div class="reel-strip"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slots-controls">
+          <button class="action-button primary spin-button" id="spinBtn">
+            🎰 SPIN (2€)
+          </button>
+        </div>
+
+        <div class="result-message" id="slotsResult"></div>
+
+        <div class="paytable">
+          <h3>💰 Table des gains</h3>
+          <div class="paytable-grid">
+            <div class="paytable-item">
+              <span class="paytable-symbols">💎 💎 💎</span>
+              <span class="paytable-win">50€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">👑 👑 👑</span>
+              <span class="paytable-win">30€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">⭐ ⭐ ⭐</span>
+              <span class="paytable-win">20€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🍒 🍒 🍒</span>
+              <span class="paytable-win">10€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🍋 🍋 🍋</span>
+              <span class="paytable-win">5€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🔔 🔔 🔔</span>
+              <span class="paytable-win">4€</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <script type="module" src="js/game.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
+    <!-- Zone de jeu pour CARD CHANCE -->
+    <div class="game-zone" id="cardGame" style="display: none;">
+      <div class="card-game">
+        <div class="card-header">
+          <h2>🃏 Carte Chance</h2>
+          <p>Retournez une carte et découvrez votre gain !</p>
+        </div>
+
+        <div class="card-display">
+          <div class="card-deck" id="cardDeck">
+            <!-- Les cartes seront générées par JS -->
+          </div>
+        </div>
+
+        <div class="card-controls">
+          <button class="action-button primary" id="newCardBtn" style="display: none;">
+            🃏 Nouvelle carte (10€)
+          </button>
+        </div>
+
+        <div class="result-message" id="cardResult"></div>
+
+        <div class="paytable">
+          <h3>💰 Table des gains</h3>
+          <div class="paytable-grid">
+            <div class="paytable-item">
+              <span class="paytable-symbols">🂡 As</span>
+              <span class="paytable-win">30€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🂮 Roi</span>
+              <span class="paytable-win">20€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🂭 Dame</span>
+              <span class="paytable-win">15€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🂫 Valet</span>
+              <span class="paytable-win">10€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">10 - 7</span>
+              <span class="paytable-win">5€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">6 - 2</span>
+              <span class="paytable-win">0€</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour WHEEL OF FORTUNE -->
+    <div class="game-zone" id="wheelGame" style="display: none;">
+      <div class="wheel-game">
+        <div class="wheel-header">
+          <h2>🎡 Roue de la Fortune</h2>
+          <p>Faites tourner la roue et tentez le jackpot !</p>
+        </div>
+
+        <div class="wheel-display">
+          <div class="wheel-container">
+            <div class="wheel-pointer">▼</div>
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+          </div>
+        </div>
+
+        <div class="wheel-controls">
+          <button class="action-button primary spin-button" id="spinWheelBtn">
+            🎡 FAIRE TOURNER (50€)
+          </button>
+        </div>
+
+        <div class="result-message" id="wheelResult"></div>
+
+        <div class="paytable">
+          <h3>💰 Secteurs de la roue</h3>
+          <div class="paytable-grid wheel-prizes">
+            <div class="paytable-item">
+              <span class="paytable-symbols">💎 JACKPOT</span>
+              <span class="paytable-win">500€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">👑 Super</span>
+              <span class="paytable-win">100€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">⭐ Excellent</span>
+              <span class="paytable-win">50€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🎁 Bon</span>
+              <span class="paytable-win">30€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">💰 Moyen</span>
+              <span class="paytable-win">20€</span>
+            </div>
+            <div class="paytable-item">
+              <span class="paytable-symbols">🍀 Petit</span>
+              <span class="paytable-win">10€</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour CRASH ROCKET -->
+    <div class="game-zone" id="crashGame" style="display: none;">
+      <div class="crash-game">
+        <div class="crash-header">
+          <h2>🚀 Crash Rocket</h2>
+          <p>Récupérez vos gains avant l'explosion !</p>
+        </div>
+
+        <div class="crash-display">
+          <canvas id="crashCanvas" width="600" height="400"></canvas>
+          <div class="crash-multiplier" id="crashMultiplier">1.00x</div>
+        </div>
+
+        <div class="crash-controls">
+          <button class="action-button primary" id="crashBetBtn">
+            🚀 LANCER (20€)
+          </button>
+          <button class="action-button" id="crashCashoutBtn" style="display: none;">
+            💰 ENCAISSER
+          </button>
+        </div>
+
+        <div class="result-message" id="crashResult"></div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour BLACKJACK -->
+    <div class="game-zone" id="blackjackGame" style="display: none;">
+      <div class="blackjack-game">
+        <div class="blackjack-header">
+          <h2 id="gameTitle">🃏 Blackjack 21</h2>
+          <p>Battez la banque sans dépasser 21 !</p>
+          <div>
+            Nom du joueur : <span id="playerNameDisplay"></span>
+          </div>
+        </div>
+
+        <div class="blackjack-table">
+          <div class="dealer-area">
+            <h3>🏛️ Banque <span id="dealerScore">0</span></h3>
+            <div class="cards-hand" id="dealerHand"></div>
+          </div>
+
+          <div class="player-area">
+            <h3>👤 Vous <span id="playerScore">0</span></h3>
+            <div class="cards-hand" id="playerHand"></div>
+          </div>
+        </div>
+
+        <div class="blackjack-controls">
+          <button class="action-button primary" id="bjDealBtn">🎴 DISTRIBUER (25€)</button>
+          <button class="action-button" id="bjHitBtn" style="display: none;">➕ TIRER</button>
+          <button class="action-button" id="bjStandBtn" style="display: none;">✋ RESTER</button>
+        </div>
+
+        <div class="result-message" id="blackjackResult"></div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour PLINKO -->
+    <div class="game-zone" id="plinkoGame" style="display: none;">
+      <div class="plinko-game">
+        <div class="plinko-header">
+          <h2>🔴 Plinko Drop</h2>
+          <p>Lâchez la bille et regardez-la tomber !</p>
+        </div>
+
+        <div class="plinko-display">
+          <canvas id="plinkoCanvas" width="600" height="500"></canvas>
+        </div>
+
+        <div class="plinko-controls">
+          <button class="action-button primary" id="plinkoDropBtn">
+            🔴 LÂCHER LA BILLE (5€)
+          </button>
+        </div>
+
+        <div class="result-message" id="plinkoResult"></div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour HI-LO -->
+    <div class="game-zone" id="hiloGame" style="display: none;">
+      <div class="hilo-game">
+        <div class="hilo-header">
+          <h2>⬆️⬇️ Hi-Lo</h2>
+          <p>Plus haut ou plus bas ? Enchaînez les victoires !</p>
+        </div>
+
+        <div class="hilo-display">
+          <div class="hilo-card-area">
+            <div class="hilo-card" id="hiloCurrentCard"></div>
+            <div class="hilo-streak">
+              Série: <span id="hiloStreak">0</span> | Gain actuel: <span id="hiloCurrentWin">0€</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hilo-controls">
+          <button class="action-button" id="hiloHigherBtn" style="display: none;">
+            ⬆️ PLUS HAUT
+          </button>
+          <button class="action-button" id="hiloLowerBtn" style="display: none;">
+            ⬇️ PLUS BAS
+          </button>
+          <button class="action-button primary" id="hiloStartBtn">
+            🎴 COMMENCER (5€)
+          </button>
+          <button class="action-button" id="hiloCashoutBtn" style="display: none;">
+            💰 ENCAISSER
+          </button>
+        </div>
+
+        <div class="result-message" id="hiloResult"></div>
+      </div>
+    </div>
+
+    <!-- Message si pas assez d'argent -->
+    <div class="game-over" id="gameOver" style="display: none;">
+      <div class="game-over-card">
+        <div class="game-over-icon">😢</div>
+        <h2>Plus d'argent !</h2>
+        <p>Vous n'avez plus assez d'argent pour jouer.</p>
+        <button class="action-button primary" onclick="window.location.href='index.html'">
+          🔄 Retour au menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Popup -->
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+      <div class="popup-icon" id="popupIcon">⚠️</div>
+      <h3 class="popup-title" id="popupTitle">Attention</h3>
+      <p class="popup-message" id="popupMessage">Message</p>
+      <button class="popup-button" id="popupButton">OK</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

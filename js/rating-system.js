@@ -155,6 +155,9 @@ function setupRatingListeners() {
 
     if (!rating) return;
 
+    // Éviter d'ajouter plusieurs fois le même listener
+    if (rating.dataset.ratingListener) return;
+
     rating.style.cursor = "pointer";
     rating.title = "Cliquez pour noter ce jeu";
 
@@ -162,6 +165,9 @@ function setupRatingListeners() {
       e.stopPropagation();
       openRatingModal(gameId);
     });
+
+    // Marquer comme ayant un listener
+    rating.dataset.ratingListener = "true";
   });
 }
 

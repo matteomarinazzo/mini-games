@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Setup - Lost Below</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔦</text></svg>" />
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .setup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .player-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .player-card.is-me {
+            border-color: var(--accent);
+        }
+
+        .player-card.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .role-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .role-btn {
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            background: var(--light);
+            transition: var(--transition);
+        }
+
+        .role-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .role-btn.taken {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .difficulty-selector {
+            margin-top: 40px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 16px;
+        }
+
+        .countdown-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            color: white;
+        }
+
+        .countdown-num {
+            font-size: 120px;
+            font-weight: 800;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">⛏️</div>
+                <h1>Lost Below</h1>
+            </div>
+            <p class="subtitle">Configuration de l'expédition</p>
+        </div>
+
+        <div id="setupContent">
+            <div id="playersSetup" class="setup-grid">
+                <!-- Dynamically generated character cards -->
+            </div>
+
+            <div id="leaderSettings" class="difficulty-selector" style="display: none;">
+                <h3>⚙️ Paramètres du Leader</h3>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Seul le leader peut modifier ces options.</p>
+
+                <div class="config-section">
+                    <label class="config-label">🎯 Difficulté de la grotte</label>
+                    <div class="radio-grid" id="diffGrid">
+                        <label class="radio-card"><input type="radio" name="difficulty" value="easy">
+                            <div class="radio-content">Facile</div>
+                        </label>
+                        <label class="radio-card"><input type="radio" name="difficulty" value="normal" checked>
+                            <div class="radio-content">Normal</div>
+                        </label>
+                        <label class="radio-card"><input type="radio" name="difficulty" value="hard">
+                            <div class="radio-content">Difficile</div>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="startGameFinalBtn" class="start-button">
+                    🔥 Lancer l'Expédition
+                </button>
+            </div>
+
+            <div id="playerWaiting" class="difficulty-selector" style="display: none; text-align: center;">
+                <p>En attente du lancement par le leader...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="countdownOverlay" class="countdown-overlay">
+        <h2>LANCEMENT DANS...</h2>
+        <div id="countdownDisplay" class="countdown-num">3</div>
+        <p>Préparez vos torches !</p>
+    </div>
+
+    <script type="module" src="js/setup.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

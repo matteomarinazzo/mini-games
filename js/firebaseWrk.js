@@ -1,4 +1,4 @@
-import { database, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady } from "./config/firebase-config.js";
+import { database, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate, getRemove } from "./config/firebase-config.js";
 
 // Attendre que Firebase soit initialisé avant de faire quoi que ce soit
 async function waitForFirebase() {
@@ -11,7 +11,9 @@ const getDbTools = () => ({
     _get: getGet(),
     _set: getSet(),
     _run: getRunTransaction(),
-    _onValue: getOnValue()
+    _onValue: getOnValue(),
+    _update: getUpdate(),
+    _remove: getRemove(),
 });
 
 /*================ STATISTIQUES ================*/
@@ -152,4 +154,136 @@ export function generateStars(rating) {
     for (let i = 0; i < emptyStars; i++) html += "☆";
 
     return html;
+}
+
+/*================ ROOMS ================*/
+export async function createRoom(gameId, roomData) {
+    await waitForFirebase();
+    const { _ref, _set, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_set) return false;
+    try {
+        if (await checkRoomExists(gameId)) return false;
+
+        await _set(_ref(database, `rooms/${gameId}`), roomData);
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
+export async function joinRoom(gameId, playerData) {
+    await waitForFirebase();
+    const { _ref, _set, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_set || !_get) return false;
+
+    try {
+        const snapshot = await _get(_ref(database, `rooms/${gameId}`));
+
+        if (!snapshot.exists()) {
+            console.log("La room n'existe pas !");
+            return false;
+        }
+
+        const room = snapshot.val();
+
+        const players = room.players || {};
+        const currentCount = Object.keys(players).length;
+
+        // 🔒 Empêcher si la room est pleine
+        if (currentCount >= room.numPlayers) {
+            console.log("La room est pleine !");
+            return false;
+        }
+
+        // ✅ Ajouter le joueur
+        await _set(
+            _ref(database, `rooms/${gameId}/players/${playerData.uid}`),
+            playerData
+        );
+
+        console.log("Rejoint la room :", gameId, playerData.name);
+        return true;
+
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
+
+
+export async function getRoom(gameId) {
+    await waitForFirebase();
+    const { _ref, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_get) return null;
+
+    try {
+        const snapshot = await _get(_ref(database, `rooms/${gameId}`));
+        if (snapshot.exists()) {
+            return snapshot.val();
+        }
+        return null;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function deleteRoom(gameId) {
+    await waitForFirebase();
+    const { _ref, _remove } = getDbTools();
+    if (!navigator.onLine || !database || !_remove) return false;
+
+    try {
+        await _remove(_ref(database, `rooms/${gameId}`));
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
+export async function updateRoom(gameId, roomData) {
+    await waitForFirebase();
+    const { _ref, _update } = getDbTools();  // ✅ CORRIGÉ ICI
+    if (!navigator.onLine || !database || !_update) return false;
+
+    try {
+        await _update(_ref(database, `rooms/${gameId}`), roomData);
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
+export async function listenToRoomChanges(gameId, callback) {
+    await waitForFirebase();
+    const { _ref, _onValue } = getDbTools();
+    if (!navigator.onLine || !database || !_onValue) return;
+
+    const roomRef = _ref(database, `rooms/${gameId}`);
+    _onValue(roomRef, (snapshot) => {
+        const data = snapshot.val();
+        callback(data);
+    });
+}
+
+// utiliitaires
+export async function checkRoomExists(gameId) {
+    await waitForFirebase();
+    const { _ref, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_get) return false;
+
+    try {
+        const snapshot = await _get(_ref(database, `rooms/${gameId}`));
+        if (snapshot.exists()) {
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
 }

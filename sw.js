@@ -43,6 +43,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/morpion.png',
     'assets/logos/pong.png',
     'assets/logos/snow-digger.png',
+    'assets/logos/lostBelow.png',
 
     // About
     'about/about.html',

@@ -1,137 +1,134 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>morpion 3x3</title>
-    <link rel="canonical" href="https://mini-games.ch/games/morpion/standard3x3.html" />
-    <link rel="stylesheet" href="../css/3x3.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⭕</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- Menu principal en haut -->
-    <div id="menuOptions">
-      <button id="homeBtn">Accueil</button>
-      <button id="symbolBtn">Retour au choix des symboles</button>
-      <button id="resetBtn">Réinitialiser la partie</button>
-      <button id="fullscreenBtn" , title="Plein écran">⛶</button>
-    </div>
 
-    <!-- Overlay pour mobile -->
-    <!-- Conteneur principal du jeu -->
-    <div class="game-container">
-      <!-- Indicateur du tour actuel -->
-      <div class="turn-indicator">
-        <div class="player-turn active" id="player1Turn">
-          <div class="player-avatar player1-avatar">
-            <span class="player-number">1</span>
-          </div>
-          <div class="player-info">
-            <span class="player-name">Joueur 1</span>
-            <span class="player-symbol" id="player1SymbolDisplay">❌</span>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Morpion 3x3 – Jeu</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/morpion/" />
+  <link rel="stylesheet" href="../css/3x3.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⭕</text></svg>" />
+</head>
+
+<body>
+  <!-- Menu principal en haut -->
+  <div id="menuOptions">
+    <button id="homeBtn">Accueil</button>
+    <button id="symbolBtn">Retour au choix des symboles</button>
+    <button id="resetBtn">Réinitialiser la partie</button>
+    <button id="fullscreenBtn" , title="Plein écran">⛶</button>
+  </div>
+
+  <!-- Overlay pour mobile -->
+  <!-- Conteneur principal du jeu -->
+  <div class="game-container">
+    <!-- Indicateur du tour actuel -->
+    <div class="turn-indicator">
+      <div class="player-turn active" id="player1Turn">
+        <div class="player-avatar player1-avatar">
+          <span class="player-number">1</span>
         </div>
-
-        <div class="turn-label">
-          <div class="turn-arrow" id="arrowTop" style="visibility: visible">
-            ↑
-          </div>
-          <span class="turn-text">Au tour de</span>
-          <div class="turn-arrow" id="arrowBottom" style="visibility: hidden">
-            ↓
-          </div>
-        </div>
-
-        <div class="player-turn" id="player2Turn">
-          <div class="player-avatar player2-avatar">
-            <span class="player-number">2</span>
-          </div>
-          <div class="player-info">
-            <span class="player-name">Joueur 2</span>
-            <span class="player-symbol" id="player2SymbolDisplay">⭕</span>
-          </div>
+        <div class="player-info">
+          <span class="player-name">Joueur 1</span>
+          <span class="player-symbol" id="player1SymbolDisplay">❌</span>
         </div>
       </div>
 
-      <!-- Plateau de jeu 3x3 -->
-      <div class="game-board" id="gameBoard">
-        <div class="cell" data-index="0"></div>
-        <div class="cell" data-index="1"></div>
-        <div class="cell" data-index="2"></div>
-        <div class="cell" data-index="3"></div>
-        <div class="cell" data-index="4"></div>
-        <div class="cell" data-index="5"></div>
-        <div class="cell" data-index="6"></div>
-        <div class="cell" data-index="7"></div>
-        <div class="cell" data-index="8"></div>
+      <div class="turn-label">
+        <div class="turn-arrow" id="arrowTop" style="visibility: visible">
+          ↑
+        </div>
+        <span class="turn-text">Au tour de</span>
+        <div class="turn-arrow" id="arrowBottom" style="visibility: hidden">
+          ↓
+        </div>
       </div>
 
-      <!-- Stats de la partie -->
-      <div class="game-stats">
-        <div class="stat-item">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-content">
-            <span class="stat-label">Victoires J1</span>
-            <span class="stat-game" id="player1Wins">0</span>
-          </div>
+      <div class="player-turn" id="player2Turn">
+        <div class="player-avatar player2-avatar">
+          <span class="player-number">2</span>
         </div>
-
-        <div class="stat-item">
-          <div class="stat-icon">🤝</div>
-          <div class="stat-content">
-            <span class="stat-label">Égalités</span>
-            <span class="stat-game" id="draws">0</span>
-          </div>
-        </div>
-
-        <div class="stat-item">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-content">
-            <span class="stat-label">Victoires J2</span>
-            <span class="stat-game" id="player2Wins">0</span>
-          </div>
+        <div class="player-info">
+          <span class="player-name">Joueur 2</span>
+          <span class="player-symbol" id="player2SymbolDisplay">⭕</span>
         </div>
       </div>
     </div>
 
-    <!-- HTML à ajouter -->
-    <div id="popupOverlay" class="popup-overlay"></div>
-
-    <div id="winnerPopup" class="winner-popup">
-      <div class="popup-content">
-        <div class="winner-icon" id="winnerIcon">🏆</div>
-        <div class="winner-message" id="winnerMessage">
-          <span id="winnerText"
-            >Joueur <span id="winnerNumber">1</span> gagne !</span
-          >
-          <div class="winner-symbol" id="winnerSymbol">🎉</div>
-        </div>
-        <button id="popupOkBtn" class="popup-btn">Continuer</button>
-      </div>
+    <!-- Plateau de jeu 3x3 -->
+    <div class="game-board" id="gameBoard">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
     </div>
 
-    <!-- Popup d'égalité -->
-    <div id="drawPopup" class="draw-popup">
-      <div class="popup-content">
-        <div class="draw-icon">🤝</div>
-        <div class="draw-message" id="DrawMessage">
-          Match nul !
-          <div
-            class="draw-subtitle"
-            style="font-size: 16px; opacity: 0.9; margin-top: 10px"
-          >
-            Aucun gagnant cette fois-ci !
-          </div>
+    <!-- Stats de la partie -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <span class="stat-label">Victoires J1</span>
+          <span class="stat-game" id="player1Wins">0</span>
         </div>
-        <button id="drawOkBtn" class="draw-btn">Rejouer</button>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon">🤝</div>
+        <div class="stat-content">
+          <span class="stat-label">Égalités</span>
+          <span class="stat-game" id="draws">0</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <span class="stat-label">Victoires J2</span>
+          <span class="stat-game" id="player2Wins">0</span>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script type="module" src="../js/modes/standard3x3.js"></script>
-    <script type="module" src="../js/ui/menuInGame.js"></script>
-    <script type="module" src="../../../js/countPlayedTime.js"></script>
-  </body>
+  <!-- HTML à ajouter -->
+  <div id="popupOverlay" class="popup-overlay"></div>
+
+  <div id="winnerPopup" class="winner-popup">
+    <div class="popup-content">
+      <div class="winner-icon" id="winnerIcon">🏆</div>
+      <div class="winner-message" id="winnerMessage">
+        <span id="winnerText">Joueur <span id="winnerNumber">1</span> gagne !</span>
+        <div class="winner-symbol" id="winnerSymbol">🎉</div>
+      </div>
+      <button id="popupOkBtn" class="popup-btn">Continuer</button>
+    </div>
+  </div>
+
+  <!-- Popup d'égalité -->
+  <div id="drawPopup" class="draw-popup">
+    <div class="popup-content">
+      <div class="draw-icon">🤝</div>
+      <div class="draw-message" id="DrawMessage">
+        Match nul !
+        <div class="draw-subtitle" style="font-size: 16px; opacity: 0.9; margin-top: 10px">
+          Aucun gagnant cette fois-ci !
+        </div>
+      </div>
+      <button id="drawOkBtn" class="draw-btn">Rejouer</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../js/modes/standard3x3.js"></script>
+  <script type="module" src="../js/ui/menuInGame.js"></script>
+  <script type="module" src="../../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

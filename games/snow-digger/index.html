@@ -1,141 +1,163 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-    />
-    <title>Snow Digger</title>
-    <link rel="canonical" href="https://mini-games.ch/games/snow-digger/" />
-    <link rel="stylesheet" href="./style.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>❄️</text></svg>"
-    />
-  </head>
-  <body>
-    <canvas id="canvas"></canvas>
 
-    <!-- Menu principal en haut -->
-    <div id="menuOptions">
-      <button id="homeBtn">Accueil</button>
-      <button id="settingsBtn">⚙️ Paramètres</button>
-      <button id="fullscreenBtn" , title="Plein écran">⛶</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Snow Digger – Jeu gratuit en ligne | Mini‑Games</title>
+
+  <meta name="description"
+    content="Jouez gratuitement à Snow Digger sur Mini‑Games ! Creusez la neige, débloquez des skieurs, améliorez votre pelle et agrandissez votre terrain. Jeu fun et addictif, jouable sur mobile et PC.">
+
+  <link rel="canonical" href="https://mini-games.ch/games/snow-digger/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Snow Digger – Jeu gratuit en ligne">
+  <meta property="og:description"
+    content="Creusez la neige, débloquez des skieurs et améliorez votre équipement dans Snow Digger. Jouable sur mobile et PC.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mini-games.ch/games/snow-digger/">
+  <meta property="og:image" content="https://mini-games.ch/assets/logos/snow-digger.png">
+  <meta property="og:site_name" content="Mini-Games">
+  <meta property="og:locale" content="fr_CH">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Snow Digger – Jeu gratuit en ligne">
+  <meta name="twitter:description"
+    content="Creusez la neige et améliorez votre pelle dans Snow Digger. Jeu gratuit sur mobile et PC.">
+  <meta name="twitter:image" content="https://mini-games.ch/assets/logos/snow-digger.png">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Snow Digger",
+    "url": "https://mini-games.ch/games/snow-digger/",
+    "description": "Jeu gratuit où vous creusez la neige, débloquez des skieurs et améliorez votre pelle.",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "genre": "Arcade",
+    "inLanguage": "fr",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mini-Games"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>❄️</text></svg>" />
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+
+  <!-- Menu principal en haut -->
+  <div id="menuOptions">
+    <button id="homeBtn">Accueil</button>
+    <button id="settingsBtn">⚙️ Paramètres</button>
+    <button id="fullscreenBtn" , title="Plein écran">⛶</button>
+  </div>
+
+  <!-- Menu d'upgrades fixé en bas -->
+  <div id="menuUpgrades">
+    <button id="shovelBtn">Augmenter la pelle</button>
+    <button id="coinBtn">Augmenter les gains</button>
+
+    <button id="spawnSkierBtn">Débloquer les skieurs</button>
+    <button id="spawnTimeBtn">Diminuer le temps d'attente</button>
+    <button id="spawnRateBtn">Augmenter le nombre de skieurs</button>
+  </div>
+
+  <!-- Menu paramètres déroulable -->
+  <div id="menuParams" style="display: none">
+    <h3>Paramètres du jeu</h3>
+
+    <label>
+      Largeur du terrain :
+      <input type="number" id="terrainWidth" min="800" max="20000" value="2000" />
+    </label>
+    <label>
+      Hauteur du terrain :
+      <input type="number" id="terrainHeight" min="600" max="20000" value="2000" />
+    </label>
+    <button id="applyTerrainSize">Appliquer</button>
+    <hr />
+
+    <label>
+      Taille initiale de la pelle :
+      <input type="number" id="shovelSize" min="1" max="20" value="1" />
+    </label>
+    <hr />
+
+    <label>
+      Vitesse des skieurs :
+      <input type="number" id="skierSpeed" min="1" max="100" value="6" />
+    </label>
+    <hr />
+
+    <label>
+      Ratio argent / tuile :
+      <input type="number" step="0.1" id="coinRatio" min="0.1" max="10000" value="0.1" />
+    </label>
+    <hr />
+
+    <label>
+      Temps d’attente entre spawn de skieur (s) :
+      <input type="number" id="spawnTime" min="0" max="30" value="30" />
+    </label>
+    <hr />
+
+    <label>
+      Nombre de skieurs par clic droit :
+      <input type="number" id="spawnRate" min="1" max="10" value="1" />
+    </label>
+    <hr />
+
+    <label>
+      <input type="checkbox" id="infiniteCoins" />
+      Mode “infinite coins”
+    </label>
+  </div>
+
+  <!-- Indicateurs de direction de la caméra -->
+  <div id="cameraHints">
+    <div class="arrow up">▲</div>
+    <div class="arrow down">▼</div>
+    <div class="arrow left">◀</div>
+    <div class="arrow right">▶</div>
+  </div>
+
+  <!-- Infos de gauche (Stats) -->
+  <div class="ui-panel left-panel">
+    <div class="ui-row">
+      <span class="label">🏔️ Terrain :</span>
+      <span id="ui-percent" class="value">0%</span>
     </div>
-
-    <!-- Menu d'upgrades fixé en bas -->
-    <div id="menuUpgrades">
-      <button id="shovelBtn">Augmenter la pelle</button>
-      <button id="coinBtn">Augmenter les gains</button>
-
-      <button id="spawnSkierBtn">Débloquer les skieurs</button>
-      <button id="spawnTimeBtn">Diminuer le temps d'attente</button>
-      <button id="spawnRateBtn">Augmenter le nombre de skieurs</button>
+    <div class="ui-row">
+      <span class="label">💰 Pièces :</span>
+      <span id="ui-coins" class="value gold">0</span>
     </div>
+  </div>
 
-    <!-- Menu paramètres déroulable -->
-    <div id="menuParams" style="display: none">
-      <h3>Paramètres du jeu</h3>
-
-      <label>
-        Largeur du terrain :
-        <input
-          type="number"
-          id="terrainWidth"
-          min="800"
-          max="20000"
-          value="2000"
-        />
-      </label>
-      <label>
-        Hauteur du terrain :
-        <input
-          type="number"
-          id="terrainHeight"
-          min="600"
-          max="20000"
-          value="2000"
-        />
-      </label>
-      <button id="applyTerrainSize">Appliquer</button>
-      <hr />
-
-      <label>
-        Taille initiale de la pelle :
-        <input type="number" id="shovelSize" min="1" max="20" value="1" />
-      </label>
-      <hr />
-
-      <label>
-        Vitesse des skieurs :
-        <input type="number" id="skierSpeed" min="1" max="100" value="6" />
-      </label>
-      <hr />
-
-      <label>
-        Ratio argent / tuile :
-        <input
-          type="number"
-          step="0.1"
-          id="coinRatio"
-          min="0.1"
-          max="10000"
-          value="0.1"
-        />
-      </label>
-      <hr />
-
-      <label>
-        Temps d’attente entre spawn de skieur (s) :
-        <input type="number" id="spawnTime" min="0" max="30" value="30" />
-      </label>
-      <hr />
-
-      <label>
-        Nombre de skieurs par clic droit :
-        <input type="number" id="spawnRate" min="1" max="10" value="1" />
-      </label>
-      <hr />
-
-      <label>
-        <input type="checkbox" id="infiniteCoins" />
-        Mode “infinite coins”
-      </label>
+  <!-- Infos de droite (Upgrades) -->
+  <div class="ui-panel right-panel">
+    <div class="ui-row">
+      <span class="label">🛠️ Pelle :</span>
+      <span id="ui-shovel" class="value">Niveau 1</span>
     </div>
+    <div id="ui-skier-status" class="ui-status">Skieurs non débloqués</div>
+  </div>
 
-    <!-- Indicateurs de direction de la caméra -->
-    <div id="cameraHints">
-      <div class="arrow up">▲</div>
-      <div class="arrow down">▼</div>
-      <div class="arrow left">◀</div>
-      <div class="arrow right">▶</div>
-    </div>
+  <!-- Scripts -->
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/ui/menu.js"></script>
+  <script type="module" src="./js/ui/menuParams.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
 
-    <!-- Infos de gauche (Stats) -->
-    <div class="ui-panel left-panel">
-      <div class="ui-row">
-        <span class="label">🏔️ Terrain :</span>
-        <span id="ui-percent" class="value">0%</span>
-      </div>
-      <div class="ui-row">
-        <span class="label">💰 Pièces :</span>
-        <span id="ui-coins" class="value gold">0</span>
-      </div>
-    </div>
-
-    <!-- Infos de droite (Upgrades) -->
-    <div class="ui-panel right-panel">
-      <div class="ui-row">
-        <span class="label">🛠️ Pelle :</span>
-        <span id="ui-shovel" class="value">Niveau 1</span>
-      </div>
-      <div id="ui-skier-status" class="ui-status">Skieurs non débloqués</div>
-    </div>
-
-    <!-- Scripts -->
-    <script type="module" src="./js/main.js"></script>
-    <script type="module" src="./js/ui/menu.js"></script>
-    <script type="module" src="./js/ui/menuParams.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
 </html>

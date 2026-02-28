@@ -260,8 +260,8 @@ function createBricks() {
 
   for (let row = 0; row < config.height; row++) {
     for (let col = 0; col < config.width; col++) {
-      const x = col * (70 + fix_padding) + fix_offsetX;
-      const y = row * (25 + fix_padding) + fix_offsetY;
+      const x = col * (fix_brickWidth + fix_padding) + fix_offsetX;
+      const y = row * (fix_brickHeight + fix_padding) + fix_offsetY;
       gameState.bricks.push(new Brick(x, y, config.brickLives));
     }
   }

@@ -1,197 +1,208 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>morpion</title>
-    <link rel="canonical" href="https://mini-games.ch/games/morpion/" />
-    <link rel="stylesheet" href="./css/style.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⭕</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- Menu principal en haut -->
-    <div id="menuOptions">
-      <button id="homeBtn">Accueil</button>
-      <button id="settingsBtn">⚙️ Paramètres</button>
-      <button id="fullscreenBtn" , title="Plein écran">⛶</button>
-    </div>
 
-    <!-- Menu paramètres déroulable -->
-    <div id="menuParams" style="display: none">
-      <h3>⚙️ Paramètres du jeu</h3>
+<head>
+  <meta charset="UTF-8" />
+  <title>Morpion en ligne gratuit – Jouez au Tic Tac Toe | Mini‑Games</title>
+  <meta name="description"
+    content="Jouez gratuitement au Morpion (Tic Tac Toe) en ligne sur Mini‑Games. Affrontez un ami ou l’IA dans ce jeu classique. Compatible mobile, tablette et PC, sans inscription.">
+  <link rel="canonical" href="https://mini-games.ch/games/morpion/" /> <!-- Open Graph -->
+  <meta property="og:title" content="Morpion en ligne gratuit – Tic Tac Toe">
+  <meta property="og:description"
+    content="Affrontez un ami ou l’ordinateur dans ce jeu de Morpion gratuit. Jouable sur mobile et PC.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mini-games.ch/games/morpion/">
+  <meta property="og:image" content="https://mini-games.ch/assets/logos/morpion.png">
+  <meta property="og:site_name" content="Mini‑Games">
+  <meta property="og:locale" content="fr_CH"> <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Morpion en ligne gratuit – Tic Tac Toe">
+  <meta name="twitter:description" content="Jouez au Morpion gratuitement sur mobile et PC.">
+  <meta name="twitter:image" content="https://mini-games.ch/assets/logos/morpion.png"> <!-- Schema.org -->
+  <script
+    type="application/ld+json"> { "@context": "https://schema.org", "@type": "VideoGame", "name": "Morpion", "url": "https://mini-games.ch/games/morpion/", "description": "Jeu de Morpion gratuit jouable en ligne contre un ami ou l'ordinateur.", "applicationCategory": "Game", "operatingSystem": "Any", "genre": "Puzzle", "inLanguage": "fr", "publisher": { "@type": "Organization", "name": "Mini-Games" } } </script>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⭕</text></svg>" />
+</head>
 
-      <div class="param-group">
-        <label>Type de jeu <span class="option-badge">Nouveau</span></label>
-        <p>Choisissez la taille du plateau de jeu</p>
-        <div class="radio-options">
-          <label class="radio-label">
-            <input type="radio" name="gameType" value="standard3x3" checked />
-            <span>Standard (3×3)</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="gameType" value="big5x5" />
-            <span>Grand (5×5)</span>
-            <br />
-            <span class="option-description"
-              >Mode grand : alignez 4 symboles pour gagner</span
-            >
-          </label>
+<body>
+  <!-- Menu principal en haut -->
+  <div id="menuOptions">
+    <button id="homeBtn">Accueil</button>
+    <button id="settingsBtn">⚙️ Paramètres</button>
+    <button id="fullscreenBtn" , title="Plein écran">⛶</button>
+  </div>
 
-          <label class="radio-label">
-            <input type="radio" name="gameType" value="ultimate" />
-            <span>Géant (9×9)</span>
-            <br />
-            <span class="option-description"
-              >Mode géant : un morpion dans un morpion</span
-            >
-          </label>
-        </div>
-      </div>
+  <!-- Menu paramètres déroulable -->
+  <div id="menuParams" style="display: none">
+    <h3>⚙️ Paramètres du jeu</h3>
 
-      <hr />
+    <div class="param-group">
+      <label>Type de jeu <span class="option-badge">Nouveau</span></label>
+      <p>Choisissez la taille du plateau de jeu</p>
+      <div class="radio-options">
+        <label class="radio-label">
+          <input type="radio" name="gameType" value="standard3x3" checked />
+          <span>Standard (3×3)</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="gameType" value="big5x5" />
+          <span>Grand (5×5)</span>
+          <br />
+          <span class="option-description">Mode grand : alignez 4 symboles pour gagner</span>
+        </label>
 
-      <div class="param-group">
-        <label>Mode de jeu</label>
-        <p>Choisissez le nombre de joueurs</p>
-        <div class="radio-options">
-          <label class="radio-label">
-            <input type="radio" name="gameMode" value="solo" />
-            <span>Solo (vs IA)</span>
-            <br />
-            <span class="option-description"
-              >Mode solo : affrontez une intelligence artificielle</span
-            >
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="gameMode" value="multiplayer" checked />
-            <span>2 joueurs</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="param-group" id="difficultyGroup" style="display: none">
-        <label>Difficulté IA</label>
-        <p>Choisissez le niveau de l’IA</p>
-        <div class="radio-options">
-          <label class="radio-label">
-            <input type="radio" name="aiDifficulty" value="easy" checked />
-            <span>Facile</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="aiDifficulty" value="medium" />
-            <span>Moyen</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="aiDifficulty" value="hard" />
-            <span>Difficile</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="aiDifficulty" value="expert" />
-            <span>Expert</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="param-actions">
-        <button id="cancelBtn">Retour</button>
-        <button id="applyBtn">Appliquer</button>
+        <label class="radio-label">
+          <input type="radio" name="gameType" value="ultimate" />
+          <span>Géant (9×9)</span>
+          <br />
+          <span class="option-description">Mode géant : un morpion dans un morpion</span>
+        </label>
       </div>
     </div>
 
-    <!-- Overlay pour mobile -->
-    <div class="menu-overlay" id="menuOverlay" style="display: none"></div>
+    <hr />
 
-    <div class="symbol-selection">
-      <!--<h1>⭕ Morpion ❌</h1>
+    <div class="param-group">
+      <label>Mode de jeu</label>
+      <p>Choisissez le nombre de joueurs</p>
+      <div class="radio-options">
+        <label class="radio-label">
+          <input type="radio" name="gameMode" value="solo" />
+          <span>Solo (vs IA)</span>
+          <br />
+          <span class="option-description">Mode solo : affrontez une intelligence artificielle</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="gameMode" value="multiplayer" checked />
+          <span>2 joueurs</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="param-group" id="difficultyGroup" style="display: none">
+      <label>Difficulté IA</label>
+      <p>Choisissez le niveau de l’IA</p>
+      <div class="radio-options">
+        <label class="radio-label">
+          <input type="radio" name="aiDifficulty" value="easy" checked />
+          <span>Facile</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="aiDifficulty" value="medium" />
+          <span>Moyen</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="aiDifficulty" value="hard" />
+          <span>Difficile</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="aiDifficulty" value="expert" />
+          <span>Expert</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="param-actions">
+      <button id="cancelBtn">Retour</button>
+      <button id="applyBtn">Appliquer</button>
+    </div>
+  </div>
+
+  <!-- Overlay pour mobile -->
+  <div class="menu-overlay" id="menuOverlay" style="display: none"></div>
+
+  <div class="symbol-selection">
+    <!--<h1>⭕ Morpion ❌</h1>
       <p class="subtitle">Choisissez vos symboles pour commencer la partie</p> -->
 
-      <div class="players-container">
-        <!-- Joueur 1 -->
-        <div class="player-section player1" id="player1Section">
-          <div class="player-header">
-            <div class="player-icon">1</div>
-            <h2>Joueur 1</h2>
-          </div>
-
-          <div class="symbol-grid" id="player1Symbols">
-            <div class="symbol-option" data-symbol="✖️">✖️</div>
-            <div class="symbol-option" data-symbol="⭕">⭕</div>
-            <div class="symbol-option" data-symbol="🔵">🔵</div>
-            <div class="symbol-option" data-symbol="🔴">🔴</div>
-            <div class="symbol-option" data-symbol="⭐">⭐</div>
-            <div class="symbol-option" data-symbol="💎">💎</div>
-            <div class="symbol-option" data-symbol="💲">💲</div>
-            <div class="symbol-option" data-symbol="🎮">🎮</div>
-          </div>
-
-          <div class="custom-symbol" id="customSymbol1">
-            <span>📁 Image personnalisée</span>
-            <p style="color: #636e72; margin-top: 5px">
-              Cliquez pour choisir ou glissez une image
-            </p>
-            <div class="custom-preview" id="preview1">
-              <img id="previewImg1" alt="Preview" />
-            </div>
-            <input type="file" id="fileInput1" accept="image/*" />
-          </div>
-
-          <div class="selected-display">
-            <div class="preview" id="player1Preview">?</div>
-            <div class="label">Symbole sélectionné</div>
-          </div>
+    <div class="players-container">
+      <!-- Joueur 1 -->
+      <div class="player-section player1" id="player1Section">
+        <div class="player-header">
+          <div class="player-icon">1</div>
+          <h2>Joueur 1</h2>
         </div>
 
-        <!-- VS -->
-        <div class="vs-divider">
-          <div class="vs-circle">VS</div>
+        <div class="symbol-grid" id="player1Symbols">
+          <div class="symbol-option" data-symbol="✖️">✖️</div>
+          <div class="symbol-option" data-symbol="⭕">⭕</div>
+          <div class="symbol-option" data-symbol="🔵">🔵</div>
+          <div class="symbol-option" data-symbol="🔴">🔴</div>
+          <div class="symbol-option" data-symbol="⭐">⭐</div>
+          <div class="symbol-option" data-symbol="💎">💎</div>
+          <div class="symbol-option" data-symbol="💲">💲</div>
+          <div class="symbol-option" data-symbol="🎮">🎮</div>
         </div>
 
-        <!-- Joueur 2 -->
-        <div class="player-section player2" id="player2Section">
-          <div class="player-header">
-            <div class="player-icon">2</div>
-            <h2>Joueur 2</h2>
+        <div class="custom-symbol" id="customSymbol1">
+          <span>📁 Image personnalisée</span>
+          <p style="color: #636e72; margin-top: 5px">
+            Cliquez pour choisir ou glissez une image
+          </p>
+          <div class="custom-preview" id="preview1">
+            <img id="previewImg1" alt="Preview" />
           </div>
+          <input type="file" id="fileInput1" accept="image/*" />
+        </div>
 
-          <div class="symbol-grid" id="player2Symbols">
-            <div class="symbol-option" data-symbol="✖️">✖️</div>
-            <div class="symbol-option" data-symbol="⭕">⭕</div>
-            <div class="symbol-option" data-symbol="🔵">🔵</div>
-            <div class="symbol-option" data-symbol="🔴">🔴</div>
-            <div class="symbol-option" data-symbol="⭐">⭐</div>
-            <div class="symbol-option" data-symbol="💎">💎</div>
-            <div class="symbol-option" data-symbol="💲">💲</div>
-            <div class="symbol-option" data-symbol="🎮">🎮</div>
-          </div>
-
-          <div class="custom-symbol" id="customSymbol2">
-            <span>📁 Image personnalisée</span>
-            <p style="color: #636e72; margin-top: 5px">
-              Cliquez pour choisir ou glissez une image
-            </p>
-            <div class="custom-preview" id="preview2">
-              <img id="previewImg2" alt="Preview" />
-            </div>
-            <input type="file" id="fileInput2" accept="image/*" />
-          </div>
-
-          <div class="selected-display">
-            <div class="preview" id="player2Preview">?</div>
-            <div class="label">Symbole sélectionné</div>
-          </div>
+        <div class="selected-display">
+          <div class="preview" id="player1Preview">?</div>
+          <div class="label">Symbole sélectionné</div>
         </div>
       </div>
 
-      <button class="start-button" id="startBtn" disabled>
-        🎮 Commencer la partie
-      </button>
+      <!-- VS -->
+      <div class="vs-divider">
+        <div class="vs-circle">VS</div>
+      </div>
+
+      <!-- Joueur 2 -->
+      <div class="player-section player2" id="player2Section">
+        <div class="player-header">
+          <div class="player-icon">2</div>
+          <h2>Joueur 2</h2>
+        </div>
+
+        <div class="symbol-grid" id="player2Symbols">
+          <div class="symbol-option" data-symbol="✖️">✖️</div>
+          <div class="symbol-option" data-symbol="⭕">⭕</div>
+          <div class="symbol-option" data-symbol="🔵">🔵</div>
+          <div class="symbol-option" data-symbol="🔴">🔴</div>
+          <div class="symbol-option" data-symbol="⭐">⭐</div>
+          <div class="symbol-option" data-symbol="💎">💎</div>
+          <div class="symbol-option" data-symbol="💲">💲</div>
+          <div class="symbol-option" data-symbol="🎮">🎮</div>
+        </div>
+
+        <div class="custom-symbol" id="customSymbol2">
+          <span>📁 Image personnalisée</span>
+          <p style="color: #636e72; margin-top: 5px">
+            Cliquez pour choisir ou glissez une image
+          </p>
+          <div class="custom-preview" id="preview2">
+            <img id="previewImg2" alt="Preview" />
+          </div>
+          <input type="file" id="fileInput2" accept="image/*" />
+        </div>
+
+        <div class="selected-display">
+          <div class="preview" id="player2Preview">?</div>
+          <div class="label">Symbole sélectionné</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module" src="./js/ctrl/symbolsChoiceCtrl.js"></script>
-    <script type="module" src="./js/ui/menuParams.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
+    <button class="start-button" id="startBtn" disabled>
+      🎮 Commencer la partie
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="./js/ctrl/symbolsChoiceCtrl.js"></script>
+  <script type="module" src="./js/ui/menuParams.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

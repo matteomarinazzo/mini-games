@@ -1,25 +1,9 @@
 {
-  "snow-digger": {
-    "path": "./games/snow-digger/index.html",
-    "name": "Snow Digger",
-    "emoji": "❄️",
-    "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
-    "tags": [
-      "🪏 Pelle",
-      "❄️ Neige",
-      "🎮 Clicker",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
   "lostBelow": {
     "path": "./games/lostBelow/index.html",
     "name": "Lost Below",
     "emoji": "🔦",
-    "description": "Survis aux profondeurs : explore la grotte, gère ta santé et trouve la sortie avant qu'il ne soit trop tard.",
+    "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
     "tags": [
       "🔦 Survie",
       "🧗 Exploration",
@@ -91,6 +75,22 @@
     ],
     "badge": "classic",
     "badgeText": "Classique",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
+  "snow-digger": {
+    "path": "./games/snow-digger/index.html",
+    "name": "Snow Digger",
+    "emoji": "❄️",
+    "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
+    "tags": [
+      "🪏 Pelle",
+      "❄️ Neige",
+      "🎮 Clicker",
+      "👤 Solo"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },

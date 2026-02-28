@@ -123,13 +123,16 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 30px) scale(0.9);
   }
@@ -169,10 +172,12 @@ body {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -332,13 +337,11 @@ body {
   transition: var(--transition);
 }
 
-.radio-card input:checked + .radio-content {
+.radio-card input:checked+.radio-content {
   border-color: var(--primary);
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1),
-    rgba(118, 75, 162, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.1),
+      rgba(118, 75, 162, 0.1));
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
@@ -364,12 +367,10 @@ body {
 ======================================== */
 .config-divider {
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--border),
-    transparent
-  );
+  background: linear-gradient(to right,
+      transparent,
+      var(--border),
+      transparent);
   margin: 40px 0;
 }
 
@@ -482,6 +483,7 @@ body {
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -493,6 +495,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -504,26 +507,27 @@ body {
 ======================================== */
 @media (max-aspect-ratio: 1/1) {
   body {
-    margin-top: 3vw;
+    margin-top: 13px;
   }
+
   .home-button {
     top: 10px;
     left: 10px;
     padding: 10px 16px;
-    font-size: 3vw;
+    font-size: 13px;
   }
 
   .home-button svg {
-    width: 3vw;
-    height: 3vw;
+    width: 13px;
+    height: 13px;
   }
 
   .header h1 {
-    font-size: 8vw;
+    font-size: 40px;
   }
 
   .logo-icon {
-    font-size: 8vw;
+    font-size: 48px;
   }
 
   .config-card {
@@ -531,39 +535,7 @@ body {
   }
 
   .config-header h2 {
-    font-size: 6vw;
-  }
-
-  .slider-container {
-    gap: 10px;
-  }
-
-  .slider-value {
-    font-size: 3vw;
-    padding: 6px 12px;
-  }
-
-  .slider {
-    height: 15px;
-  }
-
-  /* Pour Chrome, Safari et Edge */
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    border-radius: 50%;
-  }
-
-  /* Pour Firefox */
-  .slider::-moz-range-thumb {
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    border-radius: 50%;
-    border: none;
+    font-size: 24px;
   }
 
   .container p,
@@ -573,17 +545,16 @@ body {
   .label-icon,
   .radio-label,
   .radio-icon,
-  .stat-icon
-  {
-    font-size: 3.5vw;
+  .stat-icon {
+    font-size: 15px;
   }
 
   .preview-section h3 {
-    font-size: 4vw;
+    font-size: 18px;
   }
 
   .radio-description {
-    font-size: 3vw;
+    font-size: 13px;
   }
 
   .radio-grid {
@@ -591,12 +562,7 @@ body {
   }
 
   .preview-brick {
-    width: 3vw;
-    height: 1.5vw;
-  }
-
-  .start-button {
-    font-size: 5vw;
-    padding: 15px;
+    width: 13px;
+    height: 8px;
   }
 }

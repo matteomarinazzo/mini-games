@@ -1,92 +1,95 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Casse-Briques - Jeu</title>
-    <link rel="canonical" href="https://mini-games.ch/games/casse-briques/game.html" />
-    <link rel="stylesheet" href="css/game.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🧱</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- HUD -->
-    <div class="hud">
-      <div class="hud-left">
-        <div class="score-display">
-          <span class="label">Score</span>
-          <span class="value" id="score">0</span>
-        </div>
-      </div>
 
-      <div class="hud-center">
-        <div class="lives-display">
-          <span class="label">Vies</span>
-          <div class="hearts" id="hearts"></div>
-        </div>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Casse-Briques - Jeu gratuit de casse-briques en ligne | Mini-Games</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/casse-briques/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🧱</text></svg>" />
+</head>
 
-      <div class="hud-right">
-        <div class="bricks-display">
-          <span class="label">Briques</span>
-          <span class="value" id="bricksRemaining">0</span>
-        </div>
+<body>
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-left">
+      <div class="score-display">
+        <span class="label">Score</span>
+        <span class="value" id="score">0</span>
       </div>
     </div>
 
-    <!-- Game Container -->
-    <div class="game-container">
-      <canvas id="gameCanvas"></canvas>
-
-      <!-- Overlay de pause -->
-      <div class="game-overlay" id="pauseOverlay" style="display: none;">
-        <div class="overlay-content">
-          <h2>⏸️ Pause</h2>
-          <button class="btn-primary" id="resumeBtn">Reprendre</button>
-          <button class="btn-secondary" id="restartBtn">Recommencer</button>
-          <button class="btn-secondary" id="menuBtn">Menu principal</button>
-        </div>
-      </div>
-
-      <!-- Overlay de game over -->
-      <div class="game-overlay" id="gameOverOverlay" style="display: none;">
-        <div class="overlay-content">
-          <h2>💀 Game Over</h2>
-          <p class="final-score">Score final: <span id="finalScore">0</span></p>
-          <button class="btn-primary" id="retryBtn">Réessayer</button>
-          <button class="btn-secondary" id="menuBtn2">Menu principal</button>
-        </div>
-      </div>
-
-      <!-- Overlay de victoire -->
-      <div class="game-overlay" id="winOverlay" style="display: none;">
-        <div class="overlay-content">
-          <h2>🎉 Victoire !</h2>
-          <p class="final-score">Score final: <span id="winScore">0</span></p>
-          <button class="btn-primary" id="playAgainBtn">Rejouer</button>
-          <button class="btn-secondary" id="menuBtn3">Menu principal</button>
-        </div>
+    <div class="hud-center">
+      <div class="lives-display">
+        <span class="label">Vies</span>
+        <div class="hearts" id="hearts"></div>
       </div>
     </div>
 
-    <!-- Controls Info -->
-    <div class="controls-info">
-      <div class="control-item">
-        <kbd>←</kbd> <kbd>→</kbd>
-        <span>Déplacer la raquette</span>
+    <div class="hud-right">
+      <div class="bricks-display">
+        <span class="label">Briques</span>
+        <span class="value" id="bricksRemaining">0</span>
       </div>
-      <div class="control-item">
-        <kbd>Espace</kbd>
-        <span>Lancer / Pause</span>
-      </div>
-      <div class="control-item">
-        <kbd>Souris</kbd>
-        <span>Déplacer la raquette</span>
+    </div>
+  </div>
+
+  <!-- Game Container -->
+  <div class="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Overlay de pause -->
+    <div class="game-overlay" id="pauseOverlay" style="display: none;">
+      <div class="overlay-content">
+        <h2>⏸️ Pause</h2>
+        <button class="btn-primary" id="resumeBtn">Reprendre</button>
+        <button class="btn-secondary" id="restartBtn">Recommencer</button>
+        <button class="btn-secondary" id="menuBtn">Menu principal</button>
       </div>
     </div>
 
-    <script type="module" src="js/game.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
+    <!-- Overlay de game over -->
+    <div class="game-overlay" id="gameOverOverlay" style="display: none;">
+      <div class="overlay-content">
+        <h2>💀 Game Over</h2>
+        <p class="final-score">Score final: <span id="finalScore">0</span></p>
+        <button class="btn-primary" id="retryBtn">Réessayer</button>
+        <button class="btn-secondary" id="menuBtn2">Menu principal</button>
+      </div>
+    </div>
+
+    <!-- Overlay de victoire -->
+    <div class="game-overlay" id="winOverlay" style="display: none;">
+      <div class="overlay-content">
+        <h2>🎉 Victoire !</h2>
+        <p class="final-score">Score final: <span id="winScore">0</span></p>
+        <button class="btn-primary" id="playAgainBtn">Rejouer</button>
+        <button class="btn-secondary" id="menuBtn3">Menu principal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls Info -->
+  <div class="controls-info">
+    <div class="control-item">
+      <kbd>←</kbd> <kbd>→</kbd>
+      <span>Déplacer la raquette</span>
+    </div>
+    <div class="control-item">
+      <kbd>Espace</kbd>
+      <span>Lancer / Pause</span>
+    </div>
+    <div class="control-item">
+      <kbd>Souris</kbd>
+      <span>Déplacer la raquette</span>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

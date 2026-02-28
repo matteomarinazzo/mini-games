@@ -1,206 +1,208 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Funfair Frenzy - Jeu</title>
-    <link rel="canonical" href="https://mini-games.ch/games/funfair/game.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/game.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎪</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- Bouton Retour -->
-    <a href="index.html" class="home-button">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      <span>Retour</span>
-    </a>
 
-    <!-- Animated Background -->
-    <div class="bg-animation">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funfair Frenzy - Jeu</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/funfair/" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎪</text></svg>" />
+</head>
+
+<body>
+  <!-- Bouton Retour -->
+  <a href="index.html" class="home-button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+    <span>Retour</span>
+  </a>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Game Container -->
+  <div class="container game-container">
+    <!-- Header avec tickets -->
+    <div class="game-header">
+      <div class="tickets-display-game">
+        <span class="tickets-label">🎟️ Tickets</span>
+        <span class="tickets-amount" id="gameTickets">0</span>
+      </div>
+      <div class="game-title" id="gameTitle">🎮 Jeu</div>
+      <div class="price-display">
+        <span class="price-label">Prix</span>
+        <span class="price-amount" id="priceAmount">0🎟️</span>
+      </div>
     </div>
 
-    <!-- Game Container -->
-    <div class="container game-container">
-      <!-- Header avec tickets -->
-      <div class="game-header">
-        <div class="tickets-display-game">
-          <span class="tickets-label">🎟️ Tickets</span>
-          <span class="tickets-amount" id="gameTickets">0</span>
+    <!-- Zone de jeu pour PYRAMIDE DE GOBELETS -->
+    <div class="game-zone" id="cupsGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🥎 Pyramide de Gobelets</h2>
+          <p>Lancez la balle et faites tomber tous les gobelets !</p>
         </div>
-        <div class="game-title" id="gameTitle">🎮 Jeu</div>
-        <div class="price-display">
-          <span class="price-label">Prix</span>
-          <span class="price-amount" id="priceAmount">0🎟️</span>
+
+        <canvas id="cupsCanvas" width="600" height="500"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="cupsTriesDisplay">Essais restants : 3</div>
+          <button class="action-button primary" id="cupsShootBtn">
+            🎯 Lancer la balle
+          </button>
+          <button class="action-button" id="cupsNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (1🎟️)
+          </button>
         </div>
-      </div>
 
-      <!-- Zone de jeu pour PYRAMIDE DE GOBELETS -->
-      <div class="game-zone" id="cupsGame" style="display: none;">
-        <div class="game-card-main">
-          <div class="game-header-zone">
-            <h2>🥎 Pyramide de Gobelets</h2>
-            <p>Lancez la balle et faites tomber tous les gobelets !</p>
-          </div>
+        <div class="result-message" id="cupsResult"></div>
 
-          <canvas id="cupsCanvas" width="600" height="500"></canvas>
-
-          <div class="game-controls">
-            <div class="tries-display" id="cupsTriesDisplay">Essais restants : 3</div>
-            <button class="action-button primary" id="cupsShootBtn">
-              🎯 Lancer la balle
-            </button>
-            <button class="action-button" id="cupsNewGameBtn" style="display: none;">
-              🔄 Nouvelle partie (1🎟️)
-            </button>
-          </div>
-
-          <div class="result-message" id="cupsResult"></div>
-
-          <div class="game-rules">
-            <h3>📜 Règles du jeu</h3>
-            <ul>
-              <li>Vous avez 3 lancers pour faire tomber tous les gobelets</li>
-              <li>Si vous réussissez, vous gagnez 2🎟️</li>
-              <li>Si vous échouez, vous perdez votre ticket</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour TIR À LA CIBLE -->
-      <div class="game-zone" id="shootingGame" style="display: none;">
-        <div class="game-card-main">
-          <div class="game-header-zone">
-            <h2>🔫 Tir à la Cible</h2>
-            <p>Visez juste et touchez le centre de la cible !</p>
-          </div>
-
-          <canvas id="shootingCanvas" width="600" height="600"></canvas>
-
-          <div class="game-controls">
-            <div class="tries-display" id="shootingTriesDisplay">Tirs restants : 5</div>
-            <div class="score-display" id="shootingScoreDisplay">Score : 0🎟️</div>
-            <button class="action-button primary" id="shootingShootBtn">
-              🔫 Tirer !
-            </button>
-            <button class="action-button" id="shootingNewGameBtn" style="display: none;">
-              🔄 Nouvelle partie (5🎟️)
-            </button>
-          </div>
-
-          <div class="result-message" id="shootingResult"></div>
-
-          <div class="game-rules">
-            <h3>📜 Règles du jeu</h3>
-            <ul>
-              <li>Vous avez 5 tirs pour marquer un maximum de points</li>
-              <li>🎯 Centre parfait = 3🎟️</li>
-              <li>🔴 Cercle intérieur = 2🎟️</li>
-              <li>⚪ Cercle extérieur = 1🎟️</li>
-              <li>❌ Raté = 0🎟️</li>
-              <li>Gains maximum : 15🎟️</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour BEER PONG -->
-      <div class="game-zone" id="beerpongGame" style="display: none;">
-        <div class="game-card-main">
-          <div class="game-header-zone">
-            <h2>🏓 Beer Pong</h2>
-            <p>Lancez la balle dans les gobelets !</p>
-          </div>
-
-          <canvas id="beerpongCanvas" width="600" height="700"></canvas>
-
-          <div class="game-controls">
-            <div class="tries-display" id="beerpongTriesDisplay">Lancers restants : 10</div>
-            <div class="score-display" id="beerpongScoreDisplay">Gobelets touchés : 0/10</div>
-            <div class="angle-display" id="beerpongAngleDisplay">Angle : 45°</div>
-            <div class="power-display" id="beerpongPowerDisplay" style="display: none;">Puissance : 50%</div>
-            <button class="action-button primary" id="beerpongLockBtn">
-              🔒 Verrouiller l'angle
-            </button>
-            <button class="action-button primary" id="beerpongShootBtn" style="display: none;">
-              🎯 Lancer !
-            </button>
-            <button class="action-button" id="beerpongNewGameBtn" style="display: none;">
-              🔄 Nouvelle partie (5🎟️)
-            </button>
-          </div>
-
-          <div class="result-message" id="beerpongResult"></div>
-
-          <div class="game-rules">
-            <h3>📜 Règles du jeu</h3>
-            <ul>
-              <li>Vous avez 10 lancers pour toucher un maximum de gobelets</li>
-              <li>Réglez l'angle de tir puis la puissance</li>
-              <li>1 gobelet touché = 1🎟️ gagné</li>
-              <li>Gains maximum : 10🎟️</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zone de jeu pour FLÉCHETTES -->
-      <div class="game-zone" id="dartsGame" style="display: none;">
-        <div class="game-card-main">
-          <div class="game-header-zone">
-            <h2>🎯 Fléchettes</h2>
-            <p>Trois lancers pour marquer un maximum de points !</p>
-          </div>
-
-          <canvas id="dartsCanvas" width="600" height="600"></canvas>
-
-          <div class="game-controls">
-            <div class="tries-display" id="dartsTriesDisplay">Fléchettes restantes : 3</div>
-            <div class="score-display" id="dartsScoreDisplay">Score total : 0 points</div>
-            <button class="action-button primary" id="dartsThrowBtn">
-              🎯 Lancer la fléchette
-            </button>
-            <button class="action-button" id="dartsNewGameBtn" style="display: none;">
-              🔄 Nouvelle partie (2🎟️)
-            </button>
-          </div>
-
-          <div class="result-message" id="dartsResult"></div>
-
-          <div class="game-rules">
-            <h3>📜 Règles du jeu</h3>
-            <ul>
-              <li>🎯 Centre : 50 pts | 🟢 Cercle Vert : 35 pts</li>
-              <li>⚪ Blanc (Moyen) : 20 pts | ⚫ Noir (Moyen) : 15 pts</li>
-              <li>🟢 Vert (Grand) : 10 pts | 🔴 Rouge (Grand) : 5 pts</li>
-              <li>⚪ Blanc (Ext.) : 1 pt | ⚫ Noir (Ext.) : 0 pts</li>
-              <li>🎟️ Gains : 10pts=1🎟️, 40pts=2🎟️, 70pts=3🎟️, 100pts=5🎟️</li>
-            </ul>
-          </div>
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Vous avez 3 lancers pour faire tomber tous les gobelets</li>
+            <li>Si vous réussissez, vous gagnez 2🎟️</li>
+            <li>Si vous échouez, vous perdez votre ticket</li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- Custom Popup -->
-    <div class="popup-overlay" id="popupOverlay">
-      <div class="popup-card">
-        <div class="popup-icon" id="popupIcon">⚠️</div>
-        <h3 class="popup-title" id="popupTitle">Attention</h3>
-        <p class="popup-message" id="popupMessage">Message</p>
-        <button class="popup-button" id="popupButton">OK</button>
+    <!-- Zone de jeu pour TIR À LA CIBLE -->
+    <div class="game-zone" id="shootingGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🔫 Tir à la Cible</h2>
+          <p>Visez juste et touchez le centre de la cible !</p>
+        </div>
+
+        <canvas id="shootingCanvas" width="600" height="600"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="shootingTriesDisplay">Tirs restants : 5</div>
+          <div class="score-display" id="shootingScoreDisplay">Score : 0🎟️</div>
+          <button class="action-button primary" id="shootingShootBtn">
+            🔫 Tirer !
+          </button>
+          <button class="action-button" id="shootingNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (5🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="shootingResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Vous avez 5 tirs pour marquer un maximum de points</li>
+            <li>🎯 Centre parfait = 3🎟️</li>
+            <li>🔴 Cercle intérieur = 2🎟️</li>
+            <li>⚪ Cercle extérieur = 1🎟️</li>
+            <li>❌ Raté = 0🎟️</li>
+            <li>Gains maximum : 15🎟️</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <script type="module" src="js/game.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
+    <!-- Zone de jeu pour BEER PONG -->
+    <div class="game-zone" id="beerpongGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🏓 Beer Pong</h2>
+          <p>Lancez la balle dans les gobelets !</p>
+        </div>
+
+        <canvas id="beerpongCanvas" width="600" height="700"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="beerpongTriesDisplay">Lancers restants : 10</div>
+          <div class="score-display" id="beerpongScoreDisplay">Gobelets touchés : 0/10</div>
+          <div class="angle-display" id="beerpongAngleDisplay">Angle : 45°</div>
+          <div class="power-display" id="beerpongPowerDisplay" style="display: none;">Puissance : 50%</div>
+          <button class="action-button primary" id="beerpongLockBtn">
+            🔒 Verrouiller l'angle
+          </button>
+          <button class="action-button primary" id="beerpongShootBtn" style="display: none;">
+            🎯 Lancer !
+          </button>
+          <button class="action-button" id="beerpongNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (5🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="beerpongResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Vous avez 10 lancers pour toucher un maximum de gobelets</li>
+            <li>Réglez l'angle de tir puis la puissance</li>
+            <li>1 gobelet touché = 1🎟️ gagné</li>
+            <li>Gains maximum : 10🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour FLÉCHETTES -->
+    <div class="game-zone" id="dartsGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🎯 Fléchettes</h2>
+          <p>Trois lancers pour marquer un maximum de points !</p>
+        </div>
+
+        <canvas id="dartsCanvas" width="600" height="600"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="dartsTriesDisplay">Fléchettes restantes : 3</div>
+          <div class="score-display" id="dartsScoreDisplay">Score total : 0 points</div>
+          <button class="action-button primary" id="dartsThrowBtn">
+            🎯 Lancer la fléchette
+          </button>
+          <button class="action-button" id="dartsNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (2🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="dartsResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>🎯 Centre : 50 pts | 🟢 Cercle Vert : 35 pts</li>
+            <li>⚪ Blanc (Moyen) : 20 pts | ⚫ Noir (Moyen) : 15 pts</li>
+            <li>🟢 Vert (Grand) : 10 pts | 🔴 Rouge (Grand) : 5 pts</li>
+            <li>⚪ Blanc (Ext.) : 1 pt | ⚫ Noir (Ext.) : 0 pts</li>
+            <li>🎟️ Gains : 10pts=1🎟️, 40pts=2🎟️, 70pts=3🎟️, 100pts=5🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Popup -->
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+      <div class="popup-icon" id="popupIcon">⚠️</div>
+      <h3 class="popup-title" id="popupTitle">Attention</h3>
+      <p class="popup-message" id="popupMessage">Message</p>
+      <button class="popup-button" id="popupButton">OK</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

@@ -1,243 +1,280 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Funfair Frenzy</title>
-    <link rel="canonical" href="https://mini-games.ch/games/funfair/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎪</text></svg>"
-    />
-  </head>
-  <body>
-    <!-- Bouton Accueil -->
-    <a href="../../index.html" class="home-button">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-      </svg>
-      <span>Accueil</span>
-    </a>
 
-    <!-- Animated Background -->
-    <div class="bg-animation">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funfair Frenzy - Jeu de fête foraine gratuit en ligne | Mini-Games</title>
+
+  <meta name="description"
+    content="Jouez gratuitement à Funfair Frenzy sur Mini-Games. Gagnez des tickets dans 4 mini-jeux de fête foraine : tir à la cible, beer pong, fléchettes et pyramide de gobelets. Jeu gratuit sans téléchargement, jouable sur mobile et PC.">
+
+  <link rel="canonical" href="https://mini-games.ch/games/funfair/" />
+
+  <meta property="og:title" content="Funfair Frenzy - Jeu de fête foraine gratuit">
+  <meta property="og:description"
+    content="Testez votre adresse dans 4 mini-jeux de fête foraine et gagnez un maximum de tickets !">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mini-games.ch/games/funfair/">
+  <meta property="og:image" content="https://mini-games.ch/assets/logos/funfair.png">
+  <meta property="og:site_name" content="Mini-Games">
+  <meta property="og:locale" content="fr_CH">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Funfair Frenzy - Jeu gratuit">
+  <meta name="twitter:description" content="4 mini-jeux de fête foraine pour gagner des tickets en ligne.">
+  <meta name="twitter:image" content="https://mini-games.ch/assets/logos/funfair.png">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎪</text></svg>" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Funfair Frenzy",
+  "url": "https://mini-games.ch/games/funfair/",
+  "description": "Jeu de fête foraine gratuit avec plusieurs mini-jeux : tir à la cible, beer pong, fléchettes et pyramide de gobelets.",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "genre": ["Arcade", "Skill"],
+  "numberOfPlayers": "1",
+  "inLanguage": "fr",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mini-Games"
+  }
+}
+</script>
+</head>
+
+<body>
+  <!-- Bouton Accueil -->
+  <a href="../../index.html" class="home-button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    <span>Accueil</span>
+  </a>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Menu principal -->
+  <div class="container" id="menuContainer">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">🎪</div>
+        <h1>Funfair Frenzy</h1>
+      </div>
+      <p class="subtitle">Gagnez des tickets et remportez tous les prix !</p>
     </div>
 
-    <!-- Menu principal -->
-    <div class="container" id="menuContainer">
-      <div class="header">
-        <div class="logo">
-          <div class="logo-icon">🎪</div>
-          <h1>Funfair Frenzy</h1>
-        </div>
-        <p class="subtitle">Gagnez des tickets et remportez tous les prix !</p>
+    <!-- Affichage argent et tickets -->
+    <div class="money-display" id="moneyDisplay" style="display: none;">
+      <div class="money-card">
+        <span class="money-label">💰 Argent</span>
+        <span class="money-amount" id="currentMoney">0€</span>
       </div>
-
-      <!-- Affichage argent et tickets -->
-      <div class="money-display" id="moneyDisplay" style="display: none;">
-        <div class="money-card">
-          <span class="money-label">💰 Argent</span>
-          <span class="money-amount" id="currentMoney">0€</span>
-        </div>
-        <div class="money-card tickets">
-          <span class="money-label">🎟️ Tickets</span>
-          <span class="money-amount" id="currentTickets">0</span>
-        </div>
-        <button class="action-btn convert-btn" id="convertBtn">💱 Convertir</button>
-        <button class="reset-button" id="resetBtn">🔄 Recommencer</button>
+      <div class="money-card tickets">
+        <span class="money-label">🎟️ Tickets</span>
+        <span class="money-amount" id="currentTickets">0</span>
       </div>
+      <button class="action-btn convert-btn" id="convertBtn">💱 Convertir</button>
+      <button class="reset-button" id="resetBtn">🔄 Recommencer</button>
+    </div>
 
-      <!-- Configuration initiale -->
-      <div class="config-container" id="configContainer">
-        <div class="config-card">
-          <div class="config-header">
-            <h2>💵 Choisissez votre budget</h2>
-            <p>Avec combien d'argent voulez-vous commencer ?</p>
-          </div>
-
-          <div class="config-section">
-            <div class="radio-grid budget-grid">
-              <label class="radio-card">
-                <input type="radio" name="budget" value="10" />
-                <div class="radio-content">
-                  <div class="radio-icon">💵</div>
-                  <div class="radio-label">10€</div>
-                  <div class="radio-description">Petit budget</div>
-                </div>
-              </label>
-              
-              <label class="radio-card">
-                <input type="radio" name="budget" value="20" checked />
-                <div class="radio-content">
-                  <div class="radio-icon">💰</div>
-                  <div class="radio-label">20€</div>
-                  <div class="radio-description">Budget normal</div>
-                </div>
-              </label>
-              
-              <label class="radio-card">
-                <input type="radio" name="budget" value="30" />
-                <div class="radio-content">
-                  <div class="radio-icon">💎</div>
-                  <div class="radio-label">30€</div>
-                  <div class="radio-description">Bon budget</div>
-                </div>
-              </label>
-
-              <label class="radio-card">
-                <input type="radio" name="budget" value="50" />
-                <div class="radio-content">
-                  <div class="radio-icon">👑</div>
-                  <div class="radio-label">50€</div>
-                  <div class="radio-description">Gros budget</div>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <button class="start-button" id="setBudgetBtn">
-            ✨ Valider mon budget
-          </button>
+    <!-- Configuration initiale -->
+    <div class="config-container" id="configContainer">
+      <div class="config-card">
+        <div class="config-header">
+          <h2>💵 Choisissez votre budget</h2>
+          <p>Avec combien d'argent voulez-vous commencer ?</p>
         </div>
-      </div>
 
-      <!-- Conversion argent → tickets -->
-      <div class="conversion-container" id="conversionContainer" style="display: none;">
-        <div class="config-card">
-          <div class="config-header">
-            <h2>🎟️ Acheter des tickets</h2>
-            <p>1 ticket = 2€ | Vous avez <span id="availableMoney">0€</span></p>
-          </div>
-
-          <div class="ticket-selector">
-            <button class="ticket-btn" id="minusTicket">−</button>
-            <div class="ticket-display">
-              <div class="ticket-count" id="ticketCount">0</div>
-              <div class="ticket-cost">= <span id="ticketCost">0€</span></div>
-            </div>
-            <button class="ticket-btn" id="plusTicket">+</button>
-          </div>
-
-          <button class="start-button" id="buyTicketsBtn">
-            🎟️ Acheter les tickets
-          </button>
-          <button class="skip-button" id="skipBuyBtn">
-            Passer →
-          </button>
-        </div>
-      </div>
-
-      <!-- Sélection des jeux -->
-      <div class="games-container" id="gamesContainer" style="display: none;">
-        <div class="config-card">
-          <div class="config-header">
-            <h2>🎮 Choisissez votre jeu</h2>
-            <p>Sélectionnez un jeu et tentez de gagner des tickets !</p>
-          </div>
-
-          <div class="games-grid">
-            <div class="game-card" data-game="cups">
-              <div class="game-icon">🥎</div>
-              <h3>Pyramide de Gobelets</h3>
-              <p>Lancez la balle et faites tomber tous les gobelets !</p>
-              <div class="game-info">
-                <span class="info-badge">Prix : 1🎟️</span>
-                <span class="info-badge win">Gain : 2🎟️</span>
+        <div class="config-section">
+          <div class="radio-grid budget-grid">
+            <label class="radio-card">
+              <input type="radio" name="budget" value="10" />
+              <div class="radio-content">
+                <div class="radio-icon">💵</div>
+                <div class="radio-label">10€</div>
+                <div class="radio-description">Petit budget</div>
               </div>
-              <button class="play-button">Jouer</button>
-            </div>
+            </label>
 
-            <div class="game-card" data-game="shooting">
-              <div class="game-icon">🔫</div>
-              <h3>Tir à la Cible</h3>
-              <p>Visez juste et touchez le centre de la cible !</p>
-              <div class="game-info">
-                <span class="info-badge">Prix : 5🎟️</span>
-                <span class="info-badge win">Max : 15🎟️</span>
+            <label class="radio-card">
+              <input type="radio" name="budget" value="20" checked />
+              <div class="radio-content">
+                <div class="radio-icon">💰</div>
+                <div class="radio-label">20€</div>
+                <div class="radio-description">Budget normal</div>
               </div>
-              <button class="play-button">Jouer</button>
-            </div>
+            </label>
 
-            <div class="game-card" data-game="beerpong">
-              <div class="game-icon">🏓</div>
-              <h3>Beer Pong</h3>
-              <p>Lancez la balle dans les gobelets !</p>
-              <div class="game-info">
-                <span class="info-badge">Prix : 5🎟️</span>
-                <span class="info-badge win">Max : 10🎟️</span>
+            <label class="radio-card">
+              <input type="radio" name="budget" value="30" />
+              <div class="radio-content">
+                <div class="radio-icon">💎</div>
+                <div class="radio-label">30€</div>
+                <div class="radio-description">Bon budget</div>
               </div>
-              <button class="play-button">Jouer</button>
-            </div>
+            </label>
 
-            <div class="game-card" data-game="darts">
-              <div class="game-icon">🎯</div>
-              <h3>Fléchettes</h3>
-              <p>Trois lancers pour marquer un maximum de points !</p>
-              <div class="game-info">
-                <span class="info-badge">Prix : 2🎟️</span>
-                <span class="info-badge win">Progressif</span>
+            <label class="radio-card">
+              <input type="radio" name="budget" value="50" />
+              <div class="radio-content">
+                <div class="radio-icon">👑</div>
+                <div class="radio-label">50€</div>
+                <div class="radio-description">Gros budget</div>
               </div>
-              <button class="play-button">Jouer</button>
-            </div>
-          </div>
-
-          <div class="funfair-stats-section">
-            <h3>📊 Vos statistiques</h3>
-            <div class="funfair-stats-grid">
-              <div class="funfair-stat-item">
-                <span class="funfair-stat-icon">🎮</span>
-                <div class="funfair-stat-info">
-                  <span class="funfair-stat-label">Parties jouées</span>
-                  <span class="funfair-stat-value" id="totalGames">0</span>
-                </div>
-              </div>
-              <div class="funfair-stat-item">
-                <span class="funfair-stat-icon">🏆</span>
-                <div class="funfair-stat-info">
-                  <span class="funfair-stat-label">Parties gagnées</span>
-                  <span class="funfair-stat-value" id="totalWins">0</span>
-                </div>
-              </div>
-              <div class="funfair-stat-item">
-                <span class="funfair-stat-icon">🎟️</span>
-                <div class="funfair-stat-info">
-                  <span class="funfair-stat-label">Tickets gagnés</span>
-                  <span class="funfair-stat-value" id="totalTicketsWon">0</span>
-                </div>
-              </div>
-              <div class="funfair-stat-item">
-                <span class="funfair-stat-icon">📈</span>
-                <div class="funfair-stat-info">
-                  <span class="funfair-stat-label">Plus gros gain</span>
-                  <span class="funfair-stat-value" id="biggestWin">0🎟️</span>
-                </div>
-              </div>
-            </div>
+            </label>
           </div>
         </div>
-      </div>
 
-      <div class="footer">
-        <p>🎪 Bienvenue à la fête foraine - Amusez-vous bien !</p>
+        <button class="start-button" id="setBudgetBtn">
+          ✨ Valider mon budget
+        </button>
       </div>
     </div>
 
-    <!-- Custom Popup -->
-    <div class="popup-overlay" id="popupOverlay">
-      <div class="popup-card">
-        <div class="popup-icon" id="popupIcon">⚠️</div>
-        <h3 class="popup-title" id="popupTitle">Attention</h3>
-        <p class="popup-message" id="popupMessage">Message</p>
-        <button class="popup-button" id="popupButton">OK</button>
+    <!-- Conversion argent → tickets -->
+    <div class="conversion-container" id="conversionContainer" style="display: none;">
+      <div class="config-card">
+        <div class="config-header">
+          <h2>🎟️ Acheter des tickets</h2>
+          <p>1 ticket = 2€ | Vous avez <span id="availableMoney">0€</span></p>
+        </div>
+
+        <div class="ticket-selector">
+          <button class="ticket-btn" id="minusTicket">−</button>
+          <div class="ticket-display">
+            <div class="ticket-count" id="ticketCount">0</div>
+            <div class="ticket-cost">= <span id="ticketCost">0€</span></div>
+          </div>
+          <button class="ticket-btn" id="plusTicket">+</button>
+        </div>
+
+        <button class="start-button" id="buyTicketsBtn">
+          🎟️ Acheter les tickets
+        </button>
+        <button class="skip-button" id="skipBuyBtn">
+          Passer →
+        </button>
       </div>
     </div>
 
-    <script type="module" src="js/menu.js"></script>
-    <script type="module" src="../../js/countPlayedTime.js"></script>
-  </body>
+    <!-- Sélection des jeux -->
+    <div class="games-container" id="gamesContainer" style="display: none;">
+      <div class="config-card">
+        <div class="config-header">
+          <h2>🎮 Choisissez votre jeu</h2>
+          <p>Sélectionnez un jeu et tentez de gagner des tickets !</p>
+        </div>
+
+        <div class="games-grid">
+          <div class="game-card" data-game="cups">
+            <div class="game-icon">🥎</div>
+            <h3>Pyramide de Gobelets</h3>
+            <p>Lancez la balle et faites tomber tous les gobelets !</p>
+            <div class="game-info">
+              <span class="info-badge">Prix : 1🎟️</span>
+              <span class="info-badge win">Gain : 2🎟️</span>
+            </div>
+            <button class="play-button">Jouer</button>
+          </div>
+
+          <div class="game-card" data-game="shooting">
+            <div class="game-icon">🔫</div>
+            <h3>Tir à la Cible</h3>
+            <p>Visez juste et touchez le centre de la cible !</p>
+            <div class="game-info">
+              <span class="info-badge">Prix : 5🎟️</span>
+              <span class="info-badge win">Max : 15🎟️</span>
+            </div>
+            <button class="play-button">Jouer</button>
+          </div>
+
+          <div class="game-card" data-game="beerpong">
+            <div class="game-icon">🏓</div>
+            <h3>Beer Pong</h3>
+            <p>Lancez la balle dans les gobelets !</p>
+            <div class="game-info">
+              <span class="info-badge">Prix : 5🎟️</span>
+              <span class="info-badge win">Max : 10🎟️</span>
+            </div>
+            <button class="play-button">Jouer</button>
+          </div>
+
+          <div class="game-card" data-game="darts">
+            <div class="game-icon">🎯</div>
+            <h3>Fléchettes</h3>
+            <p>Trois lancers pour marquer un maximum de points !</p>
+            <div class="game-info">
+              <span class="info-badge">Prix : 2🎟️</span>
+              <span class="info-badge win">Progressif</span>
+            </div>
+            <button class="play-button">Jouer</button>
+          </div>
+        </div>
+
+        <div class="funfair-stats-section">
+          <h3>📊 Vos statistiques</h3>
+          <div class="funfair-stats-grid">
+            <div class="funfair-stat-item">
+              <span class="funfair-stat-icon">🎮</span>
+              <div class="funfair-stat-info">
+                <span class="funfair-stat-label">Parties jouées</span>
+                <span class="funfair-stat-value" id="totalGames">0</span>
+              </div>
+            </div>
+            <div class="funfair-stat-item">
+              <span class="funfair-stat-icon">🏆</span>
+              <div class="funfair-stat-info">
+                <span class="funfair-stat-label">Parties gagnées</span>
+                <span class="funfair-stat-value" id="totalWins">0</span>
+              </div>
+            </div>
+            <div class="funfair-stat-item">
+              <span class="funfair-stat-icon">🎟️</span>
+              <div class="funfair-stat-info">
+                <span class="funfair-stat-label">Tickets gagnés</span>
+                <span class="funfair-stat-value" id="totalTicketsWon">0</span>
+              </div>
+            </div>
+            <div class="funfair-stat-item">
+              <span class="funfair-stat-icon">📈</span>
+              <div class="funfair-stat-info">
+                <span class="funfair-stat-label">Plus gros gain</span>
+                <span class="funfair-stat-value" id="biggestWin">0🎟️</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>🎪 Bienvenue à la fête foraine - Amusez-vous bien !</p>
+    </div>
+  </div>
+
+  <!-- Custom Popup -->
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+      <div class="popup-icon" id="popupIcon">⚠️</div>
+      <h3 class="popup-title" id="popupTitle">Attention</h3>
+      <p class="popup-message" id="popupMessage">Message</p>
+      <button class="popup-button" id="popupButton">OK</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/menu.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
 </html>

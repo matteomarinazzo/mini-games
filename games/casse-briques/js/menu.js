@@ -100,7 +100,7 @@ function startGame() {
 function updateMaxGridWidth() {
   const maxWidth = Math.floor(
     (window.innerWidth + fix_padding - 2 * fix_offsetX) /
-      (fix_brickWidth + fix_padding),
+    (fix_brickWidth + fix_padding),
   );
 
   gridWidthSlider.max = Math.max(maxWidth, parseInt(gridWidthSlider.min)); // ne jamais aller en dessous du min
@@ -115,7 +115,7 @@ function updateMaxGridWidth() {
 // Adapter dynamiquement la hauteur max du slider
 function updateMaxGridHeight() {
   const screenHeight = window.innerHeight;
-  const screenWidth = window.innerWidth; 
+  const screenWidth = window.innerWidth;
 
   // Ratio dynamique selon la hauteur réelle
   let usableRatio = 0.65; // desktop par défaut
@@ -130,7 +130,7 @@ function updateMaxGridHeight() {
 
   const maxHeight = Math.floor(
     (usableHeight - fix_offsetY + fix_padding) /
-      (fix_brickHeight + fix_padding),
+    (fix_brickHeight + fix_padding),
   );
 
   gridHeightSlider.max = Math.max(maxHeight, parseInt(gridHeightSlider.min));

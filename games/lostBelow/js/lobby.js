@@ -1,5 +1,6 @@
 import { auth } from "../../../js/config/firebase-config.js";
 import { createRoom, joinRoom, checkRoomExists } from "../../../js/firebaseWrk.js";
+import { checkRealConnection } from '../../../js/network.js';
 
 const createBtn = document.getElementById("createRoomBtn");
 const joinBtn = document.getElementById("joinRoomBtn");
@@ -14,8 +15,17 @@ function generateRoomID() {
     return result;
 }
 
-// Charger le nom depuis le localStorage au démarrage
-document.addEventListener("DOMContentLoaded", () => {
+// Charger le nom depuis le localStorage au démarrage + Check connexion
+document.addEventListener("DOMContentLoaded", async () => {
+    // Vérifier la connexion immédiatement
+    const isOnline = await checkRealConnection();
+    if (!isOnline) {
+        const targetUrl = new URL(window.location.href).href;
+        sessionStorage.setItem('offline_target_path', targetUrl);
+        window.location.href = '../offline.html';
+        return;
+    }
+
     const savedName = localStorage.getItem("lostBelow_playerName");
     if (savedName) {
         document.getElementById("playerNameInput").value = savedName;
@@ -29,6 +39,15 @@ createBtn.onclick = async () => {
     if (!chosenName) {
         alert("Veuillez entrer votre prénom avant de commencer l'expédition !");
         nameInput.focus();
+        return;
+    }
+
+    // Vérifier la connexion
+    const isOnline = await checkRealConnection();
+    if (!isOnline) {
+        const targetUrl = new URL(window.location.href).href;
+        sessionStorage.setItem('offline_target_path', targetUrl);
+        window.location.href = '../offline.html';
         return;
     }
 
@@ -77,6 +96,15 @@ joinBtn.onclick = async () => {
     if (!chosenName) {
         alert("Veuillez entrer votre prénom avant de rejoindre l'expédition !");
         nameInput.focus();
+        return;
+    }
+
+    // Vérifier la connexion
+    const isOnline = await checkRealConnection();
+    if (!isOnline) {
+        const targetUrl = new URL(window.location.href).href;
+        sessionStorage.setItem('offline_target_path', targetUrl);
+        window.location.href = '../offline.html';
         return;
     }
 

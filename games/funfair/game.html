@@ -189,6 +189,140 @@
         </div>
       </div>
     </div>
+
+    <!-- Zone de jeu pour COUVRE-TOUT -->
+    <div class="game-zone" id="coverspotGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🔴 Couvre-Tout</h2>
+          <p>Recouvrez entièrement le cercle blanc avec les 6 disques rouges !</p>
+        </div>
+
+        <canvas id="coverspotCanvas" width="600" height="600"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="coverspotTriesDisplay">Disques : 5</div>
+          <div class="score-display" id="coverspotScoreDisplay">Couverture : 0%</div>
+          <button class="action-button primary" id="coverspotCheckBtn">
+            ✅ Valider le placement
+          </button>
+          <button class="action-button" id="coverspotNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (3🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="coverspotResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Faites glisser les 5 disques rouges sur le cercle blanc</li>
+            <li>Le cercle blanc doit être 100% recouvert pour le gros lot</li>
+            <li>100% = 5🎟️ | 95%+ = 4🎟️ | 90%+ = 2🎟️ | 80%+ = 1🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour MARTEAU DE FORCE -->
+    <div class="game-zone" id="highstrikerGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🔨 Marteau de Force</h2>
+          <p>Frappez au bon moment pour atteindre le sommet !</p>
+        </div>
+
+        <canvas id="highstrikerCanvas" width="400" height="600"></canvas>
+
+        <div class="game-controls">
+          <button class="action-button primary" id="highstrikerHitBtn">
+            🔨 FRAPPER !
+          </button>
+          <button class="action-button" id="highstrikerNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (3🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="highstrikerResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Cliquez quand le curseur est le plus bas possible pour frapper fort</li>
+            <li>Atteignez le sommet (Bonus) pour gagner le maximum</li>
+            <li>Récompenses : Sommet=5🎟️, Haut=3🎟️, Milieu=1🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour BALLONS À ÉCLATER -->
+    <div class="game-zone" id="balloonpopGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>🎈 Ballons à Éclater</h2>
+          <p>Éclatez un maximum de ballons avant la fin du temps !</p>
+        </div>
+
+        <canvas id="balloonpopCanvas" width="600" height="500"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="balloonpopTimerDisplay">Temps : 20s</div>
+          <div class="score-display" id="balloonpopScoreDisplay">Score : 0🎟️</div>
+          <button class="action-button primary" id="balloonpopStartBtn">
+            🚀 Commencer !
+          </button>
+          <button class="action-button" id="balloonpopNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (5🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="balloonpopResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Éclatez les ballons qui apparaissent (20 secondes)</li>
+            <li>🎈 Rouge = 1 pt | 🎈 Doré = 5 pts</li>
+            <li>Gains : 10 pts = 1🎟️, 30 pts = 3🎟️, 50 pts = 5🎟️, 80 pts = 8🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de jeu pour ANNEAUX SUR PIQUETS -->
+    <div class="game-zone" id="ringtossGame" style="display: none;">
+      <div class="game-card-main">
+        <div class="game-header-zone">
+          <h2>⭕ Anneaux sur Piquets</h2>
+          <p>Visez les piquets pour gagner des tickets !</p>
+        </div>
+
+        <canvas id="ringtossCanvas" width="600" height="500"></canvas>
+
+        <div class="game-controls">
+          <div class="tries-display" id="ringtossTriesDisplay">Anneaux restants : 5</div>
+          <div class="score-display" id="ringtossScoreDisplay">Gains : 0🎟️</div>
+          <button class="action-button primary" id="ringtossThrowBtn">
+            ⭕ Lancer l'anneau
+          </button>
+          <button class="action-button" id="ringtossNewGameBtn" style="display: none;">
+            🔄 Nouvelle partie (10🎟️)
+          </button>
+        </div>
+
+        <div class="result-message" id="ringtossResult"></div>
+
+        <div class="game-rules">
+          <h3>📜 Règles du jeu</h3>
+          <ul>
+            <li>Lancez 3 anneaux sur les piquets</li>
+            <li>Piquets éloignés = 5🎟️ | Piquets moyens = 2🎟️ | Piquets proches = 1🎟️</li>
+            <li>Gains maximum : 15🎟️</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Custom Popup -->

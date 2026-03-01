@@ -11,30 +11,14 @@ const STORAGE_KEYS = {
 // GAME CONFIGURATION
 // ========================================
 const GAMES_CONFIG = {
-  cups: {
-    name: 'Pyramide de Gobelets',
-    price: 1,
-    tries: 3,
-    reward: 2
-  },
-  shooting: {
-    name: 'Tir à la Cible',
-    price: 3,
-    tries: 5,
-    maxReward: 5
-  },
-  beerpong: {
-    name: 'Beer Pong',
-    price: 5,
-    tries: 10,
-    maxReward: 10
-  },
-  darts: {
-    name: 'Fléchettes',
-    price: 2,
-    tries: 3,
-    maxReward: 3
-  }
+  cups: { name: 'Pyramide de Gobelets', price: 1, tries: 3, reward: 2 },
+  shooting: { name: 'Tir à la Cible', price: 5, tries: 5, maxReward: 15 },
+  beerpong: { name: 'Beer Pong', price: 5, tries: 10, maxReward: 10 },
+  darts: { name: 'Fléchettes', price: 2, tries: 3, maxReward: 5 },
+  coverspot: { name: 'Couvre-Tout', price: 3, maxReward: 5 },
+  highstriker: { name: 'Marteau de Force', price: 3, maxReward: 5 },
+  balloonpop: { name: 'Ballons à Éclater', price: 5, maxReward: 8 },
+  ringtoss: { name: 'Anneaux sur Piquets', price: 10, maxReward: 15 }
 };
 
 // ========================================
@@ -119,7 +103,8 @@ function updateStats(won, ticketsWon) {
 // INITIALIZE
 // ========================================
 function init() {
-  const gameType = sessionStorage.getItem('funfair_current_game');
+  let gameType = sessionStorage.getItem('funfair_current_game');
+  if (gameType) gameType = gameType.trim();
 
   if (!gameType || !GAMES_CONFIG[gameType]) {
     showPopup('⚠️', 'Erreur', 'Type de jeu invalide !').then(() => {
@@ -151,6 +136,18 @@ function init() {
       break;
     case 'darts':
       initDartsGame();
+      break;
+    case 'coverspot':
+      initCoverSpotGame();
+      break;
+    case 'highstriker':
+      initHighStrikerGame();
+      break;
+    case 'balloonpop':
+      initBalloonPopGame();
+      break;
+    case 'ringtoss':
+      initRingTossGame();
       break;
   }
 }
@@ -616,6 +613,13 @@ function initShootingGame() {
   shootBtn.disabled = false;
   shootBtn.onclick = () => shootTarget(ctx, canvas);
 
+  // Canvas interaction for Shooting
+  canvas.onclick = () => shootTarget(ctx, canvas);
+  canvas.ontouchstart = (e) => {
+    e.preventDefault();
+    shootTarget(ctx, canvas);
+  };
+
   document.getElementById('shootingNewGameBtn').onclick = () => {
     const tickets = getTickets();
     if (tickets < 5) {
@@ -872,6 +876,13 @@ function initBeerpongGame() {
   lockBtn.style.display = 'block';
   lockBtn.disabled = false;
   lockBtn.onclick = () => handleBeerpongClick(ctx, canvas);
+
+  // Canvas interaction for Beer Pong
+  canvas.onclick = () => handleBeerpongClick(ctx, canvas);
+  canvas.ontouchstart = (e) => {
+    e.preventDefault();
+    handleBeerpongClick(ctx, canvas);
+  };
 
   // Hide unused elements from previous version
   document.getElementById('beerpongShootBtn').style.display = 'none';
@@ -1300,6 +1311,13 @@ function initDartsGame() {
   throwBtn.disabled = false;
   throwBtn.onclick = () => throwDart(ctx, canvas);
 
+  // Canvas interaction for Darts
+  canvas.onclick = () => throwDart(ctx, canvas);
+  canvas.ontouchstart = (e) => {
+    e.preventDefault();
+    throwDart(ctx, canvas);
+  };
+
   document.getElementById('dartsNewGameBtn').onclick = () => {
     const tickets = getTickets();
     if (tickets < 2) {
@@ -1617,6 +1635,971 @@ function throwDart(ctx, canvas) {
       animateCrosshair();
     }
   }, 500);
+}
+
+// ========================================
+// GAME 5: COUVRE-TOUT (Cover the Spot)
+// ========================================
+let coverspotGameState = {
+  discs: [],
+  target: { x: 300, y: 220, r: 100 },
+  draggingIndex: -1,
+  dragOffset: { x: 0, y: 0 },
+  finished: false,
+  coverage: 0
+};
+
+function initCoverSpotGame() {
+  const canvas = document.getElementById('coverspotCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Detect mobile
+  const isSmallScreen = window.innerWidth < 600 || ('ontouchstart' in window);
+  const targetRadius = isSmallScreen ? 120 : 100;
+  const discRadius = isSmallScreen ? 65 : 55;
+
+  coverspotGameState = {
+    discs: [],
+    target: { x: 300, y: 220, r: targetRadius },
+    draggingIndex: -1,
+    dragOffset: { x: 0, y: 0 },
+    finished: false,
+    coverage: 0
+  };
+
+  // Initialize 6 discs at the bottom
+  for (let i = 0; i < 6; i++) {
+    coverspotGameState.discs.push({
+      x: canvas.width / 2,
+      y: 520,
+      r: discRadius,
+      color: '#dc2626'
+    });
+  }
+
+  const updateUI = () => {
+    document.getElementById('coverspotTriesDisplay').textContent = `Disques : 6`;
+    document.getElementById('coverspotScoreDisplay').textContent = `Couverture : ${Math.round(coverspotGameState.coverage)}%`;
+  };
+  updateUI();
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  const handleStart = (e) => {
+    if (coverspotGameState.finished) return;
+    const pos = getMousePos(e);
+
+    // Check discs from top to bottom (last drawn is top)
+    for (let i = coverspotGameState.discs.length - 1; i >= 0; i--) {
+      const disc = coverspotGameState.discs[i];
+      const dist = Math.sqrt((pos.x - disc.x) ** 2 + (pos.y - disc.y) ** 2);
+      if (dist < disc.r) {
+        coverspotGameState.draggingIndex = i;
+        coverspotGameState.dragOffset.x = pos.x - disc.x;
+        coverspotGameState.dragOffset.y = pos.y - disc.y;
+        // Move to top of array to draw on top
+        const dragged = coverspotGameState.discs.splice(i, 1)[0];
+        coverspotGameState.discs.push(dragged);
+        coverspotGameState.draggingIndex = coverspotGameState.discs.length - 1;
+        break;
+      }
+    }
+  };
+
+  const handleMove = (e) => {
+    if (coverspotGameState.draggingIndex !== -1) {
+      if (e.cancelable) e.preventDefault();
+      const pos = getMousePos(e);
+      const disc = coverspotGameState.discs[coverspotGameState.draggingIndex];
+      disc.x = pos.x - coverspotGameState.dragOffset.x;
+      disc.y = pos.y - coverspotGameState.dragOffset.y;
+      drawCoverSpotGame(ctx, canvas);
+    }
+  };
+
+  const handleEnd = () => {
+    coverspotGameState.draggingIndex = -1;
+  };
+
+  canvas.onmousedown = handleStart;
+  window.onmousemove = handleMove; // Global move for better dragging
+  window.onmouseup = handleEnd;
+
+  canvas.addEventListener('touchstart', handleStart, { passive: false });
+  window.addEventListener('touchmove', handleMove, { passive: false });
+  window.addEventListener('touchend', handleEnd);
+
+  document.getElementById('coverspotCheckBtn').onclick = () => validateCoverSpot(ctx, canvas);
+  document.getElementById('coverspotNewGameBtn').style.display = 'none';
+
+  document.getElementById('coverspotNewGameBtn').onclick = () => {
+    const tickets = getTickets();
+    if (tickets < 3) {
+      showPopup('🎟️', 'Tickets insuffisants', 'Il vous faut 3 tickets !');
+      return;
+    }
+    removeTickets(3);
+    initCoverSpotGame();
+    document.getElementById('coverspotResult').className = 'result-message';
+    document.getElementById('coverspotCheckBtn').disabled = false;
+  };
+
+  drawCoverSpotGame(ctx, canvas);
+
+  if (!coverspotGameState.finished) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.font = '14px Poppins';
+    ctx.textAlign = 'center';
+  }
+}
+
+function drawCoverSpotGame(ctx, canvas) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  ctx.fillStyle = '#f3f4f6';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw target circle shadow
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'rgba(0,0,0,0.1)';
+
+  // Target circle
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(coverspotGameState.target.x, coverspotGameState.target.y, coverspotGameState.target.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#d1d5db';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+
+  // Draw discs
+  coverspotGameState.discs.forEach((disc, index) => {
+    // Disc shadow
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetY = 2;
+    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+
+    ctx.fillStyle = disc.color;
+    ctx.beginPath();
+    ctx.arc(disc.x, disc.y, disc.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Disc highlight
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.beginPath();
+    ctx.arc(disc.x - disc.r / 3, disc.y - disc.r / 3, disc.r / 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  if (!coverspotGameState.finished) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.font = '14px Poppins';
+    ctx.textAlign = 'center';
+  }
+}
+
+function validateCoverSpot(ctx, canvas) {
+  if (coverspotGameState.finished) return;
+
+  // Calculate coverage using pixel-counting on a temporary canvas
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  const tctx = tempCanvas.getContext('2d');
+
+  // 1. Draw target circle in white on a black background
+  tctx.fillStyle = '#000000';
+  tctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+  tctx.fillStyle = '#ffffff';
+  tctx.beginPath();
+  tctx.arc(coverspotGameState.target.x, coverspotGameState.target.y, coverspotGameState.target.r, 0, Math.PI * 2);
+  tctx.fill();
+
+  // 2. Erase what red discs cover
+  tctx.globalCompositeOperation = 'destination-out';
+  coverspotGameState.discs.forEach(disc => {
+    tctx.beginPath();
+    tctx.arc(disc.x, disc.y, disc.r, 0, Math.PI * 2);
+    tctx.fill();
+  });
+
+  // 3. Count remaining white pixels
+  const imageData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+  const data = imageData.data;
+  let remainingPixels = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] > 128) remainingPixels++; // Check R channel
+  }
+
+  // Calculate total pixels in target
+  const targetArea = Math.PI * (coverspotGameState.target.r ** 2);
+  const totalPixels = targetArea; // Approximation is fine here as we compare relative
+  // More accurate: count white pixels without subtraction
+  tctx.globalCompositeOperation = 'source-over';
+  tctx.fillStyle = '#000000';
+  tctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+  tctx.fillStyle = '#ffffff';
+  tctx.beginPath();
+  tctx.arc(coverspotGameState.target.x, coverspotGameState.target.y, coverspotGameState.target.r, 0, Math.PI * 2);
+  tctx.fill();
+  const totalImageData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+  const totalData = totalImageData.data;
+  let totalTargetPixels = 0;
+  for (let i = 0; i < totalData.length; i += 4) {
+    if (totalData[i] > 128) totalTargetPixels++;
+  }
+
+  const coverage = Math.max(0, 100 - (remainingPixels / totalTargetPixels) * 100);
+  coverspotGameState.coverage = coverage;
+  coverspotGameState.finished = true;
+
+  let tickets = 0;
+  let resType = 'lose';
+  if (coverage == 100) {
+    tickets = 5;
+    resType = 'win';
+  } else if (coverage >= 95) {
+    tickets = 4;
+    resType = 'partial';
+  } else if (coverage >= 90) {
+    tickets = 2;
+    resType = 'partial';
+  } else if (coverage >= 80) {
+    tickets = 1;
+    resType = 'partial';
+  }
+
+  if (tickets > 0) {
+    addTickets(tickets);
+    updateStats(true, tickets);
+    showResult('coverspotResult', resType, `✨ Couverture : ${Math.round(coverage)}% ! Vous gagnez ${tickets}🎟️`);
+    if (tickets >= 4) createConfetti();
+  } else {
+    updateStats(false, 0);
+    showResult('coverspotResult', 'lose', `😢 Couverture : ${Math.round(coverage)}%. Trop de blanc visible !`);
+  }
+
+  document.getElementById('coverspotScoreDisplay').textContent = `Couverture : ${Math.round(coverage)}%`;
+  document.getElementById('coverspotNewGameBtn').style.display = 'block';
+  document.getElementById('coverspotCheckBtn').disabled = true;
+}
+
+// ========================================
+// GAME 6: MARTEAU DE FORCE (High Striker)
+// ========================================
+let highstrikerGameState = {
+  power: 0,
+  powerDir: 1,
+  powerSpeed: 5,
+  puckY: 500,
+  targetPuckY: 500,
+  isHitting: false,
+  finished: false,
+  animationId: null
+};
+
+function initHighStrikerGame() {
+  const canvas = document.getElementById('highstrikerCanvas');
+  const ctx = canvas.getContext('2d');
+
+  highstrikerGameState = {
+    power: 0,
+    powerDir: 1,
+    powerSpeed: 0.05, // 0 to 1
+    puckY: 500,
+    targetPuckY: 500,
+    isHitting: false,
+    finished: false,
+    animationId: null
+  };
+
+  const hitBtn = document.getElementById('highstrikerHitBtn');
+  hitBtn.disabled = false;
+  hitBtn.style.display = 'block';
+  hitBtn.onclick = () => strikeHammer(ctx, canvas);
+
+  // Canvas interaction
+  canvas.onclick = () => strikeHammer(ctx, canvas);
+  canvas.ontouchstart = (e) => { e.preventDefault(); strikeHammer(ctx, canvas); };
+
+  document.getElementById('highstrikerNewGameBtn').onclick = () => {
+    const tickets = getTickets();
+    if (tickets < 3) {
+      showPopup('🎟️', 'Tickets insuffisants', 'Il vous faut 3 tickets !');
+      return;
+    }
+    removeTickets(3);
+    initHighStrikerGame();
+    document.getElementById('highstrikerResult').className = 'result-message';
+    document.getElementById('highstrikerNewGameBtn').style.display = 'none';
+  };
+
+  function animateHighStriker() {
+    if (!highstrikerGameState.finished) {
+      if (!highstrikerGameState.isHitting) {
+        // Oscillate power
+        highstrikerGameState.power += highstrikerGameState.powerSpeed * highstrikerGameState.powerDir;
+        if (highstrikerGameState.power >= 1 || highstrikerGameState.power <= 0) {
+          highstrikerGameState.powerDir *= -1;
+        }
+      } else {
+        // Move puck towards target
+        const diff = highstrikerGameState.targetPuckY - highstrikerGameState.puckY;
+        if (Math.abs(diff) > 2) {
+          highstrikerGameState.puckY += diff * 0.1;
+        } else {
+          highstrikerGameState.puckY = highstrikerGameState.targetPuckY;
+          finishStrike(ctx, canvas);
+        }
+      }
+
+      drawHighStrikerGame(ctx, canvas);
+      highstrikerGameState.animationId = requestAnimationFrame(animateHighStriker);
+    }
+  }
+
+  if (highstrikerGameState.animationId) cancelAnimationFrame(highstrikerGameState.animationId);
+  animateHighStriker();
+}
+
+function drawHighStrikerGame(ctx, canvas) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const centerX = canvas.width / 2;
+  const bottomY = 520;
+  const topY = 100;
+  const trackHeight = bottomY - topY;
+
+  // Draw Machine
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(centerX - 40, topY - 40, 80, trackHeight + 60);
+
+  // Draw Scale
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(centerX, topY);
+  ctx.lineTo(centerX, bottomY);
+  ctx.stroke();
+
+  // Draw ticks
+  ctx.strokeStyle = '#64748b';
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= 10; i++) {
+    const ty = bottomY - (i / 10) * trackHeight;
+    ctx.beginPath();
+    ctx.moveTo(centerX - 15, ty);
+    ctx.lineTo(centerX + 15, ty);
+    ctx.stroke();
+  }
+
+  // Draw Bell
+  ctx.fillStyle = '#fbbf24';
+  ctx.beginPath();
+  ctx.arc(centerX, topY - 10, 25, 0, Math.PI, true);
+  ctx.fill();
+
+  // Draw Puck
+  ctx.fillStyle = '#ef4444';
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'rgba(239, 68, 68, 0.5)';
+  ctx.fillRect(centerX - 20, highstrikerGameState.puckY - 10, 40, 20);
+  ctx.shadowBlur = 0;
+
+  // Draw Base/Hammer Target
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(centerX - 60, bottomY - 10, 120, 30);
+
+  // Power bar (Indicator)
+  const barX = 320;
+  const barY = bottomY;
+  const barH = 200;
+  const barW = 20;
+
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(barX, barY - barH, barW, barH);
+
+  // Power indicator
+  const displayPower = 1 - highstrikerGameState.power;
+  const fillH = displayPower * barH;
+  const hue = (1 - displayPower) * 120;
+  ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+  ctx.fillRect(barX, barY - fillH, barW, fillH);
+
+  ctx.strokeStyle = '#fff';
+  ctx.strokeRect(barX, barY - barH, barW, barH);
+
+  // Label
+  ctx.fillStyle = '#000';
+  ctx.font = '12px Poppins';
+  ctx.textAlign = 'center';
+  ctx.fillText('PUISSANCE', barX + 10, barY + 20);
+
+  if (!highstrikerGameState.isHitting && !highstrikerGameState.finished) {
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 16px Poppins';
+    ctx.fillText('👆 Touchez pour frapper !', centerX, 50);
+  }
+}
+
+function strikeHammer(ctx, canvas) {
+  if (highstrikerGameState.isHitting || highstrikerGameState.finished) return;
+
+  highstrikerGameState.isHitting = true;
+  document.getElementById('highstrikerHitBtn').disabled = true;
+
+  // User: "hit when lowest" -> lowest power = highest hit
+  // power is 0 to 1.
+  const strength = 1 - highstrikerGameState.power; // 0 (bad) to 1 (perfect)
+
+  const bottomY = 520;
+  const topY = 100;
+  const trackHeight = bottomY - topY;
+
+  // Target puck height
+  highstrikerGameState.targetPuckY = bottomY - (strength * trackHeight);
+}
+
+function finishStrike(ctx, canvas) {
+  highstrikerGameState.finished = true;
+
+  const bottomY = 520;
+  const topY = 100;
+  const trackHeight = bottomY - topY;
+  const finalStrength = (bottomY - highstrikerGameState.puckY) / trackHeight;
+
+  let tickets = 0;
+  let resType = 'lose';
+  let message = '';
+
+  if (finalStrength == 1) {
+    tickets = 5;
+    resType = 'win';
+    message = '🔔 DING DING DING ! Sommet atteint ! +5🎟️';
+    createConfetti();
+  } else if (finalStrength >= 0.6) {
+    tickets = 3;
+    resType = 'partial';
+    message = '💪 Belle force ! +3🎟️';
+  } else if (finalStrength >= 0.3) {
+    tickets = 1;
+    resType = 'partial';
+    message = '🔨 Pas mal, mais peut mieux faire. +1🎟️';
+  } else {
+    tickets = 0;
+    resType = 'lose';
+    message = '😢 Un peu faiblard... Réessayez !';
+  }
+
+  if (tickets > 0) {
+    addTickets(tickets);
+    updateStats(true, tickets);
+  } else {
+    updateStats(false, 0);
+  }
+
+  showResult('highstrikerResult', resType, message);
+  document.getElementById('highstrikerNewGameBtn').style.display = 'block';
+}
+
+// ========================================
+// GAME 7: BALLONS À ÉCLATER (Balloon Pop)
+// ========================================
+let balloonpopGameState = {
+  balloons: [],
+  score: 0,
+  timeLeft: 20,
+  isActive: false,
+  finished: false,
+  lastSpawnTime: 0,
+  animationId: null,
+  timerInterval: null
+};
+
+function initBalloonPopGame() {
+  const canvas = document.getElementById('balloonpopCanvas');
+  const ctx = canvas.getContext('2d');
+
+  balloonpopGameState = {
+    balloons: [],
+    score: 0,
+    timeLeft: 20,
+    isActive: false,
+    finished: false,
+    lastSpawnTime: 0,
+    animationId: null,
+    timerInterval: null
+  };
+
+  const startBtn = document.getElementById('balloonpopStartBtn');
+  startBtn.disabled = false;
+  startBtn.style.display = 'block';
+  startBtn.onclick = () => startBalloonPop();
+
+  document.getElementById('balloonpopNewGameBtn').onclick = () => {
+    const tickets = getTickets();
+    if (tickets < 5) {
+      showPopup('🎟️', 'Tickets insuffisants', 'Il vous faut 5 tickets !');
+      return;
+    }
+    removeTickets(5);
+    initBalloonPopGame();
+    document.getElementById('balloonpopResult').className = 'result-message';
+    document.getElementById('balloonpopNewGameBtn').style.display = 'none';
+  };
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  const handleClick = (e) => {
+    if (!balloonpopGameState.isActive) {
+      if (!balloonpopGameState.finished) startBalloonPop();
+      return;
+    }
+    const pos = getMousePos(e);
+
+    // Check balloons from top to bottom
+    for (let i = balloonpopGameState.balloons.length - 1; i >= 0; i--) {
+      const b = balloonpopGameState.balloons[i];
+      if (b.popped) continue;
+
+      const dist = Math.sqrt((pos.x - b.x) ** 2 + (pos.y - b.y) ** 2);
+      if (dist < b.r + 10) {
+        b.popped = true;
+        balloonpopGameState.score += b.points;
+        updateBalloonUI();
+        break;
+      }
+    }
+  };
+
+  canvas.onmousedown = handleClick;
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleClick(e); }, { passive: false });
+
+  updateBalloonUI();
+  drawBalloonPopGame(ctx, canvas);
+}
+
+function updateBalloonUI() {
+  document.getElementById('balloonpopTimerDisplay').textContent = `Temps : ${Math.ceil(balloonpopGameState.timeLeft)}s`;
+  document.getElementById('balloonpopScoreDisplay').textContent = `Score : ${balloonpopGameState.score} pts`;
+}
+
+function startBalloonPop() {
+  const canvas = document.getElementById('balloonpopCanvas');
+  const ctx = canvas.getContext('2d');
+
+  balloonpopGameState.isActive = true;
+  document.getElementById('balloonpopStartBtn').style.display = 'none';
+
+  balloonpopGameState.timerInterval = setInterval(() => {
+    balloonpopGameState.timeLeft -= 0.1;
+    if (balloonpopGameState.timeLeft <= 0) {
+      balloonpopGameState.timeLeft = 0;
+      finishBalloonPop(ctx, canvas);
+    }
+    updateBalloonUI();
+  }, 100);
+
+  function animateBalloonPop() {
+    if (balloonpopGameState.isActive) {
+      updateBalloonPhysics(canvas);
+      drawBalloonPopGame(ctx, canvas);
+      balloonpopGameState.animationId = requestAnimationFrame(animateBalloonPop);
+    }
+  }
+  animateBalloonPop();
+}
+
+function updateBalloonPhysics(canvas) {
+  // Spawn balloons
+  const now = Date.now();
+  if (now - balloonpopGameState.lastSpawnTime > 400 + Math.random() * 600) {
+    balloonpopGameState.lastSpawnTime = now;
+    const isGold = Math.random() < 0.15;
+    balloonpopGameState.balloons.push({
+      x: 50 + Math.random() * (canvas.width - 100),
+      y: canvas.height + 50,
+      r: 30 + Math.random() * 10,
+      speed: 1.5 + Math.random() * 2,
+      drift: (Math.random() - 0.5) * 1,
+      color: isGold ? '#fbbf24' : '#dc2626',
+      points: isGold ? 5 : 1,
+      popped: false,
+      popAnim: 0
+    });
+  }
+
+  // Move balloons
+  balloonpopGameState.balloons.forEach((b, index) => {
+    if (!b.popped) {
+      b.y -= b.speed;
+      b.x += Math.sin(Date.now() / 500 + index) * b.drift;
+    } else {
+      b.popAnim += 0.2;
+    }
+  });
+
+  // Remove off-screen or finished pop balloons
+  balloonpopGameState.balloons = balloonpopGameState.balloons.filter(b =>
+    b.y > -100 && (b.popAnim < 1)
+  );
+}
+
+function drawBalloonPopGame(ctx, canvas) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#bae6fd');
+  grad.addColorStop(1, '#e0f2fe');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw balloons
+  balloonpopGameState.balloons.forEach(b => {
+    if (!b.popped) {
+      ctx.save();
+      ctx.translate(b.x, b.y);
+
+      // Balloon thread
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, b.r);
+      ctx.quadraticCurveTo(5, b.r + 10, 0, b.r + 30);
+      ctx.stroke();
+
+      // Balloon body
+      ctx.fillStyle = b.color;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, b.r * 0.9, b.r, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(-b.r / 3, -b.r / 3, b.r / 4, b.r / 3, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    } else {
+      // Pop animation
+      ctx.strokeStyle = b.color;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 8; i++) {
+        const angle = i * Math.PI / 4;
+        const dist = b.r * (1 + b.popAnim);
+        ctx.beginPath();
+        ctx.moveTo(b.x + Math.cos(angle) * (dist - 10), b.y + Math.sin(angle) * (dist - 10));
+        ctx.lineTo(b.x + Math.cos(angle) * dist, b.y + Math.sin(angle) * dist);
+        ctx.stroke();
+      }
+    }
+  });
+
+  // UI Hint
+  if (!balloonpopGameState.isActive && !balloonpopGameState.finished) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.font = 'bold 20px Poppins';
+    ctx.textAlign = 'center';
+    ctx.fillText('🚀 Cliquez sur Commencer pour jouer !', canvas.width / 2, canvas.height / 2);
+  }
+}
+
+function finishBalloonPop(ctx, canvas) {
+  balloonpopGameState.isActive = false;
+  balloonpopGameState.finished = true;
+  clearInterval(balloonpopGameState.timerInterval);
+  if (balloonpopGameState.animationId) cancelAnimationFrame(balloonpopGameState.animationId);
+
+  const score = balloonpopGameState.score;
+  let tickets = 0;
+  if (score >= 80) tickets = 8;
+  else if (score >= 50) tickets = 5;
+  else if (score >= 30) tickets = 3;
+  else if (score >= 10) tickets = 1;
+
+  if (tickets > 0) {
+    addTickets(tickets);
+    updateStats(true, tickets);
+    showResult('balloonpopResult', 'win', `🎈 Bravo ! ${score} points = ${tickets}🎟️ gagnés !`);
+    if (tickets >= 5) createConfetti();
+  } else {
+    updateStats(false, 0);
+    showResult('balloonpopResult', 'lose', `😢 ${score} points... Pas assez pour des tickets !`);
+  }
+
+  document.getElementById('balloonpopNewGameBtn').style.display = 'block';
+}
+
+// ========================================
+// GAME 8: ANNEAUX SUR PIQUETS (Ring Toss)
+// ========================================
+let ringtossGameState = {
+  pegs: [],
+  rings: [],
+  tries: 3,
+  score: 0,
+  activeRing: null,
+  finished: false,
+  animationId: null
+};
+
+function initRingTossGame() {
+  const canvas = document.getElementById('ringtossCanvas');
+  const ctx = canvas.getContext('2d');
+
+  ringtossGameState = {
+    pegs: [],
+    rings: [],
+    tries: 3,
+    score: 0,
+    activeRing: null,
+    finished: false,
+    animationId: null
+  };
+
+  // Define pegs (x, y, value, name)
+  const rows = [
+    { y: 120, count: 4, val: 5, color: '#dc2626' }, // Far
+    { y: 220, count: 5, val: 2, color: '#3b82f6' }, // Mid
+    { y: 320, count: 6, val: 1, color: '#10b981' }  // Near
+  ];
+
+  rows.forEach(row => {
+    const spacing = canvas.width / (row.count + 1);
+    for (let i = 1; i <= row.count; i++) {
+      ringtossGameState.pegs.push({
+        x: i * spacing,
+        y: row.y,
+        val: row.val,
+        color: row.color,
+        hasRing: false
+      });
+    }
+  });
+
+  const throwBtn = document.getElementById('ringtossThrowBtn');
+  throwBtn.disabled = false;
+  throwBtn.style.display = 'block';
+  throwBtn.onclick = () => {
+    // Hint: click on canvas to throw
+    showPopup('⭕', 'Ring Toss', 'Cliquez sur le plateau pour lancer un anneau vers cet endroit !');
+  };
+
+  document.getElementById('ringtossNewGameBtn').onclick = () => {
+    const tickets = getTickets();
+    if (tickets < 8) {
+      showPopup('🎟️', 'Tickets insuffisants', 'Il vous faut 10 tickets !');
+      return;
+    }
+    removeTickets(8);
+    initRingTossGame();
+    document.getElementById('ringtossResult').className = 'result-message';
+    document.getElementById('ringtossNewGameBtn').style.display = 'none';
+  };
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  const handleThrow = (e) => {
+    if (ringtossGameState.finished || ringtossGameState.activeRing || ringtossGameState.tries <= 0) return;
+    const pos = getMousePos(e);
+    launchRing(pos.x, pos.y, ctx, canvas);
+  };
+
+  canvas.onmousedown = handleThrow;
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleThrow(e); }, { passive: false });
+
+  updateRingUI();
+  drawRingTossGame(ctx, canvas);
+}
+
+function updateRingUI() {
+  document.getElementById('ringtossTriesDisplay').textContent = `Anneaux : ${ringtossGameState.tries}`;
+  document.getElementById('ringtossScoreDisplay').textContent = `Gains : ${ringtossGameState.score}🎟️`;
+}
+
+function launchRing(tx, ty, ctx, canvas) {
+  ringtossGameState.activeRing = {
+    startX: 300,
+    startY: canvas.height + 50,
+    x: 300,
+    y: canvas.height + 50,
+    targetX: tx,
+    targetY: ty,
+    progress: 0,
+    speed: 0.02
+  };
+
+  function animateRing() {
+    if (ringtossGameState.activeRing) {
+      ringtossGameState.activeRing.progress += ringtossGameState.activeRing.speed;
+      const p = ringtossGameState.activeRing.progress;
+
+      // Arc movement
+      const start = { x: ringtossGameState.activeRing.startX, y: ringtossGameState.activeRing.startY };
+      const target = { x: ringtossGameState.activeRing.targetX, y: ringtossGameState.activeRing.targetY };
+
+      ringtossGameState.activeRing.x = start.x + (target.x - start.x) * p;
+      const arcHeight = 200;
+      ringtossGameState.activeRing.y = start.y + (target.y - start.y) * p - Math.sin(p * Math.PI) * arcHeight;
+
+      drawRingTossGame(ctx, canvas);
+
+      if (p < 1) {
+        requestAnimationFrame(animateRing);
+      } else {
+        checkRingLanding();
+        drawRingTossGame(ctx, canvas);
+      }
+    }
+  }
+  animateRing();
+}
+
+function checkRingLanding() {
+  const ring = ringtossGameState.activeRing;
+  ringtossGameState.activeRing = null;
+  ringtossGameState.tries--;
+
+  let hit = false;
+  ringtossGameState.pegs.forEach(peg => {
+    const dist = Math.sqrt((ring.targetX - peg.x) ** 2 + (ring.targetY - peg.y) ** 2);
+    if (dist < 20 && !peg.hasRing) {
+      peg.hasRing = true;
+      ringtossGameState.score += peg.val;
+      hit = true;
+    }
+  });
+
+  // Store ring anyway for visual
+  ringtossGameState.rings.push({ x: ring.targetX, y: ring.targetY, hit: hit });
+
+  updateRingUI();
+
+  if (ringtossGameState.tries <= 0) {
+    finishRingToss();
+  }
+}
+
+function drawRingTossGame(ctx, canvas) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background (Perspective floor)
+  ctx.fillStyle = '#475569';
+  ctx.beginPath();
+  ctx.moveTo(0, 100);
+  ctx.lineTo(canvas.width, 100);
+  ctx.lineTo(canvas.width + 100, canvas.height);
+  ctx.lineTo(-100, canvas.height);
+  ctx.fill();
+
+  // Draw Pegs
+  ringtossGameState.pegs.forEach(peg => {
+    // Peg Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(peg.x, peg.y + 5, 10, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Peg Body
+    ctx.fillStyle = peg.color;
+    ctx.fillRect(peg.x - 4, peg.y - 40, 8, 40);
+    ctx.beginPath();
+    ctx.arc(peg.x, peg.y - 40, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // If has ring
+    if (peg.hasRing) {
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(peg.x, peg.y - 10, 20, 10, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  });
+
+  // Draw Missed Rings
+  ringtossGameState.rings.forEach(ring => {
+    if (!ring.hit) {
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(ring.x, ring.y, 20, 10, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  });
+
+  // Draw Active Ring
+  if (ringtossGameState.activeRing) {
+    const ring = ringtossGameState.activeRing;
+    const scale = 1 + (1 - ring.progress);
+    ctx.strokeStyle = '#fde047';
+    ctx.lineWidth = 5 * scale;
+    ctx.beginPath();
+    ctx.ellipse(ring.x, ring.y, 30 * scale, 15 * scale, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // UI Hint
+  if (!ringtossGameState.finished && ringtossGameState.tries > 0 && !ringtossGameState.activeRing) {
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Poppins';
+    ctx.textAlign = 'center';
+    ctx.fillText('👆 Touchez le plateau pour lancer un anneau', canvas.width / 2, 40);
+  }
+}
+
+function finishRingToss() {
+  ringtossGameState.finished = true;
+
+  const score = ringtossGameState.score;
+  if (score > 0) {
+    addTickets(score);
+    updateStats(true, score);
+    showResult('ringtossResult', 'win', `⭕ Bien joué ! Vous gagnez ${score}🎟️ !`);
+    if (score >= 5) createConfetti();
+  } else {
+    updateStats(false, 0);
+    showResult('ringtossResult', 'lose', `😢 Aucun piquet touché... Réessayez !`);
+  }
+
+  document.getElementById('ringtossNewGameBtn').style.display = 'block';
+  document.getElementById('ringtossThrowBtn').disabled = true;
 }
 
 // ========================================

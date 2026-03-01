@@ -1,7 +1,3 @@
-import { auth } from "../../../js/config/firebase-config.js";
-import { createRoom, joinRoom, updateRoom, getRoom, deleteRoom, checkRoomExists, listenToRoomChanges } from "../../../js/firebaseWrk.js";
-import { checkRealConnection } from "../../../js/network.js";
-
 // ========================================
 // STORAGE KEYS
 // ========================================
@@ -90,14 +86,14 @@ const CRASH_CONFIG = {
 };
 
 const BLACKJACK_CONFIG = {
-  bet: 25,
+  bet: 5,
 };
 
 const PLINKO_CONFIG = {
   bet: 5,
   rows: 10,
-  multipliers: [15, 8, 5, 3, 2, 1, 0.5, 1, 2, 3, 5, 8, 15],
-  prizes: [75, 40, 25, 15, 10, 5, 2.5, 5, 10, 15, 25, 40, 75],
+  multipliers: [8, 5, 3, 2, 1, 0.5, 0, 0.5, 1, 2, 3, 5, 8],
+  prizes: [40, 25, 15, 10, 5, 2.5, 0, 2.5, 5, 10, 15, 25, 40],
 };
 
 const HILO_CONFIG = {
@@ -121,32 +117,6 @@ const blackjackGame = document.getElementById("blackjackGame");
 const plinkoGame = document.getElementById("plinkoGame");
 const hiloGame = document.getElementById("hiloGame");
 const gameOverDiv = document.getElementById("gameOver");
-
-// Rooms
-const baseMenu = document.getElementById("baseMenu");
-const roomMenu = document.getElementById("roomMenu");
-
-const joinRoomForm = document.getElementById("joinRoomForm");
-const joinPlayerName = document.getElementById("joinPlayerName");
-const joinRoomID = document.getElementById("joinRoomID");
-const joinRoomBtnForm = document.getElementById("joinRoomBtnForm");
-const cancelJoinBtn = document.getElementById("cancelJoinBtn");
-
-const createRoomForm = document.getElementById("createRoomForm");
-const createPlayerName = document.getElementById("createPlayerName");
-const createRoomID = document.getElementById("createRoomID");
-const createSlider = document.getElementById("createSlider");
-const sliderValue = document.getElementById("sliderValue");
-const createRoomBtnForm = document.getElementById("createRoomBtnForm");
-const cancelCreateBtn = document.getElementById("cancelCreateBtn");
-
-// Room buttons
-const showJoinRoom = document.getElementById("showJoinRoom");
-const showCreateRoom = document.getElementById("showCreateRoom");
-
-// Lobby
-const gameLobby = document.getElementById("gameLobby");
-let roomID = null;
 
 // ========================================
 // CURRENT GAME STATE
@@ -188,7 +158,7 @@ function init() {
       initCrashGame();
       break;
     case "blackjack":
-      initGameWithRooms("blackjack");
+      initBlackjackGame();
       break;
     case "plinko":
       initPlinkoGame();
@@ -196,179 +166,9 @@ function init() {
     case "hilo":
       initHiloGame();
       break;
-    // case "texas":
-    //   initGameWithRooms("texas");
-    //   break;
   }
 
   updateMoneyDisplay();
-}
-
-// ========================================
-// GAME WITH ROOMS MANAGEMENT
-// ========================================
-function initGameWithRooms(gameType) {
-  // Si le menu room existe, vérifier la connexion
-  if (roomMenu && checkRealConnection()) {
-    setupRoomUI(gameType);
-  } else {
-    // Pas de connexion ou pas de menu room -> mode solo direct
-    startSoloGame(gameType);
-  }
-}
-
-function startSoloGame(gameType) {
-  // Cacher le menu room si présent
-  if (roomMenu) roomMenu.style.display = "none";
-
-  switch (gameType) {
-    case "blackjack":
-      initBlackjackSoloGame();
-      break;
-    // case "texas":
-    //   initTexasSoloGame();
-    //   break;
-    default:
-      console.error("Jeu solo inconnu");
-  }
-}
-
-// ========================================
-// ROOM SYSTEM (GÉNÉRIQUE)
-// ========================================
-function setupRoomUI(gameType) {
-  // ===== MENU =====
-  showJoinRoom.onclick = () => toggleMenu("join");
-  showCreateRoom.onclick = () => {
-    generateRoomID();
-    toggleMenu("create");
-  };
-
-  cancelJoinBtn.onclick = () => toggleMenu("base");
-  cancelCreateBtn.onclick = () => toggleMenu("base");
-
-  // ===== SLIDER =====
-  createSlider.oninput = () => {
-    sliderValue.textContent = createSlider.value;
-  };
-
-  // ===== JOIN ROOM =====
-  joinRoomBtnForm.onclick = async () => {
-    const name = joinPlayerName.value.trim();
-    roomID = joinRoomID.value.trim();
-
-    if (!name || !roomID) return alert("Nom et ID requis !");
-
-    const playerData = {
-      name,
-      score: 0,
-      uid: auth.currentUser.uid
-    };
-
-    const success = await joinRoom(roomID, playerData);
-    if (!success) return alert("Impossible de rejoindre la room");
-
-    toggleMenu("none");
-    initLobby(roomID, gameType);
-  };
-
-  // ===== CREATE ROOM =====
-  createRoomBtnForm.onclick = async () => {
-    const name = createPlayerName.value.trim();
-    roomID = parseInt(createRoomID.value, 10);
-    const numPlayers = parseInt(createSlider.value, 10);
-
-    if (!name) return alert("Entrez votre nom !");
-
-    // Solo automatique
-    if (numPlayers < 2) {
-      startSoloGame(gameType);
-      roomMenu.style.display = "none";
-      return;
-    }
-
-    const roomData = {
-      gameType,
-      leader: name,
-      leaderId: auth.currentUser.uid,
-      numPlayers,
-      players: {
-        [auth.currentUser.uid]: {
-          name,
-          score: 0,
-          uid: auth.currentUser.uid
-        }
-      }
-    };
-
-    await createRoom(roomID, roomData);
-
-    toggleMenu("none");
-    initLobby(roomID, gameType);
-    roomMenu.style.display = "none";
-  };
-}
-
-// LOBBY
-function initLobby(roomID, gameType) {
-  gameLobby.style.display = "block";
-  if (roomMenu) roomMenu.style.display = "none";
-
-  listenToRoomChanges(roomID, (room) => {
-    if (!room) return;
-
-    const players = Object.values(room.players || {});
-    const numPlayers = room.numPlayers;
-
-    updateLobbyUI(players, numPlayers);
-
-    if (players.length === numPlayers) {
-      setTimeout(() => {
-        startMultiGame(gameType, room);
-      }, 2000);
-    }
-  });
-}
-
-const lobbyStatus = document.getElementById("lobbyStatus");
-const playerList = document.getElementById("playerList");
-
-function updateLobbyUI(players, numPlayers) {
-  playerList.innerHTML = "";
-
-  players.forEach(player => {
-    const li = document.createElement("li");
-    li.textContent = player.name;
-    playerList.appendChild(li);
-  });
-
-  if (players.length === numPlayers) {
-    lobbyStatus.innerHTML = `Room ${roomID} <br> Tous les joueurs sont là !`;
-  } else {
-    lobbyStatus.innerHTML = `Room ${roomID} <br> En attente de joueurs... (${players.length}/${numPlayers})`;
-  }
-}
-
-function startMultiGame(gameType, room) {
-  switch (gameType) {
-    case "blackjack":
-      startBlackjackMultiGame(room);
-      break;
-    // case "texas":
-    //   startTexasMultiGame(room);
-    //   gameInstance = new TexasGame(room.players, room.leaderId);
-    //   break;
-  }
-}
-
-function toggleMenu(state) {
-  baseMenu.style.display = state === "base" ? "block" : "none";
-  joinRoomForm.style.display = state === "join" ? "block" : "none";
-  createRoomForm.style.display = state === "create" ? "block" : "none";
-}
-
-function generateRoomID() {
-  createRoomID.value = Math.floor(1000 + Math.random() * 9000);
 }
 
 // ========================================
@@ -1220,25 +1020,14 @@ let bjPlayerHand = [];
 let bjDealerHand = [];
 let bjGameActive = false;
 
-// Éléments DOM
-const bjDealBtn = document.getElementById("bjDealBtn");
-const bjHitBtn = document.getElementById("bjHitBtn");
-const bjStandBtn = document.getElementById("bjStandBtn");
-const playerHandDiv = document.getElementById("playerHand");
-const dealerHandDiv = document.getElementById("dealerHand");
-const resultDiv = document.getElementById("blackjackResult");
-
-// ========================================
-// BLACKJACK - SOLO MODE
-// ========================================
-function initBlackjackSoloGame() {
+function initBlackjackGame() {
   blackjackGame.style.display = "block";
   gameTitleEl.textContent = "🃏 Blackjack 21";
   betAmountEl.textContent = `${BLACKJACK_CONFIG.bet}€`;
 
-  bjDealBtn.onclick = bjDeal;
-  bjHitBtn.onclick = bjHit;
-  bjStandBtn.onclick = bjStand;
+  document.getElementById("bjDealBtn").addEventListener("click", bjDeal);
+  document.getElementById("bjHitBtn").addEventListener("click", bjHit);
+  document.getElementById("bjStandBtn").addEventListener("click", bjStand);
 }
 
 function createBJDeck() {
@@ -1322,6 +1111,10 @@ function bjDeal() {
   bjDealerHand = [bjDeck.pop(), bjDeck.pop()];
   bjGameActive = true;
 
+  const playerHandDiv = document.getElementById("playerHand");
+  const dealerHandDiv = document.getElementById("dealerHand");
+  const resultDiv = document.getElementById("blackjackResult");
+
   playerHandDiv.innerHTML = "";
   dealerHandDiv.innerHTML = "";
   resultDiv.textContent = "";
@@ -1339,9 +1132,9 @@ function bjDeal() {
     bjDealerHand[0],
   );
 
-  bjDealBtn.style.display = "none";
-  bjHitBtn.style.display = "inline-block";
-  bjStandBtn.style.display = "inline-block";
+  document.getElementById("bjDealBtn").style.display = "none";
+  document.getElementById("bjHitBtn").style.display = "inline-block";
+  document.getElementById("bjStandBtn").style.display = "inline-block";
 
   // Check for blackjack
   if (bjCalculateScore(bjPlayerHand) === 21) {
@@ -1355,6 +1148,7 @@ function bjHit() {
   const newCard = bjDeck.pop();
   bjPlayerHand.push(newCard);
 
+  const playerHandDiv = document.getElementById("playerHand");
   playerHandDiv.appendChild(bjRenderCard(newCard));
 
   const playerScore = bjCalculateScore(bjPlayerHand);
@@ -1373,6 +1167,7 @@ function bjStand() {
   bjGameActive = false;
 
   // Reveal dealer's hidden card
+  const dealerHandDiv = document.getElementById("dealerHand");
   dealerHandDiv.innerHTML = "";
   bjDealerHand.forEach((card) => dealerHandDiv.appendChild(bjRenderCard(card)));
 
@@ -1403,6 +1198,7 @@ function bjEndGame(condition) {
 
   const playerScore = bjCalculateScore(bjPlayerHand);
   const dealerScore = bjCalculateScore(bjDealerHand);
+  const resultDiv = document.getElementById("blackjackResult");
 
   let result = "";
   let won = false;
@@ -1437,650 +1233,9 @@ function bjEndGame(condition) {
 
   resultDiv.textContent = result;
 
-  bjDealBtn.style.display = "inline-block";
-  bjHitBtn.style.display = "none";
-  bjStandBtn.style.display = "none";
-}
-
-// ========================================
-// BLACKJACK - MULTIPLAYER MODE
-// ========================================
-
-let gameInstance;
-let room;
-let currentPlayerIndex = 0;
-let isMyTurn = false;
-let myUID = null;
-
-function startBlackjackMultiGame(roomData) {
-  gameLobby.style.display = "none";
-  room = roomData;
-  myUID = auth.currentUser.uid;
-
-  // Initialiser l'UI multiplayer
-  initBlackjackMultiUI();
-
-  // ✅ TOUS les joueurs écoutent les changements
-  listenToGameChanges();
-
-  // Le leader affiche le bouton DISTRIBUER
-  if (auth.currentUser.uid === room.leaderId) {
-    gameInstance = new BlackjackMultiGame(room);
-    bjDealBtn.style.display = "inline-block";
-    bjDealBtn.textContent = "🎴 DISTRIBUER (25€)";
-    bjDealBtn.onclick = () => startMultiRound();
-  }
-}
-
-async function startMultiRound() {
-  if (!gameInstance) return;
-
-  bjDealBtn.style.display = "none";
-
-  // ✅ Marquer le jeu comme "started" dans Firebase
-  await updateRoom(roomID, { gameStarted: true });
-
-  await gameInstance.startGame();
-}
-
-// ========================================
-// CLASSE BLACKJACK MULTI
-// ========================================
-class BlackjackMultiGame {
-  constructor(roomData) {
-    this.roomID = roomData.roomID || roomID;
-    this.players = roomData.players;
-    this.leaderId = roomData.leaderId;
-    this.deck = this.createDeck();
-    this.dealerHand = [];
-    this.currentPlayerIndex = 0;
-    this.gameActive = false;
-    this.gamePhase = "betting";
-  }
-
-  createDeck() {
-    const suits = ["♠", "♥", "♦", "♣"];
-    const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-    const deck = [];
-    for (let suit of suits) {
-      for (let value of values) {
-        deck.push({ value, suit });
-      }
-    }
-    return deck.sort(() => Math.random() - 0.5);
-  }
-
-  getCardValue(card) {
-    if (card.value === "A") return 11;
-    if (["J", "Q", "K"].includes(card.value)) return 10;
-    return parseInt(card.value);
-  }
-
-  calculateScore(hand) {
-    let score = 0;
-    let aces = 0;
-    for (let card of hand) {
-      const val = this.getCardValue(card);
-      score += val;
-      if (card.value === "A") aces++;
-    }
-    while (score > 21 && aces > 0) {
-      score -= 10;
-      aces--;
-    }
-    return score;
-  }
-
-  async startGame() {
-    console.log("🎴 Distribution des cartes...");
-
-    // Distribuer 2 cartes à chaque joueur
-    for (let uid in this.players) {
-      this.players[uid].hand = [this.deck.pop(), this.deck.pop()];
-      this.players[uid].score = this.calculateScore(this.players[uid].hand);
-      this.players[uid].stand = false;
-      this.players[uid].bust = false;
-      this.players[uid].result = null;
-      this.players[uid].hasPaid = false; // ✅ Flag individuel par joueur
-    }
-
-    // Distribuer 2 cartes au dealer
-    this.dealerHand = [this.deck.pop(), this.deck.pop()];
-
-    this.gameActive = true;
-    this.gamePhase = "playing"; // ✅ IMPORTANT: Changer en "playing"
-    this.currentPlayerIndex = 0;
-
-    console.log("✅ Cartes distribuées, phase:", this.gamePhase);
-    console.log("👥 Joueurs:", Object.keys(this.players).map(uid => ({
-      name: this.players[uid].name,
-      cards: this.players[uid].hand.length,
-      score: this.players[uid].score
-    })));
-
-    // Synchroniser avec Firebase
-    await this.syncGameState();
-  }
-
-  async syncGameState() {
-    const gameState = {
-      players: this.players,
-      dealerHand: this.dealerHand,
-      currentPlayerIndex: this.currentPlayerIndex,
-      gamePhase: this.gamePhase,
-      gameActive: this.gameActive,
-      deck: this.deck,
-    };
-
-    console.log("🔄 Sync Firebase - Phase:", gameState.gamePhase, "Joueur actif:", gameState.currentPlayerIndex);
-    await updateRoom(this.roomID, { gameState });
-  }
-
-  getPlayerUIDs() {
-    return Object.keys(this.players);
-  }
-
-  getCurrentPlayerUID() {
-    const uids = this.getPlayerUIDs();
-    return uids[this.currentPlayerIndex];
-  }
-
-  async playerHit(uid) {
-    const currentRoom = await getRoom(this.roomID);
-    if (!currentRoom || !currentRoom.gameState) return;
-
-    const gameState = currentRoom.gameState;
-    const player = gameState.players[uid];
-
-    if (!player || player.stand || player.bust) return;
-
-    // ✅ utiliser le deck Firebase
-    const newCard = gameState.deck.pop();
-
-    if (!newCard) {
-      console.error("Deck vide !");
-      return;
-    }
-
-    player.hand.push(newCard);
-    player.score = this.calculateScore(player.hand);
-
-    if (player.score > 21) {
-      player.bust = true;
-      player.stand = true;
-      this.currentPlayerIndex++;
-    }
-
-    // ✅ resync proprement
-    this.deck = gameState.deck;
-    this.players = gameState.players;
-
-    await this.syncGameState();
-  }
-
-  async playerStand(uid) {
-    // ✅ Lire l'état actuel depuis Firebase
-    const currentRoom = await getRoom(this.roomID);
-    if (!currentRoom || !currentRoom.gameState) return;
-
-    const gameState = currentRoom.gameState;
-    const player = gameState.players[uid];
-
-    if (!player || player.stand) return;
-
-    player.stand = true;
-    console.log(`✋ ${player.name} reste avec ${player.score}`);
-
-    // ✅ Passer au joueur suivant
-    this.currentPlayerIndex++;
-
-    // Si tous les joueurs ont joué, c'est au tour du dealer
-    if (this.currentPlayerIndex >= Object.keys(gameState.players).length) {
-      console.log("🏛️ Tous les joueurs ont joué, tour du dealer");
-
-      // ✅ Mettre à jour this.players avec les nouvelles données
-      this.players = gameState.players;
-
-      await this.syncGameState();
-      await this.dealerPlay();
-      return;
-    }
-
-    // ✅ Mettre à jour this.players avec les nouvelles données
-    this.players = gameState.players;
-
-    await this.syncGameState();
-  }
-
-  async dealerPlay() {
-    this.gamePhase = "dealer";
-    await this.syncGameState();
-
-    console.log("🏛️ Le dealer joue...");
-
-    // Le dealer tire jusqu'à 17+
-    let dealerScore = this.calculateScore(this.dealerHand);
-
-    while (dealerScore < 17) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const newCard = this.deck.pop();
-      this.dealerHand.push(newCard);
-      dealerScore = this.calculateScore(this.dealerHand);
-      console.log(`🏛️ Dealer tire:`, newCard, "Score:", dealerScore);
-      await this.syncGameState();
-    }
-
-    console.log(`🏛️ Dealer s'arrête à ${dealerScore}`);
-
-    // Calculer les résultats
-    await this.finishGame(dealerScore);
-  }
-
-  async finishGame(dealerScore) {
-    this.gamePhase = "finished";
-    this.gameActive = false;
-
-    console.log("🏁 Calcul des résultats...");
-
-    // Calculer le résultat pour chaque joueur
-    for (let uid in this.players) {
-      const player = this.players[uid];
-
-      if (player.bust) {
-        player.result = "bust";
-        player.winAmount = 0;
-      } else if (dealerScore > 21) {
-        player.result = "win";
-        player.winAmount = BLACKJACK_CONFIG.bet * 2;
-      } else if (player.score > dealerScore) {
-        player.result = "win";
-        player.winAmount = BLACKJACK_CONFIG.bet * 2;
-      } else if (player.score === dealerScore) {
-        player.result = "draw";
-        player.winAmount = BLACKJACK_CONFIG.bet;
-      } else {
-        player.result = "lose";
-        player.winAmount = 0;
-      }
-
-      console.log(`${player.name}: ${player.result} (${player.winAmount}€)`);
-    }
-
-    await this.syncGameState();
-  }
-}
-
-// ========================================
-// UI MULTIPLAYER
-// ========================================
-function initBlackjackMultiUI() {
-  blackjackGame.style.display = "block";
-  gameTitleEl.textContent = "🃏 Blackjack 21 - Multijoueur";
-  betAmountEl.textContent = `${BLACKJACK_CONFIG.bet}€`;
-
-  // Cacher les éléments solo
-  const soloTable = document.querySelector('.blackjack-table');
-  if (soloTable) soloTable.style.display = "none";
-
-  // Afficher la table multi
-  const multiTable = document.getElementById("multiplayerTable");
-  if (multiTable) {
-    multiTable.style.display = "block";
-  } else {
-    createMultiplayerTable();
-  }
-
-  // Boutons
-  bjHitBtn.onclick = () => handleHit();
-  bjStandBtn.onclick = () => handleStand();
-  bjDealBtn.style.display = "none";
-}
-
-function createMultiplayerTable() {
-  const container = blackjackGame.querySelector('.blackjack-game');
-
-  // Créer la table multi
-  const multiTable = document.createElement('div');
-  multiTable.id = "multiplayerTable";
-  multiTable.className = "multiplayer-table";
-  multiTable.innerHTML = `
-    <div class="dealer-section">
-      <h3>🏛️ Banque <span id="multiDealerScore">0</span></h3>
-      <div class="cards-hand" id="multiDealerHand"></div>
-    </div>
-    
-    <div class="players-grid" id="playersGrid">
-      <!-- Les joueurs seront ajoutés dynamiquement -->
-    </div>
-  `;
-
-  // Insérer après le header
-  const header = container.querySelector('.blackjack-header');
-  header.after(multiTable);
-}
-
-function renderMultiplayerGame(gameState) {
-  if (!gameState) {
-    console.warn("⚠️ renderMultiplayerGame appelé sans gameState");
-    return;
-  }
-
-  console.log("🎨 Render - Phase:", gameState.gamePhase, "Joueur actif:", gameState.currentPlayerIndex);
-
-  const playersGrid = document.getElementById("playersGrid");
-  if (!playersGrid) return;
-
-  playersGrid.innerHTML = "";
-
-  // Afficher tous les joueurs
-  const playerUIDs = Object.keys(gameState.players);
-  playerUIDs.forEach((uid, index) => {
-    const player = gameState.players[uid];
-    const isCurrentPlayer = index === gameState.currentPlayerIndex;
-    const isMe = uid === myUID;
-
-    console.log(`👤 Render ${player.name}: ${player.hand?.length || 0} cartes`);
-
-    const playerCard = document.createElement('div');
-    playerCard.className = `player-card ${isCurrentPlayer ? 'active' : ''} ${isMe ? 'me' : ''}`;
-    playerCard.innerHTML = `
-      <div class="player-info">
-        <h4>${player.name} ${isMe ? '(Vous)' : ''}</h4>
-        <div class="player-score">Score: ${player.score || 0}</div>
-        ${player.stand ? '<span class="status-badge stand">✋ Stand</span>' : ''}
-        ${player.bust ? '<span class="status-badge bust">💥 Bust</span>' : ''}
-        ${player.result ? `<span class="status-badge ${player.result}">${getResultText(player.result)}</span>` : ''}
-      </div>
-      <div class="cards-hand" id="hand-${uid}"></div>
-    `;
-    playersGrid.appendChild(playerCard);
-
-    // Afficher les cartes du joueur
-    const handDiv = document.getElementById(`hand-${uid}`);
-    if (player.hand && player.hand.length > 0) {
-      player.hand.forEach(card => {
-        handDiv.appendChild(bjRenderCard(card));
-      });
-    }
-  });
-
-  // Afficher les cartes du dealer
-  const dealerHandDiv = document.getElementById("multiDealerHand");
-  const dealerScoreSpan = document.getElementById("multiDealerScore");
-
-  if (dealerHandDiv && gameState.dealerHand && gameState.dealerHand.length > 0) {
-    dealerHandDiv.innerHTML = "";
-
-    console.log(`🏛️ Render dealer: ${gameState.dealerHand.length} cartes`);
-
-    gameState.dealerHand.forEach((card, index) => {
-      // Cacher la 2ème carte si le jeu est encore actif
-      const hideCard = index === 1 && gameState.gamePhase === "playing";
-      dealerHandDiv.appendChild(bjRenderCard(card, hideCard));
-    });
-
-    // Score du dealer
-    if (gameState.gamePhase === "playing") {
-      dealerScoreSpan.textContent = bjGetCardValue(gameState.dealerHand[0]);
-    } else {
-      dealerScoreSpan.textContent = calculateScoreHelper(gameState.dealerHand);
-    }
-  }
-
-  // Gérer les boutons
-  updateMultiplayerButtons(gameState);
-
-  // Afficher le résultat final
-  if (gameState.gamePhase === "finished") {
-    showMultiplayerResults(gameState);
-  }
-}
-
-function updateMultiplayerButtons(gameState) {
-  const isMyTurnNow = gameState.currentPlayerIndex !== undefined &&
-    Object.keys(gameState.players)[gameState.currentPlayerIndex] === myUID;
-
-  const myPlayer = gameState.players[myUID];
-  const gameInProgress = gameState.gamePhase === "playing";
-
-  if (gameInProgress && isMyTurnNow && myPlayer && !myPlayer.stand && !myPlayer.bust) {
-    bjHitBtn.style.display = "inline-block";
-    bjStandBtn.style.display = "inline-block";
-    bjHitBtn.disabled = false;
-    bjStandBtn.disabled = false;
-  } else {
-    bjHitBtn.style.display = "none";
-    bjStandBtn.style.display = "none";
-  }
-
-  // Bouton "Nouvelle partie" si la partie est terminée et qu'on est le leader
-  if (gameState.gamePhase === "finished" && auth.currentUser.uid === room.leaderId) {
-    bjDealBtn.style.display = "inline-block";
-    bjDealBtn.textContent = "🎴 NOUVELLE PARTIE (25€)";
-    bjDealBtn.onclick = () => restartMultiGame();
-  } else if (gameState.gamePhase === "betting" && auth.currentUser.uid === room.leaderId) {
-    // ✅ Si on est en phase betting et qu'on est le leader, afficher DISTRIBUER
-    bjDealBtn.style.display = "inline-block";
-    bjDealBtn.textContent = "🎴 DISTRIBUER (25€)";
-    bjDealBtn.onclick = () => startMultiRound();
-  } else {
-    bjDealBtn.style.display = "none";
-  }
-}
-
-function getResultText(result) {
-  switch (result) {
-    case "win": return "🏆 Gagné";
-    case "lose": return "😔 Perdu";
-    case "draw": return "🤝 Égalité";
-    case "bust": return "💥 Bust";
-    default: return "";
-  }
-}
-
-function showMultiplayerResults(gameState) {
-  const myPlayer = gameState.players[myUID];
-  if (!myPlayer) return;
-
-  // Appliquer les gains pour le joueur local
-  if (myPlayer.winAmount > 0) {
-    addWinnings(myPlayer.winAmount);
-    updateStats(true, myPlayer.winAmount);
-  } else {
-    updateStats(false);
-  }
-
-  // Afficher le message
-  let message = "";
-  if (myPlayer.result === "win") {
-    message = `🎉 Vous avez gagné ${myPlayer.winAmount}€ !`;
-    resultDiv.className = "result-message win";
-  } else if (myPlayer.result === "draw") {
-    message = `🤝 Égalité ! Mise remboursée (${myPlayer.winAmount}€)`;
-    resultDiv.className = "result-message win";
-  } else if (myPlayer.result === "bust") {
-    message = `💥 BUST ! Vous avez dépassé 21.`;
-    resultDiv.className = "result-message lose";
-  } else {
-    message = `😔 Vous avez perdu contre la banque.`;
-    resultDiv.className = "result-message lose";
-  }
-
-  resultDiv.textContent = message;
-  resultDiv.style.display = "block";
-}
-
-// ========================================
-// ACTIONS JOUEUR
-// ========================================
-async function handleHit() {
-  bjHitBtn.disabled = true;
-  bjStandBtn.disabled = true;
-
-  if (auth.currentUser.uid === room.leaderId) {
-    // Le leader met à jour directement
-    await gameInstance.playerHit(myUID);
-  } else {
-    // Les autres joueurs envoient un signal
-    await updateRoom(roomID, {
-      playerAction: {
-        uid: myUID,
-        action: "hit",
-        timestamp: Date.now()
-      }
-    });
-  }
-}
-
-async function handleStand() {
-  bjHitBtn.disabled = true;
-  bjStandBtn.disabled = true;
-
-  if (auth.currentUser.uid === room.leaderId) {
-    await gameInstance.playerStand(myUID);
-  } else {
-    await updateRoom(roomID, {
-      playerAction: {
-        uid: myUID,
-        action: "stand",
-        timestamp: Date.now()
-      }
-    });
-  }
-}
-
-async function restartMultiGame() {
-  console.log("🔄 Restart de la partie...");
-
-  // Reset l'UI
-  resultDiv.textContent = "";
-  resultDiv.style.display = "none";
-
-  // ✅ Reset le flag gameStarted dans Firebase
-  await updateRoom(roomID, { gameStarted: false });
-
-  // ✅ Le leader recrée l'instance avec les données actuelles de la room
-  if (auth.currentUser.uid === room.leaderId) {
-    // Récupérer les données fraîches de la room
-    const freshRoomData = await getRoom(roomID);
-    if (freshRoomData) {
-      room = freshRoomData; // ✅ Mettre à jour avec les données fraîches
-      gameInstance = new BlackjackMultiGame(room);
-
-      // Afficher le bouton DISTRIBUER
-      bjDealBtn.style.display = "inline-block";
-      bjDealBtn.textContent = "🎴 DISTRIBUER (25€)";
-      bjDealBtn.onclick = () => startMultiRound();
-    }
-  }
-}
-
-// ========================================
-// ÉCOUTE DES CHANGEMENTS FIREBASE
-// ========================================
-// ✅ Variables locales pour éviter le spam
-let lastGameStateHash = null;
-let isProcessingAction = false;
-
-function listenToGameChanges() {
-  listenToRoomChanges(roomID, async (roomData) => {
-    if (!roomData) return;
-
-    // Mettre à jour la référence globale room
-    room = roomData;
-
-    // -------------------------------------------------------
-    // CAS 1 : Le jeu a démarré ET le gameState existe
-    // -------------------------------------------------------
-    if (roomData.gameStarted && roomData.gameState) {
-      const gameState = roomData.gameState;
-      const myPlayer = gameState.players[myUID];
-
-      // --- Déduire la mise UNE SEULE FOIS par joueur ---
-      if (myPlayer && myPlayer.hand && myPlayer.hand.length > 0 && !myPlayer.hasPaid) {
-
-        if (!canPlay(BLACKJACK_CONFIG.bet)) {
-          showGameOver();
-          return;
-        }
-
-        // ✅ Marquer hasPaid LOCALEMENT en premier (évite double déduction)
-        myPlayer.hasPaid = true;
-        deductBet(BLACKJACK_CONFIG.bet);
-        console.log("💰 Mise de 25€ déduite pour cette manche");
-
-        // ✅ Sauvegarder en arrière-plan SANS bloquer le render
-        updateRoom(roomID, { gameState }).catch(console.error);
-
-        // ✅ PAS DE RETURN ici → on continue vers le render
-      }
-
-      // --- Hash pour éviter les re-renders inutiles ---
-      const currentHash = JSON.stringify({
-        phase: gameState.gamePhase,
-        playerIndex: gameState.currentPlayerIndex,
-        dealerCards: gameState.dealerHand?.length,
-        playersData: Object.keys(gameState.players).map(uid => ({
-          uid,
-          cards: gameState.players[uid]?.hand?.length,
-          stand: gameState.players[uid]?.stand,
-          bust: gameState.players[uid]?.bust,
-          result: gameState.players[uid]?.result,
-        }))
-      });
-
-      // Toujours render en phase "dealer" (le score change à chaque carte)
-      if (currentHash === lastGameStateHash && gameState.gamePhase !== "dealer") {
-        return;
-      }
-      lastGameStateHash = currentHash;
-
-      // ✅ RENDER — toujours appelé, même après paiement
-      renderMultiplayerGame(gameState);
-
-      // Mettre à jour isMyTurn
-      const playerUIDs = Object.keys(gameState.players);
-      const currentUID = playerUIDs[gameState.currentPlayerIndex];
-      isMyTurn = currentUID === myUID;
-
-      // --- Le leader traite les actions des autres joueurs ---
-      if (auth.currentUser.uid === room.leaderId && roomData.playerAction) {
-        // Bloquer si déjà en train de traiter
-        if (isProcessingAction) {
-          console.log("⏸️ Action déjà en cours, skip");
-          return;
-        }
-
-        const action = roomData.playerAction;
-        console.log(`🎮 Leader traite l'action: ${action.action} de ${action.uid}`);
-
-        isProcessingAction = true;
-
-        try {
-          if (action.action === "hit") {
-            await gameInstance.playerHit(action.uid);
-          } else if (action.action === "stand") {
-            await gameInstance.playerStand(action.uid);
-          }
-          // Nettoyer l'action dans Firebase
-          await updateRoom(roomID, { playerAction: null });
-        } catch (e) {
-          console.error("Erreur traitement action:", e);
-        } finally {
-          // ✅ Toujours débloquer, même en cas d'erreur
-          isProcessingAction = false;
-          console.log("✅ Action débloquée");
-        }
-      }
-    }
-
-    // -------------------------------------------------------
-    // CAS 2 : gameStarted=false mais gameState existe (après reset)
-    // -------------------------------------------------------
-    else if (roomData.gameState) {
-      renderMultiplayerGame(roomData.gameState);
-    }
-  });
+  document.getElementById("bjDealBtn").style.display = "inline-block";
+  document.getElementById("bjHitBtn").style.display = "none";
+  document.getElementById("bjStandBtn").style.display = "none";
 }
 
 // ========================================

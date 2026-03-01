@@ -73,26 +73,14 @@ const biggestWinEl = document.getElementById('biggestWin');
 // GAME DATA
 // ========================================
 const GAMES = {
-  cups: {
-    name: 'Pyramide de Gobelets',
-    price: 1,
-    maxWin: 2
-  },
-  shooting: {
-    name: 'Tir à la Cible',
-    price: 5,
-    maxWin: 5
-  },
-  beerpong: {
-    name: 'Beer Pong',
-    price: 5,
-    maxWin: 10
-  },
-  darts: {
-    name: 'Fléchettes',
-    price: 2,
-    maxWin: 3
-  }
+  cups: { name: 'Pyramide de Gobelets', price: 1, maxWin: 2 },
+  shooting: { name: 'Tir à la Cible', price: 5, maxWin: 15 },
+  beerpong: { name: 'Beer Pong', price: 5, maxWin: 10 },
+  darts: { name: 'Fléchettes', price: 2, maxWin: 5 },
+  coverspot: { name: 'Couvre-Tout', price: 3, maxWin: 5 },
+  highstriker: { name: 'Marteau de Force', price: 3, maxWin: 5 },
+  balloonpop: { name: 'Ballons à Éclater', price: 5, maxWin: 8 },
+  ringtoss: { name: 'Anneaux sur Piquets', price: 10, maxWin: 15 }
 };
 
 // ========================================

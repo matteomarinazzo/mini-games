@@ -444,13 +444,7 @@ body {
 }
 
 /* Corners use SVG clip trick via CSS */
-.tile[data-type="corner-ne"] {}
-
-.tile[data-type="corner-nw"] {}
-
-.tile[data-type="corner-se"] {}
-
-.tile[data-type="corner-sw"] {}
+/* Placeholder selectors removed to fix linting */
 
 /* 3. T-JUNCTION */
 /* has 3 arms — rendered via JS-placed .tunnel-arm spans */
@@ -966,7 +960,7 @@ body {
   border-radius: 16px;
   padding: 40px 36px;
   text-align: center;
-  max-width: 380px;
+  max-width: 500px;
   width: 90%;
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
 }
@@ -1245,7 +1239,7 @@ body {
 ======================================== */
 .rules-tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 10px;
@@ -1256,7 +1250,7 @@ body {
   background: transparent;
   border: 1px solid rgba(61, 53, 48, 0.5);
   color: var(--text-dim);
-  padding: 8px;
+  padding: 5px;
   border-radius: 6px;
   font-family: 'Poppins', sans-serif;
   font-size: 11px;
@@ -1356,4 +1350,39 @@ body {
   .overlay-box h2 {
     font-size: 22px;
   }
+}
+
+/* Rules Table */
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rules-tab-btn {
+  font-size: 10px;
+}
+
+.rules-table th,
+.rules-table td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rules-table th {
+  background: rgba(196, 154, 90, 0.1);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.rules-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
 }

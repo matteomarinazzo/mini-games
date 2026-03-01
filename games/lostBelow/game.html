@@ -91,6 +91,7 @@
         <button class="rules-tab-btn">Exploration</button>
         <button class="rules-tab-btn">Survie</button>
         <button class="rules-tab-btn">Évènements</button>
+        <button class="rules-tab-btn">Difficultés</button>
       </div>
       <div class="rules-content">
         <div id="rules-mission" class="rules-page active">
@@ -130,7 +131,57 @@
             tours.</p>
           <p><strong>Éboulement :</strong> Un amas de pierres bloque un ou plusieurs passages de la tuile.</p>
           <p><strong>Courant d'Air :</strong> Un vent glacial souffle dans les tunnels. Les joueurs dans la zone perdent
-            immédiatement 1 AP.</p>
+            1 AP à leur prochain tour.</p>
+        </div>
+        <div id="rules-difficultés" class="rules-page">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th>❤️</th>
+                <th>🟠</th>
+                <th>🗺️ Tuiles</th>
+                <th>⚠️ Dangers</th>
+                <th>🚪 Sorties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Facile</td>
+                <td>5</td>
+                <td>5</td>
+                <td>50</td>
+                <td>30</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>Normal</td>
+                <td>3</td>
+                <td>3</td>
+                <td>75</td>
+                <td>22</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>Difficile</td>
+                <td>2</td>
+                <td>2</td>
+                <td>100</td>
+                <td>18</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>Extrême</td>
+                <td>1</td>
+                <td>2</td>
+                <td>150</td>
+                <td>14</td>
+                <td>1</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size: 0.85em; margin-top: 10px; opacity: 0.8;">❤️ Points de vie · 🟠 Points d'action par tour
+          </p>
         </div>
       </div>
       <button class="btn-primary" id="closeRulesBtn" style="margin-top: 15px;">Fermer</button>

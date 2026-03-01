@@ -44,50 +44,6 @@
       </div>
     </div>
 
-
-    <div id="roomMenu">
-      <!-- Page de base : juste deux boutons -->
-      <div id="baseMenu">
-        <button id="showJoinRoom">Rejoindre une room</button>
-        <button id="showCreateRoom">Créer une room</button>
-      </div>
-
-      <!-- Rejoindre room -->
-      <div id="joinRoomForm" style="display:none;">
-        <label>Nom :</label>
-        <input autofocus type="text" id="joinPlayerName" placeholder="John Doe" />
-        <br>
-        <label>ID de la room :</label>
-        <input type="text" id="joinRoomID" placeholder="1234" />
-        <br>
-        <button id="joinRoomBtnForm">Rejoindre</button>
-        <button id="cancelJoinBtn">❌ Annuler</button>
-      </div>
-
-      <!-- Créer room -->
-      <div id="createRoomForm" style="display:none;">
-        <label>Nom :</label>
-        <input autofocus type="text" id="createPlayerName" placeholder="John Doe" />
-        <br>
-        <label>ID de la room :</label>
-        <input type="text" id="createRoomID" disabled />
-        <br>
-        <label>Nombre de joueurs :</label>
-        <input type="range" id="createSlider" min="1" max="5" value="1" />
-        <span id="sliderValue">1</span>
-        <button id="createRoomBtnForm">Créer la room</button>
-        <button id="cancelCreateBtn">❌ Annuler</button>
-      </div>
-    </div>
-
-    <!-- Lobby -->
-    <div id="gameLobby" style="display:none;">
-      <p id="lobbyStatus">En attente de joueurs...</p>
-      <ul id="playerList"></ul>
-      <!-- Optionnel si tu veux que le leader clique pour commencer -->
-      <!-- <button id="startGameBtn" style="display:none;">Commencer la partie</button> -->
-    </div>
-
     <!-- Zone de jeu pour SCRATCH CARD -->
     <div class="game-zone" id="scratchGame" style="display: none;">
       <div class="scratch-card">
@@ -344,11 +300,8 @@
     <div class="game-zone" id="blackjackGame" style="display: none;">
       <div class="blackjack-game">
         <div class="blackjack-header">
-          <h2 id="gameTitle">🃏 Blackjack 21</h2>
+          <h2>🃏 Blackjack 21</h2>
           <p>Battez la banque sans dépasser 21 !</p>
-          <div>
-            Nom du joueur : <span id="playerNameDisplay"></span>
-          </div>
         </div>
 
         <div class="blackjack-table">
@@ -364,9 +317,15 @@
         </div>
 
         <div class="blackjack-controls">
-          <button class="action-button primary" id="bjDealBtn">🎴 DISTRIBUER (25€)</button>
-          <button class="action-button" id="bjHitBtn" style="display: none;">➕ TIRER</button>
-          <button class="action-button" id="bjStandBtn" style="display: none;">✋ RESTER</button>
+          <button class="action-button primary" id="bjDealBtn">
+            🎴 DISTRIBUER (5€)
+          </button>
+          <button class="action-button" id="bjHitBtn" style="display: none;">
+            ➕ TIRER
+          </button>
+          <button class="action-button" id="bjStandBtn" style="display: none;">
+            ✋ RESTER
+          </button>
         </div>
 
         <div class="result-message" id="blackjackResult"></div>

@@ -51,6 +51,8 @@ const ASSETS_TO_CACHE = [
     'about/about.css',
     'about/about.js',
 
+    'games/offline.html',
+
     // Game: ball-sort
     'games/ball-sort/index.html',
     'games/ball-sort/game.html',
@@ -140,6 +142,7 @@ const ASSETS_TO_CACHE = [
     'games/snow-digger/ressources/img/pelles/niv3.png',
     'games/snow-digger/ressources/img/pelles/niv4.png',
     'games/snow-digger/ressources/img/pelles/niv5.png',
+    'games/snow-digger/ressources/img/pelles/niv6.png',
     'games/snow-digger/ressources/img/flocons/flocon1.png',
     'games/snow-digger/ressources/img/flocons/flocon2.png',
     'games/snow-digger/ressources/img/flocons/flocon3.png',

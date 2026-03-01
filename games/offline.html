@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mode Hors-Ligne - Mini Games</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #7c3aed;
+            --secondary: #db2777;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            color: white;
+            overflow: hidden;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .offline-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 2rem;
+            max-width: 450px;
+            width: 85%;
+            border-radius: 32px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .icon-container {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 44px;
+            box-shadow: 0 15px 30px -5px rgba(124, 58, 237, 0.5);
+            position: relative;
+        }
+
+        .icon-container::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 28px;
+            filter: blur(15px);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2rem;
+            border-radius: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px -5px rgba(255, 255, 255, 0.4);
+            background: #f8fafc;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Ambient background */
+        .ambient-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            filter: blur(100px);
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: move linear 25s infinite alternate;
+        }
+
+        .blob-1 {
+            top: -150px;
+            left: -150px;
+        }
+
+        .blob-2 {
+            bottom: -150px;
+            right: -150px;
+            background: linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%);
+            animation-delay: -7s;
+            width: 600px;
+            height: 600px;
+        }
+
+        @keyframes move {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(80px, 40px) scale(1.1) rotate(45deg);
+            }
+
+            100% {
+                transform: translate(-40px, 80px) scale(0.9) rotate(90deg);
+            }
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 0 12px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .offline-container {
+                width: 90%;
+                padding: 2.5rem 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="offline-container">
+        <div class="status-pill">
+            <span class="status-dot"></span>
+            Mode Hors-Ligne
+        </div>
+        <div class="icon-container">📡</div>
+        <h2>Connexion Perdue</h2>
+        <p>Ce mini-jeu a besoin d'internet pour se lancer. Retrouvez le signal et tentez à nouveau votre chance !</p>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="retryBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Réessayer
+            </button>
+            <a href="../index.html" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Menu principal
+            </a>
+            <button class="btn btn-secondary" id="randomBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <circle cx="15.5" cy="15.5" r="1.5"></circle>
+                    <circle cx="15.5" cy="8.5" r="1.5"></circle>
+                    <circle cx="8.5" cy="15.5" r="1.5"></circle>
+                    <circle cx="12" cy="12" r="1.5"></circle>
+                </svg>
+                Jeu aléatoire
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkRealConnection } from '../js/network.js';
+
+        const retryBtn = document.getElementById('retryBtn');
+        const randomBtn = document.getElementById('randomBtn');
+
+        async function verifyAndRedirect() {
+            const isOnline = await checkRealConnection();
+            if (isOnline) {
+                const target = sessionStorage.getItem('offline_target_path') || '../index.html';
+                window.location.href = target;
+            }
+        }
+
+        retryBtn.onclick = async () => {
+            const originalContent = retryBtn.innerHTML;
+            retryBtn.innerHTML = 'Vérification...';
+            retryBtn.disabled = true;
+
+            const isOnline = await checkRealConnection();
+            if (isOnline) {
+                const target = sessionStorage.getItem('offline_target_path') || '../index.html';
+                window.location.href = target;
+            } else {
+                retryBtn.innerHTML = 'Toujours hors-ligne';
+                setTimeout(() => {
+                    retryBtn.innerHTML = originalContent;
+                    retryBtn.disabled = false;
+                }, 2000);
+            }
+        };
+
+        randomBtn.onclick = async () => {
+            try {
+                const res = await fetch("../assets/data/games.json");
+                const games = await res.json();
+                const gameIds = Object.keys(games).filter(id => games[id].path);
+                const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
+                const game = games[randomId];
+
+                // On redirige vers le jeu aléatoire (si online ok, sinon on reviendra ici via le launcher)
+                window.location.href = `../${game.path.replace('./', '')}`;
+            } catch (e) {
+                window.location.href = '../index.html';
+            }
+        };
+
+        // On vérifie automatiquement toutes les 10 secondes
+        setInterval(verifyAndRedirect, 10000);
+    </script>
+</body>
+
+</html>

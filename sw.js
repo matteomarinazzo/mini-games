@@ -36,6 +36,7 @@ const ASSETS_TO_CACHE = [
 
     // Assets logos
     'assets/logos/logo.png',
+    'assets/logos/favicon.png',
     'assets/logos/ball-sort.png',
     'assets/logos/casino.png',
     'assets/logos/casse-briques.png',

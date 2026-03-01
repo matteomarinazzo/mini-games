@@ -79,9 +79,12 @@ body {
   box-shadow: var(--shadow);
 
   /* Désactiver la sélection de text */
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10+ et Edge */
-  user-select: none; /* Standard (Firefox, Chrome, Opera) */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10+ et Edge */
+  user-select: none;
+  /* Standard (Firefox, Chrome, Opera) */
 }
 
 #menuOptions button {
@@ -99,11 +102,9 @@ body {
 }
 
 #menuOptions button:hover {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 15 0%,
-    var(--secondary) 15 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary) 15 0%,
+      var(--secondary) 15 100%);
   transform: translateY(-2px);
   box-shadow: var(--shadow-primary);
 }
@@ -127,9 +128,12 @@ body {
   overflow: hidden;
 
   /* Désactiver la sélection de text */
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10+ et Edge */
-  user-select: none; /* Standard (Firefox, Chrome, Opera) */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10+ et Edge */
+  user-select: none;
+  /* Standard (Firefox, Chrome, Opera) */
 }
 
 /* ========================================
@@ -163,21 +167,21 @@ body {
 
 .player-turn.active {
   opacity: 1;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.1) 0%,
+      rgba(118, 75, 162, 0.1) 100%);
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.03);
   }
@@ -202,11 +206,9 @@ body {
 }
 
 .player2-avatar {
-  background: linear-gradient(
-    135deg,
-    var(--accent-pink) 0%,
-    var(--accent-red) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--accent-pink) 0%,
+      var(--accent-red) 100%);
 }
 
 .player-info {
@@ -252,10 +254,12 @@ body {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -317,20 +321,20 @@ body {
 /* Grille jouable (où on peut jouer) */
 .mini-grid.playable {
   border-color: var(--primary);
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.05) 0%,
-    rgba(118, 75, 162, 0.05) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.05) 0%,
+      rgba(118, 75, 162, 0.05) 100%);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   animation: playablePulse 2s ease-in-out infinite;
 }
 
 @keyframes playablePulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.02);
   }
@@ -350,20 +354,16 @@ body {
 
 .mini-grid.won-player1 {
   border-color: var(--primary);
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.15) 0%,
-    rgba(118, 75, 162, 0.15) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.15) 0%,
+      rgba(118, 75, 162, 0.15) 100%);
 }
 
 .mini-grid.won-player2 {
   border-color: var(--accent-pink);
-  background: linear-gradient(
-    135deg,
-    rgba(240, 147, 251, 0.15) 0%,
-    rgba(245, 87, 108, 0.15) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(240, 147, 251, 0.15) 0%,
+      rgba(245, 87, 108, 0.15) 100%);
 }
 
 /* Grille nulle */
@@ -380,10 +380,12 @@ body {
 }
 
 @keyframes globalWinPulse {
+
   0%,
   100% {
     box-shadow: 0 0 20px rgba(81, 207, 102, 0.6);
   }
+
   50% {
     box-shadow: 0 0 40px rgba(81, 207, 102, 0.9);
   }
@@ -397,11 +399,11 @@ body {
   align-items: center;
   justify-content: center;
   font-size: clamp(48px, 8vw, 80px);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   z-index: 10;
   animation: overlayAppear 0.4s ease-out;
+  pointer-events: none;
 }
 
 @keyframes overlayAppear {
@@ -409,6 +411,7 @@ body {
     opacity: 0;
     transform: scale(0.5);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -435,6 +438,14 @@ body {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+}
+
+/* Effet pour voir le contenu d'une grille gagnée */
+.mini-grid.won .mini-cell,
+.mini-grid.draw .mini-cell {
+  opacity: 0.5;
+  filter: blur(1.5px);
+  transition: var(--transition);
 }
 
 .mini-cell::before {
@@ -470,9 +481,11 @@ body {
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -484,9 +497,11 @@ body {
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.15);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -532,9 +547,11 @@ body {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
   }
+
   70% {
     transform: translate(-50%, -50%) scale(1.05);
   }
+
   100% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -558,10 +575,12 @@ body {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0) scale(1);
   }
+
   50% {
     transform: translateY(-10px) scale(1.1);
   }
@@ -589,6 +608,7 @@ body {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
     transform: scale(1);
   }
+
   to {
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
     transform: scale(1.1);
@@ -658,6 +678,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -702,16 +723,20 @@ body {
 }
 
 @keyframes drawBounce {
+
   0%,
   100% {
     transform: rotate(-5deg) scale(1);
   }
+
   25% {
     transform: rotate(5deg) scale(1.05);
   }
+
   50% {
     transform: rotate(-5deg) scale(1);
   }
+
   75% {
     transform: rotate(5deg) scale(1.05);
   }
@@ -748,6 +773,7 @@ body {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
     transform: scale(1);
   }
+
   to {
     filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
     transform: scale(1.2);
@@ -797,6 +823,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -919,9 +946,11 @@ body {
   0% {
     transform: scale(0) rotate(0deg);
   }
+
   50% {
     transform: scale(1.2) rotate(180deg);
   }
+
   100% {
     transform: scale(1) rotate(360deg);
   }
@@ -958,11 +987,9 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--success) 0%,
-    var(--success-dark) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--success) 0%,
+      var(--success-dark) 100%);
   color: var(--white);
   box-shadow: var(--shadow-success);
 }
@@ -1033,11 +1060,9 @@ body {
 
   .player-turn.active {
     opacity: 1;
-    background: linear-gradient(
-      135deg,
-      rgba(102, 126, 234, 0.1) 0%,
-      rgba(118, 75, 162, 0.1) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(102, 126, 234, 0.1) 0%,
+        rgba(118, 75, 162, 0.1) 100%);
     border-color: var(--primary);
     box-shadow: inset 0 0 0 3px rgba(102, 126, 234, 0.2);
     position: relative;
@@ -1047,10 +1072,12 @@ body {
   }
 
   @keyframes pulse {
+
     0%,
     100% {
       transform: scale(1);
     }
+
     50% {
       transform: scale(0.98);
     }

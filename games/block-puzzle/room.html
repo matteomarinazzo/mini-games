@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Block Puzzle – Salle d’attente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <style>
+        .room-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .room-id-tag {
+            background: #bb86fc;
+            color: #121212;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 24px;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 0 0 20px rgba(187, 134, 252, 0.3);
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-item.is-leader {
+            border-color: #bb86fc;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .leader-badge {
+            font-size: 10px;
+            background: #bb86fc;
+            color: #121212;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-waiting {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+
+        .status-ready {
+            background: #03dac6;
+            color: #121212;
+        }
+
+        .room-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .lobby-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins';
+        }
+
+        .btn-ready {
+            background: #03dac6;
+            color: #121212;
+        }
+
+        .btn-start {
+            background: #bb86fc;
+            color: #121212;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 500px;">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🧱</div>
+                <h1>Block Puzzle</h1>
+            </div>
+        </div>
+
+        <div class="config-container">
+            <div class="config-card">
+                <div class="room-header">
+                    <h2>Salle d'attente</h2>
+                    <p>Partagez ce code avec votre ami :</p>
+                    <div id="roomIDDisplay" class="room-id-tag">------</div>
+                </div>
+
+                <div id="playerList" class="player-list">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="room-footer">
+                    <button id="readyBtn" class="lobby-btn btn-ready">
+                        <span>OUI, JE SUIS PRÊT</span>
+                    </button>
+                    <button id="startGameBtn" class="lobby-btn btn-start" style="display: none;">
+                        <span>LANCER LE DUEL 🔥</span>
+                    </button>
+                    <p id="waitingMessage" style="text-align: center; color: var(--text-dim); font-size: 14px;">
+                        En attente du deuxième joueur...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/room.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

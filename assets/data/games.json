@@ -78,6 +78,21 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "block-puzzle": {
+    "path": "./games/block-puzzle/index.html",
+    "name": "Block Puzzle",
+    "emoji": "🧱",
+    "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
+    "tags": [
+      "🧠 Logique",
+      "🧪 Puzzle",
+      "🧩 Réflexion"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "snow-digger": {
     "path": "./games/snow-digger/index.html",
     "name": "Snow Digger",

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Block Puzzle – Jeu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body>
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-item score-container">
+      <div class="label">SCORE</div>
+      <div class="value" id="score">0</div>
+    </div>
+    <div class="hud-item score-container" id="opponentHud">
+      <span id="opponentName" class="label">Adversaire</span>
+      <span class="value" id="opponentScore">0</span>
+    </div>
+
+    <div class="hud-item timer-container">
+      <div class="label" id="timerLabel">TEMPS</div>
+      <div class="value" id="timer">00:00</div>
+    </div>
+
+    <div class="hud-item best-container">
+      <div class="label">RECORD</div>
+      <div class="value" id="bestScore">0</div>
+    </div>
+  </div>
+
+  <!-- Game Area -->
+  <div class="game-area">
+    <div class="grid-container">
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <div class="pieces-container" id="piecesContainer">
+      <div class="piece-slot" data-slot="0"></div>
+      <div class="piece-slot" data-slot="1"></div>
+      <div class="piece-slot" data-slot="2"></div>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div class="game-overlay" id="gameOverOverlay" style="display: none;">
+    <div class="overlay-content">
+      <h2 id="endTitle">Fin de Partie !</h2>
+      <div class="final-stats">
+        <div class="stat">
+          <span class="stat-label">Score</span>
+          <span class="stat-value" id="finalScore">0</span>
+        </div>
+        <div class="stat" id="finalBestStat">
+          <span class="stat-label">Record</span>
+          <span class="stat-value" id="finalBest">0</span>
+        </div>
+      </div>
+      <button class="btn-primary" id="retryBtn">Rejouer</button>
+      <button class="btn-primary" id="startGameBtn" style="display: none;">Lancer revanche</button>
+      <button class="btn-secondary" id="menuBtn">Menu</button>
+    </div>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div class="game-overlay" id="pauseOverlay" style="display: none;">
+    <div class="overlay-content">
+      <h2>Pause</h2>
+      <button class="btn-primary" id="resumeBtn">Reprendre</button>
+      <button class="btn-secondary" id="restartBtn">Recommencer</button>
+      <button class="btn-secondary" id="menuBtn2">Menu</button>
+    </div>
+  </div>
+
+  <!-- Boton de pause/menu en haut à droite -->
+  <button class="pause-btn" id="pauseBtn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <rect x="6" y="4" width="4" height="16" rx="1.5" fill="currentColor" />
+      <rect x="14" y="4" width="4" height="16" rx="1.5" fill="currentColor" />
+    </svg>
+  </button>
+
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

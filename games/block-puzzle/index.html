@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Block Puzzle – Puzzle de logique à 1 ou 2 joueurs gratuit en ligne | Mini‑Games</title>
+
+  <meta name="description"
+    content="Jouez gratuitement à Block Puzzle sur Mini‑Games. Placez les blocs, complétez des lignes et évitez de bloquer la grille. Un puzzle stratégique, simple et addictif, jouable sur mobile et PC.">
+
+  <link rel="canonical" href="https://mini-games.ch/games/block-puzzle/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Block Puzzle – Puzzle de logique gratuit en ligne | Mini‑Games">
+  <meta property="og:description"
+    content="Assemblez les blocs, complétez des lignes et battez votre meilleur score dans ce puzzle stratégique et addictif. Jouable sur mobile et PC.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mini-games.ch/games/block-puzzle/">
+  <meta property="og:image" content="https://mini-games.ch/assets/logos/block-puzzle.png">
+  <meta property="og:site_name" content="Mini‑Games">
+  <meta property="og:locale" content="fr_CH">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Block Puzzle – Puzzle de logique gratuit en ligne | Mini‑Games">
+  <meta name="twitter:description"
+    content="Placez les blocs, complétez des lignes et évitez de bloquer la grille. Un puzzle stratégique et addictif.">
+  <meta name="twitter:image" content="https://mini-games.ch/assets/logos/block-puzzle.png">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Block Puzzle",
+    "url": "https://mini-games.ch/games/block-puzzle/",
+    "description": "Jeu de puzzle stratégique où vous devez placer des blocs pour compléter des lignes et éviter de bloquer la grille.",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "genre": ["Puzzle", "Logic"],
+    "inLanguage": "fr",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mini‑Games"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body>
+  <!-- Bouton Accueil -->
+  <a href="../../index.html" class="home-button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    <span>Accueil</span>
+  </a>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Menu principal -->
+  <div class="container" id="menuContainer">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">🧱</div>
+        <h1>Block Puzzle</h1>
+      </div>
+      <p class="subtitle">Assemblez les blocs pour compléter des lignes !</p>
+    </div>
+
+    <div class="config-container">
+      <div class="config-card">
+        <div class="config-header">
+          <h2>⚙️ Configuration de la partie</h2>
+          <p>Choisissez votre défi</p>
+        </div>
+
+        <div class="config-section">
+          <label class="config-label">
+            <span class="label-icon">🎮</span>
+            <span>Mode de jeu</span>
+          </label>
+          <div class="radio-grid four-cols">
+            <label class="radio-card">
+              <input type="radio" name="gameMode" value="libre" checked />
+              <div class="radio-content">
+                <div class="radio-icon">♾️</div>
+                <div class="radio-label">Libre</div>
+                <div class="radio-description">Jouez sans limite de temps</div>
+              </div>
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="gameMode" value="defi" />
+              <div class="radio-content">
+                <div class="radio-icon">🏆</div>
+                <div class="radio-label">Défi</div>
+                <div class="radio-description">Battez le score avant la fin</div>
+              </div>
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="gameMode" value="confrontation" />
+              <div class="radio-content">
+                <div class="radio-icon">⚔️</div>
+                <div class="radio-label">Duo</div>
+                <div class="radio-description">Affrontez un adversaire en ligne</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="config-divider"></div>
+
+        <!-- Section spécifique au mode Défi -->
+        <div class="config-section" id="challengeSettings" style="display: none;">
+          <label class="config-label">
+            <span class="label-icon">⏱️</span>
+            <span>Durée du défi</span>
+          </label>
+          <div class="radio-grid four-cols">
+            <label class="radio-card">
+              <input type="radio" name="challengeTime" value="30" />
+              <div class="radio-content">
+                <div class="radio-label">30s</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="challengeTime" value="60" checked />
+              <div class="radio-content">
+                <div class="radio-label">1m</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="challengeTime" value="300" />
+              <div class="radio-content">
+                <div class="radio-label">5m</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="challengeTime" value="600" />
+              <div class="radio-content">
+                <div class="radio-label">10m</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="config-divider" id="challengeDivider" style="display: none;"></div>
+
+        <button class="start-button" id="startGameBtn">
+          🎮 Commencer l'aventure
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Placez les formes stratégiquement pour vider la grille !</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/menu.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

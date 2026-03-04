@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v4";
+const CACHE_NAME = "mini-games-cache-v1.5.2026-03-04";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -45,6 +45,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/pong.png',
     'assets/logos/snow-digger.png',
     'assets/logos/lostBelow.png',
+    'assets/logos/block-puzzle.png',
 
     // About
     'about/about.html',
@@ -106,6 +107,18 @@ const ASSETS_TO_CACHE = [
     'games/morpion/js/ui/menuInGame.js',
     'games/morpion/js/ui/menuParams.js',
     'games/morpion/js/utils/shared-config.js',
+
+    // Game: Block Puzzle
+    'games/block-puzzle/index.html',
+    'games/block-puzzle/game.html',
+    'games/block-puzzle/lobby.html',
+    'games/block-puzzle/room.html',
+    'games/block-puzzle/css/style.css',
+    'games/block-puzzle/css/game.css',
+    'games/block-puzzle/js/menu.js',
+    'games/block-puzzle/js/game.js',
+    'games/block-puzzle/js/lobby.js',
+    'games/block-puzzle/js/room.js',
 
     // Game: pong
     'games/pong/index.html',
@@ -261,3 +274,13 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
+// Forcer la mise à jour du cache
+self.addEventListener("install", event => {
+    self.skipWaiting();
+});
+
+self.addEventListener("activate", event => {
+    clients.claim();
+});
+

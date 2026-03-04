@@ -1812,24 +1812,48 @@ function drawCoverSpotGame(ctx, canvas) {
   }
 }
 
+function countWhitePixels(imageData) {
+  const data = imageData.data;
+  let count = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    // Pixel vraiment blanc (anti-aliasing filtré)
+    if (r > 240 && g > 240 && b > 240) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
 function validateCoverSpot(ctx, canvas) {
   if (coverspotGameState.finished) return;
 
-  // Calculate coverage using pixel-counting on a temporary canvas
+  // Canvas temporaire
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = canvas.width;
   tempCanvas.height = canvas.height;
   const tctx = tempCanvas.getContext('2d');
 
-  // 1. Draw target circle in white on a black background
+  // 1. Cible blanche sur fond noir
   tctx.fillStyle = '#000000';
   tctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
   tctx.fillStyle = '#ffffff';
   tctx.beginPath();
-  tctx.arc(coverspotGameState.target.x, coverspotGameState.target.y, coverspotGameState.target.r, 0, Math.PI * 2);
+  tctx.arc(
+    coverspotGameState.target.x,
+    coverspotGameState.target.y,
+    coverspotGameState.target.r,
+    0,
+    Math.PI * 2
+  );
   tctx.fill();
 
-  // 2. Erase what red discs cover
+  // 2. On "perce" avec les disques (destination-out)
   tctx.globalCompositeOperation = 'destination-out';
   coverspotGameState.discs.forEach(disc => {
     tctx.beginPath();
@@ -1837,43 +1861,47 @@ function validateCoverSpot(ctx, canvas) {
     tctx.fill();
   });
 
-  // 3. Count remaining white pixels
+  // 3. Pixels blancs restants (cible non couverte)
   const imageData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-  const data = imageData.data;
-  let remainingPixels = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i] > 128) remainingPixels++; // Check R channel
-  }
+  const remainingPixels = countWhitePixels(imageData);
 
-  // Calculate total pixels in target
-  const targetArea = Math.PI * (coverspotGameState.target.r ** 2);
-  const totalPixels = targetArea; // Approximation is fine here as we compare relative
-  // More accurate: count white pixels without subtraction
+  // 4. Recalcule la cible seule pour avoir le total de pixels de la cible
   tctx.globalCompositeOperation = 'source-over';
   tctx.fillStyle = '#000000';
   tctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
   tctx.fillStyle = '#ffffff';
   tctx.beginPath();
-  tctx.arc(coverspotGameState.target.x, coverspotGameState.target.y, coverspotGameState.target.r, 0, Math.PI * 2);
+  tctx.arc(
+    coverspotGameState.target.x,
+    coverspotGameState.target.y,
+    coverspotGameState.target.r,
+    0,
+    Math.PI * 2
+  );
   tctx.fill();
-  const totalImageData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-  const totalData = totalImageData.data;
-  let totalTargetPixels = 0;
-  for (let i = 0; i < totalData.length; i += 4) {
-    if (totalData[i] > 128) totalTargetPixels++;
-  }
 
-  const coverage = Math.max(0, 100 - (remainingPixels / totalTargetPixels) * 100);
+  const totalImageData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+  const totalTargetPixels = countWhitePixels(totalImageData);
+
+  // 5. Couverture précise
+  const coverageRaw = Math.max(0, 100 - (remainingPixels / totalTargetPixels) * 100);
+  const coverage = coverageRaw;              // pour la logique
+  const coverageDisplay = coverageRaw.toFixed(1) // pour l'affichage
+
+  console.log("test" + coverageRaw, coverage, coverageDisplay)
+
+
   coverspotGameState.coverage = coverage;
   coverspotGameState.finished = true;
 
   let tickets = 0;
   let resType = 'lose';
-  if (coverage == 100) {
+
+  if (coverage === 100) {
     tickets = 5;
     resType = 'win';
   } else if (coverage >= 95) {
-    tickets = 4;
+    tickets = 3;
     resType = 'partial';
   } else if (coverage >= 90) {
     tickets = 2;
@@ -1886,14 +1914,23 @@ function validateCoverSpot(ctx, canvas) {
   if (tickets > 0) {
     addTickets(tickets);
     updateStats(true, tickets);
-    showResult('coverspotResult', resType, `✨ Couverture : ${Math.round(coverage)}% ! Vous gagnez ${tickets}🎟️`);
+    showResult(
+      'coverspotResult',
+      resType,
+      `✨ Couverture : ${coverageDisplay}% ! Vous gagnez ${tickets}🎟️`
+    );
     if (tickets >= 4) createConfetti();
   } else {
     updateStats(false, 0);
-    showResult('coverspotResult', 'lose', `😢 Couverture : ${Math.round(coverage)}%. Trop de blanc visible !`);
+    showResult(
+      'coverspotResult',
+      'lose',
+      `😢 Couverture : ${coverageDisplay}%. Trop de blanc visible !`
+    );
   }
 
-  document.getElementById('coverspotScoreDisplay').textContent = `Couverture : ${Math.round(coverage)}%`;
+  document.getElementById('coverspotScoreDisplay').textContent =
+    `Couverture : ${coverageDisplay}%`;
   document.getElementById('coverspotNewGameBtn').style.display = 'block';
   document.getElementById('coverspotCheckBtn').disabled = true;
 }

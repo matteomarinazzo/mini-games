@@ -205,6 +205,12 @@ function setupMultiplayer() {
         }
       );
     }
+
+    // ── Vérification de fin de partie (Centralisée) ──
+    // On ne vérifie que si c'est notre tour et que la partie est en cours
+    if (gameMode === 'confrontation' && isMyTurn && room.state === 'playing') {
+      checkGameOver();
+    }
   }); // ← ferme listenToRoomChanges
 } // ← ferme setupMultiplayer
 
@@ -320,7 +326,10 @@ function spawnPieces() {
     currentPieces.push(shape);
     piecesContainer.appendChild(createPieceSlot(i, shape));
   }
-  checkGameOver();
+  // En mode confrontation, la vérification est centralisée dans setupMultiplayer
+  if (gameMode !== 'confrontation') {
+    checkGameOver();
+  }
 }
 
 function createPieceSlot(index, shape) {
@@ -659,7 +668,10 @@ async function tryPlace(r, c, shape, index) {
       spawnPieces();
     }, 100);
   } else {
-    checkGameOver();
+    // En mode confrontation, la vérification est centralisée dans setupMultiplayer
+    if (gameMode !== 'confrontation') {
+      checkGameOver();
+    }
   }
 
   return true;
@@ -694,11 +706,6 @@ function clearLines() {
   }, 400);
 
   return rowsToClear.length + colsToClear.length;
-}
-
-function checkSlotEmpty() {
-  if (currentPieces.every(p => p === null)) spawnPieces();
-  else checkGameOver();
 }
 
 function checkGameOver() {

@@ -472,18 +472,3 @@ body {
 .piece-slot .piece {
   animation: popIn 0.25s ease forwards;
 }
-
-@media (max-aspect-ratio: 1/1) {
-  .game-area {
-    padding: 6px 8px;
-    justify-content: space-between;
-  }
-
-  .hud {
-    padding: 7px 12px;
-  }
-
-  .hud-item .value {
-    font-size: 18px;
-  }
-}

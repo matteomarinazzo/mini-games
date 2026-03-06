@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.6.2026-03-05";
+const CACHE_NAME = "mini-games-cache-v1.5.2026-03-06";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -36,6 +36,8 @@ const ASSETS_TO_CACHE = [
 
     // Assets logos
     'assets/logos/logo.png',
+    'assets/logos/logo-512.png',
+    'assets/logos/logo-192.png',
     'assets/logos/favicon.png',
     'assets/logos/ball-sort.png',
     'assets/logos/casino.png',

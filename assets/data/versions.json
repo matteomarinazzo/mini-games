@@ -1,12 +1,13 @@
 {
-    "currentVersion": "1.6.2026-03-05",
+    "currentVersion": "1.5.2026-03-06",
     "lastUpdate": "2026-03-05",
     "history": [
         {
-            "version": "1.6.2026-03-05",
+            "version": "1.5.2026-03-06",
             "date": "2026-03-04",
             "changes": [
-                "Locker l'orientation"
+                "Locker l'orientation",
+                "Amélioration du manifest.json"
             ]
         },
         {

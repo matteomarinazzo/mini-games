@@ -66,5 +66,12 @@ document.addEventListener("visibilitychange", () => {
 // Lancer au chargement si la page est visible
 if (!document.hidden) startCounter();
 
+// TRICHE : bloquer l'orientation sur toutes les pages
+document.addEventListener("DOMContentLoaded", () => {
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("portrait").catch(() => { });
+    }
+});
+
 // Export pour utilisation ailleurs si besoin
 export { incrementTime, startCounter, stopCounter };

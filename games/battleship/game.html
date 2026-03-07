@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bataille Navale – Jeu | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0077b6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="rules-overlay" id="rulesOverlay">
+        <div class="rules-modal">
+            <button class="rules-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de la Bataille Navale</h2>
+            <div class="rules-content">
+                <section>
+                    <h3>🚢 Flotte</h3>
+                    <ul>
+                        <li><span class="ship-badge s5">●●●●●</span> Porte-avions (5 cases)</li>
+                        <li><span class="ship-badge s4">●●●●</span> Croiseur (4 cases)</li>
+                        <li><span class="ship-badge s3">●●●</span> Destroyer (3 cases)</li>
+                        <li><span class="ship-badge s3">●●●</span> Sous-marin (3 cases)</li>
+                        <li><span class="ship-badge s2">●●</span> Torpilleur (2 cases)</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>🎮 Déroulement</h3>
+                    <ol>
+                        <li><strong>Placement</strong> : glisse tes bateaux sur ta grille. Tap pour pivoter. 3 minutes
+                            chrono !</li>
+                        <li><strong>Tir</strong> : clique sur la grille adverse pour tirer. <span
+                                class="badge-hit">Touché</span> ou <span class="badge-miss">Raté</span></li>
+                        <li><strong>Tour par tour</strong> : un tir chacun, alternativement.</li>
+                        <li><strong>Victoire</strong> : coule tous les bateaux ennemis en premier !</li>
+                    </ol>
+                </section>
+                <section>
+                    <h3>📌 Astuces</h3>
+                    <ul>
+                        <li>Un tir raté = 💧 bleu sur ta grille</li>
+                        <li>Un tir touché = 🔴 sur ta grille</li>
+                        <li>Un bateau coulé est signalé immédiatement</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud" id="hud">
+        <div class="hud-left">
+            <button class="icon-button" id="rulesBtn" title="Règles">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+            <div class="hud-player" id="myHudArea">
+                <div class="hud-label" id="myNameEl">MOI</div>
+                <div class="hud-score" id="myHits">0<span>/17</span></div>
+            </div>
+        </div>
+        <div class="hud-center">
+            <div class="turn-pill" id="turnIndicator">⚓ EN ATTENTE</div>
+        </div>
+        <div class="hud-player hud-right" id="opponentHudArea">
+            <div class="hud-label" id="opponentName">Adversaire</div>
+            <div class="hud-score" id="opponentHits">0<span>/17</span></div>
+        </div>
+    </div>
+
+    <!-- ─── PHASE PLACEMENT OVERLAY ─── -->
+    <div class="placement-overlay" id="placementOverlay" style="display:none;">
+        <div class="placement-header">
+            <h2>⚓ Placez votre flotte</h2>
+            <div class="placement-timer-wrap">
+                <span class="timer-label">Temps restant</span>
+                <span class="placement-timer" id="placementTimer">03:00</span>
+            </div>
+        </div>
+
+        <div class="placement-body">
+            <!-- Grille de placement -->
+            <div class="placement-grid-wrap">
+                <div class="grid-labels-col">
+                    <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+                    <span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+                </div>
+                <div class="grid-wrap-inner">
+                    <div class="grid-labels-row">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                    </div>
+                    <div id="gridBateaux" class="grid placement-grid"></div>
+                </div>
+            </div>
+
+            <!-- Chantier naval -->
+            <div class="shipyard-wrap">
+                <h3>🏗️ Chantier Naval</h3>
+                <p class="shipyard-hint">Glisse · Tap pour pivoter</p>
+                <div id="shipyard" class="shipyard"></div>
+            </div>
+        </div>
+
+        <button id="readyActionBtn" class="btn-ready-action" disabled>
+            🔒 Place tous tes bateaux
+        </button>
+    </div> <!-- Fin placement-overlay -->
+
+    <!-- ─── ZONE DE JEU (STYLE BOÎTE OUVERTE) ─── -->
+    <main class="game-area" id="gameArea" style="display:none;">
+        <div class="game-board-3d" id="gameBoard3d">
+
+            <!-- Panneau Haut (Vertical) : Ma Flotte -->
+            <div class="board-panel panel-top">
+                <div class="panel-header">MA FLOTTE</div>
+                <div class="grid-container">
+                    <div class="grid grid-bateaux" id="gridBateauxGame"></div>
+                    <div class="grid-label-top">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                    </div>
+                    <div class="grid-label-left">
+                        <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="stat-item">💧 Ratés : <span id="myMissesStat">0</span></div>
+                    <div class="stat-item">💥 Encaissés : <span id="myHitsTakenStat">0</span></div>
+                </div>
+            </div>
+
+            <!-- Panneau Bas (Horizontal/Incliné) : Zone de Tir -->
+            <div class="board-panel panel-bottom">
+                <div class="panel-header">ZONE DE TIR</div>
+                <div class="grid-container">
+                    <div id="gridCibles" class="grid grid-cibles"></div>
+                    <div class="grid-label-top">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                    </div>
+                    <div class="grid-label-left">
+                        <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+                    </div>
+                </div>
+                <p class="cibles-subtitle" id="ciblesSubtitle">Clique pour tirer !</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ─── POPUP TIR (résultat) ─── -->
+    <div class="shot-popup" id="shotPopup">
+        <div class="shot-popup-inner">
+            <div class="shot-icon" id="shotIcon">💥</div>
+            <div class="shot-title" id="shotTitle">Touché !</div>
+            <div class="shot-coord" id="shotCoord">A1</div>
+        </div>
+    </div>
+
+    <!-- ─── POPUP ATTAQUE ADVERSE ─── -->
+    <div class="attack-popup" id="attackPopup">
+        <div class="attack-popup-inner">
+            <span class="attack-icon">⚠️</span>
+            <span id="attackMsg">Attaqué en A1 !</span>
+        </div>
+    </div>
+
+    <!-- ─── OVERLAY GAME OVER ─── -->
+    <div class="game-overlay" id="gameOverOverlay" style="display:none;">
+        <div class="overlay-content">
+            <div class="end-emoji" id="endEmoji">🏆</div>
+            <h2 id="endTitle">Fin de Partie !</h2>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Bateaux coulés</span>
+                    <span id="finalScore" class="stat-val">0/5</span>
+                </div>
+                <div class="stat-row">
+                    <span>Cases touchées</span>
+                    <span id="finalHits" class="stat-val">0/17</span>
+                </div>
+            </div>
+            <button class="btn-ocean" id="retryBtn">⚓ Demander Revanche</button>
+            <button class="btn-ocean btn-secondary-ocean" id="menuBtn">🏠 Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── OVERLAY ATTENTE (connexion) ─── -->
+    <div class="game-overlay" id="waitingOverlay" style="display:none;">
+        <div class="overlay-content">
+            <div class="spinner"></div>
+            <h2>Connexion en cours…</h2>
+            <p>En attente de l'adversaire</p>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

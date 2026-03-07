@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bataille Navale – Multijoueur en ligne | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Jouez gratuitement à la Bataille Navale sur Mini‑Games. Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/battleship/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Bataille Navale – Multijoueur en ligne | Mini‑Games">
+    <meta property="og:description"
+        content="Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/battleship/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/battleship.png">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bataille Navale – Multijoueur en ligne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/battleship.png">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Bataille Navale",
+      "url": "https://mini-games.ch/games/battleship/",
+      "description": "Jeu classique de Bataille Navale où vous devez couler la flotte de votre adversaire.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Board Game", "Strategy", "Multiplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+
+<body>
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span>Retour</span>
+    </a>
+
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🛥️</div>
+                <h1>Bataille Navale</h1>
+            </div>
+            <!-- Subtitle removed as requested -->
+        </div>
+
+        <div class="config-container">
+            <div class="config-card">
+                <div class="config-header">
+                    <h2>🎮 Rejoindre une partie</h2>
+                    <p>Entrez votre prénom pour commencer</p>
+                </div>
+
+                <div class="config-section">
+                    <div class="input-group">
+                        <label for="playerNameInput">Votre Prénom</label>
+                        <input type="text" id="playerNameInput" placeholder="John Doe" maxlength="15">
+                    </div>
+                </div>
+
+                <div class="config-divider"></div>
+
+                <div class="lobby-actions">
+                    <button id="createRoomBtn" class="start-button">
+                        ➕ Créer une salle
+                    </button>
+
+                    <div class="join-section">
+                        <div class="config-divider">OU</div>
+                        <input type="text" id="roomInput" placeholder="Code (ex: ABC123)" maxlength="6">
+                        <button id="joinRoomBtn" class="btn-secondary" style="width: 100%; margin-top: 10px;">
+                            🚪 Rejoindre
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

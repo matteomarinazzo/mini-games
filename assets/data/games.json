@@ -63,6 +63,21 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "battleship": {
+    "path": "./games/battleship/index.html",
+    "name": "Bataille navale",
+    "emoji": "",
+    "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
+    "tags": [
+      "⚡ Temps réel",
+      "🎲 Stratégie",
+      "👥 Multijoueur"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "morpion": {
     "path": "./games/morpion/index.html",
     "name": "Morpion",

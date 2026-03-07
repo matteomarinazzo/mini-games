@@ -126,7 +126,7 @@ function createGameCard(gameId, game) {
       <span class="badge badge-${game.badge}">${game.badgeText}</span>
     </div>
     <div class="card-image">
-      <img src="assets/logos/${gameId}.png" alt="${game.name}" />
+      <img src="assets/logos/${gameId}.webp" alt="${game.name}" />
       <div class="card-overlay">
         <div class="play-button">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none">

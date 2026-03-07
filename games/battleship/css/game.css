@@ -1,0 +1,1022 @@
+/* ── Bataille Navale – game.css ── */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+:root {
+    --ocean-deep: #010b1f;
+    --ocean-dark: #03112a;
+    --ocean-mid: #0a1f3a;
+    --ocean-blue: #0077b6;
+    --ocean-light: #00b4d8;
+    --ocean-pale: #90e0ef;
+    --ocean-foam: #caf0f8;
+
+    --hit-color: #ef476f;
+    --miss-color: #48cae4;
+    --sunk-color: #ff6b35;
+    --boat-color: #457b9d71;
+
+    --cell-size: 32px;
+    --cs: 32px;
+    --grid-gap: 2px;
+    --radius: 12px;
+    --empty-color: #1a2a44;
+    /* Gris Challenge - Ocean Deep */
+    --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Fredoka', sans-serif;
+    background: var(--ocean-deep);
+    color: var(--ocean-foam);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ─── BACKGROUND ─── */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(0, 119, 182, .25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(0, 180, 216, .15) 0%, transparent 60%),
+        var(--ocean-deep);
+}
+
+/* ─── ICON-BUTTON (dans HUD) ─── */
+.icon-button {
+    background: rgba(0, 119, 182, .25);
+    border: 1px solid rgba(0, 180, 216, .3);
+    color: var(--ocean-foam);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.icon-button:hover {
+    background: rgba(0, 119, 182, .5);
+}
+
+
+/* ─── RULES OVERLAY ─── */
+.rules-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(1, 11, 31, .85);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.rules-overlay.open {
+    display: flex;
+}
+
+/* scrollbar custom */
+.rules-modal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rules-modal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .2);
+    border-radius: 3px;
+}
+
+.rules-modal::-webkit-scrollbar-thumb {
+    background: var(--ocean-blue);
+    border-radius: 3px;
+}
+
+.rules-modal::-webkit-scrollbar-thumb:hover {
+    background: var(--ocean-light);
+}
+
+.rules-modal {
+    position: relative;
+    background: var(--ocean-mid);
+    border: 1px solid rgba(0, 180, 216, .3);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+}
+
+.rules-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--ocean-pale);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.rules-close:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.rules-modal h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--ocean-light);
+}
+
+.rules-modal h3 {
+    font-size: 15px;
+    color: var(--ocean-light);
+    margin: 16px 0 8px;
+}
+
+.rules-content section {
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    padding-bottom: 14px;
+}
+
+.rules-content ul,
+.rules-content ol {
+    padding-left: 18px;
+}
+
+.rules-content li {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ship-badge {
+    font-family: monospace;
+    letter-spacing: 2px;
+    color: var(--ocean-light);
+}
+
+.badge-hit {
+    background: rgba(239, 71, 111, .2);
+    color: var(--hit-color);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.badge-miss {
+    background: rgba(72, 202, 228, .15);
+    color: var(--miss-color);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* ─── HUD ─── */
+.hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 54px;
+    background: rgba(3, 17, 42, .9);
+    border-bottom: 1px solid rgba(0, 180, 216, .2);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.hud-left {
+    position: absolute;
+    left: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+}
+
+.hud-right {
+    position: absolute;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* Aligné à droite */
+    justify-content: center;
+    z-index: 10;
+}
+
+.hud-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--ocean-pale);
+    letter-spacing: .5px;
+}
+
+.hud-score {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ocean-foam);
+    line-height: 1;
+}
+
+.hud-score span {
+    font-size: 12px;
+    color: var(--ocean-pale);
+}
+
+.hud-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.turn-pill {
+    background: rgba(0, 119, 182, .3);
+    border: 1px solid rgba(0, 180, 216, .4);
+    padding: 5px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    transition: var(--transition);
+}
+
+.turn-pill.my-turn {
+    background: rgba(0, 180, 216, .25);
+    border-color: var(--ocean-light);
+    color: var(--ocean-light);
+    box-shadow: 0 0 15px rgba(0, 180, 216, .3);
+}
+
+.turn-pill.opponent-turn {
+    color: var(--ocean-pale);
+}
+
+.hud-player.active-turn .hud-score {
+    color: var(--ocean-light);
+}
+
+/* ─── PLACEMENT OVERLAY ─── */
+.placement-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 14px 14px;
+    gap: 12px;
+    background: var(--ocean-deep);
+    overflow: hidden;
+}
+
+.placement-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+}
+
+.placement-header h2 {
+    font-size: 20px;
+}
+
+.placement-timer-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.timer-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--ocean-pale);
+}
+
+.placement-timer {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ocean-light);
+    font-variant-numeric: tabular-nums;
+}
+
+.placement-timer.urgent {
+    color: var(--hit-color);
+    animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-red {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+.placement-body {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
+    align-items: flex-start;
+}
+
+/* ─── GRID LABELS ─── */
+.grid-labels-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding-top: 18px;
+    /* align with rows */
+    gap: 0;
+    min-width: 16px;
+}
+
+.grid-labels-col span {
+    font-size: 10px;
+    color: var(--ocean-pale);
+    text-align: center;
+    line-height: 1;
+}
+
+.grid-labels-row {
+    display: flex;
+    justify-content: space-around;
+    height: 16px;
+    margin-bottom: 2px;
+}
+
+.grid-labels-row span {
+    font-size: 10px;
+    color: var(--ocean-pale);
+    text-align: center;
+    flex: 1;
+}
+
+.grid-wrap-inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.placement-grid-wrap {
+    display: flex;
+    gap: 2px;
+}
+
+.grid-labeled {
+    display: flex;
+    gap: 2px;
+}
+
+/* ─── GRID ─── */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(10, var(--cs));
+    grid-template-rows: repeat(10, var(--cs));
+    gap: var(--grid-gap);
+    background: rgba(0, 0, 0, 0.15);
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.cell {
+    width: var(--cs);
+    height: var(--cs);
+    background: var(--empty-color);
+    /* Gris Challenge */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    transition: background .15s, transform 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Bateau intact */
+.cell.boat {
+    background: var(--boat-color);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Tir raté (Miss) */
+.cell.miss {
+    background: rgba(72, 202, 228, 0.15) !important;
+    border-color: var(--miss-color) !important;
+}
+
+.cell.miss::after {
+    content: '●';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--miss-color);
+    font-size: calc(var(--cs) * 0.5);
+    line-height: 1;
+}
+
+/* Bateau touché (Hit) */
+.cell.hit {
+    background: rgba(239, 71, 111, 0.25) !important;
+    border-color: var(--hit-color) !important;
+    animation: pop 0.3s ease;
+}
+
+.cell.hit::after {
+    content: '×';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hit-color);
+    font-size: calc(var(--cs) * 0.7);
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Tir raté sur bateau (miss+boat dans le cas zones mixtes) */
+.cell.boat.miss {
+    background: rgba(72, 202, 228, .18) !important;
+    border-color: var(--miss-color) !important;
+}
+
+/* Bateau coulé */
+.cell.sunk {
+    background: rgba(255, 107, 53, 0.25) !important;
+    border-color: var(--sunk-color) !important;
+    animation: sunk-flash 0.5s ease;
+}
+
+.cell.sunk::after {
+    content: '×';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sunk-color);
+    font-size: calc(var(--cs) * 0.8);
+    font-weight: 700;
+}
+
+@keyframes sunk-flash {
+    0% {
+        transform: scale(1);
+        filter: brightness(2);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    70% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Zone de tir interactive */
+.grid-interactive .cell {
+    cursor: crosshair;
+}
+
+.grid-interactive .cell:hover:not(.miss):not(.hit):not(.sunk) {
+    background: rgba(0, 180, 216, .3);
+    transform: scale(1.08);
+    z-index: 2;
+    border-color: var(--ocean-light);
+}
+
+.grid-interactive.locked .cell {
+    cursor: not-allowed;
+}
+
+.grid-interactive.locked .cell:hover {
+    transform: none;
+    background: rgba(0, 119, 182, .12);
+    border-color: rgba(0, 180, 216, .12);
+}
+
+/* Conflit placement */
+.cell.conflict {
+    background: rgba(239, 71, 111, .3);
+    border-color: var(--hit-color);
+}
+
+/* ─── SHIPYARD ─── */
+.shipyard-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.shipyard-wrap h3 {
+    font-size: 15px;
+}
+
+.shipyard-hint {
+    font-size: 11px;
+    color: var(--ocean-pale);
+}
+
+.shipyard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.ship-slot {
+    display: flex;
+    align-items: center;
+}
+
+.ship {
+    display: inline-grid;
+    gap: 2px;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+}
+
+.ship:active {
+    cursor: grabbing;
+}
+
+.ship-block {
+    width: var(--cs);
+    height: var(--cs);
+    background: var(--boat-color);
+    border: 1px solid rgba(0, 180, 216, .5);
+    transition: background .15s;
+}
+
+.ship:hover .ship-block {
+    background: #5a9abf;
+}
+
+.drag-ghost {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    display: inline-grid;
+    gap: 2px;
+    opacity: .8;
+}
+
+.drag-ghost .ship-block {
+    background: var(--ocean-light);
+    border-color: var(--ocean-light);
+}
+
+.drag-ghost.invalid-ghost .ship-block {
+    background: var(--hit-color);
+    border-color: var(--hit-color);
+}
+
+/* ─── READY BUTTON ─── */
+.btn-ready-action {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--ocean-blue), #023e8a);
+    box-shadow: 0 8px 20px rgba(0, 119, 182, .4);
+    transition: var(--transition);
+    letter-spacing: .5px;
+}
+
+.btn-ready-action:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 119, 182, .5);
+    filter: brightness(1.1);
+}
+
+.btn-ready-action:disabled {
+    background: rgba(255, 255, 255, .08);
+    color: rgba(255, 255, 255, .35);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.btn-ready-action.is-ready {
+    background: linear-gradient(135deg, #0096c7, #0077b6);
+    cursor: default;
+}
+
+/* ─── GAME AREA (3D BOARD) ─── */
+.game-area {
+    position: fixed;
+    top: 54px;
+    /* Sous le menu */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    perspective: 1500px;
+    overflow: hidden;
+    background: radial-gradient(circle at center, rgba(0, 119, 182, 0.1) 0%, transparent 70%);
+    padding-top: 0px;
+    /* On descend pour voir la ligne A */
+}
+
+.game-board-3d {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    /* On ne stretch plus pour ne pas centrer verticalement par défaut */
+    transform-style: preserve-3d;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.board-panel {
+    position: relative;
+    background: var(--ocean-dark);
+    border: 4px solid #1a2a44;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 40px rgba(0, 0, 0, 0.6);
+    transition: var(--transition);
+    backface-visibility: hidden;
+}
+
+/* Panneau Haut (Vertical) */
+.panel-top {
+    transform: rotateX(0deg) translateZ(0);
+    z-index: 2;
+    margin-bottom: -4px;
+    /* Jonction */
+}
+
+/* Panneau Bas (Horizontal/Incliné) */
+.panel-bottom {
+    transform: rotateX(60deg) translateY(-20px);
+    transform-origin: top center;
+    z-index: 1;
+}
+
+/* ─── ANIMATION DE TIR (Gris Challenge) ─── */
+.game-board-3d.view-shooting {
+    transform: translateY(0);
+}
+
+.game-board-3d.view-shooting .panel-top {
+    transform: rotateX(-45deg) translateY(-350px) scale(0.3);
+    opacity: 0.02;
+    pointer-events: none;
+}
+
+.game-board-3d.view-shooting .panel-bottom {
+    /* On remonte de 70% pour un centrage "pixel perfect" au milieu de l'écran */
+    transform: rotateX(0deg) translateY(-70%) scale(1.15);
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+}
+
+.grid-container {
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 18px 18px;
+    border-radius: 4px;
+}
+
+.panel-header {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ocean-light);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.panel-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.stat-item {
+    font-size: 11px;
+    color: var(--ocean-pale);
+}
+
+/* Labels de grille spécifique 3D */
+.grid-label-top,
+.grid-label-left {
+    position: absolute;
+    display: flex;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.35;
+    color: var(--ocean-pale);
+}
+
+.grid-label-top {
+    top: 3px;
+    left: 20px;
+    right: 20px;
+    justify-content: space-around;
+}
+
+.grid-label-left {
+    left: 3px;
+    top: 20px;
+    bottom: 20px;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.cibles-subtitle {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 10px;
+    color: var(--ocean-light);
+}
+
+/* ─── POPUPS ─── */
+.shot-popup {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    z-index: 500;
+    pointer-events: none;
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .3s;
+    opacity: 0;
+}
+
+.shot-popup.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.shot-popup-inner {
+    background: rgba(3, 17, 42, .95);
+    border: 1px solid rgba(0, 180, 216, .4);
+    border-radius: 20px;
+    padding: 16px 28px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+    min-width: 180px;
+}
+
+.shot-icon {
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.shot-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.shot-coord {
+    font-size: 14px;
+    color: var(--ocean-pale);
+}
+
+.shot-popup.type-hit .shot-title {
+    color: var(--hit-color);
+}
+
+.shot-popup.type-miss .shot-title {
+    color: var(--miss-color);
+}
+
+.shot-popup.type-sunk .shot-title {
+    color: var(--sunk-color);
+}
+
+.attack-popup {
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    z-index: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .3s;
+}
+
+.attack-popup.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.attack-popup-inner {
+    background: rgba(239, 71, 111, .15);
+    border: 1px solid rgba(239, 71, 111, .4);
+    border-radius: 30px;
+    padding: 8px 18px;
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.attack-icon {
+    font-size: 18px;
+}
+
+/* ─── OVERLAYS ─── */
+.game-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(1, 11, 31, .88);
+    backdrop-filter: blur(8px);
+    padding: 20px;
+}
+
+.overlay-content {
+    background: var(--ocean-mid);
+    border: 1px solid rgba(0, 180, 216, .25);
+    border-radius: 24px;
+    padding: 36px 28px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.overlay-content h2 {
+    font-size: 28px;
+}
+
+.overlay-content p {
+    color: var(--ocean-pale);
+    font-size: 14px;
+}
+
+.end-emoji {
+    font-size: 56px;
+}
+
+.final-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, .05);
+    border-radius: 10px;
+}
+
+.stat-val {
+    font-weight: 700;
+    color: var(--ocean-light);
+}
+
+.btn-ocean {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--ocean-blue), #023e8a);
+    box-shadow: 0 6px 18px rgba(0, 119, 182, .4);
+    transition: var(--transition);
+}
+
+.btn-ocean:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.btn-ocean.btn-secondary-ocean {
+    background: rgba(255, 255, 255, .07);
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.btn-ocean.btn-secondary-ocean:hover {
+    background: rgba(255, 255, 255, .13);
+}
+
+/* ─── SPINNER ─── */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(0, 180, 216, .2);
+    border-top-color: var(--ocean-light);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    :root {
+        --cs: 36px;
+    }
+
+    .placement-body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .boards-wrapper {
+        flex-direction: row;
+    }
+
+    .boards-wrapper.show-targets {
+        /* Sur desktop, on met juste un highlight au lieu de translater */
+        transform: none;
+    }
+
+    .panel-bateaux {
+        border-right: 1px solid rgba(0, 180, 216, .15);
+        border-bottom: none;
+    }
+
+    .panel-cibles {
+        transition: box-shadow .3s;
+    }
+
+    .boards-wrapper.show-targets .panel-cibles {
+        box-shadow: inset 0 0 0 2px rgba(0, 180, 216, .5);
+    }
+}

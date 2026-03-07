@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.5.2026-03-06";
+const CACHE_NAME = "mini-games-cache-v1.6.2026-03-07";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -39,15 +39,17 @@ const ASSETS_TO_CACHE = [
     'assets/logos/logo-512.png',
     'assets/logos/logo-192.png',
     'assets/logos/favicon.png',
-    'assets/logos/ball-sort.png',
-    'assets/logos/casino.png',
-    'assets/logos/casse-briques.png',
-    'assets/logos/funfair.png',
-    'assets/logos/morpion.png',
-    'assets/logos/pong.png',
-    'assets/logos/snow-digger.png',
-    'assets/logos/lostBelow.png',
-    'assets/logos/block-puzzle.png',
+
+    'assets/logos/ball-sort.webp',
+    'assets/logos/casino.webp',
+    'assets/logos/casse-briques.webp',
+    'assets/logos/funfair.webp',
+    'assets/logos/morpion.webp',
+    'assets/logos/pong.webp',
+    'assets/logos/snow-digger.webp',
+    'assets/logos/lostBelow.webp',
+    'assets/logos/block-puzzle.webp',
+    'assets/logos/battleship.webp',
 
     // About
     'about/about.html',
@@ -121,6 +123,16 @@ const ASSETS_TO_CACHE = [
     'games/block-puzzle/js/game.js',
     'games/block-puzzle/js/lobby.js',
     'games/block-puzzle/js/room.js',
+
+    // Game: battleship
+    'games/battleship/index.html',
+    'games/battleship/game.html',
+    'games/battleship/room.html',
+    'games/battleship/css/style.css',
+    'games/battleship/css/game.css',
+    'games/battleship/js/menu.js',
+    'games/battleship/js/game.js',
+    'games/battleship/js/room.js',
 
     // Game: pong
     'games/pong/index.html',

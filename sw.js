@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.6.2026-03-07";
+const CACHE_NAME = "mini-games-cache-v1.7.2026-03-08";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -50,6 +50,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/lostBelow.webp',
     'assets/logos/block-puzzle.webp',
     'assets/logos/battleship.webp',
+    'assets/logos/layer-pile.webp',
 
     // About
     'about/about.html',
@@ -193,7 +194,12 @@ const ASSETS_TO_CACHE = [
     'games/lostBelow/js/game.js',
     'games/lostBelow/js/lobby.js',
     'games/lostBelow/js/room.js',
-    'games/lostBelow/js/setup.js'
+    'games/lostBelow/js/setup.js',
+
+    // Game: Layer Pile
+    'games/layer-pile/index.html',
+    'games/layer-pile/css/game.css',
+    'games/layer-pile/js/game.js'
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

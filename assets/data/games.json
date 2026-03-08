@@ -108,6 +108,22 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "layer-pile": {
+    "path": "./games/layer-pile/index.html",
+    "name": "Layer Pile",
+    "emoji": "🏗️",
+    "description": "Empile les blocs avec précision. Chaque millimètre compte !",
+    "tags": [
+      "🧱 Arcade",
+      "🎯 Précision",
+      "⚡ Réflexes",
+      "👤 Solo"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "snow-digger": {
     "path": "./games/snow-digger/index.html",
     "name": "Snow Digger",

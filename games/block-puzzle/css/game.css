@@ -472,3 +472,219 @@ body {
 .piece-slot .piece {
   animation: popIn 0.25s ease forwards;
 }
+
+/*  RECORDS CUSTOM STYLES  */
+.records-modal {
+  max-width: 380px !important;
+  position: relative;
+  overflow: visible !important;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.records-title {
+  text-align: center;
+  font-size: 26px !important;
+  margin-bottom: 24px !important;
+}
+
+.records-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.records-section h3 {
+  margin-top: 0 !important;
+  margin-bottom: 12px !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  color: var(--accent) !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.record-card {
+  background: rgba(187, 134, 252, 0.08);
+  border: 1px solid rgba(187, 134, 252, 0.15);
+  padding: 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  transition: all 0.2s;
+}
+
+.record-card:hover {
+  background: rgba(187, 134, 252, 0.12);
+  transform: translateY(-2px);
+}
+
+.record-card.global {
+  background: rgba(3, 218, 198, 0.08);
+  border-color: rgba(3, 218, 198, 0.2);
+}
+
+.record-card.global:hover {
+  background: rgba(3, 218, 198, 0.12);
+}
+
+.rc-label {
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rc-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-card.global .rc-value {
+  color: var(--teal);
+}
+
+.rc-message {
+  display: block;
+  font-size: 12px;
+  color: var(--dim);
+  font-style: italic;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+}
+
+.connection-status {
+  font-size: 11px;
+  text-align: center;
+  margin-top: 12px;
+  color: var(--dim);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* 🏆 Popup Record 🏆 */
+#recordMessagePopup .overlay-content {
+  background: rgba(22, 22, 31, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(168, 85, 247, 0.2);
+  padding: 40px 30px;
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#recordMessagePopup .overlay-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+#recordMessagePopup h2 {
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+#recordMessagePopup p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dim);
+  margin-bottom: 24px;
+}
+
+.message-input-wrapper {
+  margin-bottom: 30px;
+  position: relative;
+}
+
+#recordMsgInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#recordMsgInput:focus {
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.char-counter {
+  position: absolute;
+  bottom: -22px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.5px;
+}
+
+#saveRecordMsgBtn {
+  background: linear-gradient(135deg, var(--accent), #7e22ce);
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+  border: none;
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+#saveRecordMsgBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(168, 85, 247, 0.4);
+  filter: brightness(1.1);
+}

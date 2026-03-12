@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.7.2026-03-08",
-    "lastUpdate": "2026-03-08",
+    "currentVersion": "1.7.2026-03-12",
+    "lastUpdate": "2026-03-12",
     "history": [
+        {
+            "version": "1.7.2026-03-12",
+            "date": "2026-03-12",
+            "changes": [
+                "Ajout des records globaux dans Layer Pile et Block Puzzle",
+                "Correction des extensions d'images dans les heads"
+            ]
+        },
         {
             "version": "1.7.2026-03-08",
             "date": "2026-03-08",

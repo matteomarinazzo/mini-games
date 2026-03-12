@@ -3,7 +3,10 @@
  */
 
 import { auth, firebaseReady } from "../../../js/config/firebase-config.js";
-import { updateRoom, listenToRoomChanges, deleteRoom } from "../../../js/firebaseWrk.js";
+import { updateRoom, listenToRoomChanges, deleteRoom, setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js";
+import { checkRealConnection } from "../../../js/network.js";
+
+let best_score_ever = await getFirebaseLeaderboard("block_puzzle", "score")
 
 // ─────────────────────────────────────────────
 // CONFIG
@@ -84,6 +87,19 @@ const restartBtn = document.getElementById('restartBtn');
 const opponentHudEl = document.getElementById('opponentHud');
 const opponentNameEl = document.getElementById('opponentName');
 const opponentScoreEl = document.getElementById('opponentScore');
+
+const recordsOverlay = document.getElementById('recordsOverlay');
+const recordsClose = document.getElementById('recordsClose');
+const recordsBtn = document.getElementById('recordsBtn');
+const recPersonalScore = document.getElementById('recPersonalScore');
+const recGlobalScore = document.getElementById('recGlobalScore');
+const recStatus = document.getElementById('recStatus');
+
+// 🏆 Popup Record
+const recordMessagePopup = document.getElementById('recordMessagePopup');
+const recordMsgInput = document.getElementById('recordMsgInput');
+const saveRecordMsgBtn = document.getElementById('saveRecordMsgBtn');
+const recordCharCounter = document.getElementById('recordCharCounter');
 
 // ─────────────────────────────────────────────
 // MULTIPLAYER
@@ -741,6 +757,24 @@ function triggerGameOver(reason) {
   timerInterval = null;
   if (roomID) localStorage.removeItem(`blockPuzzle_timer_${roomID}`);
 
+  let $isOnline = checkRealConnection();
+  let isGlobalScoreBroken = false;
+
+  if (score > (best_score_ever || 0) && $isOnline && gameMode !== 'confrontation') {
+    isGlobalScoreBroken = true;
+    best_score_ever = score;
+  }
+
+  // Préparer les données pour la popup si un record est battu
+  if (isGlobalScoreBroken) {
+    window.pendingRecordData = {
+      score: score,
+      isScoreBroken: true
+    };
+  } else {
+    window.pendingRecordData = null;
+  }
+
   endTitle.textContent = reason;
   finalScoreEl.textContent = score;
   finalBestEl.textContent = bestScore;
@@ -763,7 +797,14 @@ function triggerGameOver(reason) {
     listenToRematchStatus();
   }
 
-  gameOverOverlay.style.display = 'flex';
+  if (window.pendingRecordData) {
+    recordMessagePopup.style.display = 'flex';
+    recordMsgInput.value = '';
+    recordCharCounter.textContent = '0/50';
+    setTimeout(() => recordMsgInput.focus(), 100);
+  } else {
+    gameOverOverlay.style.display = 'flex';
+  }
 }
 
 async function requestRematch() {
@@ -920,6 +961,89 @@ function setupEventListeners() {
 
   pauseBtn?.addEventListener('click', togglePause);
   resumeBtn?.addEventListener('click', togglePause);
+
+  recordsBtn?.addEventListener('click', async () => {
+    const opening = recordsOverlay.style.display !== 'flex';
+    recordsOverlay.style.display = opening ? 'flex' : 'none';
+
+    if (opening) {
+      recPersonalScore.textContent = bestScore;
+      recStatus.textContent = "Synchronisation...";
+      try {
+        let isOnline = checkRealConnection();
+        if (isOnline) {
+          const scoreData = await getFirebaseRecordData("block_puzzle", "score");
+          const scoreVal = (scoreData && typeof scoreData === 'object') ? (scoreData.value || 0) : (scoreData || 0);
+
+          recGlobalScore.textContent = scoreVal;
+
+          // Message Handling
+          const scoreCard = recGlobalScore.closest('.record-card');
+          scoreCard.querySelectorAll('.rc-message').forEach(m => m.remove());
+
+          if (scoreData?.message) {
+            const m = document.createElement('span');
+            m.className = 'rc-message';
+            m.textContent = `« ${scoreData.message} »`;
+            scoreCard.appendChild(m);
+          }
+
+          recStatus.textContent = "À jour (Cloud)";
+        } else {
+          recStatus.textContent = "Hors ligne (Records locaux)";
+          recGlobalScore.textContent = best_score_ever || 0;
+        }
+      } catch (e) {
+        console.error("Firebase records error:", e);
+        recStatus.textContent = "Erreur de connexion";
+      }
+    }
+  });
+
+  recordsClose?.addEventListener('click', () => {
+    recordsOverlay.style.display = 'none';
+  });
+
+  recordsOverlay?.addEventListener('click', (e) => {
+    if (e.target === recordsOverlay) recordsOverlay.style.display = 'none';
+  });
+
+  // 🏆 Popup Record Events
+  saveRecordMsgBtn.addEventListener('click', async () => {
+    const message = recordMsgInput.value.trim().substring(0, 50);
+    const data = window.pendingRecordData;
+    if (!data) return;
+
+    saveRecordMsgBtn.disabled = true;
+    saveRecordMsgBtn.textContent = 'Enregistrement...';
+
+    try {
+      if (data.isScoreBroken) {
+        await setFirebaseLeaderboard("block_puzzle", "score", {
+          value: data.score,
+          message: message,
+          timestamp: Date.now()
+        });
+      }
+    } catch (e) { console.error("Error saving record message:", e); }
+
+    saveRecordMsgBtn.disabled = false;
+    saveRecordMsgBtn.textContent = 'Sauvegarder';
+    recordMessagePopup.style.display = 'none';
+    gameOverOverlay.style.display = 'flex';
+    window.pendingRecordData = null;
+  });
+
+  recordMsgInput.addEventListener('input', () => {
+    recordCharCounter.textContent = `${recordMsgInput.value.length}/50`;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+      // Empêcher l'espace de faire défiler ou autre si on est dans le jeu (si applicable)
+    }
+  });
 }
 
 function togglePause() {

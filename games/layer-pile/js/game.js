@@ -6,6 +6,11 @@
  * Alternance de l'axe d'oscillation : pair=X (gauche-droite), impair=Z (avant-arrière en iso)
  * Logique de découpe correcte sur chaque axe indépendamment.
  */
+import { setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js"
+import { checkRealConnection } from "../../../js/network.js"
+
+let best_score_ever = await getFirebaseLeaderboard("layer_pile", "best_score")
+let best_layer_ever = await getFirebaseLeaderboard("layer_pile", "best_layer")
 
 'use strict';
 
@@ -273,6 +278,15 @@ const rulesOverlay = document.getElementById('rulesOverlay');
 const pauseOverlay = document.getElementById('pauseOverlay');
 const gameoverOverlay = document.getElementById('gameoverOverlay');
 
+const recordsOverlay = document.getElementById('recordsOverlay');
+const recordsClose = document.getElementById('recordsClose');
+const recordsBtn = document.getElementById('recordsBtn');
+const recPersonalScore = document.getElementById('recPersonalScore');
+const recPersonalHeight = document.getElementById('recPersonalHeight');
+const recGlobalScore = document.getElementById('recGlobalScore');
+const recGlobalHeight = document.getElementById('recGlobalHeight');
+const recStatus = document.getElementById('recStatus');
+
 const rulesBtn = document.getElementById('rulesBtn');
 const rulesClose = document.getElementById('rulesClose');
 const pauseBtn = document.getElementById('pauseBtn');
@@ -287,6 +301,12 @@ const goBest = document.getElementById('goBest');
 const goHeight = document.getElementById('goHeight');
 const goRestartBtn = document.getElementById('goRestartBtn');
 const goMenuBtn = document.getElementById('goMenuBtn');
+
+// 🏆 Popup Record
+const recordMessagePopup = document.getElementById('recordMessagePopup');
+const recordMsgInput = document.getElementById('recordMsgInput');
+const saveRecordMsgBtn = document.getElementById('saveRecordMsgBtn');
+const recordCharCounter = document.getElementById('recordCharCounter');
 
 // ─────────────────────────────────────────────
 // RESIZE
@@ -696,6 +716,8 @@ function updateSpeedUI() {
 // GAME OVER
 // ─────────────────────────────────────────────
 function triggerGameOver() {
+    let $isOnline = checkRealConnection();
+
     playGameSound("gameover");
     gameRunning = false;
     paused = false;
@@ -703,13 +725,38 @@ function triggerGameOver() {
     canvas.classList.add('shake');
     setTimeout(() => canvas.classList.remove('shake'), 400);
 
+    let isGlobalScoreBroken = false;
+    let isGlobalLayerBroken = false;
+
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem('layerpile_best', bestScore);
+
+        if ($isOnline && bestScore > best_score_ever) {
+            isGlobalScoreBroken = true;
+            best_score_ever = bestScore; // Mettre à jour localement pour éviter les doubles popups
+        }
     }
     if (level > bestLevel) {
         bestLevel = level;
         localStorage.setItem('layerpile_bestLevel', bestLevel)
+
+        if ($isOnline && bestLevel > best_layer_ever) {
+            isGlobalLayerBroken = true;
+            best_layer_ever = bestLevel;
+        }
+    }
+
+    // Si un record mondial est battu, on prépare les données pour la popup
+    if (isGlobalScoreBroken || isGlobalLayerBroken) {
+        window.pendingRecordData = {
+            score: bestScore,
+            level: bestLevel,
+            isScoreBroken: isGlobalScoreBroken,
+            isLayerBroken: isGlobalLayerBroken
+        };
+    } else {
+        window.pendingRecordData = null;
     }
 
     bestBadgeVal.textContent = bestScore;
@@ -736,7 +783,16 @@ function triggerGameOver() {
             cameraTargetY = 0;
             drawSky();
             drawFrame();
-            setTimeout(() => gameoverOverlay.classList.add('open'), 300);
+            setTimeout(() => {
+                if (window.pendingRecordData) {
+                    recordMessagePopup.style.display = 'flex';
+                    recordMsgInput.value = '';
+                    recordCharCounter.textContent = '0/50';
+                    setTimeout(() => recordMsgInput.focus(), 100);
+                } else {
+                    gameoverOverlay.classList.add('open');
+                }
+            }, 300);
         }
     }
 
@@ -791,7 +847,10 @@ function handleInput() { if (!gameRunning || paused) return; dropBlock(); }
 canvas.addEventListener('click', handleInput);
 canvas.addEventListener('touchend', (e) => { e.preventDefault(); handleInput(); }, { passive: false });
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' || e.code === 'ArrowDown') { e.preventDefault(); handleInput(); }
+    if (e.code === 'Space' || e.code === 'ArrowDown') {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+        e.preventDefault(); handleInput();
+    }
     if (e.code === 'Escape' && gameRunning && !paused) pauseGame();
 });
 
@@ -802,6 +861,63 @@ rulesBtn.addEventListener('click', () => { if (gameRunning && !paused) rulesOver
 rulesClose.addEventListener('click', () => rulesOverlay.classList.remove('open'));
 rulesOverlay.addEventListener('click', (e) => { if (e.target === rulesOverlay) rulesOverlay.classList.remove('open'); });
 
+recordsBtn.addEventListener('click', async () => {
+    if (gameRunning && !paused) {
+        recordsOverlay.classList.toggle('open');
+        if (recordsOverlay.classList.contains('open')) {
+            // Update Personal
+            recPersonalScore.textContent = bestScore;
+            recPersonalHeight.textContent = bestLevel;
+
+            // Fetch & Update Global
+            recStatus.textContent = "Synchronisation...";
+            try {
+                let isOnline = checkRealConnection();
+                if (isOnline) {
+                    const scoreData = await getFirebaseRecordData("layer_pile", "best_score");
+                    const layerData = await getFirebaseRecordData("layer_pile", "best_layer");
+
+                    const scoreVal = (scoreData && typeof scoreData === 'object') ? (scoreData.value || 0) : (scoreData || 0);
+                    const layerVal = (layerData && typeof layerData === 'object') ? (layerData.value || 0) : (layerData || 0);
+
+                    recGlobalScore.textContent = scoreVal;
+                    recGlobalHeight.textContent = layerVal;
+
+                    // Message Handling
+                    const scoreCard = recGlobalScore.closest('.record-card');
+                    const heightCard = recGlobalHeight.closest('.record-card');
+                    scoreCard.querySelectorAll('.rc-message').forEach(m => m.remove());
+                    heightCard.querySelectorAll('.rc-message').forEach(m => m.remove());
+
+                    if (scoreData?.message) {
+                        const m = document.createElement('span');
+                        m.className = 'rc-message';
+                        m.textContent = `« ${scoreData.message} »`;
+                        scoreCard.appendChild(m);
+                    }
+                    if (layerData?.message) {
+                        const m = document.createElement('span');
+                        m.className = 'rc-message';
+                        m.textContent = `« ${layerData.message} »`;
+                        heightCard.appendChild(m);
+                    }
+
+                    recStatus.textContent = "À jour (Cloud)";
+                } else {
+                    recStatus.textContent = "Hors ligne (Records locaux)";
+                    recGlobalScore.textContent = best_score_ever || 0;
+                    recGlobalHeight.textContent = best_layer_ever || 0;
+                }
+            } catch (e) {
+                console.error("Firebase records error:", e);
+                recStatus.textContent = "Erreur de connexion";
+            }
+        }
+    }
+})
+recordsClose.addEventListener('click', () => recordsOverlay.classList.remove('open'));
+recordsOverlay.addEventListener('click', (e) => { if (e.target === recordsOverlay) recordsOverlay.classList.remove('open'); });
+
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', () => { pauseOverlay.classList.remove('open'); resumeGame(); });
 restartPauseBtn.addEventListener('click', () => { pauseOverlay.classList.remove('open'); startGame(); });
@@ -809,6 +925,43 @@ menuPauseBtn.addEventListener('click', () => { window.location.href = '../../ind
 
 goRestartBtn.addEventListener('click', () => { gameoverOverlay.classList.remove('open'); startGame(); });
 goMenuBtn.addEventListener('click', () => { window.location.href = '../../index.html'; });
+
+// 🏆 Popup Record Events
+saveRecordMsgBtn.addEventListener('click', async () => {
+    const message = recordMsgInput.value.trim().substring(0, 50);
+    const data = window.pendingRecordData;
+    if (!data) return;
+
+    saveRecordMsgBtn.disabled = true;
+    saveRecordMsgBtn.textContent = 'Enregistrement...';
+
+    try {
+        if (data.isScoreBroken) {
+            await setFirebaseLeaderboard("layer_pile", "best_score", {
+                value: data.score,
+                message: message,
+                timestamp: Date.now()
+            });
+        }
+        if (data.isLayerBroken) {
+            await setFirebaseLeaderboard("layer_pile", "best_layer", {
+                value: data.level,
+                message: message,
+                timestamp: Date.now()
+            });
+        }
+    } catch (e) { console.error("Error saving record message:", e); }
+
+    saveRecordMsgBtn.disabled = false;
+    saveRecordMsgBtn.textContent = 'Sauvegarder';
+    recordMessagePopup.style.display = 'none';
+    gameoverOverlay.classList.add('open');
+    window.pendingRecordData = null;
+});
+
+recordMsgInput.addEventListener('input', () => {
+    recordCharCounter.textContent = `${recordMsgInput.value.length}/50`;
+});
 
 // ─────────────────────────────────────────────
 // RESIZE & INIT

@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startGameBtn = document.getElementById('startGameBtn');
 
   const isOnline = await checkRealConnection();
-  console.log("zzz " + isOnline)
 
   // Handle mode selection UI
   gameModeRadios.forEach(radio => {

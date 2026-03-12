@@ -137,6 +137,42 @@
         </div>
     </div>
 
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Score</span>
+                        <span class="rc-value" id="recPersonalScore">0</span>
+                    </div>
+                    <div class="record-card">
+                        <span class="rc-label">Étage</span>
+                        <span class="rc-value" id="recPersonalHeight">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Records Mondiaux</h3>
+                <div class="record-grid">
+                    <div class="record-card global">
+                        <span class="rc-label">Best Score</span>
+                        <span class="rc-value" id="recGlobalScore">0</span>
+                    </div>
+                    <div class="record-card global">
+                        <span class="rc-label">Best Étage</span>
+                        <span class="rc-value" id="recGlobalHeight">0</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
     <!-- ─── HUD ─── -->
     <div class="hud">
         <div class="hud-left">
@@ -159,6 +195,15 @@
             <span class="score-value" id="scoreValue">0</span>
         </div>
         <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
             <button class="icon-btn" id="pauseBtn" title="Pause">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -185,7 +230,20 @@
     <!-- TAP HINT -->
     <div id="tapHint">Tap / Clic pour poser le bloc</div>
 
-    <script src="js/game.js"></script>
+    <!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-primary" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
     <script type="module" src="../../js/countPlayedTime.js"></script>
 </body>
 

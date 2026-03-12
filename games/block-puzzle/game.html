@@ -77,7 +77,45 @@
     </div>
   </div>
 
+  <!-- Records Overlay -->
+  <div class="game-overlay" id="recordsOverlay" style="display: none;">
+    <div class="overlay-content records-modal">
+      <button class="modal-close" id="recordsClose">✕</button>
+      <h2 class="records-title">🏆 Records</h2>
+
+      <section class="records-section">
+        <h3>👤 Mon Record</h3>
+        <div class="record-grid">
+          <div class="record-card">
+            <span class="rc-label">Score</span>
+            <span class="rc-value" id="recPersonalScore">0</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="records-section">
+        <h3>🌍 Records Mondiaux</h3>
+        <div class="record-grid">
+          <div class="record-card global">
+            <span class="rc-label">Best Score</span>
+            <span class="rc-value" id="recGlobalScore">0</span>
+          </div>
+        </div>
+        <div class="connection-status" id="recStatus">Synchronisation...</div>
+      </section>
+    </div>
+  </div>
+
   <!-- Boton de pause/menu en haut à droite -->
+  <button class="pause-btn" id="recordsBtn" style="right: 62px;" title="Records">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  </button>
+
   <button class="pause-btn" id="pauseBtn">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
       <rect x="6" y="4" width="4" height="16" rx="1.5" fill="currentColor" />
@@ -85,6 +123,19 @@
     </svg>
   </button>
 
+
+  <!-- 🏆 Popup Record 🏆 -->
+  <div class="game-overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+    <div class="overlay-content">
+      <h2>🏆 Nouveau Record !</h2>
+      <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+      <div class="message-input-wrapper">
+        <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+        <div class="char-counter" id="recordCharCounter">0/50</div>
+      </div>
+      <button class="btn-primary" id="saveRecordMsgBtn">Sauvegarder</button>
+    </div>
+  </div>
 
   <script type="module" src="js/game.js"></script>
   <script type="module" src="../../js/countPlayedTime.js"></script>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Politique de confidentialité – Mini‑Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            margin-top: 30px;
+            font-size: 20px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Politique de confidentialité – Mini‑Games</h1>
+    <p><strong>Dernière mise à jour : 2026</strong></p>
+
+    <p>Mini‑Games (mini-games.ch) respecte la vie privée de ses utilisateurs. 
+    Cette politique explique quelles données sont collectées, comment elles sont utilisées et quels droits vous avez.</p>
+
+    <h2>1. Données collectées</h2>
+    <p>Mini‑Games ne collecte aucune donnée personnelle identifiable. Aucune inscription, aucun compte utilisateur et aucune information personnelle ne sont demandés.</p>
+
+    <h2>2. Données techniques</h2>
+    <p>Certaines données non personnelles peuvent être collectées automatiquement :</p>
+    <ul>
+        <li>type d’appareil</li>
+        <li>version du navigateur</li>
+        <li>langue du système</li>
+        <li>statistiques d’utilisation anonymes</li>
+    </ul>
+    <p>Ces données sont utilisées uniquement pour assurer le bon fonctionnement du site et améliorer l’expérience utilisateur.</p>
+
+    <h2>3. Cookies</h2>
+    <p>Mini‑Games n’utilise que des cookies techniques nécessaires au fonctionnement des jeux (cache, préférences locales). Aucun cookie publicitaire, de suivi ou d’analyse comportementale n’est utilisé. Aucune bannière de consentement n’est requise.</p>
+
+    <h2>4. Publicités</h2>
+    <p>Mini‑Games n’affiche aucune publicité et n’utilise aucun service publicitaire tiers.</p>
+
+    <h2>5. Partage de données</h2>
+    <p>Mini‑Games ne vend, ne loue et ne partage aucune donnée personnelle. Aucune donnée n’est transmise à des tiers, sauf pour les services techniques nécessaires au fonctionnement du site (hébergement, sécurité).</p>
+
+    <h2>6. Sécurité</h2>
+    <p>Nous mettons en place des mesures techniques pour protéger le site et les données anonymes collectées.</p>
+
+    <h2>7. Services tiers</h2>
+    <p>Mini‑Games peut utiliser des services techniques tels que :</p>
+    <ul>
+        <li>hébergement web</li>
+        <li>outils de performance anonymisés</li>
+    </ul>
+    <p>Ces services respectent les réglementations en vigueur.</p>
+
+    <h2>8. Enfants</h2>
+    <p>Mini‑Games est destiné à un public général. Aucune donnée personnelle n’est collectée auprès des enfants.</p>
+
+    <h2>9. Contact</h2>
+    <p>Pour toute question concernant cette politique :<br>
+    <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a></p>
+
+    <h2>10. Modifications</h2>
+    <p>Cette politique peut être mise à jour. La version la plus récente est toujours disponible sur cette page.</p>
+
+</body>
+</html>

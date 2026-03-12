@@ -287,3 +287,46 @@ export async function checkRoomExists(gameId) {
         return false;
     }
 }
+
+/*================ LEADERBOARDS ================*/
+export async function setFirebaseLeaderboard(game, stat, score) {
+    await waitForFirebase();
+    const { _ref, _set } = getDbTools();
+    if (!navigator.onLine || !database || !_set) return false;
+
+    try {
+        // score peut être un nombre ou un objet { value, message, timestamp ... }
+        await _set(_ref(database, `leaderboards/${game}/${stat}`), score);
+        return true;
+    } catch (e) { return false; }
+}
+
+export async function getFirebaseLeaderboard(game, stat, defaultValue = 0) {
+    await waitForFirebase();
+    const { _ref, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_get) return defaultValue;
+
+    try {
+        const snapshot = await _get(_ref(database, `leaderboards/${game}/${stat}`));
+        if (snapshot.exists()) {
+            const val = snapshot.val();
+            // Si c'est le nouveau format objet, on renvoie juste la valeur numérique pour la comparaison
+            if (val && typeof val === 'object' && 'value' in val) {
+                return val.value;
+            }
+            return val;
+        }
+        return defaultValue;
+    } catch (e) { return defaultValue; }
+}
+
+export async function getFirebaseRecordData(game, stat) {
+    await waitForFirebase();
+    const { _ref, _get } = getDbTools();
+    if (!navigator.onLine || !database || !_get) return null;
+
+    try {
+        const snapshot = await _get(_ref(database, `leaderboards/${game}/${stat}`));
+        return snapshot.exists() ? snapshot.val() : null;
+    } catch (e) { return null; }
+}

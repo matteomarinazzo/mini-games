@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Draw & Guess – Jeu de dessin multijoueur gratuit en ligne | Mini‑Games</title>
+
+    <meta name="description"
+        content="Jouez gratuitement à Draw & Guess sur Mini‑Games. Dessinez un mot et faites-le deviner aux autres, ou participez à une chaîne de dessins et interprétations. Multijoueur, rapide et fun, compatible mobile et PC.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/drawAndGuess/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Draw & Guess – Jeu de dessin multijoueur gratuit en ligne | Mini‑Games">
+    <meta property="og:description"
+        content="Dessinez, devinez et enchaînez les interprétations dans ce jeu multijoueur hilarant. Jouable sur mobile et PC.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/drawAndGuess/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/drawandguess.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Draw & Guess – Jeu de dessin multijoueur gratuit en ligne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Dessinez un mot, faites-le deviner ou interprétez les dessins des autres. Multijoueur, rapide et fun.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/drawandguess.webp">
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Draw & Guess",
+    "url": "https://mini-games.ch/games/drawAndGuess/",
+    "description": "Jeu multijoueur de dessin et de devinettes. Dessinez un mot ou interprétez les dessins des autres dans deux modes hilarants.",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "genre": ["Party", "Drawing", "Multiplayer"],
+    "numberOfPlayers": "2-10",
+    "inLanguage": "fr",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mini‑Games"
+    }
+  }
+  </script>
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="bg-animation">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+    </div>
+
+    <div class="container main-menu">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">✏️</span>
+                <h1>Draw and Guess</h1>
+            </div>
+            <p class="subtitle">Dessinez, devinez, recommencez !</p>
+        </header>
+
+        <div class="player-config">
+            <input type="text" id="playerNameInput" placeholder="Votre prénom..." maxlength="15">
+        </div>
+
+        <div class="mode-selection">
+            <div class="mode-card" id="modeStandard">
+                <div class="mode-icon">👥</div>
+                <h3>Dessine et Devine</h3>
+                <p>Dessine puis devine à tour de rôle</p>
+                <button class="btn btn-primary">Jouer</button>
+            </div>
+
+            <div class="mode-card" id="modeChain">
+                <div class="mode-icon">🔗</div>
+                <h3>Dessin en Chaîne</h3>
+                <p>C'est comme le téléphone arabe, mais avec des dessins</p>
+                <button class="btn btn-secondary">Jouer</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const modeStandard = document.getElementById('modeStandard');
+        const modeChain = document.getElementById('modeChain');
+        const nameInput = document.getElementById('playerNameInput');
+
+        const savedName = localStorage.getItem('drawguess_name') || localStorage.getItem('battleship_playerName') || "";
+        if (savedName) nameInput.value = savedName;
+
+        function checkName() {
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert("Veuillez entrer un prénom !");
+                nameInput.focus();
+                return null;
+            }
+            localStorage.setItem('drawguess_name', name);
+            return name;
+        }
+
+        modeStandard.onclick = () => {
+            if (checkName()) window.location.href = 'game.html?mode=standard';
+        };
+
+        modeChain.onclick = () => {
+            if (checkName()) window.location.href = 'game.html?mode=chain';
+        };
+    </script>
+</body>
+
+</html>

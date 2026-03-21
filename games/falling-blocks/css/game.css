@@ -1,0 +1,530 @@
+:root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --surface2: #1e1e2e;
+    --accent: #bb86fc;
+    --teal: #03dac6;
+    --red: #cf6679;
+    --text: #e8e8f0;
+    --dim: #6b6b8a;
+
+    --cell-size: 28px;
+    --cell-gap: 3px;
+    --radius: 6px;
+
+    --t-blue: #4fc3f7;
+    --t-orange: #ffb74d;
+    --t-yellow: #fff176;
+    --t-green: #81c784;
+    --t-purple: #ba68c8;
+    --t-red: #e57373;
+    --t-cyan: #4dd0e1;
+}
+
+/* RESET */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+html,
+body {
+    touch-action: none;
+    overscroll-behavior: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ─── HUD ─── */
+.hud {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hud-item .label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    text-transform: uppercase;
+}
+
+.hud-item .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--teal);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+/* ─── Game Area ─── */
+
+.game-area,
+.grid-container,
+#grid,
+.game-overlay {
+    touch-action: none;
+}
+
+.game-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 10px;
+    position: relative;
+}
+
+/* ─── Grid ─── */
+.grid-container {
+    padding: 8px;
+    background: var(--surface2);
+    border-radius: 12px;
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(10, var(--cell-size));
+    grid-template-rows: repeat(20, var(--cell-size));
+    gap: var(--cell-gap);
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius);
+    transition: background-color 0.12s ease;
+}
+
+/* ─── Tetromino Colors ─── */
+.cell.I {
+    background: var(--t-cyan);
+}
+
+.cell.J {
+    background: var(--t-blue);
+}
+
+.cell.L {
+    background: var(--t-orange);
+}
+
+.cell.O {
+    background: var(--t-yellow);
+}
+
+.cell.S {
+    background: var(--t-green);
+}
+
+.cell.T {
+    background: var(--t-purple);
+}
+
+.cell.Z {
+    background: var(--t-red);
+}
+
+/* 3D effect */
+.cell.I,
+.cell.J,
+.cell.L,
+.cell.O,
+.cell.S,
+.cell.T,
+.cell.Z {
+    box-shadow:
+        inset 2px 2px 0 rgba(255, 255, 255, 0.25),
+        inset -2px -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ─── Ghost Piece ─── */
+.ghost {
+    opacity: 0.25;
+    filter: brightness(0.7);
+}
+
+/* ─── Line Clear Animation ─── */
+.clearing {
+    animation: lineClear 0.35s ease forwards;
+}
+
+@keyframes lineClear {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    40% {
+        transform: scale(1.1);
+        opacity: 1;
+        filter: brightness(1.6);
+    }
+
+    100% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+}
+
+/* ─── Pause Button ─── */
+.pause-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    font-size: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.pause-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* ─── Overlays ─── */
+.game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(6px);
+}
+
+.overlay-content {
+    background: var(--surface2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 36px 32px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.overlay-content h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.final-stats {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-bottom: 28px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--teal);
+}
+
+/* ─── Buttons ─── */
+.btn-primary,
+.btn-secondary {
+    width: 100%;
+    padding: 14px;
+    margin: 6px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), #7c4dff);
+    color: #000;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/*  RECORDS CUSTOM STYLES  */
+.records-modal {
+    max-width: 380px !important;
+    position: relative;
+    overflow: visible !important;
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.records-title {
+    text-align: center;
+    font-size: 26px !important;
+    margin-bottom: 24px !important;
+}
+
+.records-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: left;
+}
+
+.records-section h3 {
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+    font-size: 13px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    color: var(--accent) !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+.record-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.record-card {
+    background: rgba(187, 134, 252, 0.08);
+    border: 1px solid rgba(187, 134, 252, 0.15);
+    padding: 14px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    transition: all 0.2s;
+}
+
+.record-card:hover {
+    background: rgba(187, 134, 252, 0.12);
+    transform: translateY(-2px);
+}
+
+.record-card.global {
+    background: rgba(3, 218, 198, 0.08);
+    border-color: rgba(3, 218, 198, 0.2);
+}
+
+.record-card.global:hover {
+    background: rgba(3, 218, 198, 0.12);
+}
+
+.rc-label {
+    font-size: 11px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rc-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.record-card.global .rc-value {
+    color: var(--teal);
+}
+
+.rc-message {
+    display: block;
+    font-size: 12px;
+    color: var(--dim);
+    font-style: italic;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    width: 100%;
+}
+
+.connection-status {
+    font-size: 11px;
+    text-align: center;
+    margin-top: 12px;
+    color: var(--dim);
+    font-style: italic;
+    opacity: 0.7;
+}
+
+/* 🏆 Popup Record 🏆 */
+#recordMessagePopup .overlay-content {
+    background: rgba(22, 22, 31, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(168, 85, 247, 0.2);
+    padding: 40px 30px;
+    position: relative;
+    overflow: hidden;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#recordMessagePopup .overlay-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+#recordMessagePopup h2 {
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+#recordMessagePopup p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--dim);
+    margin-bottom: 24px;
+}
+
+.message-input-wrapper {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+#recordMsgInput {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#recordMsgInput:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-bottom-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.char-counter {
+    position: absolute;
+    bottom: -22px;
+    right: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+}
+
+#saveRecordMsgBtn {
+    background: linear-gradient(135deg, var(--accent), #7e22ce);
+    box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+    border: none;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+}
+
+#saveRecordMsgBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(168, 85, 247, 0.4);
+    filter: brightness(1.1);
+}

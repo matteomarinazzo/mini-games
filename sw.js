@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.8.2026-03-21";
+const CACHE_NAME = "mini-games-cache-v1.9.2026-03-21";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -52,6 +52,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/battleship.webp',
     'assets/logos/layer-pile.webp',
     'assets/logos/draw-guess.webp',
+    'assets/logos/falling-blocks.webp',
 
     // About
     'about/about.html',
@@ -202,7 +203,7 @@ const ASSETS_TO_CACHE = [
     'games/layer-pile/css/game.css',
     'games/layer-pile/js/game.js',
 
-    // Game: battleship
+    // Game: Draw and Guess
     'games/draw-guess/index.html',
     'games/draw-guess/game.html',
     'games/draw-guess/css/style.css',
@@ -210,6 +211,11 @@ const ASSETS_TO_CACHE = [
     'games/draw-guess/js/game.js',
     'games/draw-guess/js/core/canvas.js',
     'games/draw-guess/js/core/wordGenerator.js',
+
+    // Game: Falling Blocks
+    'games/falling-blocks/index.html',
+    'games/falling-blocks/css/game.css',
+    'games/falling-blocks/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

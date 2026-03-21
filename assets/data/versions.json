@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.8.2026-03-21",
+    "currentVersion": "1.9.2026-03-21",
     "lastUpdate": "2026-03-21",
     "history": [
+        {
+            "version": "1.9.2026-03-21",
+            "date": "2026-03-21",
+            "changes": [
+                "Ajout de Falling Blocks",
+                "Les joueurs comptent comme nouveaux après minimum 1 minute"
+            ]
+        },
         {
             "version": "1.8.2026-03-21",
             "date": "2026-03-21",

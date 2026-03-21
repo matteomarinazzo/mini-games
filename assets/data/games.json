@@ -94,6 +94,21 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "falling-blocks": {
+    "path": "./games/falling-blocks/index.html",
+    "name": "Falling Blocks",
+    "emoji": "🧱",
+    "description": "Empile les pièces, complète les lignes et explose le score ! ",
+    "tags": [
+      "⚡ Arcade",
+      "🧱 Réflexes",
+      "🎮 Classique"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "morpion": {
     "path": "./games/morpion/index.html",
     "name": "Morpion",

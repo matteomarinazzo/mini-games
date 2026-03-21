@@ -25,6 +25,21 @@ async function incrementTime() {
             // Envoyer 1 minute en direct
             const result = await incrementFirebaseStat("totalMinutesPlayed");
             if (result) console.log("✅ Minute synchronisée sur Firebase");
+
+            // détecter si nouveau joueur 
+            if (!localStorage.getItem("isAlreadyCounted")) {
+                console.log("Nouvelle connexion");
+                localStorage.setItem("isAlreadyCounted", true);
+                localStorage.setItem("isNewPlayer", true);
+
+                const isOnline = await checkRealConnection();
+                console.log("isOnline : ", isOnline);
+            }
+            if (localStorage.getItem("isNewPlayer")) {
+                await incrementFirebaseStat("totalPlayers");
+                localStorage.removeItem("isNewPlayer");
+            }
+
         } else {
             // Sinon stocker localement
             let minutesPlayed = Number(localStorage.getItem("minutesPlayed") || 0);

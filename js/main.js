@@ -23,30 +23,6 @@ fetch("./assets/data/games.json")
 
 // Initialisation
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!localStorage.getItem("isAlreadyCounted")) {
-    console.log("Nouvelle connexion");
-    localStorage.setItem("isAlreadyCounted", true);
-    localStorage.setItem("isNewPlayer", true);
-
-    const isOnline = await checkRealConnection();
-    console.log("isOnline : ", isOnline);
-
-    if (isOnline) {
-      try {
-        // Import dynamique pour ne pas charger Firebase si hors ligne
-        const { incrementFirebaseStat } = await import("../js/firebaseWrk.js");
-
-        // Gestion du nouveau joueur
-        if (localStorage.getItem("isNewPlayer")) {
-          await incrementFirebaseStat("totalPlayers");
-          localStorage.removeItem("isNewPlayer");
-        }
-      } catch (e) {
-        console.warn("⚠️ Erreur Firebase, passage aux valeurs par défaut", e);
-      }
-    }
-  }
-
   initRandomGameButton();
   addScrollAnimations();
   displayAppVersion()

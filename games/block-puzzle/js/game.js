@@ -71,7 +71,6 @@ const gridEl = document.getElementById('grid');
 const scoreEl = document.getElementById('score');
 const timerEl = document.getElementById('timer');
 const timerLabel = document.getElementById('timerLabel');
-const bestScoreEl = document.getElementById('bestScore');
 const piecesContainer = document.getElementById('piecesContainer');
 const gameOverOverlay = document.getElementById('gameOverOverlay');
 const finalScoreEl = document.getElementById('finalScore');
@@ -746,7 +745,6 @@ function updateScore() {
   if (score > bestScore) {
     bestScore = score;
     localStorage.setItem('blockPuzzleBest_v2', bestScore);
-    bestScoreEl.textContent = bestScore;
   }
 }
 
@@ -1070,7 +1068,6 @@ async function init() {
   roomID = rawID ? `blockPuzzle_${rawID}` : null;
   myUid = auth?.currentUser?.uid;
 
-  bestScoreEl.textContent = bestScore;
   buildGrid();
   computeAndSetCellSize();
   window.addEventListener('resize', () => { computeAndSetCellSize(); renderGrid(); });

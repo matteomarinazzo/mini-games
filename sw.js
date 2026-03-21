@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.7.2026-03-12";
+const CACHE_NAME = "mini-games-cache-v1.8.2026-03-21";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -51,6 +51,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/block-puzzle.webp',
     'assets/logos/battleship.webp',
     'assets/logos/layer-pile.webp',
+    'assets/logos/draw-guess.webp',
 
     // About
     'about/about.html',
@@ -199,7 +200,16 @@ const ASSETS_TO_CACHE = [
     // Game: Layer Pile
     'games/layer-pile/index.html',
     'games/layer-pile/css/game.css',
-    'games/layer-pile/js/game.js'
+    'games/layer-pile/js/game.js',
+
+    // Game: battleship
+    'games/draw-guess/index.html',
+    'games/draw-guess/game.html',
+    'games/draw-guess/css/style.css',
+    'games/draw-guess/css/game.css',
+    'games/draw-guess/js/game.js',
+    'games/draw-guess/js/core/canvas.js',
+    'games/draw-guess/js/core/wordGenerator.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

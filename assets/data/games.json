@@ -78,6 +78,22 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "draw-guess": {
+    "path": "./games/draw-guess/index.html",
+    "name": "Draw and Guess",
+    "emoji": "✏️",
+    "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
+    "tags": [
+      "✏️ Créativité",
+      "🧠 Réflexion",
+      "👥 Multijoueur",
+      "⚡ Temps réel"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "morpion": {
     "path": "./games/morpion/index.html",
     "name": "Morpion",

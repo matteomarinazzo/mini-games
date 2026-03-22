@@ -15,6 +15,7 @@ async function initFirebase() {
 
   if (!isReallyOnline) {
     console.log("📡 Mode Hors-ligne réel détecté. Firebase bloqué pour éviter le spam.");
+    resolveReady(false);
     return;
   }
 

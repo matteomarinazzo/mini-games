@@ -1,3 +1,4 @@
+import { playGameSound, startMusic, toggleSound, toggleMusic, getSoundEnabled, getMusicEnabled } from "./audio.js";
 import { checkRealConnection } from "../../../js/network.js";
 import { getFirebaseLeaderboard, getFirebaseRecordData, setFirebaseLeaderboard } from "../../../js/firebaseWrk.js";
 
@@ -31,6 +32,8 @@ const pauseOverlay = document.getElementById("pauseOverlay");
 const resumeBtn = document.getElementById("resumeBtn");
 const restartBtn = document.getElementById("restartBtn");
 const menuBtn2 = document.getElementById("menuBtn2");
+const soundBtn = document.getElementById("soundBtn");
+const musicBtn = document.getElementById("musicBtn");
 
 /* GAME CONSTANTS */
 const ROWS = 20;
@@ -78,7 +81,7 @@ let softDropInterval = null;
 
 const SCREEN_W = window.screen.width;
 const MOVE_THRESHOLD = Math.max(16, Math.min(26, SCREEN_W * 0.05));
-const SOFT_DROP_THRESHOLD = 100;
+const SOFT_DROP_THRESHOLD = 30;
 const TAP_THRESHOLD = 12;
 const TAP_TIME_LIMIT = 250;
 
@@ -94,11 +97,25 @@ async function init() {
     scoreEl.textContent = score;
 
     bestScore = parseInt(localStorage.getItem("fallingBlocks_best") || "0");
-    best_score_ever = await getFirebaseLeaderboard("falling_blocks", "score");
+
+    // On lance la récupération en arrière-plan sans bloquer le démarrage du jeu
+    // firebaseWrk.js gère maintenant lui-même la détection offline (checkRealConnection)
+    getFirebaseLeaderboard("falling_blocks", "score")
+        .then(val => { if (val !== undefined) best_score_ever = val; })
+        .catch(() => { });
 
     spawnPiece();
     startTimer();
+    updateAudioButtons();
     gameLoop();
+}
+
+function updateAudioButtons() {
+    if (!getSoundEnabled()) soundBtn.classList.add("muted");
+    else soundBtn.classList.remove("muted");
+
+    if (!getMusicEnabled()) musicBtn.classList.add("muted");
+    else musicBtn.classList.remove("muted");
 }
 
 // Crée les cellules UNE seule fois au démarrage
@@ -119,7 +136,6 @@ function renderGrid() {
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             const cell = cells[r * COLS + c];
-            // Ne pas écraser les cellules en cours d'animation
             if (cell.classList.contains('clearing')) continue;
             // Reset
             cell.className = "cell";
@@ -172,6 +188,7 @@ function rotate(matrix) {
 }
 
 function movePiece(dr, dc) {
+    if (!piece) return false;
     const newPiece = {
         ...piece,
         row: piece.row + dr,
@@ -180,22 +197,27 @@ function movePiece(dr, dc) {
 
     if (!collides(newPiece)) {
         piece = newPiece;
+        if (dc !== 0) playGameSound('move'); // son uniquement pour mouvements horizontaux
         return true;
     }
     return false;
 }
 
 function hardDrop() {
+    if (!piece) return;
     while (movePiece(1, 0));
-    lockPiece();
+    playGameSound('drop');
+    lockPiece(true);
 }
 
 function rotatePiece() {
+    if (!piece) return;
     const rotated = rotate(piece.shape);
     const newPiece = { ...piece, shape: rotated };
 
     if (!collides(newPiece)) {
         piece = newPiece;
+        playGameSound('rotate');
     }
 }
 
@@ -214,7 +236,7 @@ function collides(p) {
     return false;
 }
 
-function lockPiece() {
+function lockPiece(fromHardDrop = false) {
     for (let r = 0; r < piece.shape.length; r++) {
         for (let c = 0; c < piece.shape[r].length; c++) {
             if (piece.shape[r][c]) {
@@ -223,6 +245,7 @@ function lockPiece() {
         }
     }
 
+    if (!fromHardDrop) playGameSound('drop');
     clearLines();
     spawnPiece();
 }
@@ -251,9 +274,12 @@ function clearLines() {
         }
     });
 
+    // Bloquer la game loop pendant l'animation
+    isClearing = true;
+
     // Attendre la fin de l'animation (350ms) puis supprimer les lignes
     setTimeout(() => {
-        // Retirer la classe clearing de TOUTES les cellules
+        // Retirer la classe clearing
         Array.from(gridEl.children).forEach(cell => cell.classList.remove('clearing'));
 
         // Supprimer les lignes du tableau logique
@@ -265,6 +291,11 @@ function clearLines() {
 
         score += fullRows.length * 100;
         scoreEl.textContent = score;
+
+        // Son selon le nombre de lignes
+        if (fullRows.length >= 4) playGameSound('clear4');
+        else if (fullRows.length >= 2) playGameSound('clear2');
+        else playGameSound('clear1');
 
         // Reprendre la game loop
         isClearing = false;
@@ -388,6 +419,7 @@ function handleTouchStart(e) {
     ) return;
 
     e.preventDefault(); // Bloque scroll/zoom uniquement sur la zone de jeu
+    startMusic(); // démarre la musique au premier touch
     if (isPaused || isGameOver) return;
 
     const t = e.touches[0];
@@ -429,9 +461,12 @@ function handleTouchMove(e) {
     if (totalDy > SOFT_DROP_THRESHOLD && totalDx < MOVE_THRESHOLD * 1.5 && !softDropActive) {
         softDropActive = true;
         movePiece(1, 0); // premier drop immédiat
+        playGameSound('softdrop');
         softDropInterval = setInterval(() => {
             if (!isPaused && !isGameOver && isTouching) {
-                movePiece(1, 0);
+                if (movePiece(1, 0)) {
+                    playGameSound('softdrop');
+                }
             } else {
                 stopSoftDrop();
             }
@@ -479,12 +514,14 @@ function startTimer() {
 async function triggerGameOver(reason) {
     if (isGameOver) return;
     isGameOver = true;
+    playGameSound('gameover');
 
     clearInterval(timerInterval);
 
-    let $isOnline = checkRealConnection();
+    let $isOnline = await checkRealConnection();
     let isGlobalScoreBroken = false;
 
+    // Si on bat le record mondial (déjà récupéré au début) et qu'on est en ligne
     if (score > (best_score_ever || 0) && $isOnline) {
         isGlobalScoreBroken = true;
         best_score_ever = score;
@@ -526,11 +563,12 @@ async function triggerGameOver(reason) {
 
 document.addEventListener("keydown", (e) => {
     if (isPaused || isGameOver) return;
+    startMusic();
 
     switch (e.key) {
         case "ArrowLeft": movePiece(0, -1); break;
         case "ArrowRight": movePiece(0, 1); break;
-        case "ArrowDown": movePiece(1, 0); break;
+        case "ArrowDown": if (movePiece(1, 0)) playGameSound('softdrop'); break;
         case "ArrowUp": rotatePiece(); break;
         case " ": hardDrop(); break;
     }
@@ -562,6 +600,18 @@ menuBtn2.addEventListener("click", () => {
     window.location.href = "../../index.html";
 });
 
+soundBtn.addEventListener("click", () => {
+    const enabled = toggleSound();
+    if (enabled) soundBtn.classList.remove("muted");
+    else soundBtn.classList.add("muted");
+});
+
+musicBtn.addEventListener("click", () => {
+    const enabled = toggleMusic();
+    if (enabled) musicBtn.classList.remove("muted");
+    else musicBtn.classList.add("muted");
+});
+
 /* ─────────────────────────────────────────
    RECORDS OVERLAY
 ────────────────────────────────────────── */
@@ -575,9 +625,9 @@ recordsBtn.addEventListener("click", async () => {
         recStatus.textContent = "Synchronisation...";
 
         try {
-            let isOnline = checkRealConnection();
-            if (isOnline) {
-                const scoreData = await getFirebaseRecordData("falling_blocks", "score");
+            const scoreData = await getFirebaseRecordData("falling_blocks", "score");
+
+            if (scoreData) {
                 const scoreVal = (scoreData && typeof scoreData === "object") ? (scoreData.value || 0) : (scoreData || 0);
 
                 recGlobalScore.textContent = scoreVal;

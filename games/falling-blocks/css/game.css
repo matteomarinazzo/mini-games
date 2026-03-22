@@ -313,6 +313,42 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.btn-tertiary {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--dim);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tertiary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+.btn-tertiary.muted {
+    color: var(--red);
+    opacity: 0.6;
+    background: rgba(207, 102, 121, 0.05);
+    border-color: rgba(207, 102, 121, 0.2);
+}
+
+.btn-tertiary svg {
+    transition: transform 0.2s ease;
+}
+
+.btn-tertiary:active svg {
+    transform: scale(0.9);
+}
+
 /*  RECORDS CUSTOM STYLES  */
 .records-modal {
     max-width: 380px !important;

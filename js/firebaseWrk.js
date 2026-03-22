@@ -1,4 +1,5 @@
 import { database, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate, getRemove } from "./config/firebase-config.js";
+import { checkRealConnection } from "./network.js";
 
 // Attendre que Firebase soit initialisé avant de faire quoi que ce soit
 async function waitForFirebase() {
@@ -20,7 +21,8 @@ const getDbTools = () => ({
 export async function getFirebaseStat(statName, defaultValue = 0) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_get) return defaultValue;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_get) return defaultValue;
 
     try {
         console.log("📡 Récupération de la stat:", statName);
@@ -32,7 +34,8 @@ export async function getFirebaseStat(statName, defaultValue = 0) {
 export async function setFirebaseStat(statName, value) {
     await waitForFirebase();
     const { _ref, _set } = getDbTools();
-    if (!navigator.onLine || !database || !_set) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_set) return false;
 
     try {
         await _set(_ref(database, `stats/${statName}`), value);
@@ -43,7 +46,8 @@ export async function setFirebaseStat(statName, value) {
 export async function incrementFirebaseStat(statName, incrementBy = 1) {
     await waitForFirebase();
     const { _ref, _run } = getDbTools();
-    if (!navigator.onLine || !database || !_run) return null;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_run) return null;
 
     try {
         const statRef = _ref(database, `stats/${statName}`);
@@ -53,9 +57,10 @@ export async function incrementFirebaseStat(statName, incrementBy = 1) {
 }
 
 /*================ RATING GAMES ================*/
-export function listenToRatingChanges(gameId) {
+export async function listenToRatingChanges(gameId) {
     const { _ref, _onValue } = getDbTools();
-    if (!navigator.onLine || !database || !_onValue) return;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_onValue) return;
 
     const ratingRef = _ref(database, `ratings/${gameId}`);
     _onValue(ratingRef, (snapshot) => {
@@ -67,7 +72,8 @@ export function listenToRatingChanges(gameId) {
 export async function getRating(gameId) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (navigator.onLine && database && _get) {
+    const isOnline = await checkRealConnection();
+    if (isOnline && database && _get) {
         try {
             const snapshot = await _get(_ref(database, `ratings/${gameId}`));
             if (snapshot.exists()) return snapshot.val();
@@ -80,7 +86,8 @@ export async function saveRating(gameId, ratingData) {
     saveLocalRating(gameId, ratingData);
     await waitForFirebase();
     const { _ref, _set } = getDbTools();
-    if (navigator.onLine && database && _set) {
+    const isOnline = await checkRealConnection();
+    if (isOnline && database && _set) {
         try {
             await _set(_ref(database, `ratings/${gameId}`), ratingData);
         } catch (e) { return false; }
@@ -160,7 +167,8 @@ export function generateStars(rating) {
 export async function createRoom(gameId, roomData) {
     await waitForFirebase();
     const { _ref, _set, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_set) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_set) return false;
     try {
         if (await checkRoomExists(gameId)) return false;
 
@@ -175,7 +183,8 @@ export async function createRoom(gameId, roomData) {
 export async function joinRoom(gameId, playerData) {
     await waitForFirebase();
     const { _ref, _set, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_set || !_get) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_set || !_get) return false;
 
     try {
         const snapshot = await _get(_ref(database, `rooms/${gameId}`));
@@ -216,7 +225,8 @@ export async function joinRoom(gameId, playerData) {
 export async function getRoom(gameId) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_get) return null;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_get) return null;
 
     try {
         const snapshot = await _get(_ref(database, `rooms/${gameId}`));
@@ -233,7 +243,8 @@ export async function getRoom(gameId) {
 export async function deleteRoom(gameId) {
     await waitForFirebase();
     const { _ref, _remove } = getDbTools();
-    if (!navigator.onLine || !database || !_remove) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_remove) return false;
 
     try {
         await _remove(_ref(database, `rooms/${gameId}`));
@@ -247,7 +258,8 @@ export async function deleteRoom(gameId) {
 export async function updateRoom(gameId, roomData) {
     await waitForFirebase();
     const { _ref, _update } = getDbTools();  // ✅ CORRIGÉ ICI
-    if (!navigator.onLine || !database || !_update) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_update) return false;
 
     try {
         await _update(_ref(database, `rooms/${gameId}`), roomData);
@@ -274,7 +286,8 @@ export async function listenToRoomChanges(gameId, callback) {
 export async function checkRoomExists(gameId) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_get) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_get) return false;
 
     try {
         const snapshot = await _get(_ref(database, `rooms/${gameId}`));
@@ -292,7 +305,8 @@ export async function checkRoomExists(gameId) {
 export async function setFirebaseLeaderboard(game, stat, score) {
     await waitForFirebase();
     const { _ref, _set } = getDbTools();
-    if (!navigator.onLine || !database || !_set) return false;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_set) return false;
 
     try {
         // score peut être un nombre ou un objet { value, message, timestamp ... }
@@ -304,7 +318,8 @@ export async function setFirebaseLeaderboard(game, stat, score) {
 export async function getFirebaseLeaderboard(game, stat, defaultValue = 0) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_get) return defaultValue;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_get) return defaultValue;
 
     try {
         const snapshot = await _get(_ref(database, `leaderboards/${game}/${stat}`));
@@ -323,7 +338,8 @@ export async function getFirebaseLeaderboard(game, stat, defaultValue = 0) {
 export async function getFirebaseRecordData(game, stat) {
     await waitForFirebase();
     const { _ref, _get } = getDbTools();
-    if (!navigator.onLine || !database || !_get) return null;
+    const isOnline = await checkRealConnection();
+    if (!isOnline || !database || !_get) return null;
 
     try {
         const snapshot = await _get(_ref(database, `leaderboards/${game}/${stat}`));

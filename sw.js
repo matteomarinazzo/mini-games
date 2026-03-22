@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.9.2026-03-21";
+const CACHE_NAME = "mini-games-cache-v1.9.2026-03-22";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -216,6 +216,7 @@ const ASSETS_TO_CACHE = [
     'games/falling-blocks/index.html',
     'games/falling-blocks/css/game.css',
     'games/falling-blocks/js/game.js',
+    'games/falling-blocks/js/audio.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

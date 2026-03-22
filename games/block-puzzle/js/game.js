@@ -6,7 +6,7 @@ import { auth, firebaseReady } from "../../../js/config/firebase-config.js";
 import { updateRoom, listenToRoomChanges, deleteRoom, setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js";
 import { checkRealConnection } from "../../../js/network.js";
 
-let best_score_ever = await getFirebaseLeaderboard("block_puzzle", "score")
+let best_score_ever = 0;
 
 // ─────────────────────────────────────────────
 // CONFIG
@@ -748,14 +748,14 @@ function updateScore() {
   }
 }
 
-function triggerGameOver(reason) {
+async function triggerGameOver(reason) {
   if (isGameOver) return;
   isGameOver = true;
   clearInterval(timerInterval);
   timerInterval = null;
   if (roomID) localStorage.removeItem(`blockPuzzle_timer_${roomID}`);
 
-  let $isOnline = checkRealConnection();
+  let $isOnline = await checkRealConnection();
   let isGlobalScoreBroken = false;
 
   if (score > (best_score_ever || 0) && $isOnline && gameMode !== 'confrontation') {
@@ -968,7 +968,7 @@ function setupEventListeners() {
       recPersonalScore.textContent = bestScore;
       recStatus.textContent = "Synchronisation...";
       try {
-        let isOnline = checkRealConnection();
+        let isOnline = await checkRealConnection();
         if (isOnline) {
           const scoreData = await getFirebaseRecordData("block_puzzle", "score");
           const scoreVal = (scoreData && typeof scoreData === 'object') ? (scoreData.value || 0) : (scoreData || 0);
@@ -1062,6 +1062,12 @@ function togglePause() {
 // ─────────────────────────────────────────────
 async function init() {
   await firebaseReady;
+
+  // Récupération non-bloquante du record mondial
+  getFirebaseLeaderboard("block_puzzle", "score")
+    .then(val => { if (val !== undefined) best_score_ever = val; })
+    .catch(() => { });
+
   const p = new URLSearchParams(window.location.search);
   gameMode = p.get('mode') || 'libre';
   const rawID = p.get('id');

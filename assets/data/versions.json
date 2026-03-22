@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.9.2026-03-21",
-    "lastUpdate": "2026-03-21",
+    "currentVersion": "1.9.2026-03-22",
+    "lastUpdate": "2026-03-22",
     "history": [
+        {
+            "version": "1.9.2026-03-22",
+            "date": "2026-03-22",
+            "changes": [
+                "Correction des problèmes d'hors ligne",
+                "Ajout de sons et musiques dans Falling Blocks"
+            ]
+        },
         {
             "version": "1.9.2026-03-21",
             "date": "2026-03-21",

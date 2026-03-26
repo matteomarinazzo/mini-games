@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.9.2026-03-22",
-    "lastUpdate": "2026-03-22",
+    "currentVersion": "1.9.2026-03-26",
+    "lastUpdate": "2026-03-26",
     "history": [
+        {
+            "version": "1.9.2026-03-26",
+            "date": "2026-03-26",
+            "changes": [
+                "Ajout de sons et musiques dans 4 jeux et le menu"
+            ]
+        },
         {
             "version": "1.9.2026-03-22",
             "date": "2026-03-22",

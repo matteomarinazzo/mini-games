@@ -1,6 +1,15 @@
 //import { initRatingSystem } from "./rating-system.js";
 import { checkRealConnection } from './network.js';
 import { showBMC, hideBMC } from './BuyMeACoffee.js';
+import {
+  playGameSound,
+  startMenuMusic,
+  stopMenuMusic,
+  toggleMenuMusic,
+  toggleSound,
+  getMusicEnabled,
+  getSoundEnabled
+} from './utils/audio.js';
 
 
 var games = {};
@@ -222,27 +231,9 @@ function addScrollAnimations() {
   });
 }
 
-// Son au survol (optionnel - à activer si souhaité)
+// Son au survol (utilisant le moteur central)
 function playHoverSound() {
-  // Créer un son subtil au survol
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-
-  oscillator.frequency.value = 800;
-  oscillator.type = "sine";
-
-  gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.01,
-    audioContext.currentTime + 0.1,
-  );
-
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.1);
+  playGameSound('menu_hover');
 }
 
 // Gestion du bouton retour dans les jeux (à ajouter dans les jeux)
@@ -402,6 +393,98 @@ document.addEventListener("input", (e) => {
     filterGames();
   }
 });
+
+/*============================
+== GESTION AUDIO MENU ==
+============================*/
+// Initialisation de la musique au premier clic
+let musicStarted = false;
+const startInitialMusic = () => {
+  if (!musicStarted) {
+    musicStarted = true;
+    startMenuMusic();
+    // Optionnel : masquer les avertissements AudioContext
+    document.removeEventListener('mousedown', startInitialMusic);
+    document.removeEventListener('keydown', startInitialMusic);
+    document.removeEventListener('touchstart', startInitialMusic);
+  }
+};
+document.addEventListener('mousedown', startInitialMusic);
+document.addEventListener('keydown', startInitialMusic);
+document.addEventListener('touchstart', startInitialMusic);
+
+// Gestion du bouton flottant (visibilité temporaire et extension)
+const floatingContainer = document.getElementById('floating-menu-settings');
+const musicBtn = document.getElementById('mainMusicToggle');
+const soundBtn = document.getElementById('mainSoundToggle');
+let visibilityTimeout = null;
+
+const showFloatingBtn = () => {
+  if (!floatingContainer) return;
+  floatingContainer.classList.remove('hidden');
+
+  if (visibilityTimeout) clearTimeout(visibilityTimeout);
+  visibilityTimeout = setTimeout(() => {
+    floatingContainer.classList.add('hidden');
+  }, 10000); // 10 secondes
+};
+
+// Événements d'activité
+document.addEventListener('mousemove', showFloatingBtn);
+document.addEventListener('mousedown', showFloatingBtn);
+document.addEventListener('keydown', showFloatingBtn);
+document.addEventListener('touchstart', showFloatingBtn);
+
+// Logique d'extension au survol et couleurs du bouton param
+if (floatingContainer) {
+  const iconCog = musicBtn.querySelector('.icon-cog');
+  const iconMusic = musicBtn.querySelector('.icon-music');
+
+  const updateParamBtnState = () => {
+    if (!musicBtn) return;
+    const isHovered = floatingContainer.matches(':hover');
+    if (isHovered) {
+      musicBtn.classList.toggle('active', getMusicEnabled());
+    } else {
+      musicBtn.classList.toggle('active', getMusicEnabled() || getSoundEnabled());
+    }
+  };
+
+  floatingContainer.addEventListener('mouseenter', () => {
+    if (iconCog) iconCog.style.display = 'none';
+    if (iconMusic) iconMusic.style.display = 'flex';
+    updateParamBtnState();
+  });
+
+  floatingContainer.addEventListener('mouseleave', () => {
+    if (iconCog) iconCog.style.display = 'flex';
+    if (iconMusic) iconMusic.style.display = 'none';
+    updateParamBtnState();
+  });
+
+  // État initial
+  updateParamBtnState();
+
+  // Toggle musique
+  if (musicBtn) {
+    musicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenuMusic();
+      updateParamBtnState();
+    });
+  }
+
+  // Toggle son
+  if (soundBtn) {
+    soundBtn.classList.toggle('active', getSoundEnabled());
+    soundBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const enabled = toggleSound();
+      soundBtn.classList.toggle('active', enabled);
+      updateParamBtnState();
+    });
+  }
+}
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };

@@ -879,3 +879,79 @@ body {
     height: 80%;
   }
 }
+
+/* ── FLOATING SETTINGS TOGGLE ── */
+.floating-settings-container {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  z-index: 2000;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.floating-settings-container.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+.settings-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-floating {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  opacity: 0.6;
+}
+
+.btn-floating.secondary {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-left: -12px;
+  pointer-events: none;
+}
+
+.floating-settings-container:hover .btn-floating.secondary {
+  width: 56px;
+  height: 56px;
+  opacity: 0.6;
+  margin-left: 0;
+  pointer-events: auto;
+}
+
+.btn-floating:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
+  opacity: 1 !important;
+}
+
+.btn-floating.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+  opacity: 1 !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}

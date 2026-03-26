@@ -495,6 +495,41 @@ body {
     background: rgba(255, 255, 255, .14);
 }
 
+/* ─── TERTIARY CONTROLS ─── */
+.tertiary-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-tertiary {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+}
+
+.btn-tertiary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.btn-tertiary.active {
+    opacity: 1;
+    background: rgba(91, 200, 245, 0.2);
+    border-color: rgba(91, 200, 245, 0.5);
+    color: var(--ui-accent);
+}
+
 /* ─── SHAKE ─── */
 @keyframes shake {
 

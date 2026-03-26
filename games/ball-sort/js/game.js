@@ -1,3 +1,13 @@
+import {
+  playGameSound,
+  startBsMusic,
+  stopBsMusic,
+  toggleBsMusic,
+  toggleSound,
+  getSoundEnabled,
+  getMusicEnabled
+} from "../../../js/utils/audio.js";
+
 // Récupérer la configuration
 const config = JSON.parse(sessionStorage.getItem("ballSortConfig")) || {
   colors: 5,
@@ -42,6 +52,7 @@ function init() {
   updateHUD();
   startTimer();
   setupControls();
+  startBsMusic();
 }
 
 function createTubes() {
@@ -143,6 +154,7 @@ function liftTopBall(tubeIndex) {
   const heightAnimation =
     (config.ballsPerTube - balls.length + 1) * ballsSize + 10;
   balls[balls.length - 1].style.transform = `translateY(-${heightAnimation}px)`;
+  playGameSound('bs_lift');
 }
 
 function lowerTopBall(tubeIndex) {
@@ -151,6 +163,7 @@ function lowerTopBall(tubeIndex) {
   [tubeIndex].querySelectorAll(".ball");
   if (balls.length > 0) {
     balls[balls.length - 1].style.transform = "translateY(0)";
+    playGameSound('bs_lower');
   }
 }
 
@@ -216,12 +229,20 @@ async function simplePour(fromIndex, toIndex) {
 
   // ÉTAPE 2 : Descente dans le tube
   ghostBall.style.top = `${finalY}px`;
+  playGameSound('bs_lower');
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   // Finalisation
   ghostBall.remove();
   gameState.tubes[toIndex].push(gameState.tubes[fromIndex].pop());
   gameState.moves++;
+  playGameSound('bs_move');
+
+  // Vérifier si le tube est complété
+  const targetTube = gameState.tubes[toIndex];
+  if (targetTube.length === config.ballsPerTube && targetTube.every(b => b === targetTube[0])) {
+    playGameSound('bs_tube_complete');
+  }
 
   renderTubes();
   updateHUD();
@@ -285,6 +306,7 @@ function checkWin() {
   if (isWin) {
     gameState.isWin = true;
     stopTimer();
+    playGameSound('bs_win');
     setTimeout(() => showWinOverlay(), 500);
   }
 }
@@ -358,10 +380,33 @@ function setupControls() {
   document.getElementById("restartBtn2").addEventListener("click", restart);
   document.getElementById("playAgainBtn").addEventListener("click", restart);
 
+  // Audio Toggles
+  const soundToggle = document.getElementById("soundToggle");
+  const musicToggle = document.getElementById("musicToggle");
+
+  if (soundToggle) {
+    soundToggle.classList.toggle("active", getSoundEnabled());
+    soundToggle.addEventListener("click", () => {
+      const enabled = toggleSound();
+      soundToggle.classList.toggle("active", enabled);
+    });
+  }
+
+  if (musicToggle) {
+    musicToggle.classList.toggle("active", getMusicEnabled());
+    musicToggle.addEventListener("click", () => {
+      const enabled = toggleBsMusic();
+      musicToggle.classList.toggle("active", enabled);
+    });
+  }
+
   ["menuBtn", "menuBtn2"].forEach((id) => {
     document
       .getElementById(id)
-      .addEventListener("click", () => (window.location.href = "index.html"));
+      .addEventListener("click", () => {
+        stopBsMusic();
+        window.location.href = "index.html";
+      });
   });
 
   document.addEventListener("keydown", (e) => {
@@ -374,6 +419,10 @@ function setupControls() {
     } else if (e.key === " ") {
       e.preventDefault();
       togglePause();
+    } else if (e.key === "m" || e.key === "M") {
+      if (musicToggle) musicToggle.click();
+    } else if (e.key === "s" || e.key === "S") {
+      if (soundToggle) soundToggle.click();
     }
   });
 }

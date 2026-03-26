@@ -1,4 +1,4 @@
-import { playGameSound, startMusic, toggleSound, toggleMusic, getSoundEnabled, getMusicEnabled } from "./audio.js";
+import { playGameSound, startMusic, toggleSound, toggleMusic, getSoundEnabled, getMusicEnabled } from "../../../js/utils/audio.js";
 import { checkRealConnection } from "../../../js/network.js";
 import { getFirebaseLeaderboard, getFirebaseRecordData, setFirebaseLeaderboard } from "../../../js/firebaseWrk.js";
 
@@ -104,6 +104,7 @@ async function init() {
         .then(val => { if (val !== undefined) best_score_ever = val; })
         .catch(() => { });
 
+    dropInterval = 700; // Reset speed
     spawnPiece();
     startTimer();
     updateAudioButtons();
@@ -163,6 +164,9 @@ document.addEventListener('touchmove', (e) => {
 ────────────────────────────────────────── */
 
 function spawnPiece() {
+    // Increase speed slightly with each piece
+    if (dropInterval > 100) dropInterval -= 5;
+
     const type = COLORS[Math.floor(Math.random() * COLORS.length)];
     const shape = TETROMINOES[type];
 
@@ -247,7 +251,6 @@ function lockPiece(fromHardDrop = false) {
 
     if (!fromHardDrop) playGameSound('drop');
     clearLines();
-    spawnPiece();
 }
 
 /* ─────────────────────────────────────────
@@ -263,7 +266,13 @@ function clearLines() {
         }
     }
 
-    if (fullRows.length === 0) return;
+    if (fullRows.length === 0) {
+        isClearing = false;
+        spawnPiece();
+        renderGrid();
+        requestAnimationFrame(gameLoop);
+        return;
+    }
 
     // Appliquer l'animation CSS sur les cellules concernées
     const cells = gridEl.children;
@@ -282,25 +291,28 @@ function clearLines() {
         // Retirer la classe clearing
         Array.from(gridEl.children).forEach(cell => cell.classList.remove('clearing'));
 
-        // Supprimer les lignes du tableau logique
-        fullRows.sort((a, b) => b - a);
-        fullRows.forEach(r => {
-            grid.splice(r, 1);
-            grid.unshift(Array(COLS).fill(null));
-        });
+        // Supprimer les lignes du tableau logique et ajouter des lignes vides en haut
+        const newGrid = grid.filter((row, index) => !fullRows.includes(index));
+        const emptyRowsCount = ROWS - newGrid.length;
+        for (let i = 0; i < emptyRowsCount; i++) {
+            newGrid.unshift(Array(COLS).fill(null));
+        }
+        grid = newGrid;
 
         score += fullRows.length * 100;
         scoreEl.textContent = score;
+
+        // Mettre à jour la grille visuellement immédiatement pour éviter le "flicker"
+        renderGrid();
 
         // Son selon le nombre de lignes
         if (fullRows.length >= 4) playGameSound('clear4');
         else if (fullRows.length >= 2) playGameSound('clear2');
         else playGameSound('clear1');
 
-        // Reprendre la game loop
-        isClearing = false;
+        // Reprendre la game loop (mais on check si d'autres lignes sont apparues)
         lastDrop = performance.now();
-        requestAnimationFrame(gameLoop);
+        clearLines(); // Appel récursif pour vérifier à nouveau
     }, 350);
 }
 

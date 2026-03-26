@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.9.2026-03-22";
+const CACHE_NAME = "mini-games-cache-v1.9.2026-03-26";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine

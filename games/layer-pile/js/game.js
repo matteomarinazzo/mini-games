@@ -8,150 +8,20 @@
  */
 import { setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js"
 import { checkRealConnection } from "../../../js/network.js"
+import {
+    playGameSound,
+    startLpMusic,
+    stopLpMusic,
+    toggleLpMusic,
+    toggleSound,
+    getSoundEnabled,
+    getMusicEnabled
+} from "../../../js/utils/audio.js";
 
 let best_score_ever = await getFirebaseLeaderboard("layer_pile", "best_score")
 let best_layer_ever = await getFirebaseLeaderboard("layer_pile", "best_layer")
 
 'use strict';
-
-// ─────────────────────────────────────────────
-// AUDIO ENGINE
-// ─────────────────────────────────────────────
-let audioCtx = null;
-
-function getAudioCtx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    return audioCtx;
-}
-
-function masterOut(ctx, gain = 1.0) {
-    const g = ctx.createGain();
-    g.gain.value = gain;
-    g.connect(ctx.destination);
-    return g;
-}
-
-function playGameSound(type) {
-    const ctx = getAudioCtx();
-    const now = ctx.currentTime;
-
-    if (type === "drop") {
-        const out = masterOut(ctx, 1.8);
-
-        // Impact principal
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
-
-        gain.gain.setValueAtTime(0.8, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-        osc.connect(gain); gain.connect(out);
-        osc.start(now); osc.stop(now + 0.12);
-
-        // Petit click en plus
-        const click = ctx.createOscillator();
-        const clickGain = ctx.createGain();
-
-        click.type = "square";
-        click.frequency.setValueAtTime(900, now);
-        clickGain.gain.setValueAtTime(0.25, now);
-        clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-
-        click.connect(clickGain); clickGain.connect(out);
-        click.start(now); click.stop(now + 0.05);
-    }
-
-    else if (type === "perfect") {
-        const out = masterOut(ctx, 1.6);
-        const t = now;
-
-        // ───────────────────────────────
-        // 1) Note principale (montée)
-        // ───────────────────────────────
-        const osc1 = ctx.createOscillator();
-        const g1 = ctx.createGain();
-
-        osc1.type = "sine";
-        osc1.frequency.setValueAtTime(650, t);
-        osc1.frequency.exponentialRampToValueAtTime(1500, t + 0.18);
-
-        g1.gain.setValueAtTime(0.9, t);
-        g1.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-
-        osc1.connect(g1); g1.connect(out);
-        osc1.start(t); osc1.stop(t + 0.22);
-
-        // ───────────────────────────────
-        // 2) Harmonic sparkle (petit tintement aigu)
-        // ───────────────────────────────
-        const osc2 = ctx.createOscillator();
-        const g2 = ctx.createGain();
-
-        osc2.type = "triangle";
-        osc2.frequency.setValueAtTime(1800, t + 0.02);
-        osc2.frequency.exponentialRampToValueAtTime(2600, t + 0.12);
-
-        g2.gain.setValueAtTime(0.4, t + 0.02);
-        g2.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-
-        osc2.connect(g2); g2.connect(out);
-        osc2.start(t + 0.02); osc2.stop(t + 0.14);
-
-        // ───────────────────────────────
-        // 3) Petit "ding" très court (attaque brillante)
-        // ───────────────────────────────
-        const osc3 = ctx.createOscillator();
-        const g3 = ctx.createGain();
-
-        osc3.type = "square";
-        osc3.frequency.setValueAtTime(2400, t);
-        g3.gain.setValueAtTime(0.25, t);
-        g3.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-
-        osc3.connect(g3); g3.connect(out);
-        osc3.start(t); osc3.stop(t + 0.05);
-    }
-
-    else if (type === "gameover") {
-        const out = masterOut(ctx, 1.8);
-
-        // Whoosh (bruit blanc filtré)
-        const buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
-        const data = buf.getChannelData(0);
-        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-
-        const hp = ctx.createBiquadFilter();
-        hp.type = "highpass"; hp.frequency.value = 400;
-
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.6, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-        src.connect(hp); hp.connect(gain); gain.connect(out);
-        src.start(now); src.stop(now + 0.4);
-
-        // Impact grave
-        const osc = ctx.createOscillator();
-        const g2 = ctx.createGain();
-
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(90, now + 0.05);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
-
-        g2.gain.setValueAtTime(1.0, now + 0.05);
-        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-
-        osc.connect(g2); g2.connect(out);
-        osc.start(now + 0.05); osc.stop(now + 0.3);
-    }
-}
 
 // ─────────────────────────────────────────────
 // CONFIG
@@ -568,13 +438,13 @@ function dropBlock() {
         const isPerfect = Math.abs(delta) <= PERFECT_TOL;
 
         if (isPerfect) {
-            playGameSound("perfect");
+            playGameSound("lp_perfect");
             newWx = top.wx; newBw = cur.bw;
             perfectCombo++;
             showPerfect(perfectCombo);
             addScore(POINTS_PERFECT + (perfectCombo - 1) * 20);
         } else {
-            playGameSound("drop");
+            playGameSound("lp_drop");
             newWx = (oL + oR) / 2;
             newBw = overlap;
             perfectCombo = 0;
@@ -612,13 +482,13 @@ function dropBlock() {
         const isPerfect = Math.abs(delta) <= PERFECT_TOL;
 
         if (isPerfect) {
-            playGameSound("perfect");
+            playGameSound("lp_perfect");
             newWz = top.wz; newBd = cur.bd;
             perfectCombo++;
             showPerfect(perfectCombo);
             addScore(POINTS_PERFECT + (perfectCombo - 1) * 20);
         } else {
-            playGameSound("drop");
+            playGameSound("lp_drop");
             newWz = (oF + oB) / 2;
             newBd = overlap;
             perfectCombo = 0;
@@ -718,7 +588,8 @@ function updateSpeedUI() {
 function triggerGameOver() {
     let $isOnline = checkRealConnection();
 
-    playGameSound("gameover");
+    playGameSound("lp_gameover");
+    stopLpMusic();
     gameRunning = false;
     paused = false;
 
@@ -823,6 +694,7 @@ function startGame() {
     lastTime = performance.now();
     cancelAnimationFrame(animFrame);
     animFrame = requestAnimationFrame(gameLoop);
+    startLpMusic();
 }
 
 // ─────────────────────────────────────────────
@@ -921,10 +793,36 @@ recordsOverlay.addEventListener('click', (e) => { if (e.target === recordsOverla
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', () => { pauseOverlay.classList.remove('open'); resumeGame(); });
 restartPauseBtn.addEventListener('click', () => { pauseOverlay.classList.remove('open'); startGame(); });
-menuPauseBtn.addEventListener('click', () => { window.location.href = '../../index.html'; });
+menuPauseBtn.addEventListener('click', () => {
+    stopLpMusic();
+    window.location.href = '../../index.html';
+});
 
 goRestartBtn.addEventListener('click', () => { gameoverOverlay.classList.remove('open'); startGame(); });
-goMenuBtn.addEventListener('click', () => { window.location.href = '../../index.html'; });
+goMenuBtn.addEventListener('click', () => {
+    stopLpMusic();
+    window.location.href = '../../index.html';
+});
+
+// Audio Toggles
+const soundToggle = document.getElementById("soundToggle");
+const musicToggle = document.getElementById("musicToggle");
+
+if (soundToggle) {
+    soundToggle.classList.toggle("active", getSoundEnabled());
+    soundToggle.addEventListener("click", () => {
+        const enabled = toggleSound();
+        soundToggle.classList.toggle("active", enabled);
+    });
+}
+
+if (musicToggle) {
+    musicToggle.classList.toggle("active", getMusicEnabled());
+    musicToggle.addEventListener("click", () => {
+        const enabled = toggleLpMusic();
+        musicToggle.classList.toggle("active", enabled);
+    });
+}
 
 // 🏆 Popup Record Events
 saveRecordMsgBtn.addEventListener('click', async () => {

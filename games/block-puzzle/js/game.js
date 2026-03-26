@@ -1,7 +1,5 @@
-/**
- * Block Puzzle – game.js
- */
 
+import { playGameSound, startBpMusic, stopBpMusic, toggleBpMusic, toggleSound, getSoundEnabled, getMusicEnabled } from "../../../js/utils/audio.js";
 import { auth, firebaseReady } from "../../../js/config/firebase-config.js";
 import { updateRoom, listenToRoomChanges, deleteRoom, setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js";
 import { checkRealConnection } from "../../../js/network.js";
@@ -79,6 +77,8 @@ const endTitle = document.getElementById('endTitle');
 const retryBtn = document.getElementById('retryBtn');
 const menuBtn = document.getElementById('menuBtn');
 const menuBtn2 = document.getElementById('menuBtn2');
+const soundBtn = document.getElementById('soundBtn');
+const musicBtn = document.getElementById('musicBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const pauseOverlay = document.getElementById('pauseOverlay');
 const resumeBtn = document.getElementById('resumeBtn');
@@ -134,6 +134,7 @@ function setupMultiplayer() {
         }
         grid = newGrid;
         renderGrid();
+        if (gameMode !== 'confrontation') playGameSound('bp_place');
       }
     }
 
@@ -652,6 +653,8 @@ function canPlace(r, c, shape) {
 async function tryPlace(r, c, shape, index) {
   if (!canPlace(r, c, shape)) return false;
 
+  if (gameMode !== 'confrontation') playGameSound('bp_place');
+
   // Ajouter la pièce
   shape.layout.forEach((row, ri) => {
     row.forEach((val, ci) => {
@@ -720,7 +723,12 @@ function clearLines() {
     });
   }, 400);
 
-  return rowsToClear.length + colsToClear.length;
+  const cleared = rowsToClear.length + colsToClear.length;
+  if (gameMode !== 'confrontation') {
+    if (cleared === 1) playGameSound('bp_clear1');
+    else if (cleared > 1) playGameSound('bp_clear_multi');
+  }
+  return cleared;
 }
 
 function checkGameOver() {
@@ -751,6 +759,10 @@ function updateScore() {
 async function triggerGameOver(reason) {
   if (isGameOver) return;
   isGameOver = true;
+  if (gameMode !== 'confrontation') {
+    stopBpMusic();
+    playGameSound('bp_gameover');
+  }
   clearInterval(timerInterval);
   timerInterval = null;
   if (roomID) localStorage.removeItem(`blockPuzzle_timer_${roomID}`);
@@ -1042,6 +1054,16 @@ function setupEventListeners() {
       // Empêcher l'espace de faire défiler ou autre si on est dans le jeu (si applicable)
     }
   });
+
+  soundBtn?.addEventListener('click', () => {
+    const enabled = toggleSound();
+    soundBtn.classList.toggle('muted', !enabled);
+  });
+
+  musicBtn?.addEventListener('click', () => {
+    const enabled = toggleBpMusic();
+    musicBtn.classList.toggle('muted', !enabled);
+  });
 }
 
 function togglePause() {
@@ -1049,10 +1071,12 @@ function togglePause() {
   const paused = pauseOverlay.style.display === 'flex';
   pauseOverlay.style.display = paused ? 'none' : 'flex';
   if (paused) {
+    if (gameMode !== 'confrontation') startBpMusic();
     if (gameMode === 'defi') startCountdown(() => triggerGameOver('⏱️ Temps écoulé !'));
     else startChrono();
   } else {
     clearInterval(timerInterval);
+    if (gameMode !== 'confrontation') stopBpMusic();
     timerInterval = null;
   }
 }
@@ -1074,14 +1098,23 @@ async function init() {
   roomID = rawID ? `blockPuzzle_${rawID}` : null;
   myUid = auth?.currentUser?.uid;
 
+  if (soundBtn) soundBtn.classList.toggle('muted', !getSoundEnabled());
+  if (musicBtn) musicBtn.classList.toggle('muted', !getMusicEnabled());
+
   buildGrid();
   computeAndSetCellSize();
   window.addEventListener('resize', () => { computeAndSetCellSize(); renderGrid(); });
 
-  if (gameMode === 'confrontation' && roomID) { pauseBtn.style.display = 'none'; setupMultiplayer() }
+  if (gameMode === 'confrontation' && roomID) {
+    pauseBtn.style.display = 'none';
+    if (soundBtn) soundBtn.style.display = 'none';
+    if (musicBtn) musicBtn.style.display = 'none';
+    setupMultiplayer();
+  }
   else setupSinglePlayer(parseInt(p.get('duration') || '60'));
 
   setupEventListeners();
+  if (gameMode !== 'confrontation') startBpMusic();
 }
 
 init();

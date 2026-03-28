@@ -1,3 +1,22 @@
+import { initSettingsUI } from '../../../js/utils/settingsUI.js';
+import { startFunfairMusic, playFunfairSound } from '../../../js/utils/audio.js';
+
+initSettingsUI('funfair');
+
+let musicStarted = false;
+const startInitialMusic = () => {
+  if (!musicStarted) {
+    musicStarted = true;
+    startFunfairMusic();
+    document.removeEventListener('mousedown', startInitialMusic);
+    document.removeEventListener('keydown', startInitialMusic);
+    document.removeEventListener('touchstart', startInitialMusic);
+  }
+};
+document.addEventListener('mousedown', startInitialMusic);
+document.addEventListener('keydown', startInitialMusic);
+document.addEventListener('touchstart', startInitialMusic);
+
 // ========================================
 // STORAGE KEYS
 // ========================================
@@ -406,6 +425,7 @@ function shootCups(ctx, canvas) {
   if (cupsGameState.finished || cupsGameState.shooting || !cupsGameState.clickTarget) return;
 
   cupsGameState.shooting = true;
+  playFunfairSound('throw');
 
   const startX = 300;
   const startY = canvas.height;
@@ -467,6 +487,7 @@ function shootCups(ctx, canvas) {
       requestAnimationFrame(animate);
     } else {
       if (hitCups.length > 0) {
+        playFunfairSound('cupsCrash');
         hitCups.forEach(cup => {
           cup.falling = true;
           applyCupPhysics(cup);
@@ -549,12 +570,14 @@ function finishShot(ctx, canvas) {
     cupsGameState.finished = true;
     addTickets(2);
     updateStats(true, 2);
+    playFunfairSound('win');
     showResult('cupsResult', 'win', '🎉 Victoire ! Tous les gobelets sont tombés ! +2🎟️');
     document.getElementById('cupsNewGameBtn').style.display = 'block';
     createConfetti();
   } else if (cupsGameState.tries === 0) {
     cupsGameState.finished = true;
     updateStats(false, 0);
+    playFunfairSound('lose');
     const fallen = cupsGameState.cups.filter(c => c.fallen).length;
     showResult('cupsResult', 'lose', `😢 Perdu ! ${fallen}/21 gobelets tombés.`);
     document.getElementById('cupsNewGameBtn').style.display = 'block';
@@ -728,6 +751,7 @@ function shootTarget(ctx, canvas) {
 
   shootingGameState.shooting = true;
   document.getElementById('shootingShootBtn').disabled = true;
+  playFunfairSound('shoot');
 
   // Get current crosshair position (where aim is right now)
   const crosshair = getCrosshairPosition();
@@ -763,13 +787,17 @@ function shootTarget(ctx, canvas) {
   }
 
   if (hit) {
+    if (distance <= 4) {
+      playFunfairSound('shootBullseye');
+    } else {
+      playFunfairSound('shootHit');
+    }
     shootingGameState.score += points;
-    // Store impact relative to target center
-    // impact position = crosshair position
-    // relative = crosshair - target
     const impactDx = crosshair.x - targetX;
     const impactDy = crosshair.y - targetY;
     shootingGameState.impacts.push({ dx: impactDx, dy: impactDy });
+  } else {
+    playFunfairSound('shootMiss');
   }
 
   document.getElementById('shootingTriesDisplay').textContent = `Tirs restants : ${shootingGameState.tries}`;
@@ -964,6 +992,7 @@ function updateBeerpongLogic(canvas) {
             if (dist < CUP_INNER_R) {
               // SCORED!
               hitCup = cup;
+              playFunfairSound('pongSplash');
               // ... handle score below
             } else {
               // RIM HIT (Edge of cup)
@@ -972,7 +1001,7 @@ function updateBeerpongLogic(canvas) {
               ball.vy *= -0.6; // Lossy bounce
               ball.vx += (Math.random() - 0.5) * 5; // Random deflection
               ball.vz += (Math.random() - 0.5) * 5;
-              // Trigger sound?
+              playFunfairSound('pongBounce');
             }
           }
           // Case 2: Hitting Side (Was already below rim)
@@ -1009,6 +1038,7 @@ function updateBeerpongLogic(canvas) {
         ball.vy *= -0.5; // Damping
         ball.vx *= 0.8;
         ball.vz *= 0.8;
+        playFunfairSound('pongBounce');
       } else {
         // Stop completely
         beerpongGameState.ball = null;
@@ -1061,6 +1091,8 @@ function handleBeerpongClick(ctx, canvas) {
     beerpongGameState.phase = 'SHOOTING';
     btn.disabled = true;
     btn.innerHTML = "🚀 Tir en cours...";
+
+    playFunfairSound('throw');
 
     // Launch Ball
     // Calculate 3D velocity vector
@@ -1535,6 +1567,7 @@ function throwDart(ctx, canvas) {
 
   dartsGameState.shooting = true;
   document.getElementById('dartsThrowBtn').disabled = true;
+  playFunfairSound('dartThrow');
 
   const x = dartsGameState.crosshairX;
   const y = dartsGameState.crosshairY;
@@ -1573,6 +1606,7 @@ function throwDart(ctx, canvas) {
     score = 0; // Miss
   }
 
+  playFunfairSound('dartThud');
   dartsGameState.darts.push({ x, y, score, scoreText: `+${score}` });
   dartsGameState.totalScore += score;
   dartsGameState.tries--;
@@ -1603,10 +1637,12 @@ function throwDart(ctx, canvas) {
       if (ticketsWon > 0) {
         addTickets(ticketsWon);
         updateStats(true, ticketsWon);
+        playFunfairSound('win');
         showResult('dartsResult', 'win', `🎯 Bravo ! ${dartsGameState.totalScore}pts = ${ticketsWon}🎟️`);
         if (ticketsWon >= 3) createConfetti();
       } else {
         updateStats(false, 0);
+        playFunfairSound('lose');
         showResult('dartsResult', 'lose', `😢 Score : ${dartsGameState.totalScore} pts. Visez mieux !`);
       }
 
@@ -1728,6 +1764,7 @@ function initCoverSpotGame() {
   };
 
   const handleEnd = () => {
+    if (coverspotGameState.draggingIndex !== -1) playFunfairSound('coverDrop');
     coverspotGameState.draggingIndex = -1;
   };
 
@@ -1914,6 +1951,7 @@ function validateCoverSpot(ctx, canvas) {
   if (tickets > 0) {
     addTickets(tickets);
     updateStats(true, tickets);
+    playFunfairSound('win');
     showResult(
       'coverspotResult',
       resType,
@@ -1922,6 +1960,7 @@ function validateCoverSpot(ctx, canvas) {
     if (tickets >= 4) createConfetti();
   } else {
     updateStats(false, 0);
+    playFunfairSound('lose');
     showResult(
       'coverspotResult',
       'lose',
@@ -2098,6 +2137,7 @@ function strikeHammer(ctx, canvas) {
 
   highstrikerGameState.isHitting = true;
   document.getElementById('highstrikerHitBtn').disabled = true;
+  playFunfairSound('hammerHit');
 
   // User: "hit when lowest" -> lowest power = highest hit
   // power is 0 to 1.
@@ -2127,6 +2167,8 @@ function finishStrike(ctx, canvas) {
     tickets = 5;
     resType = 'win';
     message = '🔔 DING DING DING ! Sommet atteint ! +5🎟️';
+    playFunfairSound('bellRing');
+    setTimeout(() => playFunfairSound('win'), 800);
     createConfetti();
   } else if (finalStrength >= 0.6) {
     tickets = 3;
@@ -2145,8 +2187,10 @@ function finishStrike(ctx, canvas) {
   if (tickets > 0) {
     addTickets(tickets);
     updateStats(true, tickets);
+    if (finalStrength != 1) playFunfairSound('win');
   } else {
     updateStats(false, 0);
+    playFunfairSound('lose');
   }
 
   showResult('highstrikerResult', resType, message);
@@ -2226,6 +2270,7 @@ function initBalloonPopGame() {
       const dist = Math.sqrt((pos.x - b.x) ** 2 + (pos.y - b.y) ** 2);
       if (dist < b.r + 10) {
         b.popped = true;
+        playFunfairSound('balloonPop');
         balloonpopGameState.score += b.points;
         updateBalloonUI();
         break;
@@ -2383,10 +2428,12 @@ function finishBalloonPop(ctx, canvas) {
   if (tickets > 0) {
     addTickets(tickets);
     updateStats(true, tickets);
+    playFunfairSound('win');
     showResult('balloonpopResult', 'win', `🎈 Bravo ! ${score} points = ${tickets}🎟️ gagnés !`);
     if (tickets >= 5) createConfetti();
   } else {
     updateStats(false, 0);
+    playFunfairSound('lose');
     showResult('balloonpopResult', 'lose', `😢 ${score} points... Pas assez pour des tickets !`);
   }
 
@@ -2503,6 +2550,7 @@ function launchRing(tx, ty, ctx, canvas) {
   };
 
   function animateRing() {
+    if (ringtossGameState.activeRing && ringtossGameState.activeRing.progress === 0) playFunfairSound('ringThrow');
     if (ringtossGameState.activeRing) {
       ringtossGameState.activeRing.progress += ringtossGameState.activeRing.speed;
       const p = ringtossGameState.activeRing.progress;
@@ -2542,6 +2590,9 @@ function checkRingLanding() {
       hit = true;
     }
   });
+
+  if (hit) playFunfairSound('ringClink');
+  else playFunfairSound('thud');
 
   // Store ring anyway for visual
   ringtossGameState.rings.push({ x: ring.targetX, y: ring.targetY, hit: hit });
@@ -2628,10 +2679,12 @@ function finishRingToss() {
   if (score > 0) {
     addTickets(score);
     updateStats(true, score);
+    playFunfairSound('win');
     showResult('ringtossResult', 'win', `⭕ Bien joué ! Vous gagnez ${score}🎟️ !`);
     if (score >= 5) createConfetti();
   } else {
     updateStats(false, 0);
+    playFunfairSound('lose');
     showResult('ringtossResult', 'lose', `😢 Aucun piquet touché... Réessayez !`);
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.9.2026-03-26";
+const CACHE_NAME = "mini-games-cache-v1.10.2026-03-28";
 
 const ASSETS_TO_CACHE = [
     '',              // Racine
@@ -29,6 +29,7 @@ const ASSETS_TO_CACHE = [
     'js/app.js',
     'js/network.js',
     'js/BuyMeACoffee.js',
+    'js/utils/audio.js',
 
     // Assets data
     'assets/data/games.json',
@@ -53,6 +54,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/layer-pile.webp',
     'assets/logos/draw-guess.webp',
     'assets/logos/falling-blocks.webp',
+    'assets/logos/lights-out-reflex.webp',
 
     // About
     'about/about.html',
@@ -216,7 +218,11 @@ const ASSETS_TO_CACHE = [
     'games/falling-blocks/index.html',
     'games/falling-blocks/css/game.css',
     'games/falling-blocks/js/game.js',
-    'games/falling-blocks/js/audio.js',
+
+    // Game: Lights Out Reflex
+    'games/lights-out-reflex/index.html',
+    'games/lights-out-reflex/css/game.css',
+    'games/lights-out-reflex/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────
@@ -226,31 +232,32 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
 
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
+        caches.open(CACHE_NAME).then(async (cache) => {
             console.log(`[SW] 📦 Mise en cache de ${CACHE_NAME}...`);
 
-            // On utilise Promise.all pour suivre l'avancement, 
-            // mais chaque fetch a son propre .catch pour ne pas bloquer les autres.
-            return Promise.all(
-                ASSETS_TO_CACHE.map((url) => {
-                    // On ajoute un timestamp pour éviter de mettre en cache une vieille version du serveur (Cache-Busting)
-                    const cacheRequest = new Request(url, { mode: 'cors' });
+            // Traitement par lots (batch) pour éviter ERR_INSUFFICIENT_RESOURCES sur mobile
+            const BATCH_SIZE = 15;
+            for (let i = 0; i < ASSETS_TO_CACHE.length; i += BATCH_SIZE) {
+                const batch = ASSETS_TO_CACHE.slice(i, i + BATCH_SIZE);
+                await Promise.all(
+                    batch.map(async (url) => {
+                        try {
+                            const cacheRequest = new Request(url);
+                            const response = await fetch(cacheRequest);
 
-                    return fetch(cacheRequest)
-                        .then((response) => {
-                            if (response.ok) {
+                            // On accepte response.ok OU type 'opaque' (pour requêtes sans CORS direct)
+                            if (response.ok || response.type === 'opaque') {
                                 console.log(`✅ Mis en cache : ${url}`);
-                                return cache.put(url, response);
+                                await cache.put(url, response);
+                            } else {
+                                console.warn(`⚠️ Fichier ignoré (Status ${response.status}): ${url}`);
                             }
-                            // Si le fichier est en 404, on ne bloque pas l'install, on l'ignore juste.
-                            console.warn(`⚠️ Fichier ignoré (Status ${response.status}): ${url}`);
-                        })
-                        .catch((err) => {
-                            // Erreur réseau (ex: le serveur est tombé pendant l'install)
+                        } catch (err) {
                             console.error(`❌ Erreur réseau pour : ${url}`);
-                        });
-                })
-            );
+                        }
+                    })
+                );
+            }
         })
     );
 });
@@ -281,7 +288,11 @@ self.addEventListener('fetch', (event) => {
     // On force le réseau SANS passer par le cache pour avoir un résultat réel
     if (url.search.includes('ping=')) {
         return event.respondWith(
-            fetch(event.request).catch(() => {
+            // Timeout explicitly in the SW because mobile browser SWs ignore the client's AbortController
+            Promise.race([
+                fetch(event.request),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1200))
+            ]).catch(() => {
                 // On renvoie une 200 (pas de rouge console) 
                 // mais avec un header spécial 'X-Offline'
                 return new Response('', {

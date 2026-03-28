@@ -109,6 +109,21 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "lights-out-reflex": {
+    "path": "./games/lights-out-reflex/index.html",
+    "name": "Lights Out Reflex",
+    "emoji": "🎯",
+    "description": "Teste tes réflexes ! ",
+    "tags": [
+      "⚡ Arcade",
+      "🎯 Réflexes",
+      "👤 Solo"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "morpion": {
     "path": "./games/morpion/index.html",
     "name": "Morpion",

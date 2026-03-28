@@ -1,3 +1,24 @@
+import { initSettingsUI } from '../../../js/utils/settingsUI.js';
+import { startCasinoMusic, playCasinoSound } from '../../../js/utils/audio.js';
+
+// Initialiser l'UI des paramètres sonores
+initSettingsUI('casino');
+
+// Démarrer la musique au premier clic
+let musicStarted = false;
+const startInitialMusic = () => {
+  if (!musicStarted) {
+    musicStarted = true;
+    startCasinoMusic();
+    document.removeEventListener('mousedown', startInitialMusic);
+    document.removeEventListener('keydown', startInitialMusic);
+    document.removeEventListener('touchstart', startInitialMusic);
+  }
+};
+document.addEventListener('mousedown', startInitialMusic);
+document.addEventListener('keydown', startInitialMusic);
+document.addEventListener('touchstart', startInitialMusic);
+
 // ========================================
 // STORAGE KEYS
 // ========================================
@@ -105,8 +126,13 @@ function init() {
   }
 
   // Event listeners
-  setBudgetBtn.addEventListener('click', handleSetBudget);
+  setBudgetBtn.addEventListener('click', () => { playCasinoSound('win'); handleSetBudget(); });
   resetBtn.addEventListener('click', handleReset);
+
+  // Add listener for budget choices
+  document.querySelectorAll('input[name="budget"]').forEach(radio => {
+    radio.addEventListener('change', () => playCasinoSound('coin'));
+  });
 
   // Game card clicks
   document.querySelectorAll('.game-card').forEach(card => {

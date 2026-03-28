@@ -1,3 +1,22 @@
+import { initSettingsUI } from '../../../js/utils/settingsUI.js';
+import { startFunfairMusic, playFunfairSound } from '../../../js/utils/audio.js';
+
+initSettingsUI('funfair');
+
+let musicStarted = false;
+const startInitialMusic = () => {
+  if (!musicStarted) {
+    musicStarted = true;
+    startFunfairMusic();
+    document.removeEventListener('mousedown', startInitialMusic);
+    document.removeEventListener('keydown', startInitialMusic);
+    document.removeEventListener('touchstart', startInitialMusic);
+  }
+};
+document.addEventListener('mousedown', startInitialMusic);
+document.addEventListener('keydown', startInitialMusic);
+document.addEventListener('touchstart', startInitialMusic);
+
 // ========================================
 // STORAGE KEYS
 // ========================================
@@ -110,10 +129,15 @@ function init() {
   resetBtn.addEventListener('click', handleReset);
 
   // Conversion listeners (use onclick to allow overriding)
-  minusTicketBtn.onclick = () => adjustTicketCount(-1);
-  plusTicketBtn.onclick = () => adjustTicketCount(1);
-  buyTicketsBtn.onclick = handleBuyTickets;
+  minusTicketBtn.onclick = () => { playFunfairSound('ticketChange'); adjustTicketCount(-1); };
+  plusTicketBtn.onclick = () => { playFunfairSound('ticketChange'); adjustTicketCount(1); };
+  buyTicketsBtn.onclick = () => { playFunfairSound('win'); handleBuyTickets(); };
   skipBuyBtn.onclick = showGamesMenu;
+
+  // Add listener for budget choices (like casino)
+  document.querySelectorAll('input[name="budget"]').forEach(radio => {
+    radio.addEventListener('change', () => playFunfairSound('ticketChange'));
+  });
 
   // Game card clicks
   document.querySelectorAll('.game-card').forEach(card => {

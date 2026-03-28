@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lights Out Reflex – Jeu de Réflexes F1 | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Testez vos réflexes avec Lights Out Reflex sur Mini‑Games. Inspiré du départ F1 : attendez l'extinction des feux et lâchez le plus vite possible !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/lights-out-reflex/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Lights Out Reflex – Jeu de Réflexes F1 | Mini‑Games">
+    <meta property="og:description"
+        content="Testez vos réflexes avec Lights Out Reflex. Inspiré du départ F1 : attendez l'extinction des feux et lâchez le plus vite possible !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/lights-out-reflex/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/lights-out-reflex.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lights Out Reflex – Jeu de Réflexes F1 | Mini‑Games">
+    <meta name="twitter:description"
+        content="Testez vos réflexes avec Lights Out Reflex. Inspiré du départ F1 : attendez l'extinction des feux et lâchez le plus vite possible !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/lights-out-reflex.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Lights Out Reflex – Réflexes F1",
+      "url": "https://mini-games.ch/games/lights-out-reflex/",
+      "description": "Jeu de réflexes inspiré du départ F1 : attendez l'extinction des 5 feux et relâchez le plus vite possible.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Arcade Game", "Reflex Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body>
+
+    <!-- Back Button -->
+    <a href="../../index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-item">
+            <div class="label">MEILLEUR</div>
+            <div class="value" id="bestTime">—</div>
+        </div>
+        <div class="hud-item">
+            <div class="label">ESSAIS</div>
+            <div class="value" id="attempts">0</div>
+        </div>
+        <div class="hud-item">
+            <div class="label">MOYENNE</div>
+            <div class="value" id="avgTime">—</div>
+        </div>
+    </div>
+
+    <!-- History Button -->
+    <button class="pause-btn" id="historyBtn" style="right: 58px;" title="Historique">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="12 8 12 12 14 14" />
+            <path d="M3.05 11a9 9 0 1 1 .5 4" />
+            <polyline points="3 16 3 11 8 11" />
+        </svg>
+    </button>
+
+    <!-- Records Button -->
+    <button class="pause-btn" id="recordsBtn" style="right: 12px;" title="Records">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+    </button>
+
+    <!-- Game Area -->
+    <div class="game-area" id="gameArea">
+
+        <!-- Lights -->
+        <div class="lights-panel">
+            <div class="light" id="light0"></div>
+            <div class="light" id="light1"></div>
+            <div class="light" id="light2"></div>
+            <div class="light" id="light3"></div>
+            <div class="light" id="light4"></div>
+        </div>
+
+        <!-- Chrono display -->
+        <div class="chrono-wrap">
+            <div class="chrono" id="chrono">0.000 s</div>
+            <div class="chrono-sub" id="chronoSub">Appuyez n'importe où pour démarrer</div>
+        </div>
+
+        <!-- Last result -->
+        <div class="last-result" id="lastResult"></div>
+
+        <!-- Hold zone -->
+        <div class="hold-zone" id="holdZone">
+            <div class="hold-ring"></div>
+            <div class="hold-label">MAINTENEZ</div>
+        </div>
+
+    </div>
+
+    <!-- ══ OVERLAY — Record Mondial battu ══ -->
+    <div class="game-overlay" id="recordOverlay" style="display:none;">
+        <div class="overlay-content record-popup">
+            <div class="record-badge" id="recordBadge">🏆</div>
+            <h2 id="recordTitle">Nouveau Record !</h2>
+            <div class="record-details" id="recordDetails"></div>
+            <div class="message-input-wrapper" id="messageWrap" style="display:none;">
+                <p class="record-msg-label">Laissez un message pour l'histoire :</p>
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50" autocomplete="off">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-primary" id="saveRecordBtn">Continuer</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Records ══ -->
+    <div class="game-overlay" id="recordsOverlay" style="display:none;">
+        <div class="overlay-content records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mes Records</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Meilleur réflexe</span>
+                        <span class="rc-value" id="recPersonalBest">—</span>
+                    </div>
+                    <div class="record-card">
+                        <span class="rc-label">Meilleure moyenne</span>
+                        <span class="rc-value" id="recPersonalAvg">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Records Mondiaux</h3>
+                <div class="record-grid">
+                    <div class="record-card global">
+                        <span class="rc-label">Meilleur réflexe</span>
+                        <span class="rc-value" id="recGlobalBest">—</span>
+                    </div>
+                    <div class="record-card global">
+                        <span class="rc-label">Meilleure moyenne</span>
+                        <span class="rc-value" id="recGlobalAvg">—</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Historique ══ -->
+    <div class="game-overlay" id="historyOverlay" style="display:none;">
+        <div class="overlay-content history-modal">
+            <button class="modal-close" id="historyClose">✕</button>
+            <h2 class="records-title">⏱ Historique</h2>
+            <div class="history-stats" id="historyStats"></div>
+            <div class="history-list" id="historyList"></div>
+            <button class="btn-secondary" id="historyClear">Effacer l'historique</button>
+        </div>
+    </div>
+
+    <script type="module" src="./js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+
+</body>
+
+</html>

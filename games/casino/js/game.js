@@ -1,3 +1,22 @@
+import { initSettingsUI } from '../../../js/utils/settingsUI.js';
+import { startCasinoMusic, playCasinoSound } from '../../../js/utils/audio.js';
+
+initSettingsUI('casino');
+
+let musicStarted = false;
+const startInitialMusic = () => {
+  if (!musicStarted) {
+    musicStarted = true;
+    startCasinoMusic();
+    document.removeEventListener('mousedown', startInitialMusic);
+    document.removeEventListener('keydown', startInitialMusic);
+    document.removeEventListener('touchstart', startInitialMusic);
+  }
+};
+document.addEventListener('mousedown', startInitialMusic);
+document.addEventListener('keydown', startInitialMusic);
+document.addEventListener('touchstart', startInitialMusic);
+
 // ========================================
 // STORAGE KEYS
 // ========================================
@@ -344,6 +363,7 @@ function revealCell(cell) {
   if (cell.classList.contains("revealed")) return;
 
   cell.classList.add("revealed");
+  playCasinoSound('scratch');
   revealedCount++;
 
   if (revealedCount === 3) {
@@ -394,11 +414,13 @@ function checkScratchWin() {
     addWinnings(prize);
     updateStats(true, prize);
 
+    playCasinoSound('win');
     resultDiv.textContent = `🎉 GAGNÉ ! ${winningSymbol} × 3 = ${prize}€`;
     resultDiv.className = "result-message win";
   } else {
     updateStats(false);
 
+    playCasinoSound('lose');
     resultDiv.textContent = `😔 Perdu ! Aucun symbole identique trouvé.`;
     resultDiv.className = "result-message lose";
   }
@@ -468,6 +490,7 @@ function spinSlots() {
 
   deductBet(SLOTS_CONFIG.bet);
   isSpinning = true;
+  playCasinoSound('slotsRolling');
 
   const spinBtn = document.getElementById("spinBtn");
   spinBtn.disabled = true;
@@ -521,6 +544,7 @@ function spinSlots() {
     setTimeout(
       () => {
         reel.classList.remove("spinning");
+        playCasinoSound('reelStop');
 
         const strip = reel.querySelector(".reel-strip");
         const symbols = strip.querySelectorAll(".reel-symbol");
@@ -545,11 +569,13 @@ function checkSlotsWin(symbols) {
     addWinnings(prize);
     updateStats(true, prize);
 
+    playCasinoSound('jackpot');
     resultDiv.textContent = `🎊 JACKPOT ! ${symbols[0]} × 3 = ${prize}€`;
     resultDiv.className = "result-message win";
   } else {
     updateStats(false);
 
+    playCasinoSound('lose');
     resultDiv.textContent = `Pas de chance ! Réessayez.`;
     resultDiv.className = "result-message lose";
   }
@@ -629,6 +655,7 @@ function flipCard(cardElement) {
   if (cardFlipped) return;
 
   cardFlipped = true;
+  playCasinoSound('flip');
   cardElement.classList.add("flipped");
 
   setTimeout(() => checkCardWin(), 800);
@@ -646,11 +673,13 @@ function checkCardWin() {
     addWinnings(prize);
     updateStats(true, prize);
 
+    playCasinoSound('win');
     resultDiv.textContent = `🎉 ${currentCard.display} ! Vous gagnez ${prize}€ !`;
     resultDiv.className = "result-message win";
   } else {
     updateStats(false);
 
+    playCasinoSound('lose');
     resultDiv.textContent = `😔 ${currentCard.display}... Pas de gain cette fois.`;
     resultDiv.className = "result-message lose";
   }
@@ -745,6 +774,7 @@ function spinWheel() {
 
   deductBet(WHEEL_CONFIG.bet);
   isWheelSpinning = true;
+  playCasinoSound('wheelSpin');
 
   const spinBtn = document.getElementById("spinWheelBtn");
   spinBtn.disabled = true;
@@ -780,6 +810,7 @@ function animateWheel(finalRotation, targetSectorIndex) {
   const startRotation = 0;
   const duration = 4000;
   const startTime = Date.now();
+  let lastTickAngle = 0;
 
   function animate() {
     const currentTime = Date.now();
@@ -790,6 +821,12 @@ function animateWheel(finalRotation, targetSectorIndex) {
 
     wheelRotation = startRotation + finalRotation * easeOut;
     drawWheel(wheelRotation);
+
+    const currentTickAngle = Math.floor(wheelRotation / ((2 * Math.PI) / WHEEL_CONFIG.sectors.length));
+    if (currentTickAngle > lastTickAngle) {
+      playCasinoSound('wheelTick');
+      lastTickAngle = currentTickAngle;
+    }
 
     if (progress < 1) {
       requestAnimationFrame(animate);
@@ -815,13 +852,16 @@ function checkWheelWin(sectorIndex) {
     updateStats(true, prize);
 
     if (prize === 500) {
+      playCasinoSound('jackpot');
       resultDiv.textContent = `🎊💎 JACKPOT !!! 💎🎊 Vous remportez ${prize}€ !!!`;
     } else {
+      playCasinoSound('win');
       resultDiv.textContent = `🎉 Bravo ! ${sector.emoji} ${sector.label} - Vous gagnez ${prize}€ !`;
     }
     resultDiv.className = "result-message win";
   } else {
     updateStats(false);
+    playCasinoSound('lose');
 
     const loseMessages = [
       "😢 Dommage... Vous avez perdu. Réessayez !",
@@ -950,6 +990,7 @@ function startCrashRound() {
   document.getElementById("crashCashoutBtn").style.display = "inline-block";
   document.getElementById("crashResult").textContent = "";
 
+  playCasinoSound('crashStart');
   animateCrash();
 }
 
@@ -980,6 +1021,7 @@ function crashCashout() {
   addWinnings(winAmount);
   updateStats(true, winAmount);
 
+  playCasinoSound('win');
   const resultDiv = document.getElementById("crashResult");
   resultDiv.textContent = `💰 Encaissé à ${crashMultiplier.toFixed(2)}x ! Gain : ${winAmount}€`;
   resultDiv.className = "result-message win";
@@ -991,6 +1033,7 @@ function crashCashout() {
 function crashExplosion() {
   cancelAnimationFrame(crashAnimationId);
   isCrashRunning = false;
+  playCasinoSound('crashExplosion');
 
   crashCtx.fillStyle = "#ff6b6b";
   crashCtx.font = "80px Arial";
@@ -1110,6 +1153,7 @@ function bjDeal() {
   bjPlayerHand = [bjDeck.pop(), bjDeck.pop()];
   bjDealerHand = [bjDeck.pop(), bjDeck.pop()];
   bjGameActive = true;
+  playCasinoSound('cardDeal');
 
   const playerHandDiv = document.getElementById("playerHand");
   const dealerHandDiv = document.getElementById("dealerHand");
@@ -1147,6 +1191,7 @@ function bjHit() {
 
   const newCard = bjDeck.pop();
   bjPlayerHand.push(newCard);
+  playCasinoSound('flip');
 
   const playerHandDiv = document.getElementById("playerHand");
   playerHandDiv.appendChild(bjRenderCard(newCard));
@@ -1167,6 +1212,7 @@ function bjStand() {
   bjGameActive = false;
 
   // Reveal dealer's hidden card
+  playCasinoSound('flip');
   const dealerHandDiv = document.getElementById("dealerHand");
   dealerHandDiv.innerHTML = "";
   bjDealerHand.forEach((card) => dealerHandDiv.appendChild(bjRenderCard(card)));
@@ -1178,6 +1224,7 @@ function bjStand() {
   function dealerDraw() {
     if (dealerScore < 17) {
       setTimeout(() => {
+        playCasinoSound('flip');
         const newCard = bjDeck.pop();
         bjDealerHand.push(newCard);
         dealerHandDiv.appendChild(bjRenderCard(newCard));
@@ -1210,6 +1257,10 @@ function bjEndGame(condition) {
     result = "🎉 La banque a dépassé 21 ! Vous gagnez !";
     won = true;
     winAmount = BLACKJACK_CONFIG.bet * 2;
+  } else if (playerScore === 21 && bjPlayerHand.length === 2 && dealerScore !== 21) {
+    result = `🎉 BLACKJACK ! Vous gagnez !`;
+    won = true;
+    winAmount = BLACKJACK_CONFIG.bet * 2.5; // Natural blackjack pays 3:2 (let's say 2.5 total)
   } else if (playerScore > dealerScore) {
     result = `🏆 Vous gagnez ${playerScore} contre ${dealerScore} !`;
     won = true;
@@ -1225,9 +1276,13 @@ function bjEndGame(condition) {
   if (won) {
     addWinnings(winAmount);
     updateStats(true, winAmount);
+    if (winAmount > BLACKJACK_CONFIG.bet * 2) playCasinoSound('jackpot');
+    else if (winAmount > BLACKJACK_CONFIG.bet) playCasinoSound('win');
+    else playCasinoSound('hiloOk'); // Draw
     resultDiv.className = "result-message win";
   } else {
     updateStats(false);
+    playCasinoSound('lose');
     resultDiv.className = "result-message lose";
   }
 
@@ -1385,6 +1440,8 @@ function dropPlinkoBall() {
   document.getElementById("plinkoDropBtn").disabled = true;
   document.getElementById("plinkoResult").textContent = "";
 
+  playCasinoSound('plinkoDrop');
+
   animatePlinkoBall();
 }
 
@@ -1426,6 +1483,8 @@ function animatePlinkoBall() {
 
       // Ajouter une petite composante aléatoire pour plus de variété
       plinkoBall.vx += (Math.random() - 0.5) * 0.5;
+
+      playCasinoSound('plinkoBounce');
     }
   });
 
@@ -1471,8 +1530,15 @@ function plinkoLanded() {
   updateStats(true, prize);
 
   const resultDiv = document.getElementById("plinkoResult");
-  resultDiv.textContent = `🎉 Multiplicateur ${multiplier}x ! Gain : ${prize}€`;
-  resultDiv.className = "result-message win";
+  if (multiplier > 1) {
+    playCasinoSound('win');
+    resultDiv.textContent = `🎉 Multiplicateur ${multiplier}x ! Gain : ${prize}€`;
+    resultDiv.className = "result-message win";
+  } else {
+    if (prize > 0) playCasinoSound('hiloOk'); else playCasinoSound('lose');
+    resultDiv.textContent = `Multiplicateur ${multiplier}x ! Gain : ${prize}€`;
+    resultDiv.className = "result-message lose";
+  }
 
   plinkoBall = null;
   document.getElementById("plinkoDropBtn").disabled = false;
@@ -1593,6 +1659,7 @@ function hiloGuess(direction) {
     document.getElementById("hiloCurrentWin").textContent =
       `${hiloCurrentWin}€`;
 
+    playCasinoSound('hiloOk');
     resultDiv.textContent = `✅ Correct ! Série : ${hiloStreak}`;
     resultDiv.className = "result-message win";
 

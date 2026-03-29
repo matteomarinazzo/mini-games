@@ -1,8 +1,7 @@
-const CACHE_NAME = "mini-games-cache-v1.11.2026-03-29";
-const GEO_CACHE = "mini-games-geo-v1"; // drapeaux + GeoJSON (cache séparé, persistant)
+const CACHE_NAME = "mini-games-cache-v1.12.2026-03-29";
 
 const ASSETS_TO_CACHE = [
-    '',              // Racine
+    '',
     'index.html',
     'style.css',
     'rating-modal.css',
@@ -56,6 +55,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/draw-guess.webp',
     'assets/logos/falling-blocks.webp',
     'assets/logos/lights-out-reflex.webp',
+    'assets/logos/geoquiz.webp',
 
     // About
     'about/about.html',
@@ -192,7 +192,6 @@ const ASSETS_TO_CACHE = [
     'games/lostBelow/game.html',
     'games/lostBelow/room.html',
     'games/lostBelow/setup.html',
-
     'games/lostBelow/css/style.css',
     'games/lostBelow/css/game.css',
     'games/lostBelow/js/menu.js',
@@ -231,10 +230,6 @@ const ASSETS_TO_CACHE = [
     'games/geoquiz/css/game.css',
     'games/geoquiz/js/game.js',
     'games/geoquiz/js/countries.js',
-
-    // GeoQuiz: lib externe (topojson + world-atlas — mis en GEO_CACHE via fetch handler)
-    'https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js',
-    'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────
@@ -259,7 +254,7 @@ self.addEventListener('install', (event) => {
 
                             // On accepte response.ok OU type 'opaque' (pour requêtes sans CORS direct)
                             if (response.ok || response.type === 'opaque') {
-                                console.log(`✅ Mis en cache : ${url}`);
+                                //console.log(`✅ Mis en cache : ${url}`);
                                 await cache.put(url, response);
                             } else {
                                 console.warn(`⚠️ Fichier ignoré (Status ${response.status}): ${url}`);
@@ -281,8 +276,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    // Garder le cache principal ET le cache geo (drapeaux/shapes)
-                    if (cacheName !== CACHE_NAME && cacheName !== GEO_CACHE) {
+                    if (cacheName !== CACHE_NAME) {
                         console.log('[SW] 🗑️ Nettoyage ancien cache :', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -312,29 +306,6 @@ self.addEventListener('fetch', (event) => {
                     status: 200,
                     headers: { 'X-Offline': 'true' }
                 });
-            })
-        );
-    }
-
-    // ÉTAPE B : Drapeaux (flagcdn.com) et assets GeoQuiz externes (jsdelivr) → GEO_CACHE
-    // Stratégie : cache-first, mise en cache automatique à la première requête réseau
-    const isFlag = url.hostname === 'flagcdn.com';
-    const isGeoLib = url.hostname === 'cdn.jsdelivr.net';
-    if (isFlag || isGeoLib) {
-        return event.respondWith(
-            caches.open(GEO_CACHE).then(async (cache) => {
-                const cached = await cache.match(event.request);
-                if (cached) return cached;
-                try {
-                    const response = await fetch(event.request);
-                    if (response.ok || response.type === 'opaque') {
-                        cache.put(event.request, response.clone());
-                        console.log(`[SW] 🌍 Geo mis en cache : ${url.pathname}`);
-                    }
-                    return response;
-                } catch {
-                    return new Response('Ressource géo indisponible hors ligne', { status: 503 });
-                }
             })
         );
     }

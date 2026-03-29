@@ -133,11 +133,20 @@
             }
         }
     </style>
+
     <script type="module">
         import { playGameSound, startGqMusic } from '../../js/utils/audio.js';
         import { initSettingsUI } from '../../js/utils/settingsUI.js';
+        import { checkRealConnection } from '../../js/network.js';
 
-        // Initialisation
+        // GeoQuiz nécessite internet — redirect offline.html si hors-ligne
+        checkRealConnection().then(isOnline => {
+            if (!isOnline) {
+                sessionStorage.setItem('offline_target_path', window.location.href);
+                window.location.href = '../offline.html';
+            }
+        });
+
         initSettingsUI('geoquiz');
 
         let selectedMode = null, selectedDiff = 'standard', selectedContinent = 'ALL', selectedLang = 'fr';
@@ -155,7 +164,6 @@
                 card.classList.add('selected');
                 selectedMode = card.dataset.mode;
 
-                // Appliquer le thème visuel
                 menu.classList.remove('theme-flag', 'theme-shape');
                 menu.classList.add(`theme-${selectedMode}`);
 
@@ -164,6 +172,7 @@
                 setTimeout(() => opt.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
             });
         });
+
         function setupPills(id, setter) {
             document.getElementById(id).addEventListener('click', e => {
                 const p = e.target.closest('.gq-pill'); if (!p) return;
@@ -175,13 +184,14 @@
         setupPills('diffGroup', v => selectedDiff = v);
         setupPills('continentGroup', v => selectedContinent = v);
         setupPills('langGroup', v => selectedLang = v);
+
         document.getElementById('startBtn').addEventListener('click', () => {
             if (!selectedMode) return;
             playGameSound('gq_start');
             const p = new URLSearchParams({ mode: selectedMode, diff: selectedDiff, continent: selectedContinent, lang: selectedLang });
             setTimeout(() => {
                 window.location.href = `game.html?${p}`;
-            }, 400); // Laisser le temps au son de démarrer
+            }, 400);
         });
     </script>
     <script type="module" src="../../js/countPlayedTime.js"></script>

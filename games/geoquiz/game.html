@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoQuiz – En jeu</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="studio-body gq-play-body">
+
+    <!-- ── TOP HUD ── -->
+    <div class="gq-top-hud">
+        <a href="./index.html" class="gq-back-btn" title="Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 12H5M5 12l7 7M5 12l7-7" />
+            </svg>
+        </a>
+        <div class="gq-hud-center">
+            <span class="gq-mode-badge" id="hudMode">–</span>
+            <span class="gq-score-label">Score</span>
+            <span class="gq-score-val" id="hudScore">0</span>
+            <span class="gq-streak" id="hudStreak" title="Série"></span>
+        </div>
+        <div class="gq-progress-wrap">
+            <span id="hudCounter">1 / 10</span>
+            <div class="gq-progress-bar">
+                <div class="gq-progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <main class="gq-main">
+        <!-- Visuel (drapeau ou forme) -->
+        <div class="gq-visual-wrap" id="visualWrap">
+            <!-- Flag mode -->
+            <img id="flagImg" class="gq-flag" src="" alt="Drapeau à deviner" style="display:none" />
+            <!-- Shape mode -->
+            <div class="gq-shape-wrap" id="shapeWrap" style="display:none">
+                <svg id="shapeSvg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+        </div>
+
+        <!-- Zone de réponse -->
+        <div class="gq-answer-zone" id="answerZone">
+            <!-- Standard : 4 boutons -->
+            <div class="gq-choices" id="choicesGrid" style="display:none"></div>
+            <!-- Hard : input -->
+            <div class="gq-hard-input" id="hardInput" style="display:none">
+                <div class="gq-blanks" id="blanksRow"></div>
+                <div class="gq-hard-form">
+                    <input type="text" id="hardInputField" placeholder="Saisir le pays…" autocomplete="off"
+                        autocorrect="off" spellcheck="false" />
+                    <button class="btn btn-primary" id="hardSubmitBtn">Valider</button>
+                </div>
+                <p class="gq-attempts-left" id="attemptsLeft"></p>
+            </div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="gq-feedback" id="feedbackBanner" style="display:none">
+            <span id="feedbackIcon"></span>
+            <span id="feedbackText"></span>
+            <button class="btn btn-outline gq-next-btn" id="nextBtn">Suivant →</button>
+        </div>
+    </main>
+
+    <!-- ── END SCREEN ── -->
+    <div class="overlay" id="endScreen" style="display:none">
+        <div class="popup gq-end-popup">
+            <div class="gq-end-emoji" id="endEmoji">🏆</div>
+            <h2 id="endTitle">Partie terminée !</h2>
+            <div class="gq-end-score">
+                <span id="endScore">0</span>
+                <small>points</small>
+            </div>
+            <p id="endSubtitle" class="subtitle"></p>
+            <div class="gq-end-stats" id="endStats"></div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+                <button class="btn btn-primary" id="replayBtn">Rejouer</button>
+                <a href="./index.html" class="btn btn-outline">Menu</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

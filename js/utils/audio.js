@@ -475,7 +475,187 @@ export function playGameSound(type) {
         osc.connect(g); g.connect(master);
         osc.start(now); osc.stop(now + 0.1);
     }
+
+    // ─────────────────────────────────────────────
+    // SONS — GeoQuiz
+    // ─────────────────────────────────────────────
+
+    // ── UI CLICK : Petit clic net et satisfaisant ──────────────
+    else if (type === 'gq_ui_click') {
+        const master = out(ctx, 0.7);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+        g.gain.setValueAtTime(0.4, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.08);
+    }
+
+    // ── START GAME : Transition ascendante ────────────────────
+    else if (type === 'gq_start') {
+        const master = out(ctx, 0.9);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(1760, now + 0.4);
+        g.gain.setValueAtTime(0.5, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.45);
+    }
+
+    // ── CORRECT (1er essai) : Fanfare de victoire brillante ────────
+    else if (type === 'gq_correct_1') {
+        const master = out(ctx, 0.9);
+        const notes = [1046, 1318, 1567]; // Do6, Mi6, Sol6 (Accord majeur)
+        notes.forEach((f, i) => {
+            const t = now + i * 0.07;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.55, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.3);
+        });
+    }
+
+    // ── CORRECT (2e essai) : Chime de succès simple ──────────────
+    else if (type === 'gq_correct_2') {
+        const master = out(ctx, 0.8);
+        [880, 1174].forEach((f, i) => { // La5, Re6
+            const t = now + i * 0.05;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.5, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.2);
+        });
+    }
+
+    // ── FAIL MID : Buzz discordant (encore des essais) ──────
+    else if (type === 'gq_fail_mid') {
+        const master = out(ctx, 0.7);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1200, now);
+        filter.frequency.exponentialRampToValueAtTime(200, now + 0.12);
+
+        g.gain.setValueAtTime(0.4, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(filter); filter.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.15);
+    }
+
+    // ── FAIL FINAL : Son de défaite descendant (glissando) ────────
+    else if (type === 'gq_fail_final') {
+        const master = out(ctx, 0.9);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        const lfo = ctx.createOscillator();
+        const lfoG = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(330, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.5);
+
+        lfo.type = 'sine';
+        lfo.frequency.value = 15;
+        lfoG.gain.value = 20;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1000, now);
+        filter.frequency.linearRampToValueAtTime(100, now + 0.5);
+
+        g.gain.setValueAtTime(0.6, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        lfo.connect(lfoG); lfoG.connect(osc.frequency);
+        osc.connect(filter); filter.connect(g); g.connect(master);
+        lfo.start(now); osc.start(now);
+        lfo.stop(now + 0.5); osc.stop(now + 0.5);
+    }
+
+    // ── RESULT PERFECT (100%) : Fanfare héroïque ───────────────
+    else if (type === 'gq_result_perfect') {
+        const master = out(ctx, 1.0);
+        const notes = [523, 659, 784, 1046, 1318];
+        notes.forEach((f, i) => {
+            const t = now + i * 0.12;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.3, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.5);
+        });
+    }
+
+    // ── RESULT GOOD (80%+) : Accord majeur joyeux ──────────────
+    else if (type === 'gq_result_good') {
+        const master = out(ctx, 0.8);
+        [523, 659, 784].forEach(f => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now);
+            g.gain.setValueAtTime(0.25, now);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+            osc.connect(g); g.connect(master);
+            osc.start(now); osc.stop(now + 0.8);
+        });
+    }
+
+    // ── RESULT MEH (50%+) : Carillon neutre ────────────────────
+    else if (type === 'gq_result_meh') {
+        const master = out(ctx, 0.6);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        g.gain.setValueAtTime(0.4, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.5);
+    }
+
+    // ── RESULT BAD (<50%) : Suite mineure triste ───────────────
+    else if (type === 'gq_result_bad') {
+        const master = out(ctx, 0.8);
+        const notes = [392, 349, 311, 261];
+        notes.forEach((f, i) => {
+            const t = now + i * 0.2;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.3, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.4);
+        });
+    }
 }
+
 
 // ─────────────────────────────────────────────
 // MUSIQUE — Falling Blocks (style 8-bit, La mineur)
@@ -2175,3 +2355,92 @@ export function playReflexSound(type) {
         });
     }
 }
+
+// ─────────────────────────────────────────────
+// AUDIO ENGINE — GeoQuiz Music (Explorer Theme)
+// ─────────────────────────────────────────────
+
+let gqMusicRunning = false;
+let gqMusicScheduler = null;
+let gqBeat = 0;
+const GQ_TEMPO = 110;
+
+// Mélodie légère (Pentatonique Majeur de Do)
+const GQ_MELODY = [
+    523.25, -1, 587.33, 659.25, // C4, D4, E4
+    783.99, -1, 659.25, -1,    // G4, E4
+    880.00, -1, 783.99, 659.25, // A4, G4, E4
+    587.33, -1, 523.25, -1     // D4, C4
+];
+
+function formatGqBeat() {
+    const ctx = getAudioCtx();
+    const beatDur = 60 / GQ_TEMPO;
+    const now = ctx.currentTime + 0.05;
+
+    // 1. Percussion légère (Woodblock)
+    const pOsc = ctx.createOscillator();
+    const pG = ctx.createGain();
+    pOsc.type = 'triangle';
+    pOsc.frequency.setValueAtTime(gqBeat % 4 === 0 ? 300 : 200, now);
+    pG.gain.setValueAtTime(0.09, now);
+    pG.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    pOsc.connect(pG); pG.connect(ctx.destination);
+    pOsc.start(now); pOsc.stop(now + 0.05);
+
+    // 2. Basse discrète
+    if (gqBeat % 8 === 0) {
+        const bOsc = ctx.createOscillator();
+        const bG = ctx.createGain();
+        bOsc.type = 'sine';
+        bOsc.frequency.setValueAtTime(130.81, now); // C3
+        bG.gain.setValueAtTime(0.18, now);
+        bG.gain.exponentialRampToValueAtTime(0.001, now + beatDur * 4);
+        bOsc.connect(bG); bG.connect(ctx.destination);
+        bOsc.start(now); bOsc.stop(now + beatDur * 4);
+    }
+
+    // 3. Marimba (Mélodie)
+    const freq = GQ_MELODY[gqBeat % GQ_MELODY.length];
+    if (freq > 0) {
+        const mOsc = ctx.createOscillator();
+        const mG = ctx.createGain();
+        mOsc.type = 'sine'; // Son pur comme un marimba doux
+        mOsc.frequency.setValueAtTime(freq, now);
+
+        mG.gain.setValueAtTime(0, now);
+        mG.gain.linearRampToValueAtTime(0.25, now + 0.01);
+        mG.gain.exponentialRampToValueAtTime(0.001, now + beatDur * 0.8);
+
+        mOsc.connect(mG); mG.connect(ctx.destination);
+        mOsc.start(now); mOsc.stop(now + beatDur * 0.8);
+    }
+
+    gqBeat++;
+}
+
+export function startGqMusic() {
+    if (gqMusicRunning || !isMusicEnabled) return;
+    gqMusicRunning = true;
+    gqBeat = 0;
+    const beatDur = 60 / GQ_TEMPO;
+    formatGqBeat();
+    gqMusicScheduler = setInterval(() => {
+        if (gqMusicRunning) formatGqBeat();
+    }, beatDur * 1000);
+}
+
+export function stopGqMusic() {
+    gqMusicRunning = false;
+    if (gqMusicScheduler) { clearInterval(gqMusicScheduler); gqMusicScheduler = null; }
+}
+
+export function toggleGqMusic() {
+    isMusicEnabled = !isMusicEnabled;
+    localStorage.setItem("mg_music", isMusicEnabled);
+    if (isMusicEnabled) startGqMusic();
+    else stopGqMusic();
+    return isMusicEnabled;
+}
+
+export function getGqMusicEnabled() { return isMusicEnabled; }

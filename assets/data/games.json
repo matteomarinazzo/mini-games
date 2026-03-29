@@ -170,6 +170,21 @@
     "rating": "0",
     "stars": "☆☆☆☆☆"
   },
+  "geoquiz": {
+    "path": "./games/geoquiz/index.html",
+    "name": "GeoQuiz",
+    "emoji": "🌍",
+    "description": "Devine les drapeaux ou les contours des pays du monde. Deux modes, plusieurs difficultés, continents et langues. Jouable hors ligne !",
+    "tags": [
+      "🧠 Géographie",
+      "🎓 Culture",
+      "⚡ Solo"
+    ],
+    "badge": "new",
+    "badgeText": "Nouveau",
+    "rating": "0",
+    "stars": "☆☆☆☆☆"
+  },
   "snow-digger": {
     "path": "./games/snow-digger/index.html",
     "name": "Snow Digger",

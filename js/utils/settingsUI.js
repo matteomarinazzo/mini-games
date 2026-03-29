@@ -3,7 +3,8 @@ import {
     getSoundEnabled,
     toggleSound,
     toggleCasinoMusic,
-    toggleFunfairMusic
+    toggleFunfairMusic,
+    toggleGqMusic
 } from './audio.js';
 
 export function initSettingsUI(context = 'casino') {
@@ -151,7 +152,8 @@ export function initSettingsUI(context = 'casino') {
     musicBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (context === 'casino') toggleCasinoMusic();
-        else toggleFunfairMusic();
+        else if (context === 'funfair') toggleFunfairMusic();
+        else if (context === 'geoquiz') toggleGqMusic();
         updateParamBtnState();
     });
 
@@ -165,7 +167,8 @@ export function initSettingsUI(context = 'casino') {
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'm') {
             if (context === 'casino') toggleCasinoMusic();
-            else toggleFunfairMusic();
+            else if (context === 'funfair') toggleFunfairMusic();
+            else if (context === 'geoquiz') toggleGqMusic();
             updateParamBtnState();
         }
         if (e.key.toLowerCase() === 's') {

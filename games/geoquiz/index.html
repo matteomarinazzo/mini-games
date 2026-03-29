@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoQuiz – Devine le Drapeau ou la Forme du Pays | Mini‑Games</title>
+    <meta name="description"
+        content="Testez vos connaissances géographiques avec GeoQuiz sur Mini‑Games. Devinez les drapeaux ou les contours des pays du monde entier. Deux modes, plusieurs difficultés, choix du continent et de la langue.">
+    <link rel="canonical" href="https://mini-games.ch/games/geoquiz/" />
+    <meta property="og:title" content="GeoQuiz – Devine le Drapeau ou la Forme du Pays | Mini‑Games">
+    <meta property="og:description"
+        content="Drapeaux ou contours de pays à deviner. Plusieurs modes, difficultés et continents. Jouable hors ligne !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/geoquiz/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/geoquiz.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GeoQuiz – Devine le Drapeau ou la Forme du Pays | Mini‑Games">
+    <meta name="twitter:description"
+        content="Drapeaux ou contours de pays à deviner. Plusieurs modes, difficultés et continents.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/geoquiz.webp">
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "GeoQuiz – Drapeaux & Formes",
+    "url": "https://mini-games.ch/games/geoquiz/",
+    "description": "Jeu de géographie solo : devinez les drapeaux ou les contours des pays du monde.",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "genre": ["Quiz", "Educational", "Singleplayer", "Geography"],
+    "inLanguage": "fr",
+    "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+  }
+  </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="bg-animation">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+        <div class="blob-3"></div>
+    </div>
+
+    <div class="container main-menu gq-menu">
+        <header class="header animate-up">
+            <div class="logo">
+                <span class="logo-icon" style="animation:globeSpin 6s linear infinite;display:inline-block">🌍</span>
+                <h1>GeoQuiz</h1>
+            </div>
+            <p class="subtitle">Drapeaux &amp; contours — teste tes connaissances !</p>
+        </header>
+
+        <section class="gq-section animate-up">
+            <h2 class="gq-section-title">Mode de jeu</h2>
+            <div class="mode-selection">
+                <div class="mode-card gq-mode-card" id="modeFlag" data-mode="flag">
+                    <div class="mode-icon">🚩</div>
+                    <h3>Guess the Flag</h3>
+                    <p>Un drapeau s'affiche — à toi de trouver le pays !</p>
+                    <button class="btn btn-primary">Choisir</button>
+                </div>
+                <div class="mode-card gq-mode-card" id="modeShape" data-mode="shape">
+                    <div class="mode-icon">🗺️</div>
+                    <h3>Guess the Shape</h3>
+                    <p>Le contour du pays s'affiche — reconnaîs-tu lequel ?</p>
+                    <button class="btn btn-secondary">Choisir</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="gq-options animate-up-2" id="gqOptions" style="display:none">
+            <div class="gq-option-group">
+                <h3 class="gq-option-label">Difficulté</h3>
+                <div class="gq-pill-group" id="diffGroup">
+                    <button class="gq-pill active" data-val="standard">Standard <small>4 choix · 2
+                            essais</small></button>
+                    <button class="gq-pill" data-val="hard">Difficile <small>Saisir · 3 essais</small></button>
+                </div>
+            </div>
+            <div class="gq-option-group">
+                <h3 class="gq-option-label">Continent</h3>
+                <div class="gq-pill-group" id="continentGroup">
+                    <button class="gq-pill active" data-val="ALL">🌍 Monde entier</button>
+                    <button class="gq-pill" data-val="AF">🌍 Afrique</button>
+                    <button class="gq-pill" data-val="AS">🌏 Asie</button>
+                    <button class="gq-pill" data-val="EU">🌍 Europe</button>
+                    <button class="gq-pill" data-val="NA">🌎 Amér. Nord</button>
+                    <button class="gq-pill" data-val="SA">🌎 Amér. Sud</button>
+                    <button class="gq-pill" data-val="OC">🌏 Océanie</button>
+                </div>
+            </div>
+            <div class="gq-option-group">
+                <h3 class="gq-option-label">Langue des noms</h3>
+                <div class="gq-pill-group" id="langGroup">
+                    <button class="gq-pill active" data-val="fr">🇫🇷 Français</button>
+                    <button class="gq-pill" data-val="en">🇬🇧 English</button>
+                    <button class="gq-pill" data-val="de">🇩🇪 Deutsch</button>
+                </div>
+            </div>
+            <button class="btn btn-primary gq-start-btn" id="startBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+                Lancer la partie
+            </button>
+        </section>
+    </div>
+
+    <style>
+        @keyframes globeSpin {
+
+            0%,
+            100% {
+                transform: rotate(-5deg) scale(1)
+            }
+
+            50% {
+                transform: rotate(5deg) scale(1.05)
+            }
+        }
+    </style>
+    <script type="module">
+        import { playGameSound, startGqMusic } from '../../js/utils/audio.js';
+        import { initSettingsUI } from '../../js/utils/settingsUI.js';
+
+        // Initialisation
+        initSettingsUI('geoquiz');
+
+        let selectedMode = null, selectedDiff = 'standard', selectedContinent = 'ALL', selectedLang = 'fr';
+        let musicStarted = false;
+
+        document.querySelectorAll('.gq-mode-card').forEach(card => {
+            card.addEventListener('click', () => {
+                if (!musicStarted) {
+                    startGqMusic();
+                    musicStarted = true;
+                }
+                playGameSound('gq_ui_click');
+                const menu = document.querySelector('.gq-menu');
+                document.querySelectorAll('.gq-mode-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedMode = card.dataset.mode;
+
+                // Appliquer le thème visuel
+                menu.classList.remove('theme-flag', 'theme-shape');
+                menu.classList.add(`theme-${selectedMode}`);
+
+                const opt = document.getElementById('gqOptions');
+                opt.style.display = 'block';
+                setTimeout(() => opt.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+            });
+        });
+        function setupPills(id, setter) {
+            document.getElementById(id).addEventListener('click', e => {
+                const p = e.target.closest('.gq-pill'); if (!p) return;
+                playGameSound('gq_ui_click');
+                document.querySelectorAll(`#${id} .gq-pill`).forEach(x => x.classList.remove('active'));
+                p.classList.add('active'); setter(p.dataset.val);
+            });
+        }
+        setupPills('diffGroup', v => selectedDiff = v);
+        setupPills('continentGroup', v => selectedContinent = v);
+        setupPills('langGroup', v => selectedLang = v);
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (!selectedMode) return;
+            playGameSound('gq_start');
+            const p = new URLSearchParams({ mode: selectedMode, diff: selectedDiff, continent: selectedContinent, lang: selectedLang });
+            setTimeout(() => {
+                window.location.href = `game.html?${p}`;
+            }, 400); // Laisser le temps au son de démarrer
+        });
+    </script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

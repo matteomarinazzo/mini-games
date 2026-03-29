@@ -73,8 +73,25 @@ function generateGameCards() {
   );
   existingCards.forEach((card) => card.remove());
 
+  // Trier les jeux : Liked d'abord (du plus récent au plus ancien)
+  const likedList = getLikedGames(); // [ancien, ..., récent]
+  const sortedGames = Object.entries(games).sort(([idA], [idB]) => {
+    const idxA = likedList.indexOf(idA);
+    const idxB = likedList.indexOf(idB);
+    const isLikedA = idxA > -1;
+    const isLikedB = idxB > -1;
+
+    if (isLikedA && !isLikedB) return -1;
+    if (!isLikedA && isLikedB) return 1;
+    if (isLikedA && isLikedB) {
+      // Les deux sont likés : le plus récent (index plus élevé) vient en premier
+      return idxB - idxA;
+    }
+    return 0; // Garde l'ordre JSON sinon
+  });
+
   // Créer une carte pour chaque jeu
-  Object.entries(games).forEach(([gameId, game]) => {
+  sortedGames.forEach(([gameId, game]) => {
     const gameCard = createGameCard(gameId, game);
     gamesGrid.insertBefore(
       gameCard,
@@ -105,6 +122,8 @@ function createGameCard(gameId, game) {
     playButtonColor = "#f093fb";
   }
 
+  const isLiked = getLikedGames().includes(gameId);
+
   // Construire le HTML de la carte
   card.innerHTML = `
     <div class="card-header">
@@ -122,7 +141,14 @@ function createGameCard(gameId, game) {
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title">${game.emoji} ${game.name}</h3>
+      <div class="card-title-row">
+        <h3 class="card-title">${game.emoji} ${game.name}</h3>
+        <button class="heart-btn ${isLiked ? 'liked' : ''}" title="Mettre en favori">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+      </div>
       <p class="card-description">${game.description}</p>
       <div class="card-tags">
         ${game.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
@@ -160,7 +186,20 @@ function initGameCards() {
     const playBtn = card.querySelector(".btn-play");
     if (playBtn) {
       playBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
         launchGame(gameId);
+      });
+    }
+
+    // 3. Clic sur le coeur (Like)
+    const heartBtn = card.querySelector(".heart-btn");
+    if (heartBtn) {
+      heartBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const liked = toggleLikeGame(gameId);
+        heartBtn.classList.toggle("liked", liked);
+        // On ne force pas le re-sort immédiat pour éviter que la carte saute
+        // Mais on prévient pour le prochain chargement
       });
     }
 
@@ -488,3 +527,30 @@ if (floatingContainer) {
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };
+
+// ─── GESTION DES FAVORIS (LIKES) ──────────────────────────────────────────────
+function getLikedGames() {
+  try {
+    return JSON.parse(localStorage.getItem("likedGames") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function toggleLikeGame(gameId) {
+  let liked = getLikedGames();
+  const idx = liked.indexOf(gameId);
+  let isNowLiked = false;
+
+  if (idx > -1) {
+    liked.splice(idx, 1);
+    isNowLiked = false;
+  } else {
+    liked.push(gameId);
+    isNowLiked = true;
+    if (playGameSound) playGameSound('gq_ui_click'); // Petit son de feedback
+  }
+
+  localStorage.setItem("likedGames", JSON.stringify(liked));
+  return isNowLiked;
+}

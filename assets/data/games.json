@@ -1,235 +1,279 @@
 {
-  "lostBelow": {
-    "path": "./games/lostBelow/index.html",
-    "name": "Lost Below",
-    "emoji": "🔦",
-    "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
-    "tags": [
-      "🔦 Survie",
-      "🧗 Exploration",
-      "🎲 Stratégie",
-      "👥 Multijoueur"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "🧠 Stratégie": {
+    "battleship": {
+      "path": "./games/battleship/index.html",
+      "name": "Bataille navale",
+      "emoji": "",
+      "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
+      "tags": [
+        "⚡ Temps réel",
+        "🧠 Stratégie",
+        "👥 Multijoueur"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "lostBelow": {
+      "path": "./games/lostBelow/index.html",
+      "name": "Lost Below",
+      "emoji": "🔦",
+      "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
+      "tags": [
+        "🔦 Survie",
+        "🧗 Exploration",
+        "🧠 Stratégie",
+        "👥 Multijoueur"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "ball-sort": {
-    "path": "./games/ball-sort/index.html",
-    "name": "Ball Sort",
-    "emoji": "🧪",
-    "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
-    "tags": [
-      "🧠 Logique",
-      "🧪 Puzzle",
-      "🧩 Réflexion",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "🎲 Hasard": {
+    "casino": {
+      "path": "./games/casino/index.html",
+      "name": "Casino",
+      "emoji": "🎰",
+      "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
+      "tags": [
+        "💰 Argent",
+        "🎲 Hasard",
+        "🎮 Jeux",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "funfair": {
+      "path": "./games/funfair/index.html",
+      "name": "Funfair Frenzy",
+      "emoji": "🎡",
+      "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
+      "tags": [
+        "🎟️ Tickets",
+        "🎯 Adresse",
+        "🎮 Jeux",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "casino": {
-    "path": "./games/casino/index.html",
-    "name": "Casino",
-    "emoji": "🎰",
-    "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
-    "tags": [
-      "💰 Argent",
-      "🎲 Hasard",
-      "🎮 Jeux",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "⚡ Arcade & Réflexes": {
+    "falling-blocks": {
+      "path": "./games/falling-blocks/index.html",
+      "name": "Falling Blocks",
+      "emoji": "🧱",
+      "description": "Empile les pièces, complète les lignes et explose le score ! ",
+      "tags": [
+        "⚡ Arcade",
+        "🧱 Réflexes",
+        "🎮 Classique"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "layer-pile": {
+      "path": "./games/layer-pile/index.html",
+      "name": "Layer Pile",
+      "emoji": "🏗️",
+      "description": "Empile les blocs avec précision. Chaque millimètre compte !",
+      "tags": [
+        "🧱 Arcade",
+        "🎯 Précision",
+        "⚡ Réflexes",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "lights-out-reflex": {
+      "path": "./games/lights-out-reflex/index.html",
+      "name": "Lights Out Reflex",
+      "emoji": "🎯",
+      "description": "Teste tes réflexes ! ",
+      "tags": [
+        "⚡ Arcade",
+        "🎯 Réflexes",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "punch-reflex": {
+      "path": "./games/punch-reflex/index.html",
+      "name": "Punch Reflex",
+      "emoji": "🎯",
+      "description": "Sois plus rapide que l'éclair : clique sur les cibles dès qu'elles s'allument !",
+      "tags": [
+        "⚡ Vitesse",
+        "🎯 Réflexes",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "funfair": {
-    "path": "./games/funfair/index.html",
-    "name": "Funfair Frenzy",
-    "emoji": "🎡",
-    "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
-    "tags": [
-      "🎟️ Tickets",
-      "🎯 Adresse",
-      "🎮 Jeux",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "🧠 Casse-tête & Logique": {
+    "ball-sort": {
+      "path": "./games/ball-sort/index.html",
+      "name": "Ball Sort",
+      "emoji": "🧪",
+      "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
+      "tags": [
+        "🧠 Logique",
+        "🧪 Puzzle",
+        "🧩 Réflexion",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "block-puzzle": {
+      "path": "./games/block-puzzle/index.html",
+      "name": "Block Puzzle",
+      "emoji": "🧱",
+      "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
+      "tags": [
+        "🧠 Logique",
+        "🧪 Puzzle",
+        "🧩 Réflexion"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "battleship": {
-    "path": "./games/battleship/index.html",
-    "name": "Bataille navale",
-    "emoji": "",
-    "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
-    "tags": [
-      "⚡ Temps réel",
-      "🎲 Stratégie",
-      "👥 Multijoueur"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "🎮 Classiques": {
+    "morpion": {
+      "path": "./games/morpion/index.html",
+      "name": "Morpion",
+      "emoji": "⭕",
+      "description": "Le jeu classique revisité ! Affronte l'IA ou un ami.",
+      "tags": [
+        "🧠 Stratégie",
+        "👥 Multijoueur",
+        "⚡ Rapide"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "casse-briques": {
+      "path": "./games/casse-briques/index.html",
+      "name": "Casse-Briques",
+      "emoji": "🧱",
+      "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
+      "tags": [
+        "🧠 Réflexe",
+        "🎯 Précision",
+        "⚡ Rapide",
+        "👤 Solo"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "pong": {
+      "path": "./games/pong/index.html",
+      "name": "Pong",
+      "emoji": "🏓",
+      "description": "Le Pong original. Rapide, nerveux et toujours efficace.",
+      "tags": [
+        "🧠 Réflexe",
+        "👥 Multijoueur",
+        "⚡ Rapide"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "draw-guess": {
+      "path": "./games/draw-guess/index.html",
+      "name": "Draw and Guess",
+      "emoji": "✏️",
+      "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
+      "tags": [
+        "✏️ Créativité",
+        "🧠 Réflexion",
+        "👥 Multijoueur",
+        "⚡ Temps réel"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "draw-guess": {
-    "path": "./games/draw-guess/index.html",
-    "name": "Draw and Guess",
-    "emoji": "✏️",
-    "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
-    "tags": [
-      "✏️ Créativité",
-      "🧠 Réflexion",
-      "👥 Multijoueur",
-      "⚡ Temps réel"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "🌍 Géographie": {
+    "geoquiz": {
+      "path": "./games/geoquiz/index.html",
+      "name": "GeoQuiz",
+      "emoji": "🌍",
+      "description": "Devine les drapeaux ou les contours des pays du monde. Deux modes, plusieurs difficultés, continents et langues.",
+      "tags": [
+        "🧠 Géographie",
+        "🎓 Culture",
+        "⚡ Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "where-am-i": {
+      "path": "./games/where-am-i/index.html",
+      "name": "Where Am I",
+      "emoji": "🌍",
+      "description": "Devine où la photo a été prise sur la carte du monde. En multijoueur ou en solo.",
+      "tags": [
+        "🧠 Géographie",
+        "🎓 Culture",
+        "⚡ Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   },
-  "falling-blocks": {
-    "path": "./games/falling-blocks/index.html",
-    "name": "Falling Blocks",
-    "emoji": "🧱",
-    "description": "Empile les pièces, complète les lignes et explose le score ! ",
-    "tags": [
-      "⚡ Arcade",
-      "🧱 Réflexes",
-      "🎮 Classique"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "lights-out-reflex": {
-    "path": "./games/lights-out-reflex/index.html",
-    "name": "Lights Out Reflex",
-    "emoji": "🎯",
-    "description": "Teste tes réflexes ! ",
-    "tags": [
-      "⚡ Arcade",
-      "🎯 Réflexes",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "morpion": {
-    "path": "./games/morpion/index.html",
-    "name": "Morpion",
-    "emoji": "⭕",
-    "description": "Le jeu classique revisité ! Affronte l'IA ou un ami.",
-    "tags": [
-      "🧠 Stratégie",
-      "👥 Multijoueur",
-      "⚡ Rapide"
-    ],
-    "badge": "classic",
-    "badgeText": "Classique",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "block-puzzle": {
-    "path": "./games/block-puzzle/index.html",
-    "name": "Block Puzzle",
-    "emoji": "🧱",
-    "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
-    "tags": [
-      "🧠 Logique",
-      "🧪 Puzzle",
-      "🧩 Réflexion"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "layer-pile": {
-    "path": "./games/layer-pile/index.html",
-    "name": "Layer Pile",
-    "emoji": "🏗️",
-    "description": "Empile les blocs avec précision. Chaque millimètre compte !",
-    "tags": [
-      "🧱 Arcade",
-      "🎯 Précision",
-      "⚡ Réflexes",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "geoquiz": {
-    "path": "./games/geoquiz/index.html",
-    "name": "GeoQuiz",
-    "emoji": "🌍",
-    "description": "Devine les drapeaux ou les contours des pays du monde. Deux modes, plusieurs difficultés, continents et langues. Jouable hors ligne !",
-    "tags": [
-      "🧠 Géographie",
-      "🎓 Culture",
-      "⚡ Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "snow-digger": {
-    "path": "./games/snow-digger/index.html",
-    "name": "Snow Digger",
-    "emoji": "❄️",
-    "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
-    "tags": [
-      "🪏 Pelle",
-      "❄️ Neige",
-      "🎮 Clicker",
-      "👤 Solo"
-    ],
-    "badge": "new",
-    "badgeText": "Nouveau",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "casse-briques": {
-    "path": "./games/casse-briques/index.html",
-    "name": "Casse-Briques",
-    "emoji": "🧱",
-    "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
-    "tags": [
-      "🧠 Réflexe",
-      "🎯 Précision",
-      "⚡ Rapide",
-      "👤 Solo"
-    ],
-    "badge": "classic",
-    "badgeText": "Classique",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
-  },
-  "pong": {
-    "path": "./games/pong/index.html",
-    "name": "Pong",
-    "emoji": "🏓",
-    "description": "Le Pong original. Rapide, nerveux et toujours efficace.",
-    "tags": [
-      "🧠 Réflexe",
-      "👥 Multijoueur",
-      "⚡ Rapide"
-    ],
-    "badge": "classic",
-    "badgeText": "Classique",
-    "rating": "0",
-    "stars": "☆☆☆☆☆"
+  "📈 Clicker": {
+    "snow-digger": {
+      "path": "./games/snow-digger/index.html",
+      "name": "Snow Digger",
+      "emoji": "❄️",
+      "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
+      "tags": [
+        "🪏 Pelle",
+        "❄️ Neige",
+        "🎮 Clicker",
+        "👤 Solo"
+      ],
+      "badge": "new",
+      "badgeText": "Nouveau",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
   }
 }

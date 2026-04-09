@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Punch Reflex – Teste tes réflexes | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Entraîne tes réflexes avec l'octogone de vitesse. Modes Chrono et Survie. Compare tes records mondiaux.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/punch-reflex/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Punch Reflex – Teste tes réflexes | Mini‑Games">
+    <meta property="og:description"
+        content="Entraîne tes réflexes avec l'octogone de vitesse. Modes Chrono et Survie. Compare tes records mondiaux.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/punch-reflex/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/punch-reflex.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Punch Reflex – Teste tes réflexes | Mini‑Games">
+    <meta name="twitter:description"
+        content="Entraîne tes réflexes avec l'octogone de vitesse. Modes Chrono et Survie. Compare tes records mondiaux.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/punch-reflex.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Punch Reflex",
+      "url": "https://mini-games.ch/games/punch-reflex/",
+      "description": "Jeu de réflexes inspiré du Batak/boxe : frappe les 9 cercles de l'octogone le plus vite possible. Modes Chrono et Survie.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Arcade Game", "Reflex Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="menu-body">
+
+    <!-- Back Button -->
+    <a href="../../index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <div class="menu-container">
+        <div class="menu-header">
+            <div class="menu-icon">🥊</div>
+            <h1 class="menu-title">PUNCH<span class="menu-title-pro">REFLEX</span></h1>
+            <p class="menu-subtitle">Frappe les cibles. Bats les records.</p>
+        </div>
+
+        <div class="mode-cards">
+
+            <!-- Mode Chrono -->
+            <div class="mode-card" id="modeChronoCard">
+                <div class="mode-card-icon">⏱</div>
+                <div class="mode-card-body">
+                    <h2 class="mode-name">MODE CHRONO</h2>
+                    <p class="mode-desc">Score maximum en temps imparti. Choisis ta durée et attaque !</p>
+                    <div class="duration-selector" id="chronoDurations">
+                        <button class="dur-btn active" data-duration="30">30s</button>
+                        <button class="dur-btn" data-duration="60">60s</button>
+                        <button class="dur-btn" data-duration="90">90s</button>
+                    </div>
+                </div>
+                <button class="btn-play" id="playChronoBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    JOUER
+                </button>
+            </div>
+
+            <!-- Mode Survie -->
+            <div class="mode-card" id="modeSurvieCard">
+                <div class="mode-card-icon">❤️</div>
+                <div class="mode-card-body">
+                    <h2 class="mode-name">MODE SURVIE</h2>
+                    <p class="mode-desc">Commence avec 30s. Chaque frappe correcte +0.5s, chaque erreur -1s.</p>
+                    <div class="survie-info">
+                        <span class="survie-tag">+0.5s par clic</span>
+                        <span class="survie-tag danger">-1s par erreur</span>
+                    </div>
+                </div>
+                <button class="btn-play accent-green" id="playSurvieBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    JOUER
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Records rapides -->
+        <div class="quick-records">
+            <div class="qr-item">
+                <span class="qr-label">MEILLEUR SCORE CHRONO</span>
+                <span class="qr-value" id="menuBestScore">—</span>
+            </div>
+            <div class="qr-sep"></div>
+            <div class="qr-item">
+                <span class="qr-label">SURVIE RECORD</span>
+                <span class="qr-value" id="menuBestSurvie">—</span>
+            </div>
+            <div class="qr-sep"></div>
+            <div class="qr-item">
+                <span class="qr-label">RÉACTION MOYENNE</span>
+                <span class="qr-value" id="menuAvgReaction">—</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

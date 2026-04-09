@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.12.2026-03-29";
+const CACHE_NAME = "mini-games-cache-v1.13.2026-04-09";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -56,6 +56,8 @@ const ASSETS_TO_CACHE = [
     'assets/logos/falling-blocks.webp',
     'assets/logos/lights-out-reflex.webp',
     'assets/logos/geoquiz.webp',
+    'assets/logos/where-am-i.webp',
+    'assets/logos/punch-reflex.webp',
 
     // About
     'about/about.html',
@@ -230,6 +232,22 @@ const ASSETS_TO_CACHE = [
     'games/geoquiz/css/game.css',
     'games/geoquiz/js/game.js',
     'games/geoquiz/js/countries.js',
+
+    // Game: Where Am I
+    'games/where-am-i/index.html',
+    'games/where-am-i/game.html',
+    'games/where-am-i/css/style.css',
+    'games/where-am-i/css/game.css',
+    'games/where-am-i/js/menu.js',
+    'games/where-am-i/js/game.js',
+
+    // Game: Punch Reflex
+    'games/punch-reflex/index.html',
+    'games/punch-reflex/game.html',
+    'games/punch-reflex/css/style.css',
+    'games/punch-reflex/css/game.css',
+    'games/punch-reflex/js/menu.js',
+    'games/punch-reflex/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

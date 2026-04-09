@@ -2308,7 +2308,7 @@ export function playReflexSound(type) {
 
     // ── Arrêt du chrono — ping net ─────────────────────────────────────────────
     else if (type === 'stop') {
-        const master = out(ctx, 0.75);
+        const master = out(ctx, 0.3); // Baissé pour les clics de menu
 
         // Ping montant satisfaisant
         const osc = ctx.createOscillator();
@@ -2353,6 +2353,136 @@ export function playReflexSound(type) {
             osc.connect(g); g.connect(master);
             osc.start(t); osc.stop(t + 0.2);
         });
+    }
+
+    // ─────────────────────────────────────────────
+    // SONS — Punch Reflex
+    // ─────────────────────────────────────────────
+
+    // ── Apparition d'une cible : Pop mécanique/électrique très court ──────────────
+    else if (type === 'punch_spawn') {
+        const master = out(ctx, 0.5);
+
+        // "Zap" rapide
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+
+        g.gain.setValueAtTime(0.5, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.04);
+
+        // Petit bruit blanc (clic électrique)
+        const buf = ctx.createBuffer(1, ctx.sampleRate * 0.015, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const ng = ctx.createGain();
+        ng.gain.setValueAtTime(0.4, now);
+        ng.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+        src.connect(ng); ng.connect(master);
+        src.start(now); src.stop(now + 0.015);
+    }
+
+    // ── Coup réussi : Petite réussite (Tock + Note douce) ───────────────
+    else if (type === 'punch_hit') {
+        const master = out(ctx, 0.7);
+
+        // 1. Tock (Petit impact sec et léger)
+        const tock = ctx.createOscillator();
+        const tg = ctx.createGain();
+        tock.type = 'sine';
+        tock.frequency.setValueAtTime(300, now);
+        tock.frequency.exponentialRampToValueAtTime(80, now + 0.05);
+        tg.gain.setValueAtTime(0.7, now);
+        tg.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+        tock.connect(tg); tg.connect(master);
+        tock.start(now); tock.stop(now + 0.07);
+
+        // 2. Chime (Tintement positif très rapide)
+        const chime = ctx.createOscillator();
+        const cg = ctx.createGain();
+        chime.type = 'sine';
+        chime.frequency.setValueAtTime(900, now);
+        cg.gain.setValueAtTime(0.4, now);
+        cg.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        chime.connect(cg); cg.connect(master);
+        chime.start(now); chime.stop(now + 0.15);
+    }
+
+    // ── Erreur / Mauvais clic : "Bonk" sourd et léger ──
+    else if (type === 'punch_error') {
+        const master = out(ctx, 0.6);
+
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+
+        g.gain.setValueAtTime(0.6, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(500, now);
+
+        osc.connect(filter); filter.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.15);
+    }
+
+    // ── Départ de partie : Arpège montant enthousiaste ───────────────
+    else if (type === 'punch_start') {
+        const master = out(ctx, 0.7);
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // Do, Mi, Sol, Do
+        notes.forEach((f, i) => {
+            const t = now + i * 0.08;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.4, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.15);
+        });
+    }
+
+    // ── Victoire / Record : Fanfare brillante ──────────────────────
+    else if (type === 'punch_success') {
+        const master = out(ctx, 0.9);
+        const notes = [783.99, 783.99, 783.99, 1046.50]; // Sol Sol Sol Do
+        notes.forEach((f, i) => {
+            const t = now + i * 0.12;
+            const dur = i === 3 ? 0.6 : 0.15;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.4, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + dur);
+        });
+    }
+
+    // ── Fin de partie neutre : Descente triste ─────────────────────
+    else if (type === 'punch_fail') {
+        const master = out(ctx, 0.75);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(220, now + 0.5);
+        g.gain.setValueAtTime(0.5, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.5);
     }
 }
 

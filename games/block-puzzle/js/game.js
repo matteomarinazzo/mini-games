@@ -11,28 +11,85 @@ let best_score_ever = 0;
 // ─────────────────────────────────────────────
 const GRID_SIZE = 10;
 
-const SHAPES = [
-  { name: '1x1', layout: [[1]], color: '#FF7043' },
-  { name: '1x2-h', layout: [[1, 1]], color: '#FFA726' },
-  { name: '1x2-v', layout: [[1], [1]], color: '#FFA726' },
-  { name: '1x3-h', layout: [[1, 1, 1]], color: '#FFEE58' },
-  { name: '1x3-v', layout: [[1], [1], [1]], color: '#FFEE58' },
-  { name: '1x4-h', layout: [[1, 1, 1, 1]], color: '#66BB6A' },
-  { name: '1x4-v', layout: [[1], [1], [1], [1]], color: '#66BB6A' },
-  { name: '2x2', layout: [[1, 1], [1, 1]], color: '#26C6DA' },
-  { name: '2x3-h', layout: [[1, 1, 1], [1, 1, 1]], color: '#EF5350' },
-  { name: '3x3', layout: [[1, 1, 1], [1, 1, 1], [1, 1, 1]], color: '#EF5350' },
-  { name: 'L', layout: [[1, 0], [1, 0], [1, 1]], color: '#42A5F5' },
-  { name: 'L-mir', layout: [[0, 1], [0, 1], [1, 1]], color: '#42A5F5' },
-  { name: 'L-r', layout: [[1, 1, 1], [1, 0, 0]], color: '#42A5F5' },
-  { name: 'L-r2', layout: [[1, 1, 1], [0, 0, 1]], color: '#42A5F5' },
-  { name: 'T', layout: [[1, 1, 1], [0, 1, 0]], color: '#FFCA28' },
-  { name: 'T-r', layout: [[0, 1, 0], [1, 1, 1]], color: '#FFCA28' },
-  { name: 'S', layout: [[0, 1, 1], [1, 1, 0]], color: '#AB47BC' },
-  { name: 'Z', layout: [[1, 1, 0], [0, 1, 1]], color: '#AB47BC' },
-  { name: '1x5-h', layout: [[1, 1, 1, 1, 1]], color: '#FF6090' },
-  { name: '1x5-v', layout: [[1], [1], [1], [1], [1]], color: '#FF6090' },
+const BLOCK_COLORS = [
+  '#FF7043', // Orange-ish
+  '#FFA726', // Orange
+  '#FFEE58', // Yellow
+  '#66BB6A', // Green
+  '#26C6DA', // Cyan
+  '#42A5F5', // Blue
+  '#AB47BC', // Purple
+  '#EF5350', // Red
+  '#FF6090', // Pink
+  '#FFCA28', // Amber
 ];
+
+// Layout utilities
+function rotateLayout(layout) {
+  const rows = layout.length;
+  const cols = layout[0].length;
+  const newLayout = Array.from({ length: cols }, () => Array(rows).fill(0));
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      newLayout[c][rows - 1 - r] = layout[r][c];
+    }
+  }
+  return newLayout;
+}
+
+function flipLayout(layout) {
+  return layout.map(row => [...row].reverse());
+}
+
+function getUniqueOrientations(baseLayout) {
+  const variants = [];
+  const seen = new Set();
+
+  let current = baseLayout;
+  for (let i = 0; i < 4; i++) {
+    [current, flipLayout(current)].forEach(bits => {
+      const str = JSON.stringify(bits);
+      if (!seen.has(str)) {
+        seen.add(str);
+        variants.push(bits);
+      }
+    });
+    current = rotateLayout(current);
+  }
+  return variants;
+}
+
+const BASE_SHAPES = [
+  { name: '1x1', layout: [[1]] },
+  { name: '1x2', layout: [[1, 1]] },
+  { name: '1x3', layout: [[1, 1, 1]] },
+  { name: '1x4', layout: [[1, 1, 1, 1]] },
+  { name: '1x5', layout: [[1, 1, 1, 1, 1]] },
+  { name: '2x2', layout: [[1, 1], [1, 1]] },
+  { name: '2x3', layout: [[1, 1, 1], [1, 1, 1]] },
+  { name: '3x3', layout: [[1, 1, 1], [1, 1, 1], [1, 1, 1]] },
+  { name: 'L', layout: [[1, 0], [1, 0], [1, 1]] },
+  { name: 'Big-L', layout: [[1, 1, 1], [1, 0, 0], [1, 0, 0]] },
+  { name: 'T', layout: [[1, 1, 1], [0, 1, 0]] },
+  { name: 'S', layout: [[0, 1, 1], [1, 1, 0]] },
+  { name: 'Z', layout: [[1, 1, 0], [0, 1, 1]] },
+  { name: 'Diag', layout: [[1, 0], [0, 1]] },
+];
+
+const ALL_VARIANTS = [];
+BASE_SHAPES.forEach(base => {
+  const orientations = getUniqueOrientations(base.layout);
+  orientations.forEach((layout, i) => {
+    ALL_VARIANTS.push({
+      name: orientations.length > 1 ? `${base.name}-${i}` : base.name,
+      layout: layout
+    });
+  });
+});
+
+// Alias for compatibility during transition if needed
+const SHAPES = ALL_VARIANTS;
+
 
 // ─────────────────────────────────────────────
 // STATE
@@ -153,20 +210,33 @@ function setupMultiplayer() {
     // ── Pièces : s'affichent dès que currentTurn est défini (partie lancée) ──
     // On ne conditionne PAS sur room.state === 'playing' car la room peut rester 'waiting'
     if (room.currentTurn) {
-      const myPiecesIdx = room.players?.[myUid]?.pieces;
+      const myPiecesData = room.players?.[myUid]?.pieces;
 
-      if (myPiecesIdx && isMyTurn) {
-        // Firebase a les pièces → afficher si différentes
-        const shapes = myPiecesIdx.map(idx => (idx !== -1 ? SHAPES[idx] : null));
-        const localNames = currentPieces.map(p => p ? p.name : null);
-        const fbNames = shapes.map(p => p ? p.name : null);
-        if (JSON.stringify(localNames) !== JSON.stringify(fbNames)) {
+      if (myPiecesData && isMyTurn) {
+        // Firebase a les pièces (format {s, c})
+        const shapes = myPiecesData.map(p => {
+          if (p === -1 || p === null) return null;
+          // Support transition: si p est un nombre, on prend une couleur par défaut
+          const sIdx = (typeof p === 'object') ? p.s : p;
+          const cIdx = (typeof p === 'object') ? p.c : 0;
+          return {
+            ...SHAPES[sIdx],
+            color: BLOCK_COLORS[cIdx],
+            shapeIndex: sIdx,
+            colorIndex: cIdx
+          };
+        });
+
+        const localIdStr = JSON.stringify(currentPieces.map(p => p ? `${p.shapeIndex}-${p.colorIndex}` : null));
+        const fbIdStr = JSON.stringify(shapes.map(p => p ? `${p.shapeIndex}-${p.colorIndex}` : null));
+
+        if (localIdStr !== fbIdStr) {
           currentPieces = shapes;
           renderPieces();
           checkGameOver();
         }
-      } else if (!myPiecesIdx && isMyTurn) {
-        // Pas encore de pièces en DB → spawn local en attendant que le leader les écrive
+      } else if (!myPiecesData && isMyTurn) {
+        // Pas encore de pièces en DB → spawn local
         if (currentPieces.every(p => p === null)) {
           spawnPieces();
         }
@@ -176,11 +246,18 @@ function setupMultiplayer() {
       }
     }
 
+
     // ── Le leader initialise quand les 2 joueurs sont là ──
     const playerCount = Object.keys(room.players || {}).length;
     if (room.leaderId === myUid && !room.currentTurn && opponentUid && playerCount >= 2) {
-      const p1 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
-      const p2 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
+      const p1 = Array.from({ length: 3 }, () => ({
+        s: Math.floor(Math.random() * SHAPES.length),
+        c: Math.floor(Math.random() * BLOCK_COLORS.length)
+      }));
+      const p2 = Array.from({ length: 3 }, () => ({
+        s: Math.floor(Math.random() * SHAPES.length),
+        c: Math.floor(Math.random() * BLOCK_COLORS.length)
+      }));
       updateRoom(roomID, {
         currentTurn: myUid,
         grid: makeEmptyGrid(),
@@ -189,6 +266,7 @@ function setupMultiplayer() {
         [`players/${opponentUid}/pieces`]: p2,
       });
     }
+
 
     // ── Le leader génère de nouvelles pièces quand les 2 ont joué ──
     if (room.leaderId === myUid && (room.roundStep || 0) >= 2) {
@@ -232,14 +310,21 @@ function setupMultiplayer() {
 
 function generateNewPiecesForRound() {
   if (!roomID || !opponentUid) return;
-  const p1 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
-  const p2 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
+  const p1 = Array.from({ length: 3 }, () => ({
+    s: Math.floor(Math.random() * SHAPES.length),
+    c: Math.floor(Math.random() * BLOCK_COLORS.length)
+  }));
+  const p2 = Array.from({ length: 3 }, () => ({
+    s: Math.floor(Math.random() * SHAPES.length),
+    c: Math.floor(Math.random() * BLOCK_COLORS.length)
+  }));
   updateRoom(roomID, {
     [`players/${myUid}/pieces`]: p1,
     [`players/${opponentUid}/pieces`]: p2,
     roundStep: 0,
   });
 }
+
 
 function renderPieces() {
   piecesContainer.innerHTML = '';
@@ -258,25 +343,32 @@ function endTurn() {
   if (!roomID || !lastRoomData || lastRoomData.currentTurn !== myUid) return;
 
   const nextStep = (lastRoomData.roundStep || 0) + 1;
-  const piecesIdx = currentPieces.map(p => (p ? SHAPES.indexOf(p) : -1));
+  const piecesData = currentPieces.map(p => (p ? { s: p.shapeIndex, c: p.colorIndex } : -1));
 
   const updates = {
     currentTurn: opponentUid,
     roundStep: nextStep,
     grid: grid,
     [`players/${myUid}/score`]: score,
-    [`players/${myUid}/pieces`]: piecesIdx,
+    [`players/${myUid}/pieces`]: piecesData,
   };
 
   if (nextStep >= 2 && lastRoomData.leaderId === myUid) {
-    const p1 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
-    const p2 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
+    const p1 = Array.from({ length: 3 }, () => ({
+      s: Math.floor(Math.random() * SHAPES.length),
+      c: Math.floor(Math.random() * BLOCK_COLORS.length)
+    }));
+    const p2 = Array.from({ length: 3 }, () => ({
+      s: Math.floor(Math.random() * SHAPES.length),
+      c: Math.floor(Math.random() * BLOCK_COLORS.length)
+    }));
     updates.roundStep = 0;
     updates[`players/${myUid}/pieces`] = p1;
     updates[`players/${opponentUid}/pieces`] = p2;
   }
 
   updateRoom(roomID, updates);
+
 }
 
 // ─────────────────────────────────────────────
@@ -338,15 +430,23 @@ function spawnPieces() {
   piecesContainer.innerHTML = '';
   currentPieces = [];
   for (let i = 0; i < 3; i++) {
-    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-    currentPieces.push(shape);
-    piecesContainer.appendChild(createPieceSlot(i, shape));
+    const sIdx = Math.floor(Math.random() * SHAPES.length);
+    const cIdx = Math.floor(Math.random() * BLOCK_COLORS.length);
+    const pieceInstance = {
+      ...SHAPES[sIdx],
+      color: BLOCK_COLORS[cIdx],
+      shapeIndex: sIdx,
+      colorIndex: cIdx
+    };
+    currentPieces.push(pieceInstance);
+    piecesContainer.appendChild(createPieceSlot(i, pieceInstance));
   }
   // En mode confrontation, la vérification est centralisée dans setupMultiplayer
   if (gameMode !== 'confrontation') {
     checkGameOver();
   }
 }
+
 
 function createPieceSlot(index, shape) {
   const slot = document.createElement('div');
@@ -860,8 +960,14 @@ async function startRematch() {
   timerStarted = false;
 
   // Générer nouvelles pièces
-  const p1 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
-  const p2 = Array.from({ length: 3 }, () => Math.floor(Math.random() * SHAPES.length));
+  const p1 = Array.from({ length: 3 }, () => ({
+    s: Math.floor(Math.random() * SHAPES.length),
+    c: Math.floor(Math.random() * BLOCK_COLORS.length)
+  }));
+  const p2 = Array.from({ length: 3 }, () => ({
+    s: Math.floor(Math.random() * SHAPES.length),
+    c: Math.floor(Math.random() * BLOCK_COLORS.length)
+  }));
 
   // Mettre à jour Firebase
   await updateRoom(roomID, {

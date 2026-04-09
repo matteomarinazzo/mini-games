@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Punch Reflex – Teste tes réflexes | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex">
+
+    <meta name="description"
+        content="Entraîne tes réflexes avec l'octogone de vitesse. Modes Chrono et Survie. Compare tes records mondiaux.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body>
+
+    <!-- Back to menu -->
+    <a href="index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-item">
+            <div class="label" id="hudLabel1">SCORE</div>
+            <div class="value" id="hudVal1">0</div>
+        </div>
+        <div class="hud-item hud-center">
+            <div class="label" id="hudTimerLabel">TEMPS</div>
+            <div class="value hud-timer" id="hudTimer">--</div>
+        </div>
+        <div class="hud-item">
+            <div class="label" id="hudLabel2">COMBO</div>
+            <div class="value" id="hudVal2">x0</div>
+        </div>
+    </div>
+
+    <!-- History Button -->
+    <button class="pause-btn" id="historyBtn" style="right: 58px;" title="Historique">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="12 8 12 12 14 14" />
+            <path d="M3.05 11a9 9 0 1 1 .5 4" />
+            <polyline points="3 16 3 11 8 11" />
+        </svg>
+    </button>
+
+    <!-- Records Button -->
+    <button class="pause-btn" id="recordsBtn" style="right: 12px;" title="Records">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+    </button>
+
+    <!-- Game Area -->
+    <div class="game-area" id="gameArea">
+
+        <!-- Mode Badge -->
+        <div class="mode-badge" id="modeBadge">CHRONO 30s</div>
+
+        <!-- Octogone -->
+        <div class="octagon-wrapper" id="octagonWrapper">
+            <div class="octagon-bg"></div>
+            <!-- 8 cercles sur les sommets (0=haut, 1=haut-droite, 2=droite ... 7=haut-gauche) + 1 centre -->
+            <div class="oct-node" id="node0" data-index="0"></div>
+            <div class="oct-node" id="node1" data-index="1"></div>
+            <div class="oct-node" id="node2" data-index="2"></div>
+            <div class="oct-node" id="node3" data-index="3"></div>
+            <div class="oct-node" id="node4" data-index="4"></div>
+            <div class="oct-node" id="node5" data-index="5"></div>
+            <div class="oct-node" id="node6" data-index="6"></div>
+            <div class="oct-node" id="node7" data-index="7"></div>
+            <div class="oct-node center-node" id="node8" data-index="8"></div>
+        </div>
+
+        <!-- Ready Overlay -->
+        <div id="readyOverlay" class="ready-overlay" style="display:none;">
+            <div class="ready-text">TAPER POUR COMMENCER</div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="stats-bar">
+            <div class="stat-pill">
+                <span class="sp-label">PEAK</span>
+                <span class="sp-value" id="statPeak">—</span>
+            </div>
+            <div class="stat-pill">
+                <span class="sp-label">MOY.</span>
+                <span class="sp-value" id="statAvg">—</span>
+            </div>
+            <div class="stat-pill">
+                <span class="sp-label">ERREURS</span>
+                <span class="sp-value" id="statErrors">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ OVERLAY — Début de partie ══ -->
+    <div class="game-overlay" id="startOverlay" style="display:flex;">
+        <div class="overlay-content start-popup">
+            <div class="start-icon">🥊</div>
+            <h2 id="startTitle">CHRONO 30s</h2>
+            <p class="start-desc" id="startDesc">Frappe les cercles allumés le plus vite possible !</p>
+            <div class="start-rules">
+                <div class="rule-row"><span class="rule-icon good">●</span><span>Cible active = frappe !</span></div>
+                <div class="rule-row"><span class="rule-icon bad">●</span><span>Mauvaise cible = pénalité</span></div>
+                <div class="rule-row"><span class="rule-icon combo">🔥</span><span>Combo = bonus de score</span></div>
+            </div>
+            <button class="btn-primary" id="startBtn">PRÊT ? GO !</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Fin de partie ══ -->
+    <div class="game-overlay" id="endOverlay" style="display:none;">
+        <div class="overlay-content end-popup">
+            <div class="end-trophy" id="endTrophy">🎯</div>
+            <h2 id="endTitle">Partie terminée</h2>
+            <div class="end-stats" id="endStats"></div>
+            <div class="record-rows" id="endRecordRows"></div>
+            <button class="btn-primary" id="replayBtn">REJOUER</button>
+            <button class="btn-secondary" id="menuBtn" style="margin-top:8px;">Changer de mode</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Record battu ══ -->
+    <div class="game-overlay" id="recordOverlay" style="display:none;">
+        <div class="overlay-content record-popup">
+            <div class="record-badge" id="recordBadge">🏆</div>
+            <h2 id="recordTitle">Nouveau Record !</h2>
+            <div class="record-details" id="recordDetails"></div>
+
+            <div id="messageWrap" style="display:none; margin: 15px 0;">
+                <p style="font-size: 11px; color: var(--dim); margin-bottom: 8px; font-family: var(--font-mono);">Laisse
+                    un message sur le leaderboard :</p>
+                <input type="text" id="recordMsgInput" maxlength="50" placeholder="Ton message..."
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-mono); font-size: 13px; text-align: center;">
+                <div id="recordCharCounter"
+                    style="font-size: 9px; color: var(--dim); text-align: right; margin-top: 4px; font-family: var(--font-mono);">
+                    0/50</div>
+            </div>
+
+            <button class="btn-primary" id="saveRecordBtn">Continuer</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Records ══ -->
+    <div class="game-overlay" id="recordsOverlay" style="display:none;">
+        <div class="overlay-content records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-tab="chrono">Chrono</button>
+                <button class="mode-tab" data-tab="survie">Survie</button>
+            </div>
+
+            <section class="records-section">
+                <h3>👤 Mes Records</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label" id="recPersonalScoreLabel">Meilleur score</span>
+                        <span class="rc-value" id="recPersonalScore">—</span>
+                    </div>
+                    <div class="record-card">
+                        <span class="rc-label">Réaction moyenne</span>
+                        <span class="rc-value" id="recPersonalAvg">—</span>
+                    </div>
+                    <div class="record-card">
+                        <span class="rc-label">Réaction peak</span>
+                        <span class="rc-value" id="recPersonalPeak">—</span>
+                    </div>
+                    <div class="record-card">
+                        <span class="rc-label">Parties jouées</span>
+                        <span class="rc-value" id="recPersonalGames">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Records Mondiaux</h3>
+                <div class="record-grid">
+                    <div class="record-card global">
+                        <span class="rc-label" id="recGlobalBestLabel">Record mondial</span>
+                        <span class="rc-value" id="recGlobalBest">—</span>
+                    </div>
+                    <div class="record-card global">
+                        <span class="rc-label" id="recGlobalAvgLabel">Moyenne mondiale</span>
+                        <span class="rc-value" id="recGlobalAvg">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="connection-status" id="recStatus">Records locaux uniquement</div>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Historique ══ -->
+    <div class="game-overlay" id="historyOverlay" style="display:none;">
+        <div class="overlay-content history-modal">
+            <button class="modal-close" id="historyClose">✕</button>
+            <h2 class="records-title">⏱ Historique</h2>
+            <div class="history-stats" id="historyStats"></div>
+            <div class="history-list" id="historyList"></div>
+            <button class="btn-secondary" id="historyClear">Effacer l'historique</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+
+</body>
+
+</html>

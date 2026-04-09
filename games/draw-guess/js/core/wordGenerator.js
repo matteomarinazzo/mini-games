@@ -1,5 +1,6 @@
-const GROQ_API_KEY = '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';
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+import { getSecret } from '../../../../js/utils/secretManager.js';
+
+
 
 const recentWords = []; // historique de la session
 
@@ -38,6 +39,9 @@ const FALLBACK_WORDS = [
 
 export async function generateWord() {
     try {
+        const GROQ_API_KEY = await getSecret('GROQ_API_KEY');
+        const GROQ_URL = await getSecret('GROQ_URL');
+
         const exclusions = recentWords.length > 0
             ? `\nEXPRESSIONS DÉJÀ UTILISÉES À ÉVITER : ${recentWords.join(', ')}.`
             : '';

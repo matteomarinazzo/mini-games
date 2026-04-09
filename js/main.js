@@ -13,6 +13,8 @@ import {
 
 
 var games = {};
+let categoriesData = {};
+let currentFilter = 'Tout';
 
 fetch("./assets/data/games.json")
   .then((res) => {
@@ -20,7 +22,16 @@ fetch("./assets/data/games.json")
     return res.json();
   })
   .then(async (data) => {
-    games = data;
+    categoriesData = data;
+    games = {};
+    for (const [catName, catGames] of Object.entries(data)) {
+      for (const [gameId, game] of Object.entries(catGames)) {
+        games[gameId] = game;
+        games[gameId].category = catName;
+      }
+    }
+
+    initCategoryFilters();
     generateGameCards();
 
     // On lance la vérification initiale
@@ -62,49 +73,150 @@ function initRandomGameButton() {
   });
 }
 
+function initCategoryFilters() {
+  const searchBar = document.querySelector('.search-bar');
+  if (!searchBar) return;
+
+  let filterContainer = document.querySelector('.category-filters');
+  if (!filterContainer) {
+    filterContainer = document.createElement('div');
+    filterContainer.className = 'category-filters';
+    filterContainer.style.display = 'flex';
+    filterContainer.style.flexWrap = 'wrap';
+    filterContainer.style.gap = '10px';
+    filterContainer.style.justifyContent = 'center';
+    filterContainer.style.marginBottom = '30px';
+    searchBar.insertAdjacentElement('afterend', filterContainer);
+  }
+
+  filterContainer.innerHTML = '';
+
+  const createFilterButton = (labelTxt, value) => {
+    const label = document.createElement('label');
+    label.className = 'cat-filter-label';
+    label.style.cursor = 'pointer';
+    label.style.padding = '8px 16px';
+    label.style.borderRadius = '20px';
+    label.style.background = value === currentFilter ? 'var(--primary, #667eea)' : 'rgba(255, 255, 255, 0.1)';
+    label.style.color = '#fff';
+    label.style.fontWeight = 'bold';
+    label.style.border = value === currentFilter ? '2px solid rgba(255, 255, 255, 0.5)' : '2px solid transparent';
+    label.style.transition = 'all 0.3s';
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'catFilter';
+    radio.value = value;
+    radio.checked = (value === currentFilter);
+    radio.style.display = 'none';
+
+    radio.addEventListener('change', (e) => {
+      currentFilter = e.target.value;
+      document.querySelectorAll('.cat-filter-label').forEach(lbl => {
+        lbl.style.background = 'rgba(255, 255, 255, 0.1)';
+        lbl.style.border = '2px solid transparent';
+      });
+      label.style.background = 'var(--primary, #667eea)';
+      label.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+      generateGameCards();
+    });
+
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(labelTxt));
+    filterContainer.appendChild(label);
+  };
+
+  createFilterButton('Tout', 'Tout');
+
+  if (getLikedGames().length > 0) {
+    createFilterButton('❤️ Favoris', 'Favoris');
+  }
+
+  for (const catName of Object.keys(categoriesData)) {
+    createFilterButton(catName, catName);
+  }
+}
+
 // Générer les cartes de jeux dynamiquement
 function generateGameCards() {
-  const gamesGrid = document.querySelector(".games-grid");
+  const gamesGrid = document.querySelector("#mainGamesGrid");
   if (!gamesGrid) return;
 
-  // Supprimer toutes les cartes existantes sauf "Bientôt"
-  const existingCards = document.querySelectorAll(
-    ".game-card:not(.random-game)",
+  const existingElements = document.querySelectorAll(
+    "#mainGamesGrid .game-card, #mainGamesGrid .category-header"
   );
-  existingCards.forEach((card) => card.remove());
+  existingElements.forEach((el) => el.remove());
 
-  // Trier les jeux : Liked d'abord (du plus récent au plus ancien)
-  const likedList = getLikedGames(); // [ancien, ..., récent]
-  const sortedGames = Object.entries(games).sort(([idA], [idB]) => {
-    const idxA = likedList.indexOf(idA);
-    const idxB = likedList.indexOf(idB);
-    const isLikedA = idxA > -1;
-    const isLikedB = idxB > -1;
+  const likedList = getLikedGames();
 
-    if (isLikedA && !isLikedB) return -1;
-    if (!isLikedA && isLikedB) return 1;
-    if (isLikedA && isLikedB) {
-      // Les deux sont likés : le plus récent (index plus élevé) vient en premier
-      return idxB - idxA;
+  const addCardToGrid = (card) => {
+    gamesGrid.appendChild(card);
+  };
+
+  const addHeader = (title) => {
+    // Le grid-column: 1 / -1 est ajouté car ces headers existent à l'intérieur de mainGamesGrid.
+    const headerHTML = `
+    <div class="category-header"
+      style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; margin: 20px auto 20px; width: 100%; gap: 20px;">
+      <div
+        style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
+      </div>
+      <span
+        style="color: #fff; font-size: 1.4em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); white-space: nowrap;">${title}</span>
+      <div
+        style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
+      </div>
+    </div>`;
+
+    gamesGrid.insertAdjacentHTML('beforeend', headerHTML);
+  };
+
+  const addSpacer = () => {
+    const spacer = document.createElement('div');
+    spacer.className = 'game-card hidden-spacer';
+    spacer.style.visibility = 'hidden';
+    spacer.style.pointerEvents = 'none';
+    gamesGrid.appendChild(spacer);
+  };
+
+  if (currentFilter === 'Tout' || currentFilter === 'Favoris') {
+    const myLikedGames = likedList.filter(id => games[id]);
+    if (myLikedGames.length > 0) {
+      addHeader('❤️ Favoris');
+      let count = 0;
+      [...myLikedGames].reverse().forEach(gameId => {
+        addCardToGrid(createGameCard(gameId, games[gameId]));
+        count++;
+      });
+      if (count % 2 !== 0 && currentFilter === 'Tout') {
+        addSpacer();
+      }
     }
-    return 0; // Garde l'ordre JSON sinon
-  });
+  }
 
-  // Créer une carte pour chaque jeu
-  sortedGames.forEach(([gameId, game]) => {
-    const gameCard = createGameCard(gameId, game);
-    gamesGrid.insertBefore(
-      gameCard,
-      document.querySelector(".game-card.random-game"),
-    );
-  });
+  for (const [catName, catGames] of Object.entries(categoriesData)) {
+    if (currentFilter !== 'Tout' && currentFilter !== catName) continue;
+    if (currentFilter === 'Favoris') continue;
 
-  // Mettre à jour le compteur de jeux
+    addHeader(catName);
+
+    let count = 0;
+    Object.entries(catGames).forEach(([gameId, game]) => {
+      addCardToGrid(createGameCard(gameId, game));
+      count++;
+    });
+
+    if (count % 2 !== 0 && currentFilter === 'Tout') {
+      addSpacer();
+    }
+  }
+
   localStorage.setItem("gamesAvailableCount", Object.keys(games).length);
-  document.getElementById("gamesNumber").innerText = Object.keys(games).length;
+  const gamesNumberEl = document.getElementById("gamesNumber");
+  if (gamesNumberEl) gamesNumberEl.innerText = Object.keys(games).length;
 
-  // Réinitialiser les événements des cartes
   initGameCards();
+  filterGames();
 }
 
 // Créer une carte de jeu avec la structure HTML exacte
@@ -198,8 +310,8 @@ function initGameCards() {
         e.stopPropagation();
         const liked = toggleLikeGame(gameId);
         heartBtn.classList.toggle("liked", liked);
-        // On ne force pas le re-sort immédiat pour éviter que la carte saute
-        // Mais on prévient pour le prochain chargement
+        // On met à jour les filtres (par ex. pour afficher "Favoris" si 1er favori)
+        initCategoryFilters();
       });
     }
 
@@ -341,41 +453,48 @@ function filterGames() {
     .value.toLowerCase()
     .trim();
 
-  const gameCards = document.querySelectorAll(".game-card");
-
   const isMobile = window.matchMedia("(max-aspect-ratio: 1/1)").matches;
+  const gamesGrid = document.querySelector("#mainGamesGrid");
+  if (!gamesGrid) return;
 
-  let visibleCount = 0;
+  let currentHeader = null;
+  let currentCategoryHasVisibleCards = false;
 
-  gameCards.forEach((card) => {
-    const title =
-      card.querySelector(".card-title")?.textContent.toLowerCase() || "";
-    const desc =
-      card.querySelector(".card-description")?.textContent.toLowerCase() || "";
-    const tags = card.dataset.tags || "";
-
-    const match =
-      query === "" ||
-      title.includes(query) ||
-      desc.includes(query) ||
-      tags.includes(query);
-
-    if (match) {
-      card.classList.remove("is-hidden", "is-hidden-desktop");
-      visibleCount++;
-    } else {
-      if (isMobile) {
-        card.classList.add("is-hidden");
-        card.classList.remove("is-hidden-desktop");
-      } else {
-        card.classList.add("is-hidden-desktop");
-        card.classList.remove("is-hidden");
+  Array.from(gamesGrid.children).forEach((el) => {
+    if (el.classList.contains('category-header')) {
+      if (currentHeader) {
+        currentHeader.style.display = currentCategoryHasVisibleCards ? 'flex' : 'none';
       }
+      currentHeader = el;
+      currentCategoryHasVisibleCards = false;
+    } else if (el.classList.contains('game-card') && !el.classList.contains('random-game') && !el.classList.contains('hidden-spacer')) {
+      const card = el;
+      const title = card.querySelector(".card-title")?.textContent.toLowerCase() || "";
+      const desc = card.querySelector(".card-description")?.textContent.toLowerCase() || "";
+      const tags = card.dataset.tags || "";
+
+      const match = query === "" || title.includes(query) || desc.includes(query) || tags.includes(query);
+
+      if (match) {
+        card.classList.remove("is-hidden", "is-hidden-desktop");
+        currentCategoryHasVisibleCards = true;
+      } else {
+        if (isMobile) {
+          card.classList.add("is-hidden");
+          card.classList.remove("is-hidden-desktop");
+        } else {
+          card.classList.add("is-hidden-desktop");
+          card.classList.remove("is-hidden");
+        }
+      }
+    } else if (el.classList.contains('hidden-spacer')) {
+      el.style.display = (query === "") ? '' : 'none';
     }
   });
 
-  // ❌ on ne touche PLUS aux stats globales
-  // donc on ne modifie PAS gamesNumber ici
+  if (currentHeader) {
+    currentHeader.style.display = currentCategoryHasVisibleCards ? 'flex' : 'none';
+  }
 }
 
 async function displayAppVersion() {

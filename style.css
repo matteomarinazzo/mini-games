@@ -108,7 +108,7 @@ body {
    CONTAINER
 ======================================== */
 .container {
-  max-width: 1200px;
+  max-width: 90%;
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
@@ -314,9 +314,11 @@ body {
 .games-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  justify-content: center;
   gap: 30px;
   margin-bottom: 80px;
 }
+
 
 /* ========================================
    GAME CARD
@@ -330,7 +332,11 @@ body {
   transition: var(--transition);
   animation: fadeInUp 0.6s ease-out both;
   position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
+
 
 .game-card.is-hidden-desktop {
   display: none;
@@ -854,6 +860,10 @@ body {
     font-size: 14px;
   }
 
+  .category-filters {
+    display: none !important;
+  }
+
   /* ========================================
      FOOTER
   ======================================== */
@@ -959,4 +969,44 @@ body {
   align-items: center;
   justify-content: center;
   transition: opacity 0.3s ease;
+}
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent) 0%, var(--danger) 100%);
+  background-clip: content-box;
+}
+
+/* ========================================
+   RANDOM SECTION SIZING
+======================================== */
+.random-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 80px;
+  width: 100%;
+}
+
+.game-card.random-game {
+  animation-delay: 0.5s;
 }

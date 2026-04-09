@@ -329,14 +329,29 @@
         randomBtn.onclick = async () => {
             try {
                 const res = await fetch("../assets/data/games.json");
-                const games = await res.json();
-                const gameIds = Object.keys(games).filter(id => games[id].path);
-                const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
-                const game = games[randomId];
+                const data = await res.json();
 
-                // On redirige vers le jeu aléatoire (si online ok, sinon on reviendra ici via le launcher)
-                window.location.href = `../${game.path.replace('./', '')}`;
+                // On aplatit les catégories pour avoir une liste de tous les jeux
+                const allGames = [];
+                for (const catName in data) {
+                    for (const gameId in data[catName]) {
+                        allGames.push({
+                            id: gameId,
+                            ...data[catName][gameId]
+                        });
+                    }
+                }
+
+                if (allGames.length === 0) return;
+
+                const randomGame = allGames[Math.floor(Math.random() * allGames.length)];
+
+                // On redirige vers le jeu aléatoire
+                if (randomGame.path) {
+                    window.location.href = `../${randomGame.path.replace('./', '')}`;
+                }
             } catch (e) {
+                console.error("Erreur Jeu Aléatoire:", e);
                 window.location.href = '../index.html';
             }
         };

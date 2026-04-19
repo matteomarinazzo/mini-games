@@ -179,42 +179,148 @@ window.addEventListener('offline', refreshStatus);
 window.addEventListener('load', refreshStatus);
 
 // Lancement
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startStats);
-} else {
-  startStats();
-}
+//if (document.readyState === 'loading') {
+//  document.addEventListener('DOMContentLoaded', startStats);
+//} else {
+//  startStats();
+//}
 
 /**
  * ANIMATIONS DE LA PAGE
  */
+/* =============================================
+   AJOUTER CE CODE dans about.js
+   (remplace ou complète initScrollAnimations)
+   ============================================= */
+
+/**
+ * SCROLL ANIMATIONS — Observer global
+ * Active .is-visible sur sections, timeline, tech-cards, stat-boxes
+ */
 function initScrollAnimations() {
-  const sections = document.querySelectorAll(".content-section");
+  const targets = document.querySelectorAll(
+    '.content-section, .timeline-item, .tech-card, .stat-box'
+  );
+
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+    entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.opacity = "1";
-        entry.target.style.transform = "translateY(0)";
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+  }, {
+    threshold: 0.08,
+    rootMargin: '0px 0px -40px 0px'
+  });
 
-  sections.forEach((section) => {
-    section.style.opacity = "0";
-    section.style.transform = "translateY(30px)";
-    section.style.transition = "all 0.6s ease-out";
-    observer.observe(section);
+  targets.forEach(el => observer.observe(el));
+}
+
+/**
+ * BARRE DE PROGRESSION SCROLL
+ */
+function initScrollProgress() {
+  const bar = document.createElement('div');
+  bar.className = 'scroll-progress';
+  document.body.appendChild(bar);
+
+  window.addEventListener('scroll', () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = total > 0 ? (window.scrollY / total) * 100 : 0;
+    bar.style.width = progress + '%';
+  }, { passive: true });
+}
+
+/**
+ * PARALLAXE LEGÈRE SUR LES BLOBS
+ */
+function initParallax() {
+  const blobs = document.querySelectorAll('.blob');
+  if (!blobs.length) return;
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    blobs[0] && (blobs[0].style.transform = `translate(${y * 0.04}px, ${y * 0.02}px) scale(1)`);
+    blobs[1] && (blobs[1].style.transform = `translate(${-y * 0.03}px, ${y * 0.015}px) scale(1)`);
+    blobs[2] && (blobs[2].style.transform = `translate(${y * 0.02}px, ${-y * 0.025}px) scale(1)`);
+  }, { passive: true });
+}
+
+/**
+ * SPOTLIGHT CURSOR
+ */
+function initSpotlight() {
+  const spotlight = document.createElement('div');
+  spotlight.className = 'spotlight';
+  document.body.appendChild(spotlight);
+
+  let mx = window.innerWidth / 2;
+  let my = window.innerHeight / 2;
+  let cx = mx, cy = my;
+
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+  }, { passive: true });
+
+  // Lerp doux
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animate() {
+    cx = lerp(cx, mx, 0.08);
+    cy = lerp(cy, my, 0.08);
+    spotlight.style.left = cx + 'px';
+    spotlight.style.top = cy + 'px';
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+/**
+ * MAGNETIC TECH CARDS — effet repousse/attire
+ * Le gradient radial suit le curseur sur chaque card
+ */
+function initMagneticCards() {
+  document.querySelectorAll('.tech-card, .stat-box').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      card.style.setProperty('--mx', x + '%');
+      card.style.setProperty('--my', y + '%');
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--mx', '50%');
+      card.style.setProperty('--my', '50%');
+    });
   });
 }
 
+/**
+ * TRANSITION BACK BUTTON
+ */
 function addBackButtonTransition() {
-  const backBtn = document.querySelector(".back-btn");
-  if (backBtn) {
-    backBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      document.body.style.opacity = "0";
-      document.body.style.transition = "opacity 0.3s ease-out";
-      setTimeout(() => { window.location.href = backBtn.href; }, 300);
-    });
-  }
+  const backBtn = document.querySelector('.back-btn');
+  if (!backBtn) return;
+
+  backBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.4s ease-out';
+    setTimeout(() => { window.location.href = backBtn.href; }, 400);
+  });
 }
+
+// Lancer au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  initScrollAnimations();
+  initScrollProgress();
+  initParallax();
+  initSpotlight();
+  initMagneticCards();
+  addBackButtonTransition();
+  startStats();
+});

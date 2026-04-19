@@ -26,8 +26,8 @@
         "🧠 Stratégie",
         "👥 Multijoueur"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "adventure",
+      "badgeText": "Aventure",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
@@ -44,8 +44,8 @@
         "🎮 Jeux",
         "👤 Solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "popular",
+      "badgeText": "Populaire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -60,8 +60,8 @@
         "🎮 Jeux",
         "👤 Solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "fun",
+      "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
@@ -102,7 +102,7 @@
       "path": "./games/lights-out-reflex/index.html",
       "name": "Lights Out Reflex",
       "emoji": "🎯",
-      "description": "Teste tes réflexes ! ",
+      "description": "Inspiré par les départs de Formule 1 : attendez l'extinction des feux et réagissez le plus vite possible pour battre le record !",
       "tags": [
         "⚡ Arcade",
         "🎯 Réflexes",
@@ -141,8 +141,8 @@
         "🧩 Réflexion",
         "👤 Solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "brain",
+      "badgeText": "Casse-tête",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -270,8 +270,8 @@
         "🎮 Clicker",
         "👤 Solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "popular",
+      "badgeText": "Populaire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }

@@ -836,47 +836,38 @@ h1 {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    /* Ou ta couleur de fond */
   }
 
+  /* ── Symbol selection container ── */
   .symbol-selection {
     height: auto;
     max-height: 95vh;
-    /* Limite la hauteur globale */
     width: 95%;
     margin: 2.5vh auto;
     overflow-y: auto;
-    /* Active le scroll interne */
-
     display: flex;
     flex-direction: column;
-
-    /* Le secret est ici : */
     padding: var(--space-md);
     padding-bottom: 10px;
-    /* Le bouton s'arrêtera pile à 10px du bord blanc */
     box-sizing: border-box;
-
     position: relative;
-    /* Référentiel pour le sticky */
   }
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     margin-bottom: 5px;
   }
 
   .subtitle {
-    font-size: 1rem;
+    font-size: 0.85rem;
     margin-bottom: var(--space-md);
     text-align: center;
   }
 
+  /* ── Players stacked vertically ── */
   .players-container {
     display: flex;
     flex-direction: column;
-    /* Empile les joueurs verticalement */
     width: 100%;
     gap: 10px;
   }
@@ -897,17 +888,16 @@ h1 {
   }
 
   .player-icon {
-    width: 12vw;
-    max-width: 50px;
-    height: 12vw;
-    max-height: 50px;
-    font-size: 3vw;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
   }
 
   .player-header h2 {
-    font-size: 3vw;
+    font-size: 15px;
   }
 
+  /* ── Symbol grid ── */
   .symbol-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -916,8 +906,8 @@ h1 {
   }
 
   .symbol-option {
-    font-size: clamp(16px, 12vw, 60px);
-    min-height: 60px;
+    font-size: 28px;
+    min-height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -930,19 +920,20 @@ h1 {
   }
 
   .custom-symbol span {
-    font-size: 2.8vw;
+    font-size: 13px;
   }
 
   .custom-symbol p {
-    font-size: 2.6vw;
+    font-size: 11px;
   }
 
   .custom-preview {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     margin: 5px auto;
   }
 
+  /* ── Selected display ── */
   .selected-display {
     display: flex;
     align-items: center;
@@ -951,30 +942,31 @@ h1 {
   }
 
   .selected-display .preview {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .selected-display .label {
-    font-size: 2.6vw;
+    font-size: 10px;
   }
 
   .vs-divider {
     display: none;
   }
 
+  /* ── Start button ── */
   .start-button {
-    font-size: 3vw;
+    font-size: 14px;
     width: 100%;
-    padding: 15px;
-    margin-top: 20px;
+    padding: 14px;
+    margin-top: 16px;
     position: sticky;
     bottom: 0;
-    /* Colle au bas du scroll */
     z-index: 10;
   }
 
+  /* ── Settings panel ── */
   .param-group {
-    padding: 20px;
+    padding: 16px;
     margin-bottom: var(--space-md);
   }
 
@@ -991,18 +983,19 @@ h1 {
     backdrop-filter: blur(10px);
   }
 
+  /* ── Top menu bar ── */
   #menuOptions {
-    top: 10px;
-    padding: 6px;
-    gap: 6px;
-    width: calc(100% - 5vw);
+    top: 8px;
+    padding: 5px;
+    gap: 5px;
+    width: calc(100% - 16px);
     justify-content: center;
   }
 
   #menuOptions button {
     width: 100%;
-    padding: 8px 12px;
-    font-size: 3vw;
+    padding: 8px 10px;
+    font-size: 12px;
     flex: 1;
     min-width: 0;
   }
@@ -1012,6 +1005,7 @@ h1 {
     flex: 0 0 auto;
   }
 
+  /* ── Full-screen settings menu ── */
   #menuParams {
     position: fixed;
     top: 0;
@@ -1022,34 +1016,35 @@ h1 {
     height: 100%;
     border-radius: 0;
     margin: 0;
-    padding: 80px 20px 30px;
+    padding: 60px 16px 24px;
     max-height: 100vh;
     z-index: 1000;
+    overflow-y: auto;
   }
 
   #menuParams h3 {
-    font-size: 3.2vw;
+    font-size: 16px;
     margin-bottom: var(--space-lg);
   }
 
   #menuParams label,
   #menuParams p {
-    font-size: 30px;
+    font-size: 14px;
   }
 
   #menuParams span {
-    font-size: 2.8vw;
+    font-size: 13px;
   }
 
   #menuParams button {
-    font-size: 30px;
-    padding: 30px;
+    font-size: 14px;
+    padding: 14px;
     margin-top: var(--space-md);
   }
 
   #menuParams .radio-label {
-    font-size: 24px;
-    padding: 16px 20px;
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 

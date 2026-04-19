@@ -1,5 +1,5 @@
 // standard3x3AI.js
-import { gameConfig } from "../utils/shared-config.js";
+import { gameConfig } from "../ctrl/gameCtrl.js";
 
 /**
  * IA pour morpion 3x3
@@ -137,7 +137,7 @@ function minimax(board, aiPlayer, humanPlayer, winPatterns) {
 
   // Choisir le meilleur coup
   let bestMove;
-  bestMove = moves.reduce((best, move) => 
+  bestMove = moves.reduce((best, move) =>
     move.score > best.score ? move : best
   );
 
@@ -177,11 +177,11 @@ function minimaxHelper(board, player, aiPlayer, humanPlayer, winPatterns) {
 
   let bestMove;
   if (player === aiPlayer) {
-    bestMove = moves.reduce((best, move) => 
+    bestMove = moves.reduce((best, move) =>
       move.score > best.score ? move : best
     );
   } else {
-    bestMove = moves.reduce((best, move) => 
+    bestMove = moves.reduce((best, move) =>
       move.score < best.score ? move : best
     );
   }

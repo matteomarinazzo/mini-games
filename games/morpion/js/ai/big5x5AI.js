@@ -1,5 +1,5 @@
 // big5x5AI.js
-import { gameConfig } from "../utils/shared-config.js";
+import { gameConfig } from "../ctrl/gameCtrl.js";
 
 /**
  * IA pour morpion 5x5 (but: aligner 4 cases)

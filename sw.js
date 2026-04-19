@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.13.2026-04-09";
+const CACHE_NAME = "mini-games-cache-v1.14.2026-04-19";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -101,18 +101,12 @@ const ASSETS_TO_CACHE = [
 
     // Game: morpion
     'games/morpion/index.html',
-    'games/morpion/views/standard3x3.html',
-    'games/morpion/views/big5x5.html',
-    'games/morpion/views/ultimate.html',
+    'games/morpion/game.html',
     'games/morpion/css/style.css',
-    'games/morpion/css/3x3.css',
-    'games/morpion/css/5x5.css',
-    'games/morpion/css/ultimate.css',
+    'games/morpion/css/game.css',
     'games/morpion/js/ctrl/mainCtrl.js',
+    'games/morpion/js/ctrl/gameCtrl.js',
     'games/morpion/js/ctrl/symbolsChoiceCtrl.js',
-    'games/morpion/js/modes/standard3x3.js',
-    'games/morpion/js/modes/big5x5.js',
-    'games/morpion/js/modes/ultimate.js',
     'games/morpion/js/ai/standard3x3AI.js',
     'games/morpion/js/ai/big5x5AI.js',
     'games/morpion/js/ai/ultimateAI.js',
@@ -336,6 +330,13 @@ self.addEventListener('fetch', (event) => {
 
             // 2. Sinon, on tente le réseau
             return fetch(event.request).then((response) => {
+                // Mise en cache dynamique des Google Fonts (CSS et polices)
+                if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                }
                 return response;
             }).catch(() => {
                 // 3. Fallback en cas de panne réseau totale

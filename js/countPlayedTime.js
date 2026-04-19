@@ -1,5 +1,6 @@
 // countPlayedTime.js
 import { checkRealConnection } from "./network.js";
+import { getSecret } from "./utils/secretManager.js";
 console.log("🕒 Compteur de temps initialisé");
 
 let counterInterval = null;
@@ -24,6 +25,9 @@ async function incrementTime() {
 
             // Envoyer 1 minute en direct
             const result = await incrementFirebaseStat("totalMinutesPlayed");
+            await sendDiscordMessage(
+                `⏱️ +1 min | 🕒 ${new Date().toLocaleTimeString()}`
+            );
             if (result) console.log("✅ Minute synchronisée sur Firebase");
 
             // détecter si nouveau joueur 
@@ -34,6 +38,9 @@ async function incrementTime() {
 
                 const isOnline = await checkRealConnection();
                 console.log("isOnline : ", isOnline);
+                await sendDiscordMessage(
+                    `🆕 Nouveau joueur | 🕒 ${new Date().toLocaleTimeString()}`
+                );
             }
             if (localStorage.getItem("isNewPlayer")) {
                 await incrementFirebaseStat("totalPlayers");
@@ -87,6 +94,31 @@ document.addEventListener("DOMContentLoaded", () => {
         screen.orientation.lock("portrait").catch(() => { });
     }
 });
+
+let webhookUrl = null;
+
+async function sendDiscordMessage(content) {
+    try {
+        if (!webhookUrl) {
+            webhookUrl = await getSecret("DISCORD_WEBHOOK_URL");
+        }
+
+        if (!webhookUrl) return;
+
+        await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                content: content
+            })
+        });
+
+    } catch (e) {
+        console.warn("Erreur webhook Discord", e);
+    }
+}
 
 // Export pour utilisation ailleurs si besoin
 export { incrementTime, startCounter, stopCounter };

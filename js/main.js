@@ -225,7 +225,8 @@ function createGameCard(gameId, game) {
   const card = document.createElement("div");
   card.className = "game-card";
   card.dataset.game = gameId;
-
+  card.dataset.category = (game.category || "").toLowerCase();
+  card.dataset.badge = (game.badgeText || "").toLowerCase();
   card.dataset.tags = game.tags.join(" ").toLowerCase();
 
   // Déterminer la couleur du bouton play en fonction du badge
@@ -472,8 +473,10 @@ function filterGames() {
       const title = card.querySelector(".card-title")?.textContent.toLowerCase() || "";
       const desc = card.querySelector(".card-description")?.textContent.toLowerCase() || "";
       const tags = card.dataset.tags || "";
+      const cat = card.dataset.category || "";
+      const badge = card.dataset.badge || "";
 
-      const match = query === "" || title.includes(query) || desc.includes(query) || tags.includes(query);
+      const match = query === "" || title.includes(query) || desc.includes(query) || tags.includes(query) || cat.includes(query) || badge.includes(query);
 
       if (match) {
         card.classList.remove("is-hidden", "is-hidden-desktop");
@@ -548,7 +551,25 @@ window.addEventListener('offline', refreshStatus);
 window.addEventListener('load', refreshStatus);
 document.addEventListener("input", (e) => {
   if (e.target.id === "searchInput") {
-    filterGames();
+    const query = e.target.value.trim();
+    if (query !== "" && currentFilter !== 'Tout') {
+      currentFilter = 'Tout';
+      // Mettre à jour l'UI des boutons
+      document.querySelectorAll('.cat-filter-label').forEach(lbl => {
+        lbl.style.background = 'rgba(255, 255, 255, 0.1)';
+        lbl.style.border = '2px solid transparent';
+      });
+      const toutLabel = Array.from(document.querySelectorAll('.cat-filter-label')).find(lbl => lbl.textContent.includes('Tout'));
+      if (toutLabel) {
+        toutLabel.style.background = 'var(--primary, #667eea)';
+        toutLabel.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+        const radio = toutLabel.querySelector('input');
+        if (radio) radio.checked = true;
+      }
+      generateGameCards(); // Va rappeler filterGames() à la fin
+    } else {
+      filterGames();
+    }
   }
 });
 
@@ -672,4 +693,97 @@ function toggleLikeGame(gameId) {
 
   localStorage.setItem("likedGames", JSON.stringify(liked));
   return isNowLiked;
+}
+
+// ─── SWIPE HORIZONTAL (MOBILE) ──────────────────────────────────────────────────
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  const touchEndX = e.changedTouches[0].screenX;
+  const touchEndY = e.changedTouches[0].screenY;
+
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+
+  // Si le balayage est horizontal et suffisamment long (swipe)
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 60) {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches || window.matchMedia("(max-aspect-ratio: 1/1)").matches;
+    if (!isMobile) return;
+
+    // Ne pas swiper si une recherche est en cours, car cela casserait le filtre global de la recherche
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && searchInput.value.trim() !== "") return;
+
+    // Récupérer la liste des catégories actuellement disponibles via les filtres générés
+    const filterLabels = Array.from(document.querySelectorAll('.cat-filter-label input')).map(input => input.value);
+    if (filterLabels.length === 0) return;
+
+    let currentIndex = filterLabels.indexOf(currentFilter);
+    if (currentIndex === -1) currentIndex = 0;
+
+    let newIndex = currentIndex;
+    let animationDirection = '';
+
+    if (deltaX > 0) {
+      // Swipe vers la droite -> Catégorie précédente
+      newIndex = currentIndex - 1;
+      if (newIndex < 0) newIndex = filterLabels.length - 1;
+      animationDirection = 'right';
+    } else {
+      // Swipe vers la gauche -> Catégorie suivante
+      newIndex = currentIndex + 1;
+      if (newIndex >= filterLabels.length) newIndex = 0;
+      animationDirection = 'left';
+    }
+
+    const newFilter = filterLabels[newIndex];
+    changeCategoryWithAnim(newFilter, animationDirection);
+  }
+});
+
+function changeCategoryWithAnim(newFilter, direction) {
+  currentFilter = newFilter;
+
+  // Mise à jour visuelle des labels (même s'ils sont cachés sur mobile, ça garde l'état propre)
+  document.querySelectorAll('.cat-filter-label').forEach(lbl => {
+    lbl.style.background = 'rgba(255, 255, 255, 0.1)';
+    lbl.style.border = '2px solid transparent';
+    const radio = lbl.querySelector('input');
+    if (radio && radio.value === currentFilter) {
+      lbl.style.background = 'var(--primary, #667eea)';
+      lbl.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+      radio.checked = true;
+    }
+  });
+
+  const grid = document.querySelector("#mainGamesGrid");
+  if (!grid) return;
+
+  // Animation de sortie courte
+  grid.style.transition = 'all 0.2s ease-out';
+  grid.style.opacity = '0';
+  grid.style.transform = direction === 'left' ? 'translateX(-30px)' : 'translateX(30px)';
+
+  setTimeout(() => {
+    // Régénérer les cartes
+    generateGameCards();
+
+    // Préparation pour l'entrée
+    grid.style.transition = 'none';
+    grid.style.transform = direction === 'left' ? 'translateX(30px)' : 'translateX(-30px)';
+
+    // Forcer le reflow du DOM pour appliquer le point de départ
+    void grid.offsetWidth;
+
+    // Animation d'entrée douce
+    grid.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    grid.style.opacity = '1';
+    grid.style.transform = 'translateX(0)';
+  }, 200);
 }

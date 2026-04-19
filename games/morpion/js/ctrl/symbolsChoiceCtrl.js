@@ -71,7 +71,7 @@ function updateGameTypeStatus() {
   document.querySelectorAll('input[name="gameType"]').forEach((radio) => {
     const label = radio.closest('.radio-label');
     const statusIndicator = label.querySelector('.status-indicator');
-    
+
     if (statusIndicator) {
       if (radio.checked) {
         statusIndicator.textContent = 'Actif';
@@ -316,5 +316,5 @@ document.getElementById("startBtn").addEventListener("click", () => {
   localStorage.setItem("morpionGameConfig", JSON.stringify(gameConfig));
 
   // Redirection
-  window.location.href = `./views/${gameConfig.gameType}.html`;
+  window.location.href = `game.html`;
 });

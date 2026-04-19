@@ -1,7 +1,18 @@
 {
-    "currentVersion": "1.13.2026-04-09",
-    "lastUpdate": "2026-04-09",
+    "currentVersion": "1.14.2026-04-19",
+    "lastUpdate": "2026-04-19",
     "history": [
+        {
+            "version": "1.14.2026-04-19",
+            "date": "2026-04-19",
+            "changes": [
+                "Refonte CSS menu et about",
+                "Musique stoppe quand page cachée",
+                "Changement de catégorie des jeux",
+                "Webhooks Discord pour les stats",
+                "Restauration du morpion"
+            ]
+        },
         {
             "version": "1.13.2026-04-09",
             "date": "2026-04-09",

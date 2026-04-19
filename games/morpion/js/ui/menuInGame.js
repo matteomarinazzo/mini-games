@@ -1,4 +1,4 @@
-import { resetGame } from "../utils/shared-config.js"
+import { resetGame } from "../ctrl/gameCtrl.js"
 
 const homeBtn = document.getElementById("homeBtn");
 const symbolBtn = document.getElementById("symbolBtn");
@@ -20,21 +20,16 @@ function onGoHome() {
   localStorage.removeItem("morpionGameConfig");
   localStorage.removeItem("morpionMode");
   localStorage.removeItem("morpionDifficulty")
-  window.location.href = "../../.././index.html";
+  window.location.href = "../../index.html";
 }
 
 function onSymbolBtn() {
   //localStorage.removeItem("morpionGameConfig");
   //localStorage.removeItem("morpionMode");
   //localStorage.removeItem("morpionDifficulty")
-  window.location.href = "../index.html";
+  window.location.href = "./index.html";
 }
 
 function onResetBtn() {
-  // Détecter si on est dans Ultimate ou Standard
-  if (typeof window.resetUltimateGame === 'function') {
-    window.resetUltimateGame();
-  } else {
-    resetGame();
-  }
+  resetGame();
 }

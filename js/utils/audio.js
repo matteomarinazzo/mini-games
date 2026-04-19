@@ -2572,5 +2572,42 @@ export function toggleGqMusic() {
     else stopGqMusic();
     return isMusicEnabled;
 }
-
 export function getGqMusicEnabled() { return isMusicEnabled; }
+
+// ─────────────────────────────────────────────
+// GESTION DE LA VISIBILITÉ DE LA PAGE
+// ─────────────────────────────────────────────
+const musicStates = {
+    music: false, bp: false, bs: false, lp: false, menu: false, casino: false, funfair: false, gq: false
+};
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        musicStates.music = musicRunning;
+        musicStates.bp = bpMusicRunning;
+        musicStates.bs = bsMusicRunning;
+        musicStates.lp = lpMusicRunning;
+        musicStates.menu = menuMusicRunning;
+        musicStates.casino = casinoMusicRunning;
+        musicStates.funfair = funfairMusicRunning;
+        musicStates.gq = gqMusicRunning;
+
+        stopMusic();
+        stopBpMusic();
+        stopBsMusic();
+        stopLpMusic();
+        stopMenuMusic();
+        stopCasinoMusic();
+        stopFunfairMusic();
+        stopGqMusic();
+    } else {
+        if (musicStates.music) startMusic();
+        if (musicStates.bp) startBpMusic();
+        if (musicStates.bs) startBsMusic();
+        if (musicStates.lp) startLpMusic();
+        if (musicStates.menu) startMenuMusic();
+        if (musicStates.casino) startCasinoMusic();
+        if (musicStates.funfair) startFunfairMusic();
+        if (musicStates.gq) startGqMusic();
+    }
+});

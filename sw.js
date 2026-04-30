@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.14.2026-04-19";
+const CACHE_NAME = "mini-games-cache-v1.15.2026-04-30";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -58,6 +58,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/geoquiz.webp',
     'assets/logos/where-am-i.webp',
     'assets/logos/punch-reflex.webp',
+    'assets/logos/rocketeer.webp',
 
     // About
     'about/about.html',
@@ -242,6 +243,21 @@ const ASSETS_TO_CACHE = [
     'games/punch-reflex/css/game.css',
     'games/punch-reflex/js/menu.js',
     'games/punch-reflex/js/game.js',
+
+    // Game: Rocketeer
+    'games/rocketeer/index.html',
+    'games/rocketeer/game.html',
+    'games/rocketeer/css/style.css',
+    'games/rocketeer/css/game.css',
+    'games/rocketeer/js/menu.js',
+    'games/rocketeer/js/game.js',
+    'games/rocketeer/js/mobile_builder.js',
+    'games/rocketeer/js/parts.js',
+    'games/rocketeer/js/physics.js',
+    'games/rocketeer/js/rocket.js',
+    'games/rocketeer/js/renderer.js',
+
+
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

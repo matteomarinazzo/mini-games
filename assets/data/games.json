@@ -30,6 +30,21 @@
       "badgeText": "Aventure",
       "rating": "0",
       "stars": "☆☆☆☆☆"
+    },
+    "rocketeer": {
+      "path": "./games/rocketeer/index.html",
+      "name": "Rocketeer",
+      "emoji": "🚀",
+      "description": "Construis ta fusée pièce par pièce et propulse-la le plus loin possible dans l'espace !",
+      "tags": [
+        "🚀 Espace",
+        "🔧 Construction",
+        "🧪 Physique"
+      ],
+      "badge": "simulation",
+      "badgeText": "Simulation",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
     }
   },
   "🎲 Hasard": {
@@ -101,7 +116,7 @@
     "lights-out-reflex": {
       "path": "./games/lights-out-reflex/index.html",
       "name": "Lights Out Reflex",
-      "emoji": "🎯",
+      "emoji": "🚦",
       "description": "Inspiré par les départs de Formule 1 : attendez l'extinction des feux et réagissez le plus vite possible pour battre le record !",
       "tags": [
         "⚡ Arcade",
@@ -116,7 +131,7 @@
     "punch-reflex": {
       "path": "./games/punch-reflex/index.html",
       "name": "Punch Reflex",
-      "emoji": "🎯",
+      "emoji": "🥊",
       "description": "Sois plus rapide que l'éclair : clique sur les cibles dès qu'elles s'allument !",
       "tags": [
         "⚡ Vitesse",

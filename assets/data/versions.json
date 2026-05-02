@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.14.2026-04-19",
-    "lastUpdate": "2026-04-19",
+    "currentVersion": "1.15.2026-05-02",
+    "lastUpdate": "2026-05-02",
     "history": [
+        {
+            "version": "1.15.2026-05-02",
+            "date": "2026-05-02",
+            "changes": [
+                "Ajout du jeu Rocketeer",
+                "Ajout du choix de langue automatique et manuel",
+                "Mise à jour de la page about.html"
+            ]
+        },
         {
             "version": "1.14.2026-04-19",
             "date": "2026-04-19",

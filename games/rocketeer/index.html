@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rocketeer – Construis et Lance ta Fusée | Mini‑Games</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <meta name="description"
+        content="Construis ta fusée pièce par pièce avec Rocketeer sur Mini‑Games. Assemble moteurs, réservoirs et modules bonus, puis lance-toi le plus loin possible !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/rocketeer/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Rocketeer – Construis et Lance ta Fusée | Mini‑Games">
+    <meta property="og:description"
+        content="Construis ta fusée pièce par pièce avec Rocketeer sur Mini‑Games. Assemble moteurs, réservoirs et modules bonus, puis lance-toi le plus loin possible !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/rocketeer/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/rocketeer.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Rocketeer – Construis et Lance ta Fusée | Mini‑Games">
+    <meta name="twitter:description"
+        content="Construis ta fusée pièce par pièce avec Rocketeer sur Mini‑Games. Assemble moteurs, réservoirs et modules bonus, puis lance-toi le plus loin possible !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/rocketeer.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Rocketeer – Constructeur de Fusée",
+      "url": "https://mini-games.ch/games/rocketeer/",
+      "description": "Jeu de construction et de simulation spatiale : assemble ta fusée, gère le carburant par étage et vise la distance maximale.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Simulation", "Strategy", "Singleplayer", "Physics Game"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+
+<body>
+    <div class="builder-layout">
+        <header class="builder-header">
+            <div class="logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2 C18 2 22 7 22 13 L22 22 L6 22 L6 13 C6 7 10 2 14 2Z" fill="#3a8fd4" opacity="0.8" />
+                    <path d="M14 2 C16 2 18 5 18 9 L18 20 L10 20 L10 9 C10 5 12 2 14 2Z" fill="#80c8ff" opacity="0.5" />
+                    <path d="M6 22 L4 28 L10 28 L10 22Z" fill="#ff6030" />
+                    <path d="M22 22 L18 22 L18 28 L24 28 Z" fill="#ff6030" />
+                    <circle cx="14" cy="10" r="3" fill="#d0eaff" opacity="0.7" />
+                    <path d="M2 18 L6 13 L6 20 Z" fill="#607090" />
+                    <path d="M26 18 L22 13 L22 20 Z" fill="#607090" />
+                </svg>
+                <span>ROCKETEER</span>
+            </div>
+            <div class="money-display" id="money-display">
+                <span id="money-val">⚡ 5,000</span> ¢
+            </div>
+            <div class="header-btns">
+                <button class="btn" onclick="document.getElementById('rules-overlay').style.display='flex'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
+                    <span data-i18n="rocketeer.menu.manual">Manual</span>
+                </button>
+                <button class="btn" id="restart-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round" style="width:14px;height:14px;margin-right:6px;vertical-align:middle;">
+                        <!-- Flèche de rotation -->
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                        <!-- Pointe de la flèche -->
+                        <path d="M21 3v5h-5" />
+                    </svg>
+                    <span data-i18n="rocketeer.menu.restart">Restart</span>
+                </button>
+
+                <button class="btn" onclick="window.location.href='../../index.html'" title="Back to menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width:14px;height:14px;margin-right:4px">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    <span data-i18n="rocketeer.menu.back_to_menu">Menu</span>
+                </button>
+            </div>
+        </header>
+
+        <aside class="panel">
+            <div class="panel-header" style="display: flex; align-items: center; gap: 10px;">
+                <!-- Icône SVG fixe et propre -->
+                <svg width="20" height="20" viewBox="0 0 32 32" xmlns="http://w3.org">
+                    <defs>
+                        <linearGradient id="header_grad" x1="0" x2="1">
+                            <stop offset="0%" stop-color="#3a5878" />
+                            <stop offset="42%" stop-color="#a0c8e8" />
+                            <stop offset="100%" stop-color="#305070" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M6 10 L18 10 L18 22 L6 22 Z M6 10 L12 4 L24 4 L18 10 M24 4 L24 16 L18 22" fill="none"
+                        stroke="url(#header_grad)" stroke-width="2" stroke-linejoin="round" />
+                </svg>
+
+                <!-- Texte normal qui suit ton CSS -->
+                <span style="border-bottom: 1px solid rgba(160, 200, 232, 0.3); padding-bottom: 2px;"
+                    data-i18n="rocketeer.menu.parts_catalog">
+                    PARTS CATALOG
+                </span>
+            </div>
+
+
+            <div id="parts-list"></div>
+        </aside>
+
+        <main class="build-area">
+            <canvas id="build-canvas"></canvas>
+            <div class="build-hint" data-i18n="rocketeer.menu.build_hint">Right-click or <kbd>Del</kbd> to remove · Drag
+                to move ·
+                Drag empty space to pan
+            </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="panel-header" style="display: flex; align-items: center; gap: 10px;">
+                <!-- Icône Graphique SVG -->
+                <svg width="20" height="20" viewBox="0 0 32 32" xmlns="http://w3.org">
+                    <defs>
+                        <linearGradient id="stats_grad" x1="0" x2="1">
+                            <stop offset="0%" stop-color="#3a5878" />
+                            <stop offset="42%" stop-color="#a0c8e8" />
+                            <stop offset="100%" stop-color="#305070" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Barres du graphique -->
+                    <rect x="4" y="16" width="6" height="10" rx="1" fill="none" stroke="url(#stats_grad)"
+                        stroke-width="2" />
+                    <rect x="13" y="8" width="6" height="18" rx="1" fill="none" stroke="url(#stats_grad)"
+                        stroke-width="2" />
+                    <rect x="22" y="12" width="6" height="14" rx="1" fill="none" stroke="url(#stats_grad)"
+                        stroke-width="2" />
+                    <!-- Ligne de base -->
+                    <line x1="2" y1="28" x2="30" y2="28" stroke="#a0c8e8" stroke-width="1" opacity="0.5" />
+                </svg>
+
+                <!-- Texte HTML (hérite de ton CSS) -->
+                <span style="letter-spacing: 1px;" data-i18n="rocketeer.menu.rocket_stats">
+                    ROCKET STATS
+                </span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_cost">Cost</div>
+                    <div class="stat-value" id="stat-cost">0 ¢</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_mass">Mass</div>
+                    <div class="stat-value" id="stat-mass">0 t</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_dv">ΔV</div>
+                    <div class="stat-value" id="stat-dv">0 m/s</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_parts">Parts</div>
+                    <div class="stat-value" id="stat-parts">0</div>
+                </div>
+            </div>
+            <div class="panel-header" style="margin-top:4px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:14px;height:14px;margin-right:8px">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <span data-i18n="rocketeer.menu.part_info">Part Info</span>
+            </div>
+            <div id="part-info-panel">
+                <div
+                    style="color:var(--text-dim);font-size:11px;text-align:center;padding:20px;font-family:var(--mono)">
+                    <span data-i18n="rocketeer.menu.select_part_hint">Select a part to analyze specs</span>
+                </div>
+            </div>
+        </aside>
+
+        <footer class="bottom-bar">
+            <button class="btn btn-danger" onclick="clearRocket()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:14px;height:14px;margin-right:6px">
+                    <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+                <span data-i18n="rocketeer.menu.btn_clear">Clear</span>
+            </button>
+            <button class="btn btn-primary" onclick="deleteSelectedPart()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:14px;height:14px;margin-right:6px">
+                    <path d="M12 22 22 12 12 2 2 12z" />
+                </svg>
+                <span data-i18n="rocketeer.menu.btn_remove">Remove</span>
+            </button>
+            <button class="btn btn-launch" id="launch-btn" onclick="launchRocket()" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:14px;height:14px;margin-right:8px">
+                    <path
+                        d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                    <path
+                        d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                    <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
+                    <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
+                </svg>
+                <span data-i18n="rocketeer.menu.btn_launch">LAUNCH</span>
+            </button>
+        </footer>
+    </div>
+
+    <!-- ─── RESTART CONFIRM ─────────────────────────────────── -->
+    <div class="modal-overlay" id="restart-confirm-overlay">
+        <div class="modal-card">
+            <div class="modal-header" data-i18n="rocketeer.modals.restart_title">Restart Game</div>
+
+            <div class="modal-body">
+                <p data-i18n="rocketeer.modals.restart_body">Are you sure you want to restart the game?</p>
+                <br />
+                <p data-i18n="rocketeer.modals.restart_warning">
+                    All current progress will be lost
+                    <strong style="letter-spacing: -2px; margin-left: 5px; color: #a0c8e8;">:'(</strong>
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <!-- Bouton Annuler : on cache l'overlay -->
+                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'"
+                    data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
+
+                <!-- Bouton Confirmer -->
+                <button class="btn btn-launch" onclick="confirmRestart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        style="width:14px;height:14px;margin-right:6px; vertical-align:middle;">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                        <path d="M21 3v5h-5" />
+                    </svg>
+                    <span data-i18n="rocketeer.modals.btn_restart">Restart</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── LAUNCH CONFIRM ─────────────────────────────────── -->
+    <div class="modal-overlay" id="launch-confirm-overlay">
+        <div class="modal-card">
+            <div class="modal-header" data-i18n="rocketeer.modals.preflight_title">Pre-Flight Checklist</div>
+
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_mass">Total Mass</span><span
+                    id="lc-mass">—</span>
+            </div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_thrust">Total Thrust</span><span
+                    id="lc-thrust">—</span></div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_twr">TWR</span><span id="lc-twr">—</span>
+            </div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_dv">Total ΔV</span><span
+                    id="lc-dv">—</span></div>
+
+            <div class="modal-body" id="lc-warning">—</div>
+
+            <div class="modal-footer">
+                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'"
+                    data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
+                <button class="btn btn-launch" onclick="confirmLaunch()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width:14px;height:14px;margin-right:6px;vertical-align:middle">
+                        <path
+                            d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                        <path
+                            d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                        <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
+                        <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
+                    </svg>
+                    <span data-i18n="rocketeer.modals.btn_ignition">Ignition</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CUSTOM MODAL ─────────────────────────────────────── -->
+    <div class="modal-overlay" id="generic-modal-overlay">
+        <div class="modal-card" style="border-color: rgba(180, 180, 255, 0.4);">
+            <div class="modal-subtitle" id="modal-subtitle" data-i18n="rocketeer.modals.modal_subtitle_default">LOGS
+            </div>
+            <div class="modal-header" id="modal-title" style="margin-bottom:10px"
+                data-i18n="rocketeer.modals.modal_title_default">Notification</div>
+
+            <div class="modal-body" id="modal-message"
+                style="background:none; text-align:left; font-size:14px; line-height:1.6; color:var(--text-secondary)">
+                —
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" id="modal-cancel" data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
+                <button class="btn btn-primary" id="modal-confirm"
+                    style="background:var(--accent); color:#000; font-weight:bold">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── RULES OVERLAY ─────────────────────────────────── -->
+    <div class="rules-overlay" id="rules-overlay">
+        <div class="rules-modal">
+            <button class="rules-close" onclick="document.getElementById('rules-overlay').style.display='none'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:16px;height:16px">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div id="rules-content-target">
+                <!-- Paginated content injected here -->
+            </div>
+
+            <div class="rules-footer">
+                <div class="rules-pagination">
+                    <button class="btn btn-sm" id="rules-prev" onclick="Rules.prevPage()">←</button>
+                    <div id="rules-dots" class="rules-dots"></div>
+                    <button class="btn btn-sm" id="rules-next" onclick="Rules.nextPage()">→</button>
+                </div>
+                <button class="btn btn-primary" onclick="document.getElementById('rules-overlay').style.display='none'"
+                    style="width:100%;margin-top:12px" data-i18n="rocketeer.modals.modal_dismiss">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/parts.js"></script>
+    <script>
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                r = Math.min(r, w / 2, h / 2);
+                this.beginPath(); this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath();
+            };
+        }
+    </script>
+    <script src="js/rocket.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="../../js/utils/i18n.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/mobile_builder.js"></script>
+    <script type="module">
+        import { playRocketeerSound } from '../../js/utils/audio.js';
+        window.playRocketeerSound = playRocketeerSound;
+    </script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

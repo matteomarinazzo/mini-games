@@ -1,0 +1,457 @@
+{
+    "menu": {
+        "subtitle": "A collection of addictive games for everyone!",
+        "play": "Play",
+        "search_placeholder": "Search a game...",
+        "games_available": "Games available",
+        "hours_fun": "Hours of fun",
+        "free": "Free",
+        "online": "Online",
+        "offline": "Offline",
+        "favorites": "❤️ Favorites",
+        "all": "All",
+        "random_title": "Random Game",
+        "random_desc": "Let fate pick your next challenge from all our games!",
+        "random_btn": "Take a challenge!",
+        "random_drawing": "🎲 Drawing...",
+        "random_challenge": "CHALLENGE",
+        "random_question": "🎯 Try me?",
+        "footer_made_with": "Made with ❤️ by You | © 2026 Mini Games | Version:",
+        "footer_about": "ℹ️ About",
+        "footer_contact": "📧 Contact",
+        "settings": "Settings",
+        "music": "Music",
+        "sound": "Sound",
+        "about": "ℹ️ About",
+        "contact": "📧 Contact",
+        "games": {
+            "battleship": {
+                "name": "Battleship",
+                "description": "Find and sink the enemy fleet before yours goes under. Strategy and intuition in multiplayer!"
+            },
+            "lostBelow": {
+                "name": "Lost Below",
+                "description": "Survive the depths: explore the cave and find the exit before it's too late."
+            },
+            "rocketeer": {
+                "name": "Rocketeer",
+                "description": "Build your rocket piece by piece and launch it as far as possible into space!"
+            },
+            "casino": {
+                "name": "Casino",
+                "description": "Try your luck at the casino games. Win big, but watch out for losses."
+            },
+            "funfair": {
+                "name": "Funfair Frenzy",
+                "description": "Win tickets and take home all the prizes at the funfair! Pick your budget and try your luck."
+            },
+            "falling-blocks": {
+                "name": "Falling Blocks",
+                "description": "Stack pieces, complete lines and crush the score!"
+            },
+            "layer-pile": {
+                "name": "Layer Pile",
+                "description": "Stack blocks with precision. Every millimetre counts!"
+            },
+            "lights-out-reflex": {
+                "name": "Lights Out Reflex",
+                "description": "Inspired by Formula 1 starts: wait for the lights to go out and react as fast as possible to beat the record!"
+            },
+            "punch-reflex": {
+                "name": "Punch Reflex",
+                "description": "Be faster than lightning: click the targets as soon as they light up!"
+            },
+            "ball-sort": {
+                "name": "Ball Sort",
+                "description": "Sort the coloured balls into flasks. Calm on the surface, terribly addictive underneath."
+            },
+            "block-puzzle": {
+                "name": "Block Puzzle",
+                "description": "Arrange blocks to complete lines and avoid blocking the grid. A strategic and addictive puzzle!"
+            },
+            "morpion": {
+                "name": "Tic-Tac-Toe",
+                "description": "The classic game revisited! Face the AI or a friend."
+            },
+            "casse-briques": {
+                "name": "Breakout",
+                "description": "Break all the bricks and keep the ball in play. Simple and effective."
+            },
+            "pong": {
+                "name": "Pong",
+                "description": "The original Pong. Fast, intense and always fun."
+            },
+            "draw-guess": {
+                "name": "Draw and Guess",
+                "description": "Show off your artistic talent (or not) and get words guessed in real time!"
+            },
+            "geoquiz": {
+                "name": "GeoQuiz",
+                "description": "Guess flags or country outlines from around the world. Two modes, multiple difficulties, continents and languages."
+            },
+            "where-am-i": {
+                "name": "Where Am I",
+                "description": "Guess where the photo was taken on the world map. Multiplayer or solo."
+            },
+            "snow-digger": {
+                "name": "Snow Digger",
+                "description": "Clear the snow, earn money, and clear faster. Simple, fast, addictive."
+            }
+        },
+        "badges": {
+            "new": "New",
+            "popular": "Popular",
+            "classic": "Classic",
+            "adventure": "Adventure",
+            "simulation": "Simulation",
+            "fun": "Fun!",
+            "brain": "Puzzle",
+            "strategy": "Strategy",
+            "action": "Action",
+            "exploration": "Exploration",
+            "random": "CHALLENGE"
+        },
+        "categories": {
+            "strategy": "🧠 Strategy",
+            "random": "🎲 Random",
+            "arcade": "⚡ Arcade & Reflexes",
+            "puzzle": "🧠 Puzzles & Logic",
+            "classic": "🎮 Classics",
+            "geo": "🌍 Geography",
+            "clicker": "📈 Clicker",
+            "fun": "⚡ Fun"
+        },
+        "tags": {
+            "real-time": "⚡ Real time",
+            "strategy": "🧠 Strategy",
+            "multiplayer": "👥 Multiplayer",
+            "survival": "🔦 Survival",
+            "exploration": "🧗 Exploration",
+            "space": "🚀 Space",
+            "construction": "🔧 Construction",
+            "physics": "🧪 Physics",
+            "money": "💰 Money",
+            "random": "🎲 Random",
+            "games": "🎮 Games",
+            "solo": "👤 Solo",
+            "tickets": "🎟️ Tickets",
+            "skill": "🎯 Skill",
+            "arcade": "🕹️ Arcade",
+            "reflexes": "⚡ Reflexes",
+            "classic": "🎮 Classics",
+            "precision": "🎯 Precision",
+            "speed": "⚡ Speed",
+            "logic": "🧠 Logic",
+            "puzzle": "🧪 Puzzle",
+            "reflexion": "🧩 Reflexion",
+            "fast": "⚡ Fast",
+            "creativity": "✏️ Creativity",
+            "geography": "🌍 Geography",
+            "culture": "🎓 Culture",
+            "clicker": "🎮 Clicker",
+            "digger": "🪏 Digger",
+            "snow": "❄️ Snow"
+        }
+    },
+    "about": {
+        "back": "Back",
+        "online": "Online",
+        "offline": "Offline",
+        "title": "About Mini Games",
+        "subtitle": "A passion for games, a platform for everyone",
+        "mission_title": "Our Mission",
+        "mission_p1": "Mini Games was born from a simple passion: <strong>creating fun and accessible games for everyone</strong>. We believe the best gaming moments are those we share, whether for a few minutes of relaxation or hours of challenge.",
+        "mission_p2": "Each game is carefully designed to offer a unique, addictive and completely free experience. No invasive ads, no pay-to-win, just pure gaming fun.",
+        "story_title": "Our Story",
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "ongoing": "Ongoing",
+        "soon": "Coming Soon",
+        "timeline_jan": "Launch of Mini Games with our first two games: <strong>Snow Digger</strong> and <strong>Morpion</strong>. The beginning of a passionate adventure around mini‑games.",
+        "timeline_feb": "New games added: <strong>casino</strong>, <strong>funfair</strong>, <strong>exploration</strong>, <strong>puzzle</strong> and introduction of <strong>multiplayer mode</strong> with a <strong>rooms</strong> system in the exploration game <strong>LostBelow</strong>. The platform is growing fast.",
+        "timeline_mar": "Major expansion with the arrival of: <strong>Block Puzzle</strong>, <strong>Battleship</strong>, <strong>Layer Pile</strong>, <strong>Draw and Guess</strong>, <strong>Falling Blocks</strong>, <strong>Lights Out Reflex</strong> and <strong>GeoQuiz</strong>.<br>The experience becomes immersive with the integration of <strong>sounds and music</strong>, as well as the arrival of <strong>world records</strong> to challenge the community.<br>The platform reaches a new milestone!",
+        "timeline_apr": "Arrival of <strong>Where Am I</strong> and <strong>Punch Reflex</strong>, plus enrichment of <strong>Block Puzzle</strong> with new pieces.<br>Complete redesign of <strong>game cards</strong> and menu with a <strong>category</strong> system. Music now pauses automatically when the page is hidden.<br>Launch of <strong>Rocketeer</strong> — build your rocket and launch it into space!<br>First steps toward <strong>multilingual support</strong> across the platform.",
+        "timeline_ongoing": "Rolling out <strong>multilingual support</strong> across all games on the platform. We're also working on <strong>new games</strong> and continuing to optimize the <strong>mobile</strong> experience.",
+        "timeline_soon": "Launch of a <strong>personalized profiles</strong> system, <strong>daily challenges</strong> with rewards and expansion of <strong>real-time multiplayer</strong> to our classics. The Mini‑Games adventure is just getting started!",
+        "tech_title": "Technologies",
+        "tech_intro": "All our games are built with modern web technologies to ensure optimal performance on all devices.",
+        "tech_js": "High-performance game logic",
+        "tech_canvas": "Smooth graphical rendering",
+        "tech_responsive": "Mobile & desktop compatible",
+        "tech_optimized": "Optimized",
+        "tech_optimized_p": "Ultra-fast loading",
+        "stats_title": "Statistics",
+        "stat_games": "Games available",
+        "stat_players": "Players",
+        "stat_hours": "Hours played",
+        "stat_minutes": "Minutes played",
+        "stat_free": "% Free",
+        "contact_title": "Stay connected",
+        "contact_p": "A bug to report? A suggestion? Feel free to contact us!",
+        "contact_btn": "Send an email",
+        "footer": "Made with ❤️ by You | © 2026 Mini Games | Version:"
+    },
+    "morpion": {
+        "title": "Tic Tac Toe",
+        "win": "Victory!",
+        "draw": "Draw"
+    },
+    "rocketeer": {
+        "menu": {
+            "manual": "Manual",
+            "restart": "Restart",
+            "back_to_menu": "Menu",
+            "parts_catalog": "PARTS CATALOG",
+            "rocket_stats": "ROCKET STATS",
+            "part_info": "Part Info",
+            "select_part_hint": "Select a part to analyze specs",
+            "build_hint": "Right-click or Del to remove · Drag to move · Drag empty space to pan",
+            "drag_hint": "Drag parts here to build your rocket",
+            "drag_hint2": "← Select from the parts list",
+            "stat_cost": "Cost",
+            "stat_mass": "Mass",
+            "stat_dv": "ΔV",
+            "stat_parts": "Parts",
+            "stat_twr": "TWR",
+            "stat_thrust": "Thrust",
+            "btn_clear": "Clear",
+            "btn_remove": "Remove",
+            "btn_launch": "LAUNCH",
+            "menu_parts": "Parts",
+            "menu_stats": "Stats",
+            "menu_config": "Config",
+            "menu_build": "Build",
+            "menu_launch": "Launch",
+            "build_mode": "Build mode",
+            "tip": "Tip",
+            "pro_tip": "Pro Tip",
+            "optimize_mass_dv": "Optimize mass ↓ / ΔV ↑",
+            "tools": "Tools",
+            "select_part": "Select a part",
+            "tape_rocket": "Tap on the rocket to place it",
+            "selection_active": "Selection remains active until placed",
+            "add_title": "Missing:",
+            "add_cockpit": "Cockpit",
+            "add_engine": "Engine",
+            "add_fuel": "Fuel",
+            "ready": "✓ Ready — Budget remaining : {budget} ¢"
+        },
+        "game": {
+            "hud_altitude": "Altitude",
+            "hud_speed": "Speed",
+            "hud_dist_max": "Dist Max",
+            "hud_twr": "TWR",
+            "hud_credits": "Credits",
+            "hud_time": "Time",
+            "hud_throttle": "THR",
+            "fuel_countdown": "⚠ OUT OF FUEL — End in {count}s",
+            "fuel_empty": "⚠ FUEL DEPLETED",
+            "landing_countdown": "LANDING — Confirmed in {count}s",
+            "landing_success": "LANDING SUCCESS!",
+            "stage_activated": "STAGE {stage} ACTIVATED",
+            "time_scale": "Time scale:",
+            "btn_stage": "STAGE",
+            "btn_center": "CENTER",
+            "btn_builder": "BUILDER",
+            "paused": "PAUSED",
+            "resume": "Resume",
+            "flight_manual": "Flight Manual",
+            "back_to_builder": "Back to Builder",
+            "mission_failed": "KABOOM — Mission failed",
+            "mission_success": "Mission success",
+            "max_distance": "MAX DISTANCE",
+            "research_grant": "Research Grant",
+            "ship_recovery": "Ship Recovery",
+            "total_credits": "Total Credits",
+            "btn_retry": "Retry",
+            "btn_builder_end": "Builder",
+            "back_to_flight": "Back to Flight"
+        },
+        "modals": {
+            "restart_title": "Restart Game",
+            "restart_body": "Are you sure you want to restart the game?",
+            "restart_warning": "All current progress will be lost",
+            "btn_cancel": "✕ Cancel",
+            "btn_restart": "Restart",
+            "preflight_title": "Pre-Flight Checklist",
+            "preflight_mass": "Total Mass",
+            "preflight_thrust": "Total Thrust",
+            "preflight_twr": "TWR",
+            "preflight_dv": "Total ΔV",
+            "btn_ignition": "Ignition",
+            "modal_subtitle_default": "ROCKETEER OS",
+            "modal_dismiss": "Dismiss"
+        },
+        "warnings": {
+            "twr_too_low": "TWR < 1 — rocket won't lift off!",
+            "twr_low": "Low TWR — slow ascent",
+            "ready": "Ready to launch!",
+            "insufficient_funds": "INSUFFICIENT FUNDS: Need {amount} ¢",
+            "no_money_rd": "Not enough money for R&D! Need extra {amount} ¢",
+            "rd_failed": "R&D FAILED",
+            "overlap": "Overlap — part repositioned",
+            "need_cockpit": "Need cockpit",
+            "need_engine": "Need engine",
+            "need_fuel": "Need fuel",
+            "clear_blueprint": "CLEAR BLUEPRINT?",
+            "clear_blueprint_body": "Resetting the layout is free. All parts will be removed.",
+            "unlock_title": "UNLOCK {partName} ?",
+            "unlock_body": "{description} <br/> Research cost: {price} ¢ <br/> Build cost: {buildCost} ¢",
+            "rd_approval": "R&D APPROVAL REQUIRED",
+            "rebuild": "Not enough credits to rebuild the rocket! Need {amount} ¢ more"
+        },
+        "parts": {
+            "categories": {
+                "cockpit": "Cockpits",
+                "tank": "Fuel Tanks",
+                "engine": "Engines",
+                "decoupler": "Decouplers",
+                "fin": "Fins",
+                "nosecone": "Nose Cones",
+                "bonus": "Bonus Modules"
+            },
+            "build_cost": "Build: {amount} ¢",
+            "rd_cost": "R&D: {amount} ¢",
+            "cockpit_basic": {
+                "name": "Mk1 Cockpit",
+                "description": "Basic crew capsule with standard amenities."
+            },
+            "cockpit_advanced": {
+                "name": "Mk2 Command Pod",
+                "description": "Streamlined advanced capsule for deep space."
+            },
+            "tank_small": {
+                "name": "FL-T100 Tank",
+                "description": "Small fuel tank."
+            },
+            "tank_medium": {
+                "name": "FL-T400 Tank",
+                "description": "Medium fuel tank."
+            },
+            "tank_long": {
+                "name": "FL-T800 Tank",
+                "description": "Long vertical tank for multi-stage rockets."
+            },
+            "tank_large": {
+                "name": "Jumbo-64 Tank",
+                "description": "Large orange fuel tank."
+            },
+            "tank_wide": {
+                "name": "X200-32 Tank",
+                "description": "Wide heavy tank for high thrust stages."
+            },
+            "tank_side": {
+                "name": "Oscar-B Tank",
+                "description": "Compact side-mountable fuel tank."
+            },
+            "engine_spark": {
+                "name": "Spark Engine",
+                "description": "Small lightweight engine for upper stages."
+            },
+            "engine_vacuum": {
+                "name": "Poodle Vacuum Engine",
+                "description": "Efficient engine for space."
+            },
+            "engine_reliant": {
+                "name": "LV-T45 Reliant",
+                "description": "High thrust, no gimbal engine."
+            },
+            "engine_swivel": {
+                "name": "LV-T30 Swivel",
+                "description": "Reliable gimballed engine."
+            },
+            "engine_mainsail": {
+                "name": "RE-M3 Mainsail",
+                "description": "Massive high-thrust engine."
+            },
+            "engine_side": {
+                "name": "Thud Booster",
+                "description": "Side-mountable booster engine."
+            },
+            "booster_srb": {
+                "name": "RT-10 Solid Booster",
+                "description": "Solid rocket booster. Cannot be throttled."
+            },
+            "decoupler_small": {
+                "name": "TR-18A Decoupler",
+                "description": "Stage separator."
+            },
+            "decoupler_radial": {
+                "name": "TT-70 Radial Decoupler",
+                "description": "Detaches side-mounted parts."
+            },
+            "fin_small": {
+                "name": "Mini Stabilizer",
+                "description": "Tiny fin for fine control."
+            },
+            "fin_basic": {
+                "name": "AV-R8 Winglet",
+                "description": "Basic aerodynamic fin."
+            },
+            "fin_large": {
+                "name": "AV-T1 Heavy Fin",
+                "description": "Large stabilizing fin."
+            },
+            "nosecone_basic": {
+                "name": "AE-FF1 Fairing",
+                "description": "Aerodynamic nose cone."
+            },
+            "bonus_science": {
+                "name": "Science Bay",
+                "description": "Heavy scientific payload. Grants +25% mission reward."
+            },
+            "bonus_cargo": {
+                "name": "Cargo Bay XL",
+                "description": "Massive cargo bay. Initially heavy, but grants +25% total fuel capacity."
+            },
+            "bonus_thruster_boost": {
+                "name": "Afterburner Pack",
+                "description": "Experimental combustion enhancer. Boosts all engine thrust by 25%."
+            }
+        },
+        "part_info": {
+            "thrust": "Thrust",
+            "isp": "ISP",
+            "fuel_cap": "Fuel Cap",
+            "mass_wet": "Mass (Wet)",
+            "fuel_amt": "Fuel Amt",
+            "configuration": "CONFIGURATION",
+            "set_as_primary": "SET AS PRIMARY",
+            "primary_cockpit": "⭐ PRIMARY COCKPIT",
+            "rd_upgrades": "R&D UPGRADES (LVL {level})",
+            "current_bonus": "Current Bonus",
+            "construction": "Construction",
+            "next_upgrade": "NEXT UPGRADE:",
+            "new_bonus": "New Bonus",
+            "new_construction": "New Const.",
+            "btn_upgrade": "🚀 UPGRADE R&D ({amount} ¢)",
+            "ignite": "Ignite",
+            "detach": "Detach"
+        },
+        "staging": {
+            "title": "MANUAL STAGING",
+            "btn_add_stage": "+ Add Stage",
+            "btn_remove_stage": "Remove",
+            "stage_label": "Stage {n}",
+            "stage_empty": "Drag engines or decouplers here"
+        },
+        "manual": {
+            "page1_title": "1. Assembly",
+            "page1_content": "<p>Drag parts from the catalog. They snap to connection nodes.</p><ul><li><b>Core:</b> Every rocket needs a Cockpit, Fuel, and Engine.</li><li><b>Staging:</b> Use Decouplers to drop empty tanks and ignite the next phase.</li><li><b>TWR:</b> Thrust-to-Weight Ratio must be > 1.0 to lift off.</li></ul>",
+            "page2_title": "2. Flight Controls",
+            "page2_content": "<ul><li><span class=\"key\">Shift</span> / <span class=\"key\">Ctrl</span> Throttle Control</li><li><span class=\"key\">Space</span> Next Stage / Decouple</li><li><span class=\"key\">T</span> Cycle Time Scale (1x, 2x, 4x, 8x, 15x)</li><li><span class=\"key\">C</span> Center Camera</li><li><b>Note:</b> Manual rotation is disabled. Balancing is done via design!</li></ul>",
+            "page3_title": "3. Economy",
+            "page3_content": "<ul><li><b>Distance:</b> 1¢ per 100m reached.</li><li><b>Speed Bonus:</b> Faster missions earn up to +10% extra!</li><li><b>Milestones:</b> Massive grants for reaching 100km, 500km, etc.</li><li><b>R&D:</b> Spend credits to improve ISP, Thrust, and Science.</li></ul>",
+            "page4_title": "4. Realism & Physics",
+            "page4_content": "<ul><li><b>Torque:</b> If thrust is off-center from the Center of Mass (CoM), the rocket will tilt.</li><li><b>Aerodynamics:</b> Air density drops with altitude. Fins help stabilize in low atmosphere.</li><li><b>Heat:</b> High-speed descent in atmosphere is dangerous!</li></ul>"
+        },
+        "bonus_descriptions": {
+            "thrustBoost": "Boosts all engine thrust by {percent}%.",
+            "fuelBonus": "Grants +{percent}% total fuel capacity.",
+            "sasBoost": "Improves SAS by {percent}%.",
+            "rewardMultiplier": "Grants +{percent}% mission reward."
+        }
+    }
+}

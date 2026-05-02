@@ -10,7 +10,7 @@ import {
   getMusicEnabled,
   getSoundEnabled
 } from './utils/audio.js';
-
+import { notifyGameLaunch, notifyBackToHome, notifyAboutVisit } from './utils/webhooks.js';
 
 var games = {};
 let categoriesData = {};
@@ -31,6 +31,24 @@ fetch("./assets/data/games.json")
       }
     }
 
+    // 1. On détermine la langue : Priorité au Cache, sinon Navigateur, sinon FR
+    const browserLang = navigator.language.split('-')[0].toUpperCase();
+    const defaultLang = localStorage.getItem("lang") || browserLang || "EN";
+
+    // 2. On initialise avec la bonne langue directement
+    await loadFallback();
+    await setLang(defaultLang);
+    const langDisplay = document.getElementById('currentLangDisplay');
+    if (langDisplay) langDisplay.textContent = I18N.lang;
+
+    // 3. On lance le reste
+    refreshTexts();
+
+    initLangSelector();
+    initRandomGameButton();
+    addScrollAnimations();
+    displayAppVersion()
+
     initCategoryFilters();
     generateGameCards();
 
@@ -41,12 +59,39 @@ fetch("./assets/data/games.json")
     console.error(err);
   });
 
-// Initialisation
-document.addEventListener("DOMContentLoaded", async () => {
-  initRandomGameButton();
-  addScrollAnimations();
-  displayAppVersion()
-});
+// Initialiser le selecteur de langue
+function initLangSelector() {
+  const langBtn = document.getElementById('langBtn');
+  const langMenu = document.getElementById('langMenu');
+  const currentLangDisplay = document.getElementById('currentLangDisplay');
+
+  if (!langBtn || !langMenu) return;
+
+  langBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langMenu.classList.toggle('hidden');
+  });
+
+  document.addEventListener('click', () => {
+    if (!langMenu.classList.contains('hidden')) {
+      langMenu.classList.add('hidden');
+    }
+  });
+
+  const options = document.querySelectorAll('.lang-option');
+  options.forEach(opt => {
+    opt.addEventListener('click', async (e) => {
+      const lang = e.target.dataset.lang;
+      await setLang(lang);
+      if (currentLangDisplay) currentLangDisplay.textContent = lang;
+
+      // Mettre à jour l'interface avec la nouvelle langue
+      initCategoryFilters();
+      generateGameCards();
+      refreshStatus();
+    });
+  });
+}
 
 // Initialiser le bouton de jeu aléatoire
 function initRandomGameButton() {
@@ -62,7 +107,7 @@ function initRandomGameButton() {
     const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
 
     // Petit effet visuel sur le bouton
-    randomBtn.innerHTML = "🎲 Tirage...";
+    randomBtn.innerHTML = `🎲 ${t('menu.random_drawing')}`;
     randomBtn.style.background = "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
 
     if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
@@ -126,14 +171,14 @@ function initCategoryFilters() {
     filterContainer.appendChild(label);
   };
 
-  createFilterButton('Tout', 'Tout');
+  createFilterButton(t('menu.all'), 'Tout');
 
   if (getLikedGames().length > 0) {
-    createFilterButton('❤️ Favoris', 'Favoris');
+    createFilterButton(t('menu.favorites'), 'Favoris');
   }
 
   for (const catName of Object.keys(categoriesData)) {
-    createFilterButton(catName, catName);
+    createFilterButton(t('menu.categories.' + catName), catName);
   }
 }
 
@@ -162,7 +207,7 @@ function generateGameCards() {
         style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
       </div>
       <span
-        style="color: #fff; font-size: 1.4em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); white-space: nowrap;">${title}</span>
+        style="color: #fff; font-size: 1.4em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); white-space: nowrap;">${t("menu.categories." + title)}</span>
       <div
         style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
       </div>
@@ -182,7 +227,7 @@ function generateGameCards() {
   if (currentFilter === 'Tout' || currentFilter === 'Favoris') {
     const myLikedGames = likedList.filter(id => games[id]);
     if (myLikedGames.length > 0) {
-      addHeader('❤️ Favoris');
+      addHeader(t('menu.favorites'));
       let count = 0;
       [...myLikedGames].reverse().forEach(gameId => {
         addCardToGrid(createGameCard(gameId, games[gameId]));
@@ -225,9 +270,11 @@ function createGameCard(gameId, game) {
   const card = document.createElement("div");
   card.className = "game-card";
   card.dataset.game = gameId;
-  card.dataset.category = (game.category || "").toLowerCase();
-  card.dataset.badge = (game.badgeText || "").toLowerCase();
-  card.dataset.tags = game.tags.join(" ").toLowerCase();
+  card.dataset.category = t("menu.categories." + game.category).toLowerCase();
+  card.dataset.badge = t("menu.badges." + game.badge).toLowerCase();
+  card.dataset.tags = game.tags
+    .map(tag => t("menu.tags." + tag).toLowerCase())
+    .join(" ");
 
   // Déterminer la couleur du bouton play en fonction du badge
   let playButtonColor = "#667eea"; // Défaut pour "new"
@@ -240,10 +287,10 @@ function createGameCard(gameId, game) {
   // Construire le HTML de la carte
   card.innerHTML = `
     <div class="card-header">
-      <span class="badge badge-${game.badge}">${game.badgeText}</span>
+      <span class="badge badge-${game.badge}">${t("menu.badges." + game.badge)}</span>
     </div>
     <div class="card-image">
-      <img src="assets/logos/${gameId}.webp" alt="${game.name}" />
+      <img src="assets/logos/${gameId}.webp" alt="${t("menu.games." + gameId + ".name")}" />
       <div class="card-overlay">
         <div class="play-button">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -255,16 +302,16 @@ function createGameCard(gameId, game) {
     </div>
     <div class="card-content">
       <div class="card-title-row">
-        <h3 class="card-title">${game.emoji} ${game.name}</h3>
-        <button class="heart-btn ${isLiked ? 'liked' : ''}" title="Mettre en favori">
+        <h3 class="card-title">${game.emoji} ${t("menu.games." + gameId + ".name")}</h3>
+        <button class="heart-btn ${isLiked ? 'liked' : ''}" title="${t('menu.favorites')}">
           <svg viewBox="0 0 24 24">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
         </button>
       </div>
-      <p class="card-description">${game.description}</p>
+      <p class="card-description">${t("menu.games." + gameId + ".description")}</p>
       <div class="card-tags">
-        ${game.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
+        ${game.tags.map((tag) => `<span class="tag">${t("menu.tags." + tag)}</span>`).join("")}
       </div>
     </div>
     <div class="card-footer">
@@ -272,7 +319,7 @@ function createGameCard(gameId, game) {
         <span class="stars">${game.stars}</span>
         <span class="rating-text">${game.rating}</span>
       </div>
-      <button class="btn-play">Jouer</button>
+      <button class="btn-play">${t('menu.play')}</button></button>
     </div>
   `;
 
@@ -343,6 +390,9 @@ function launchGame(gameId) {
 
   // Sauvegarder dans localStorage pour tracking
   saveGameLaunch(gameId);
+
+  // Notification Discord
+  notifyGameLaunch(gameId, game.name);
 }
 
 // Sauvegarder l'historique de jeu
@@ -386,48 +436,6 @@ function addScrollAnimations() {
 // Son au survol (utilisant le moteur central)
 function playHoverSound() {
   playGameSound('menu_hover');
-}
-
-// Gestion du bouton retour dans les jeux (à ajouter dans les jeux)
-export function setupBackButton() {
-  const backBtn = document.createElement("button");
-  backBtn.className = "back-to-menu";
-  backBtn.innerHTML = "← Menu";
-  backBtn.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    z-index: 1000;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  `;
-
-  backBtn.addEventListener("mouseenter", () => {
-    backBtn.style.transform = "translateX(-5px)";
-    backBtn.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.15)";
-  });
-
-  backBtn.addEventListener("mouseleave", () => {
-    backBtn.style.transform = "translateX(0)";
-    backBtn.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.1)";
-  });
-
-  backBtn.addEventListener("click", () => {
-    document.body.style.opacity = "0";
-    setTimeout(() => {
-      window.location.href = "../../index.html";
-    }, 300);
-  });
-
-  document.body.appendChild(backBtn);
 }
 
 // Statistiques de jeu (à afficher si souhaité)
@@ -531,7 +539,7 @@ async function refreshStatus() {
     if (statusBadge && statusText) {
       statusBadge.style.backgroundColor = "rgba(81, 207, 102, 0.95)";
       statusBadge.style.boxShadow = "0 0 10px rgba(81, 207, 102, 0.95)";
-      statusText.innerText = "En ligne";
+      statusText.innerText = t('menu.online');
     }
   } else {
     console.log("📡 Passage hors ligne");
@@ -540,7 +548,7 @@ async function refreshStatus() {
     if (statusBadge && statusText) {
       statusBadge.style.backgroundColor = "rgba(207, 81, 102, 0.95)";
       statusBadge.style.boxShadow = "0 0 10px rgba(207, 81, 102, 0.95)";
-      statusText.innerText = "Hors ligne";
+      statusText.innerText = t('menu.offline');
     }
   }
 }
@@ -664,6 +672,17 @@ if (floatingContainer) {
     });
   }
 }
+
+// ─── WEBHOOKS NAVIGATION ──────────────────────────────────────────────────────
+// Notification : arrivée sur la page d'accueil
+notifyBackToHome();
+
+// Notification : clic sur le lien "À propos"
+document.querySelectorAll('a[href*="about.html"]').forEach(link => {
+  link.addEventListener('click', () => {
+    notifyAboutVisit();
+  });
+});
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };

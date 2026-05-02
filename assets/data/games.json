@@ -1,17 +1,17 @@
 {
-  "🧠 Stratégie": {
+  "strategy": {
     "battleship": {
       "path": "./games/battleship/index.html",
       "name": "Bataille navale",
       "emoji": "",
       "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
       "tags": [
-        "⚡ Temps réel",
-        "🧠 Stratégie",
-        "👥 Multijoueur"
+        "real-time",
+        "strategy",
+        "multiplayer"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "strategy",
+      "badgeText": "Stratégie",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -21,10 +21,10 @@
       "emoji": "🔦",
       "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
       "tags": [
-        "🔦 Survie",
-        "🧗 Exploration",
-        "🧠 Stratégie",
-        "👥 Multijoueur"
+        "survival",
+        "exploration",
+        "strategy",
+        "multiplayer"
       ],
       "badge": "adventure",
       "badgeText": "Aventure",
@@ -37,9 +37,9 @@
       "emoji": "🚀",
       "description": "Construis ta fusée pièce par pièce et propulse-la le plus loin possible dans l'espace !",
       "tags": [
-        "🚀 Espace",
-        "🔧 Construction",
-        "🧪 Physique"
+        "space",
+        "construction",
+        "physics"
       ],
       "badge": "simulation",
       "badgeText": "Simulation",
@@ -47,20 +47,20 @@
       "stars": "☆☆☆☆☆"
     }
   },
-  "🎲 Hasard": {
+  "random": {
     "casino": {
       "path": "./games/casino/index.html",
       "name": "Casino",
       "emoji": "🎰",
       "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
       "tags": [
-        "💰 Argent",
-        "🎲 Hasard",
-        "🎮 Jeux",
-        "👤 Solo"
+        "money",
+        "random",
+        "games",
+        "solo"
       ],
-      "badge": "popular",
-      "badgeText": "Populaire",
+      "badge": "fun",
+      "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -70,10 +70,10 @@
       "emoji": "🎡",
       "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
       "tags": [
-        "🎟️ Tickets",
-        "🎯 Adresse",
-        "🎮 Jeux",
-        "👤 Solo"
+        "tickets",
+        "skill",
+        "games",
+        "solo"
       ],
       "badge": "fun",
       "badgeText": "Fun !",
@@ -81,19 +81,19 @@
       "stars": "☆☆☆☆☆"
     }
   },
-  "⚡ Arcade & Réflexes": {
+  "arcade": {
     "falling-blocks": {
       "path": "./games/falling-blocks/index.html",
       "name": "Falling Blocks",
       "emoji": "🧱",
       "description": "Empile les pièces, complète les lignes et explose le score ! ",
       "tags": [
-        "⚡ Arcade",
-        "🧱 Réflexes",
-        "🎮 Classique"
+        "arcade",
+        "reflexes",
+        "classic"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "classic",
+      "badgeText": "Classique",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -103,13 +103,13 @@
       "emoji": "🏗️",
       "description": "Empile les blocs avec précision. Chaque millimètre compte !",
       "tags": [
-        "🧱 Arcade",
-        "🎯 Précision",
-        "⚡ Réflexes",
-        "👤 Solo"
+        "arcade",
+        "precision",
+        "reflexes",
+        "solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "fun",
+      "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -119,12 +119,12 @@
       "emoji": "🚦",
       "description": "Inspiré par les départs de Formule 1 : attendez l'extinction des feux et réagissez le plus vite possible pour battre le record !",
       "tags": [
-        "⚡ Arcade",
-        "🎯 Réflexes",
-        "👤 Solo"
+        "arcade",
+        "reflexes",
+        "solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "action",
+      "badgeText": "Action",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -134,27 +134,27 @@
       "emoji": "🥊",
       "description": "Sois plus rapide que l'éclair : clique sur les cibles dès qu'elles s'allument !",
       "tags": [
-        "⚡ Vitesse",
-        "🎯 Réflexes",
-        "👤 Solo"
+        "speed",
+        "reflexes",
+        "solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "action",
+      "badgeText": "Action",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
-  "🧠 Casse-tête & Logique": {
+  "puzzle": {
     "ball-sort": {
       "path": "./games/ball-sort/index.html",
       "name": "Ball Sort",
       "emoji": "🧪",
       "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
       "tags": [
-        "🧠 Logique",
-        "🧪 Puzzle",
-        "🧩 Réflexion",
-        "👤 Solo"
+        "logic",
+        "puzzle",
+        "reflexion",
+        "solo"
       ],
       "badge": "brain",
       "badgeText": "Casse-tête",
@@ -167,26 +167,26 @@
       "emoji": "🧱",
       "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
       "tags": [
-        "🧠 Logique",
-        "🧪 Puzzle",
-        "🧩 Réflexion"
+        "logic",
+        "puzzle",
+        "reflexion"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "brain",
+      "badgeText": "Casse-tête",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
-  "🎮 Classiques": {
+  "classic": {
     "morpion": {
       "path": "./games/morpion/index.html",
       "name": "Morpion",
       "emoji": "⭕",
       "description": "Le jeu classique revisité ! Affronte l'IA ou un ami.",
       "tags": [
-        "🧠 Stratégie",
-        "👥 Multijoueur",
-        "⚡ Rapide"
+        "strategy",
+        "multiplayer",
+        "fast"
       ],
       "badge": "classic",
       "badgeText": "Classique",
@@ -199,10 +199,10 @@
       "emoji": "🧱",
       "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
       "tags": [
-        "🧠 Réflexe",
-        "🎯 Précision",
-        "⚡ Rapide",
-        "👤 Solo"
+        "reflexes",
+        "precision",
+        "fast",
+        "solo"
       ],
       "badge": "classic",
       "badgeText": "Classique",
@@ -215,9 +215,9 @@
       "emoji": "🏓",
       "description": "Le Pong original. Rapide, nerveux et toujours efficace.",
       "tags": [
-        "🧠 Réflexe",
-        "👥 Multijoueur",
-        "⚡ Rapide"
+        "reflexes",
+        "multiplayer",
+        "fast"
       ],
       "badge": "classic",
       "badgeText": "Classique",
@@ -230,30 +230,30 @@
       "emoji": "✏️",
       "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
       "tags": [
-        "✏️ Créativité",
-        "🧠 Réflexion",
-        "👥 Multijoueur",
-        "⚡ Temps réel"
+        "creativity",
+        "reflexion",
+        "multiplayer",
+        "real-time"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "fun",
+      "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
-  "🌍 Géographie": {
+  "geo": {
     "geoquiz": {
       "path": "./games/geoquiz/index.html",
       "name": "GeoQuiz",
       "emoji": "🌍",
       "description": "Devine les drapeaux ou les contours des pays du monde. Deux modes, plusieurs difficultés, continents et langues.",
       "tags": [
-        "🧠 Géographie",
-        "🎓 Culture",
-        "⚡ Solo"
+        "geography",
+        "culture",
+        "solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "brain",
+      "badgeText": "Casse-tête",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
@@ -263,27 +263,27 @@
       "emoji": "🌍",
       "description": "Devine où la photo a été prise sur la carte du monde. En multijoueur ou en solo.",
       "tags": [
-        "🧠 Géographie",
-        "🎓 Culture",
-        "⚡ Solo"
+        "geography",
+        "culture",
+        "solo"
       ],
-      "badge": "new",
-      "badgeText": "Nouveau",
+      "badge": "exploration",
+      "badgeText": "Explo",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
-  "📈 Clicker": {
+  "clicker": {
     "snow-digger": {
       "path": "./games/snow-digger/index.html",
       "name": "Snow Digger",
       "emoji": "❄️",
       "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
       "tags": [
-        "🪏 Pelle",
-        "❄️ Neige",
-        "🎮 Clicker",
-        "👤 Solo"
+        "snow",
+        "digger",
+        "clicker",
+        "solo"
       ],
       "badge": "popular",
       "badgeText": "Populaire",

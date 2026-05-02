@@ -1,5 +1,6 @@
 import { checkRealConnection } from "../js/network.js";
 import { showBMC, hideBMC } from "../js/BuyMeACoffee.js";
+import { notifyAboutVisit } from "../js/utils/webhooks.js";
 
 const statusBadge = document.querySelector(".status-badge");
 const statusText = document.getElementById("status-text");
@@ -36,7 +37,7 @@ async function startStats() {
         statusBadge.style.boxShadow = "0 0 10px rgba(81, 207, 102, 0.95)";
 
         // Changement du texte
-        statusText.innerText = "En ligne";
+        statusText.innerText = t("about.online");
       }
     } catch (e) {
       console.warn("⚠️ Erreur Firebase, passage aux valeurs par défaut", e);
@@ -53,7 +54,7 @@ async function startStats() {
       statusBadge.style.boxShadow = "0 0 10px rgba(207, 81, 102, 0.95)";
 
       // Changement du texte
-      statusText.innerText = "Hors ligne";
+      statusText.innerText = t("about.offline");
     }
   }
 
@@ -77,10 +78,10 @@ async function initStatsPage(playersCount, minutesCount) {
 
   // Logique de conversion minutes -> heures
   if (minutesCount >= 60) {
-    if (timeLabel) timeLabel.innerText = "Heures jouées";
+    if (timeLabel) timeLabel.innerText = t("about.stat_hours");
     displayMinutes = Math.floor(minutesCount / 60);
   } else {
-    if (timeLabel) timeLabel.innerText = "Minutes jouées";
+    if (timeLabel) timeLabel.innerText = t("about.stat_minutes");
   }
 
   const statsConfig = {
@@ -159,7 +160,7 @@ async function refreshStatus() {
     if (statusBadge && statusText) {
       statusBadge.style.backgroundColor = "rgba(81, 207, 102, 0.95)";
       statusBadge.style.boxShadow = "0 0 10px rgba(81, 207, 102, 0.95)";
-      statusText.innerText = "En ligne";
+      statusText.innerText = t("about.online");
     }
   } else {
     console.log("📡 Passage hors ligne");
@@ -168,7 +169,7 @@ async function refreshStatus() {
     if (statusBadge && statusText) {
       statusBadge.style.backgroundColor = "rgba(207, 81, 102, 0.95)";
       statusBadge.style.boxShadow = "0 0 10px rgba(207, 81, 102, 0.95)";
-      statusText.innerText = "Hors ligne";
+      statusText.innerText = t("about.offline");
     }
   }
 }
@@ -316,6 +317,12 @@ function addBackButtonTransition() {
 
 // Lancer au chargement
 document.addEventListener('DOMContentLoaded', () => {
+
+  initI18n();
+  refreshTexts();
+
+  notifyAboutVisit();
+
   initScrollAnimations();
   initScrollProgress();
   initParallax();

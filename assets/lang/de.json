@@ -1,0 +1,457 @@
+{
+    "menu": {
+        "subtitle": "Eine Kollektion von süchtig machenden Spielen für alle!",
+        "play": "Spielen",
+        "search_placeholder": "Spiel suchen...",
+        "games_available": "Verfügbare Spiele",
+        "hours_fun": "Stunden Spaß",
+        "free": "Kostenlos",
+        "online": "Online",
+        "offline": "Offline",
+        "favorites": "❤️ Favoriten",
+        "all": "Alle",
+        "random_title": "Zufälliges Spiel",
+        "random_desc": "Lass das Schicksal deine nächste Herausforderung aus allen unseren Spielen wählen!",
+        "random_btn": "Eine Herausforderung starten!",
+        "random_drawing": "🎲 Ziehen...",
+        "random_challenge": "HERAUSFORDERUNG",
+        "random_question": "🎯 Probiers mal!",
+        "footer_made_with": "Made with ❤️ by You | © 2026 Mini Games | Version:",
+        "footer_about": "ℹ️ Über uns",
+        "footer_contact": "📧 Kontakt",
+        "settings": "Einstellungen",
+        "music": "Musik",
+        "sound": "Ton",
+        "about": "ℹ️ Über",
+        "contact": "📧 Kontakt",
+        "games": {
+            "battleship": {
+                "name": "Schiffe versenken",
+                "description": "Finde und versenke die feindliche Flotte, bevor deine untergeht. Strategie und Intuition im Mehrspieler!"
+            },
+            "lostBelow": {
+                "name": "Lost Below",
+                "description": "Überlebe die Tiefen: Erforsche die Höhle und finde den Ausgang, bevor es zu spät ist."
+            },
+            "rocketeer": {
+                "name": "Rocketeer",
+                "description": "Baue deine Rakete Stück für Stück und schieße sie so weit wie möglich ins All!"
+            },
+            "casino": {
+                "name": "Casino",
+                "description": "Versuch dein Glück bei Casinospielen. Gewinne groß, aber pass auf Verluste auf."
+            },
+            "funfair": {
+                "name": "Funfair Frenzy",
+                "description": "Gewinne Tickets und hol alle Preise auf dem Jahrmarkt! Wähle dein Budget und probiere dein Glück."
+            },
+            "falling-blocks": {
+                "name": "Falling Blocks",
+                "description": "Stapel Teile, vervollständige Linien und hau den Score raus!"
+            },
+            "layer-pile": {
+                "name": "Layer Pile",
+                "description": "Stapel Blöcke präzise. Jeder Millimeter zählt!"
+            },
+            "lights-out-reflex": {
+                "name": "Lights Out Reflex",
+                "description": "Inspiriert von Formel-1-Starts: Warte auf das Erlöschen der Lichter und reagiere so schnell wie möglich, um den Rekord zu brechen!"
+            },
+            "punch-reflex": {
+                "name": "Punch Reflex",
+                "description": "Sei schneller als der Blitz: Klicke auf die Ziele, sobald sie aufleuchten!"
+            },
+            "ball-sort": {
+                "name": "Ball Sort",
+                "description": "Sortiere die farbigen Bälle in die Kolben. Ruhig an der Oberfläche, schrecklich süchtig machend darunter."
+            },
+            "block-puzzle": {
+                "name": "Block Puzzle",
+                "description": "Ordne Blöcke an, um Linien zu vervollständigen und die Gittersperre zu vermeiden. Ein strategisches und süchtig machendes Puzzle!"
+            },
+            "morpion": {
+                "name": "Tic-Tac-Toe",
+                "description": "Das klassische Spiel neu interpretiert! Tritt gegen die KI oder einen Freund an."
+            },
+            "casse-briques": {
+                "name": "Breakout",
+                "description": "Brich alle Ziegel und halte den Ball im Spiel. Einfach und effektiv."
+            },
+            "pong": {
+                "name": "Pong",
+                "description": "Das Original-Pong. Schnell, intensiv und immer unterhaltsam."
+            },
+            "draw-guess": {
+                "name": "Draw and Guess",
+                "description": "Zeig dein künstlerisches Talent (oder nicht) und lass Wörter in Echtzeit erraten!"
+            },
+            "geoquiz": {
+                "name": "GeoQuiz",
+                "description": "Erkenne Flaggen oder Länderumrisse aus aller Welt. Zwei Modi, verschiedene Schwierigkeitsstufen, Kontinente und Sprachen."
+            },
+            "where-am-i": {
+                "name": "Where Am I",
+                "description": "Errate, wo das Foto auf der Weltkarte aufgenommen wurde. Mehrspieler oder Solo."
+            },
+            "snow-digger": {
+                "name": "Snow Digger",
+                "description": "Räume den Schnee, verdiene Geld und räume schneller. Einfach, schnell, süchtig machend."
+            }
+        },
+        "badges": {
+            "new": "Neu",
+            "popular": "Beliebt",
+            "classic": "Klassiker",
+            "adventure": "Abenteuer",
+            "simulation": "Simulation",
+            "fun": "Spaß!",
+            "brain": "Rätsel",
+            "strategy": "Strategie",
+            "action": "Action",
+            "exploration": "Erkundung",
+            "random": "MUT"
+        },
+        "categories": {
+            "strategy": "🧠 Strategie",
+            "random": "🎲 Zufall",
+            "arcade": "⚡ Arcade & Reflexe",
+            "puzzle": "🧠 Rätsel & Logik",
+            "classic": "🎮 Klassiker",
+            "geo": "🌍 Geografie",
+            "clicker": "📈 Clicker",
+            "fun": "⚡ Spaß"
+        },
+        "tags": {
+            "real-time": "⚡ Echtzeit",
+            "strategy": "🧠 Strategie",
+            "multiplayer": "👥 Mehrspieler",
+            "survival": "🔦 Überleben",
+            "exploration": "🧗 Erkundung",
+            "space": "🚀 Weltraum",
+            "construction": "🔧 Bau",
+            "physics": "🧪 Physik",
+            "money": "💰 Geld",
+            "random": "🎲 Zufall",
+            "games": "🎮 Spiele",
+            "solo": "👤 Solo",
+            "tickets": "🎟️ Tickets",
+            "skill": "🎯 Geschick",
+            "arcade": "🕹️ Arcade",
+            "reflexes": "⚡ Reflexe",
+            "classic": "🎮 Klassiker",
+            "precision": "🎯 Präzision",
+            "speed": "⚡ Geschwindigkeit",
+            "logic": "🧠 Logik",
+            "puzzle": "🧪 Puzzle",
+            "reflexion": "🧩 Nachdenken",
+            "fast": "⚡ Schnell",
+            "creativity": "✏️ Kreativität",
+            "geography": "🌍 Geografie",
+            "culture": "🎓 Kultur",
+            "clicker": "🎮 Clicker",
+            "digger": "🪏 Gräber",
+            "snow": "❄️ Schnee"
+        }
+    },
+    "about": {
+        "back": "Zurück",
+        "online": "Online",
+        "offline": "Offline",
+        "title": "Über Mini Games",
+        "subtitle": "Eine Leidenschaft für Spiele, eine Plattform für alle",
+        "mission_title": "Unsere Mission",
+        "mission_p1": "Mini Games entstand aus einer einfachen Leidenschaft: <strong>unterhaltsame und zugängliche Spiele für alle zu schaffen</strong>. Wir glauben, dass die besten Spielmomente die sind, die man teilt – ob für ein paar Minuten Entspannung oder stundenlange Herausforderungen.",
+        "mission_p2": "Jedes Spiel ist sorgfältig gestaltet, um ein einzigartiges, süchtig machendes und völlig kostenloses Erlebnis zu bieten. Keine aufdringliche Werbung, kein Pay-to-Win – nur reinen Spielspaß.",
+        "story_title": "Unsere Geschichte",
+        "january": "Januar",
+        "february": "Februar",
+        "march": "März",
+        "april": "April",
+        "ongoing": "Laufend",
+        "soon": "Demnächst",
+        "timeline_jan": "Start von Mini Games mit unseren ersten zwei Spielen: <strong>Snow Digger</strong> und <strong>Morpion</strong>. Der Beginn eines leidenschaftlichen Abenteuers rund um Mini‑Spiele.",
+        "timeline_feb": "Neue Spiele hinzugefügt: <strong>Casino</strong>, <strong>Jahrmarkt</strong>, <strong>Erkundung</strong>, <strong>Rätsel</strong> und Einführung des <strong>Mehrspieler-Modus</strong> mit einem <strong>Rooms</strong>-System im Erkundungsspiel <strong>LostBelow</strong>. Die Plattform wächst schnell.",
+        "timeline_mar": "Große Erweiterung mit der Einführung von: <strong>Block Puzzle</strong>, <strong>Schiffe versenken</strong>, <strong>Layer Pile</strong>, <strong>Draw and Guess</strong>, <strong>Falling Blocks</strong>, <strong>Lights Out Reflex</strong> und <strong>GeoQuiz</strong>.<br>Das Erlebnis wird mit der Integration von <strong>Sounds und Musik</strong> immersiver, sowie der Einführung von <strong>Weltrekorden</strong> zur Community-Herausforderung.<br>Die Plattform erreicht einen neuen Meilenstein!",
+        "timeline_apr": "Einführung von <strong>Where Am I</strong> und <strong>Punch Reflex</strong>, sowie Erweiterung von <strong>Block Puzzle</strong> mit neuen Teilen.<br>Vollständige Überarbeitung der <strong>Spielkarten</strong> und des Menüs mit einem <strong>Kategorien</strong>-System. Musik pausiert jetzt automatisch, wenn die Seite ausgeblendet ist.<br>Start von <strong>Rocketeer</strong> — baue deine Rakete und schieße sie ins All!<br>Erste Schritte in Richtung <strong>Mehrsprachigkeit</strong> auf der Plattform.",
+        "timeline_ongoing": "Einführung der <strong>Mehrsprachigkeit</strong> für alle Spiele auf der Plattform. Wir arbeiten auch an <strong>neuen Spielen</strong> und optimieren weiterhin das <strong>Mobile</strong>-Erlebnis.",
+        "timeline_soon": "Start eines Systems mit <strong>personalisierten Profilen</strong>, <strong>täglichen Herausforderungen</strong> mit Belohnungen und Erweiterung des <strong>Echtzeit-Multiplayers</strong> auf unsere Klassiker. Das Mini‑Games-Abenteuer hat gerade erst begonnen!",
+        "tech_title": "Technologien",
+        "tech_intro": "Alle unsere Spiele werden mit modernen Webtechnologien entwickelt, um optimale Leistung auf allen Geräten zu gewährleisten.",
+        "tech_js": "Leistungsstarke Spiellogik",
+        "tech_canvas": "Flüssiges Grafik-Rendering",
+        "tech_responsive": "Mobil & Desktop kompatibel",
+        "tech_optimized": "Optimiert",
+        "tech_optimized_p": "Ultraschnelles Laden",
+        "stats_title": "Statistiken",
+        "stat_games": "Verfügbare Spiele",
+        "stat_players": "Spieler",
+        "stat_hours": "Gespielte Stunden",
+        "stat_minutes": "Gespielte Minuten",
+        "stat_free": "% Kostenlos",
+        "contact_title": "In Verbindung bleiben",
+        "contact_p": "Einen Bug melden? Einen Vorschlag? Zögere nicht, uns zu kontaktieren!",
+        "contact_btn": "E-Mail senden",
+        "footer": "Made with ❤️ by You | © 2026 Mini Games | Version:"
+    },
+    "morpion": {
+        "title": "Tic Tac Toe",
+        "win": "Sieg!",
+        "draw": "Unentschieden"
+    },
+    "rocketeer": {
+        "menu": {
+            "manual": "Handbuch",
+            "restart": "Neustart",
+            "back_to_menu": "Menü",
+            "parts_catalog": "TEILEKATALOG",
+            "rocket_stats": "RAKETEN-STATS",
+            "part_info": "Teilinfo",
+            "select_part_hint": "Teil auswählen, um Specs zu analysieren",
+            "build_hint": "Rechtsklick oder Entf zum Entfernen · Ziehen zum Verschieben · Leerfläche ziehen zum Schwenken",
+            "drag_hint": "Teile hierher ziehen, um deine Rakete zu bauen",
+            "drag_hint2": "← Aus der Teileliste auswählen",
+            "stat_cost": "Kosten",
+            "stat_mass": "Masse",
+            "stat_dv": "ΔV",
+            "stat_parts": "Teile",
+            "stat_twr": "SWV",
+            "stat_thrust": "Schub",
+            "btn_clear": "Löschen",
+            "btn_remove": "Entfernen",
+            "btn_launch": "STARTEN",
+            "menu_parts": "Teile",
+            "menu_stats": "Stats",
+            "menu_config": "Konfiguration",
+            "menu_build": "Konstruktion",
+            "menu_launch": "Start",
+            "build_mode": "Konstruktionsmodus",
+            "tip": "Tipp",
+            "pro_tip": "Profi-Tipp",
+            "optimize_mass_dv": "Optimisiere Masse ↓ / ΔV ↑",
+            "tools": "Werkzeuge",
+            "select_part": "Teil auswählen",
+            "tape_rocket": "Auf die Rakete tippen, um sie zu platzieren",
+            "selection_active": "Die Auswahl bleibt aktiv, bis sie platziert wird",
+            "add_title": "Fehlend :",
+            "add_cockpit": "Cockpit",
+            "add_engine": "Motor",
+            "add_fuel": "Treibstoff",
+            "ready": "✓ Darlehen — Verbleibendes Budget: {budget} ¢"
+        },
+        "game": {
+            "hud_altitude": "Höhe",
+            "hud_speed": "Geschw.",
+            "hud_dist_max": "Max. Dist.",
+            "hud_twr": "SWV",
+            "hud_credits": "Credits",
+            "hud_time": "Zeit",
+            "hud_throttle": "TRB",
+            "fuel_countdown": "⚠ KEIN TREIBSTOFF — Ende in {count}s",
+            "fuel_empty": "⚠ KRAFTSTOFF AUFGEGEBEN",
+            "landing_countdown": "LANDUNG — Bestätigt in {count}s",
+            "landing_success": "LANDUNG ERFOLGREICH!",
+            "stage_activated": "STUFE {stage} AKTIVIERT",
+            "time_scale": "Zeitskala:",
+            "btn_stage": "STUFE",
+            "btn_center": "ZENTRIEREN",
+            "btn_builder": "BUILDER",
+            "paused": "PAUSE",
+            "resume": "Fortsetzen",
+            "flight_manual": "Flughandbuch",
+            "back_to_builder": "Zurück zum Builder",
+            "mission_failed": "KABOOM — Mission fehlgeschlagen",
+            "mission_success": "Mission erfolgreich",
+            "max_distance": "MAX. DISTANZ",
+            "research_grant": "Forschungsförderung",
+            "ship_recovery": "Schiffsbergung",
+            "total_credits": "Credits gesamt",
+            "btn_retry": "Wiederholen",
+            "btn_builder_end": "Builder",
+            "back_to_flight": "Zurück zum Flug"
+        },
+        "modals": {
+            "restart_title": "Neustart",
+            "restart_body": "Möchtest du das Spiel wirklich neu starten?",
+            "restart_warning": "Aller aktuelle Fortschritt geht verloren",
+            "btn_cancel": "✕ Abbrechen",
+            "btn_restart": "Neustart",
+            "preflight_title": "Vor-Flug-Checkliste",
+            "preflight_mass": "Gesamtmasse",
+            "preflight_thrust": "Gesamtschub",
+            "preflight_twr": "SWV",
+            "preflight_dv": "Gesamt-ΔV",
+            "btn_ignition": "Zündung",
+            "modal_subtitle_default": "ROCKETEER OS",
+            "modal_dismiss": "Schließen"
+        },
+        "warnings": {
+            "twr_too_low": "SWV < 1 — Rakete hebt nicht ab!",
+            "twr_low": "Niedriger SWV — langsamer Aufstieg",
+            "ready": "Startbereit!",
+            "insufficient_funds": "UNZUREICHENDE MITTEL: {amount} ¢ fehlen",
+            "no_money_rd": "Nicht genug Geld für F&E! {amount} ¢ fehlen",
+            "rd_failed": "F&E FEHLGESCHLAGENE",
+            "overlap": "Überlappung — Teil zurückgesetzt",
+            "need_cockpit": "Cockpit benötigt",
+            "need_engine": "Triebwerk benötigt",
+            "need_fuel": "Treibstoff benötigt",
+            "clear_blueprint": "PLAN RESETTEN?",
+            "clear_blueprint_body": "Das Zurücksetzen des Layouts ist kostenlos. Alle Teile werden entfernt.",
+            "unlock_title": "{partName} FREISCHALTEN?",
+            "unlock_body": "{description} <br/> Forschungskosten : {price} ¢ <br/> Baukosten : {buildCost} ¢",
+            "rd_approval": "FORSCHUNGSGENEHMIGUNG ERFORDERLICH",
+            "rebuild": "Nicht genügend Credits, um die Rakete wieder aufzubauen! Benötige {amount} ¢ mehr."
+        },
+        "parts": {
+            "categories": {
+                "cockpit": "Cockpits",
+                "tank": "Treibstofftanks",
+                "engine": "Triebwerke",
+                "decoupler": "Entkoppler",
+                "fin": "Flossen",
+                "nosecone": "Nasenspitzen",
+                "bonus": "Bonusmodule"
+            },
+            "build_cost": "Bau: {amount} ¢",
+            "rd_cost": "F&E: {amount} ¢",
+            "cockpit_basic": {
+                "name": "Mk1-Kapsel",
+                "description": "Grundlegende Besatzungskapsel mit Standardausstattung."
+            },
+            "cockpit_advanced": {
+                "name": "Mk2-Kommandokapsel",
+                "description": "Stromlinienförmige Fortgeschrittenenkapsel für den Tiefraum."
+            },
+            "tank_small": {
+                "name": "FL-T100-Tank",
+                "description": "Kleiner Treibstofftank."
+            },
+            "tank_medium": {
+                "name": "FL-T400-Tank",
+                "description": "Mittlerer Treibstofftank."
+            },
+            "tank_long": {
+                "name": "FL-T800-Tank",
+                "description": "Langer vertikaler Tank für mehrstufige Raketen."
+            },
+            "tank_large": {
+                "name": "Jumbo-64-Tank",
+                "description": "Großer oranger Treibstofftank."
+            },
+            "tank_wide": {
+                "name": "X200-32-Tank",
+                "description": "Breiter Schwertank für Hochschubstufen."
+            },
+            "tank_side": {
+                "name": "Oscar-B-Tank",
+                "description": "Kompakter seitlich montierbarer Treibstofftank."
+            },
+            "engine_spark": {
+                "name": "Spark-Triebwerk",
+                "description": "Kleines leichtes Triebwerk für Oberstufen."
+            },
+            "engine_vacuum": {
+                "name": "Poodle-Vakuumtriebwerk",
+                "description": "Effizientes Triebwerk für das Weltall."
+            },
+            "engine_reliant": {
+                "name": "LV-T45 Reliant",
+                "description": "Hochschubtriebwerk ohne Schwenkdüse."
+            },
+            "engine_swivel": {
+                "name": "LV-T30 Swivel",
+                "description": "Zuverlässiges Triebwerk mit Schwenkdüse."
+            },
+            "engine_mainsail": {
+                "name": "RE-M3 Mainsail",
+                "description": "Riesiges Hochschubtriebwerk."
+            },
+            "engine_side": {
+                "name": "Thud-Booster",
+                "description": "Seitlich montierbares Boostertriebwerk."
+            },
+            "booster_srb": {
+                "name": "RT-10-Feststoffbooster",
+                "description": "Feststoffraketen-Booster. Kann nicht gedrosselt werden."
+            },
+            "decoupler_small": {
+                "name": "TR-18A-Entkoppler",
+                "description": "Stufentrenner."
+            },
+            "decoupler_radial": {
+                "name": "TT-70-Radialentkoppler",
+                "description": "Trennt seitlich montierte Teile ab."
+            },
+            "fin_small": {
+                "name": "Mini-Stabilisator",
+                "description": "Kleine Flosse zur Feinsteuerung."
+            },
+            "fin_basic": {
+                "name": "AV-R8-Winglet",
+                "description": "Grundlegende aerodynamische Flosse."
+            },
+            "fin_large": {
+                "name": "AV-T1 Schwerflosse",
+                "description": "Große Stabilisierungsflosse."
+            },
+            "nosecone_basic": {
+                "name": "AE-FF1-Verkleidung",
+                "description": "Aerodynamische Nasenspitze."
+            },
+            "bonus_science": {
+                "name": "Wissenschaftsmodul",
+                "description": "Schwere wissenschaftliche Nutzlast. Gewährt +25% Missionsbonus."
+            },
+            "bonus_cargo": {
+                "name": "Laderaum XL",
+                "description": "Riesiger Laderaum. Anfangs schwer, gewährt aber +25% Treibstoffkapazität."
+            },
+            "bonus_thruster_boost": {
+                "name": "Nachbrennerpaket",
+                "description": "Experimenteller Verbrennungsverbesserer. Erhöht den Schub aller Triebwerke um 25%."
+            }
+        },
+        "part_info": {
+            "thrust": "Schub",
+            "isp": "ISP",
+            "fuel_cap": "Tankkapazität",
+            "mass_wet": "Masse (voll)",
+            "fuel_amt": "Treibstoffmenge",
+            "configuration": "KONFIGURATION",
+            "set_as_primary": "ALS PRIMÄR SETZEN",
+            "primary_cockpit": "⭐ PRIMÄRES COCKPIT",
+            "rd_upgrades": "F&E-UPGRADES (Stufe {level})",
+            "current_bonus": "Aktueller Bonus",
+            "construction": "Konstruktion",
+            "next_upgrade": "NÄCHSTES UPGRADE:",
+            "new_bonus": "Neuer Bonus",
+            "new_construction": "Neue Konstr.",
+            "btn_upgrade": "🚀 F&E UPGRADEN ({amount} ¢)",
+            "ignite": "Zünden",
+            "detach": "Trennen"
+        },
+        "staging": {
+            "title": "MANUELLE STUFUNG",
+            "btn_add_stage": "+ Stufe hinzufügen",
+            "btn_remove_stage": "Entfernen",
+            "stage_label": "Stufe {n}",
+            "stage_empty": "Triebwerke oder Entkoppler hierher ziehen"
+        },
+        "manual": {
+            "page1_title": "1. Montage",
+            "page1_content": "<p>Teile aus dem Katalog ziehen. Sie rasten an Verbindungsknoten ein.</p><ul><li><b>Basis:</b> Jede Rakete braucht ein Cockpit, Treibstoff und ein Triebwerk.</li><li><b>Stufung:</b> Entkoppler verwenden, um leere Tanks abzutrennen und die nächste Phase zu zünden.</li><li><b>SWV:</b> Das Schub-Gewichts-Verhältnis muss > 1,0 sein, um abheben zu können.</li></ul>",
+            "page2_title": "2. Flugsteuerung",
+            "page2_content": "<ul><li><span class=\"key\">Shift</span> / <span class=\"key\">Strg</span> Schubkontrolle</li><li><span class=\"key\">Leertaste</span> Nächste Stufe / Entkoppeln</li><li><span class=\"key\">T</span> Zeitskala wechseln (1x, 2x, 4x, 8x, 15x)</li><li><span class=\"key\">C</span> Kamera zentrieren</li><li><b>Hinweis:</b> Manuelle Rotation ist deaktiviert. Gleichgewicht durch Design!</li></ul>",
+            "page3_title": "3. Wirtschaft",
+            "page3_content": "<ul><li><b>Distanz:</b> 1¢ pro 100m Reichweite.</li><li><b>Geschwindigkeitsbonus:</b> Schnellere Missionen bringen bis zu +10% extra!</li><li><b>Meilensteine:</b> Große Förderungen für das Erreichen von 100km, 500km usw.</li><li><b>F&E:</b> Credits ausgeben, um ISP, Schub und Wissenschaft zu verbessern.</li></ul>",
+            "page4_title": "4. Realismus & Physik",
+            "page4_content": "<ul><li><b>Drehmoment:</b> Wenn der Schub vom Schwerpunkt versetzt ist, neigt sich die Rakete.</li><li><b>Aerodynamik:</b> Die Luftdichte nimmt mit der Höhe ab. Flossen stabilisieren in der unteren Atmosphäre.</li><li><b>Hitze:</b> Schneller Abstieg in der Atmosphäre ist gefährlich!</li></ul>"
+        },
+        "bonus_descriptions": {
+            "thrustBoost": "Erhöht den Schub aller Triebwerke um {percent}%.",
+            "fuelBonus": "Gewährt +{percent}% Gesamttreibstoffkapazität.",
+            "sasBoost": "Verbessert SAS um {percent}%.",
+            "rewardMultiplier": "Gewährt +{percent}% Missionsbelohnung."
+        }
+    }
+}

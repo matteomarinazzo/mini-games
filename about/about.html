@@ -66,7 +66,7 @@
     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
       <path d="M10 18L2 10L10 2L11.4 3.4L5.8 9H18V11H5.8L11.4 16.6L10 18Z" />
     </svg>
-    Retour
+    <span data-i18n="about.back">Retour</span>
   </a>
 
   <!-- Header -->
@@ -79,11 +79,11 @@
           </div>
           <div class="status-badge" id="status-container">
             <span class="status-dot" id="status-dot"></span>
-            <span id="status-text">Hors ligne</span>
+            <span id="status-text" data-i18n="about.offline">Hors ligne</span>
           </div>
         </div>
-        <h1 class="page-title">À propos de Mini Games</h1>
-        <p class="page-subtitle">
+        <h1 class="page-title" data-i18n="about.title">À propos de Mini Games</h1>
+        <p class="page-subtitle" data-i18n="about.subtitle">
           Une passion pour les jeux, une plateforme pour tous
         </p>
       </div>
@@ -95,14 +95,14 @@
     <!-- Mission Section -->
     <section class="content-section">
       <div class="section-icon">🎯</div>
-      <h2>Notre Mission</h2>
-      <p>
+      <h2 data-i18n="about.mission_title">Notre Mission</h2>
+      <p data-i18n="about.mission_p1">
         Mini Games est né d'une passion simple :
         <strong>créer des jeux fun et accessibles à tous</strong>. Nous
         croyons que les meilleurs moments de jeu sont ceux qu'on partage, que
         ce soit pour quelques minutes de détente ou des heures de challenge.
       </p>
-      <p>
+      <p data-i18n="about.mission_p2">
         Chaque jeu est conçu avec soin pour offrir une expérience unique,
         addictive et totalement gratuite. Pas de publicités invasives, pas de
         pay-to-win, juste du pur plaisir de jeu.
@@ -112,15 +112,15 @@
     <!-- Story Section -->
     <section class="content-section highlight">
       <div class="section-icon">📖</div>
-      <h2>Notre Histoire</h2>
+      <h2 data-i18n="about.story">Notre Histoire</h2>
 
       <div class="timeline">
 
         <div class="timeline-item">
           <div class="timeline-marker">🚀</div>
           <div class="timeline-content">
-            <h3>Janvier 2026</h3>
-            <p>
+            <h3><span data-i18n="about.january">Janvier</span> 2026</h3>
+            <p data-i18n="about.timeline_jan">
               Lancement de Mini Games avec nos deux premiers jeux :
               <strong>Snow Digger</strong> et <strong>Morpion</strong>.
               Le début d’une aventure passionnée autour des mini‑jeux.
@@ -131,8 +131,8 @@
         <div class="timeline-item">
           <div class="timeline-marker">🎉</div>
           <div class="timeline-content">
-            <h3>Février 2026</h3>
-            <p>
+            <h3><span data-i18n="about.february">Février</span> 2026</h3>
+            <p data-i18n="about.timeline_feb">
               Ajout de nouveaux jeux :
               <strong>casino</strong>, <strong>fête foraine</strong>,
               <strong>exploration</strong>, <strong>réflexion</strong> et introduction du <strong>mode
@@ -147,8 +147,8 @@
         <div class="timeline-item">
           <div class="timeline-marker">⚡</div>
           <div class="timeline-content">
-            <h3>Mars 2026</h3>
-            <p>
+            <h3><span data-i18n="about.march">Mars</span> 2026</h3>
+            <p data-i18n="about.timeline_mar">
               Expansion majeure avec l'arrivée de :
               <strong>Block Puzzle</strong>, <strong>Bataille Navale</strong>, <strong>Layer Pile</strong>,
               <strong>Draw and Guess</strong>, <strong>Falling Blocks</strong>, <strong>Lights Out Reflex</strong> et
@@ -162,17 +162,33 @@
           </div>
         </div>
 
-        <!-- Avril 2025 : ajout de Where Am I et Punch Reflex-->
+        <div class="timeline-item">
+          <div class="timeline-marker">🌐</div>
+          <div class="timeline-content">
+            <h3><span data-i18n="about.april">Avril</span> 2026</h3>
+            <p data-i18n="about.timeline_apr">
+              Arrivée de <strong>Where Am I</strong> et <strong>Punch Reflex</strong>,
+              ainsi que l'enrichissement de <strong>Block Puzzle</strong> avec de nouvelles pièces.
+              <br>
+              Refonte complète des <strong>game cards</strong> et du menu avec un système de
+              <strong>catégories</strong>.
+              La musique se met désormais en pause automatiquement quand la page est cachée.
+              <br>
+              Lancement de <strong>Rocketeer</strong> — construis ta fusée et propulse-la dans l'espace !
+              <br>
+              Premiers pas vers le <strong>support multilingue</strong> de la plateforme.
+            </p>
+          </div>
+        </div>
 
         <div class="timeline-item">
           <div class="timeline-marker">🛠️</div>
           <div class="timeline-content">
-            <h3>En cours</h3>
-            <p>
-              Optimisation de la <strong>vitesse de chargement</strong> et peaufinage du <strong>gameplay
-                mobile</strong>.
-              Nous travaillons sur la stabilisation des serveurs pour garantir une compétition fluide sur tous les
-              nouveaux jeux.
+            <h3 data-i18n="about.ongoing">En cours</h3>
+            <p data-i18n="about.timeline_ongoing">
+              Déploiement du <strong>support multilingue</strong> sur l'ensemble des jeux de la plateforme.
+              Nous travaillons également sur de <strong>nouveaux jeux</strong> et continuons à optimiser
+              l'expérience <strong>mobile</strong>.
             </p>
           </div>
         </div>
@@ -180,8 +196,8 @@
         <div class="timeline-item">
           <div class="timeline-marker">💎</div>
           <div class="timeline-content">
-            <h3>Bientôt</h3>
-            <p>
+            <h3 data-i18n="about.soon">Bientôt</h3>
+            <p data-i18n="about.timeline_soon">
               Lancement d'un système de <strong>profils personnalisés</strong>, de <strong>défis quotidiens</strong>
               avec récompenses
               et extension du <strong>multijoueur temps réel</strong> à nos classiques. L'aventure Mini‑Games ne fait
@@ -196,8 +212,8 @@
     <!-- Tech Stack Section -->
     <section class="content-section">
       <div class="section-icon">💻</div>
-      <h2>Technologies</h2>
-      <p>
+      <h2 data-i18n="about.tech_title">Technologies</h2>
+      <p data-i18n="about.tech_intro">
         Tous nos jeux sont développés avec des technologies web modernes pour
         garantir des performances optimales sur tous les appareils.
       </p>
@@ -205,49 +221,49 @@
         <div class="tech-card">
           <div class="tech-icon">⚡</div>
           <h3>JavaScript</h3>
-          <p>Logique de jeu performante</p>
+          <p data-i18n="about.tech_js">Logique de jeu performante</p>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🎨</div>
           <h3>Canvas API</h3>
-          <p>Rendus graphiques fluides</p>
+          <p data-i18n="about.tech_canvas">Rendus graphiques fluides</p>
         </div>
         <div class="tech-card">
           <div class="tech-icon">📱</div>
           <h3>Responsive</h3>
-          <p>Compatible mobile & desktop</p>
+          <p data-i18n="about.tech_responsive">Compatible mobile & desktop</p>
         </div>
         <div class="tech-card">
           <div class="tech-icon">🚀</div>
-          <h3>Optimisé</h3>
-          <p>Chargement ultra-rapide</p>
+          <h3 data-i18n="about.tech_optimized">Optimisé</h3>
+          <p data-i18n="about.tech_optimized_p">Chargement ultra-rapide</p>
         </div>
       </div>
     </section>
 
     <!-- Stats Section -->
     <section class="content-section stats-section">
-      <h2>Statistiques</h2>
+      <h2 data-i18n="about.stats_title">Statistiques</h2>
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-icon">🎮</div>
           <div class="stat-value" id="gamesAvailable">0</div>
-          <div class="stat-label">Jeux disponibles</div>
+          <div class="stat-label" data-i18n="about.stat_games">Jeux disponibles</div>
         </div>
         <div class="stat-box">
           <div class="stat-icon">👥</div>
           <div class="stat-value" id="numberPlayers">0</div>
-          <div class="stat-label">Joueurs</div>
+          <div class="stat-label" data-i18n="about.stat_players">Joueurs</div>
         </div>
         <div class="stat-box">
           <div class="stat-icon">⏱️</div>
           <div class="stat-value" id="hoursPlayed">0</div>
-          <div class="stat-label" id="timeLabel">Heures jouées</div>
+          <div class="stat-label" id="timeLabel" data-i18n="about.stat_hours">Heures jouées</div>
         </div>
         <div class="stat-box">
           <div class="stat-icon">⭐</div>
           <div class="stat-value" id="percentFree">0</div>
-          <div class="stat-label">% Gratuit</div>
+          <div class="stat-label" data-i18n="about.stat_free">% Gratuit</div>
         </div>
       </div>
     </section>
@@ -255,8 +271,8 @@
     <!-- Contact Section -->
     <section class="content-section cta-section">
       <div class="section-icon">💬</div>
-      <h2>Restons connectés</h2>
-      <p>
+      <h2 data-i18n="about.contact_title">Restons connectés</h2>
+      <p data-i18n="about.contact_p">
         Un bug à signaler ? Une suggestion ? N'hésitez pas à nous contacter !
       </p>
       <div class="cta-buttons">
@@ -265,7 +281,7 @@
             <path
               d="M2 4L10 9L18 4V6L10 11L2 6V4ZM2 2C1.45 2 0.979 2.196 0.587 2.588C0.195 2.98 0 3.451 0 4V16C0 16.55 0.195 17.021 0.587 17.413C0.979 17.805 1.45 18 2 18H18C18.55 18 19.021 17.805 19.413 17.413C19.805 17.021 20 16.55 20 16V4C20 3.45 19.805 2.979 19.413 2.587C19.021 2.195 18.55 2 18 2H2Z" />
           </svg>
-          Envoyer un email
+          <span data-i18n="about.contact_btn">Envoyer un email</span>
         </a>
         <!--
           <a
@@ -288,7 +304,11 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p>Made with ❤️ by You | © 2026 Mini Games | Version : <span id="app-version">?</span></p>
+      <p>
+        <span data-i18n="about.footer">Made with ❤️ by You | © 2026 Mini Games | Version :</span>
+        <span id="app-version">?</span>
+      </p>
+
       <div class="social-links">
         <a href="https://instagram.com/matteo_mzzo" title="Instagram" target="_blank">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -322,6 +342,8 @@
   </footer>
 
   <script type="module" src="../js/countPlayedTime.js"></script>
+  <!-- Translation -->
+  <script src="../js/utils/i18n.js"></script>
   <script type="module" src="about.js"></script>
 </body>
 

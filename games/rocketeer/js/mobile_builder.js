@@ -84,13 +84,13 @@ const MobileBuilder = (() => {
                     <rect x="3" y="14" width="7" height="7" rx="1"/>
                     <rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
-                Pièces
+                ${t('rocketeer.menu.menu_parts')}
             </button>
             <button class="m-tab" id="mt-stats" onclick="MobileBuilder.toggle('stats')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
                 </svg>
-                Stats
+                ${t('rocketeer.menu.menu_stats')}
             </button>
             <button class="m-tab" id="mt-config" onclick="MobileBuilder.toggle('config')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -104,13 +104,13 @@ const MobileBuilder = (() => {
                     <circle cx="12" cy="10" r="2"/>
                     <circle cx="20" cy="14" r="2"/>
                 </svg>
-                Config
+                ${t('rocketeer.menu.menu_config')}
             </button>
             <button class="m-tab active" id="mt-build" onclick="MobileBuilder.toggle('build')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M21 7.5a5 5 0 0 1-6.9 4.6l-6.7 6.7a2 2 0 1 1-2.8-2.8l6.7-6.7A5 5 0 0 1 16.5 3l-2.1 2.1 2.5 2.5L21 7.5z"/>
                 </svg>
-                Build
+                ${t('rocketeer.menu.menu_build')}
             </button>
 
             <button class="m-tab tab-launch" id="mt-launch" onclick="MobileBuilder.toggle('launch')">
@@ -118,7 +118,7 @@ const MobileBuilder = (() => {
                     <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
                     <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
                 </svg>
-                Launch
+                ${t('rocketeer.menu.menu_launch')}
             </button>
         `;
 
@@ -134,7 +134,7 @@ const MobileBuilder = (() => {
                     <rect x="14" y="3" width="7" height="7" rx="1"/>
                     <rect x="3" y="14" width="7" height="7" rx="1"/>
                     <rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg> Catalogue de pièces</div>
+                </svg> ${t('rocketeer.menu.parts_catalog')}</div>
             <div class="m-sheet-body"><div class="m-parts-grid" id="m-parts-grid"></div></div>
         `;
 
@@ -147,15 +147,15 @@ const MobileBuilder = (() => {
             <div class="m-sheet-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
-            </svg> Statistiques fusée</div>
+            </svg> ${t('rocketeer.menu.rocket_stats')}</div>
             <div class="m-sheet-body">
                 <div class="m-stats-row">
-                    <div class="m-stat"><div class="m-stat-label">Coût</div><div class="m-stat-value" id="stat-cost">0¢</div></div>
-                    <div class="m-stat"><div class="m-stat-label">Masse</div><div class="m-stat-value" id="stat-mass">0t</div></div>
-                    <div class="m-stat"><div class="m-stat-label">ΔV</div><div class="m-stat-value" id="stat-dv">0</div></div>
-                    <div class="m-stat"><div class="m-stat-label">Pièces</div><div class="m-stat-value" id="stat-parts">0</div></div>
-                    <div class="m-stat"><div class="m-stat-label">TWR</div><div class="m-stat-value" id="stat-twr">0</div></div>
-                    <div class="m-stat"><div class="m-stat-label">Thrust</div><div class="m-stat-value" id="stat-thrust" style="color:#ff8030">0</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_cost')}</div><div class="m-stat-value" id="stat-cost">0¢</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_mass')}</div><div class="m-stat-value" id="stat-mass">0t</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_dv')}</div><div class="m-stat-value" id="stat-dv">0</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_parts')}</div><div class="m-stat-value" id="stat-parts">0</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_twr')}</div><div class="m-stat-value" id="stat-twr">0</div></div>
+                    <div class="m-stat"><div class="m-stat-label">${t('rocketeer.menu.stat_thrust')}</div><div class="m-stat-value" id="stat-thrust" style="color:#ff8030">0</div></div>
                 </div>
                 <div id="m-part-detail"></div>
             </div>
@@ -177,10 +177,10 @@ const MobileBuilder = (() => {
                     <circle cx="4" cy="12" r="2"/>
                     <circle cx="12" cy="10" r="2"/>
                     <circle cx="20" cy="14" r="2"/>
-                </svg> Configuration
+                </svg> ${t('rocketeer.menu.menu_config')}
             </div>
             <div class="m-sheet-body" id="m-config-body">
-                <div class="m-config-empty">Sélectionne une pièce pour afficher ses réglages</div>
+                <div class="m-config-empty">${t('rocketeer.menu.select_part_hint')}</div>
             </div>
         `;
 
@@ -193,16 +193,17 @@ const MobileBuilder = (() => {
             <div class="m-sheet-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M21 7.5a5 5 0 0 1-6.9 4.6l-6.7 6.7a2 2 0 1 1-2.8-2.8l6.7-6.7A5 5 0 0 1 16.5 3l-2.1 2.1 2.5 2.5L21 7.5z"/>
-                </svg> Build</div>
-                <div class="m-sheet-body">
-                    <div class="m-section-header">Outils</div>
-                        <div class="m-action-grid">
-                            <button class="m-action-btn danger" onclick="clearRocket()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                </svg> ${t('rocketeer.menu.menu_build')}
+            </div>
+            <div class="m-sheet-body">
+                <div class="m-section-header">${t('rocketeer.menu.tools')}</div>
+                    <div class="m-action-grid">
+                        <button class="m-action-btn danger" onclick="clearRocket()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6h18"/>
                         <path d="M8 6v14c0 1 1 2 2 2h4c1 0 2-1 2-2V6"/>
                     </svg>
-                    Clear
+                    ${t('rocketeer.menu.btn_clear')}
                 </button>
 
                 <button class="m-action-btn" onclick="deleteSelectedPart()">
@@ -210,28 +211,28 @@ const MobileBuilder = (() => {
                         <path d="M18 6 6 18"/>
                         <path d="M6 6l12 12"/>
                     </svg>
-                    Delete
+                    ${t('rocketeer.menu.btn_remove')}
                 </button>
             </div>
 
             <!-- SECTION BUILD MODE -->
             <div class="m-section">
-                <div class="m-section-header">Mode de construction</div>
+                <div class="m-section-header">${t('rocketeer.menu.build_mode')}</div>
 
                 <div class="m-build-hint">
-                    • Sélectionne une pièce dans le catalogue<br>
-                    • Tape sur le vaisseau pour la placer<br>
-                    • La sélection reste active jusqu’à placement
+                    • ${t('rocketeer.menu.select_part')}<br>
+                    • ${t('rocketeer.menu.tape_rocket')}<br>
+                    • ${t('rocketeer.menu.selection_active')}
                 </div>
             </div>
 
             <!-- SECTION TIP (cohérence UI comme stats) -->
             <div class="m-section">
-                <div class="m-section-header">Astuce</div>
+                <div class="m-section-header">${t('rocketeer.menu.tip')}</div>
 
                 <div class="m-stat">
-                    <div class="m-stat-label">Pro tip</div>
-                    <div class="m-stat-value">Optimise masse ↓ / ΔV ↑</div>
+                    <div class="m-stat-label">${t('rocketeer.menu.pro_tip')}</div>
+                    <div class="m-stat-value">${t('rocketeer.menu.optimize_mass_dv')}</div>
                 </div>
             </div>
 
@@ -248,15 +249,15 @@ const MobileBuilder = (() => {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
                 <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-            </svg> Lancement</div>
+            </svg> ${t('rocketeer.menu.menu_launch')}</div>
             <div class="m-sheet-body">
-                <div id="m-launch-status">Ajoute cockpit + moteur + réservoir</div>
+                <div id="m-launch-status"></div>
                 <button id="m-btn-launch" disabled onclick="launchRocket()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
                         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
                         <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
                     </svg>
-                    LAUNCH
+                    ${t('rocketeer.menu.btn_launch')}
                 </button>
             </div>
         `;
@@ -264,7 +265,7 @@ const MobileBuilder = (() => {
         // Hint placement
         const hint = document.createElement('div');
         hint.id = 'm-place-hint';
-        hint.textContent = '✚ Tape pour poser';
+        hint.textContent = `✚ ${t('rocketeer.menu.tape_rocket')}`;
 
         const area = document.querySelector('.build-area');
         if (area) {
@@ -322,7 +323,7 @@ const MobileBuilder = (() => {
 
             const label = document.createElement('div');
             label.className = 'm-cat-label';
-            label.innerHTML = `${meta.icon} ${meta.label}`;
+            label.innerHTML = `${meta.icon} ${t(`rocketeer.parts.categories.${cat}`)}`;
             grid.appendChild(label);
 
             for (const part of partsInCat) {
@@ -396,7 +397,7 @@ const MobileBuilder = (() => {
 
         const hint = document.getElementById('m-place-hint');
         if (hint) {
-            hint.textContent = `✚ ${def.name} — Tape pour poser`;
+            hint.textContent = `✚ ${def.name} — ${t('rocketeer.menu.tape_rocket')}`;
             hint.classList.add('visible');
         }
 
@@ -513,14 +514,14 @@ const MobileBuilder = (() => {
         const status = document.getElementById('m-launch-status');
         if (status) {
             if (ok) {
-                status.textContent = `✓ Prêt — Budget restant : ${builderState.money.toLocaleString()}¢`;
+                status.textContent = `${t('rocketeer.menu.ready').replace('{budget}', builderState.money.toLocaleString())}`;
                 status.className = 'ready';
             } else {
                 const miss = [];
-                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'cockpit')) miss.push('cockpit');
-                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'engine')) miss.push('moteur');
-                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'tank')) miss.push('réservoir');
-                status.textContent = `Manque : ${miss.join(' · ')}`;
+                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'cockpit')) miss.push(t("rocketeer.menu.add_cockpit"));
+                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'engine')) miss.push(t("rocketeer.menu.add_engine"));
+                if (!parts.some(p => PARTS_CATALOG[p.partId]?.category === 'tank')) miss.push(t("rocketeer.menu.add_fuel"));
+                status.textContent = `${t("rocketeer.menu.add_title")} ${miss.join(' · ')}`;
                 status.className = '';
             }
         }

@@ -456,7 +456,7 @@ const Game = (() => {
 
         const show = () => {
             if (!cdEl) return;
-            cdEl.textContent = count > 0 ? `LANDING — Confirmed in ${count}s` : 'LANDING CONFIRMED';
+            cdEl.textContent = count > 0 ? `${t("rocketeer.game.landing_countdown").replace("{count}", count)}` : `${t("rocketeer.game.landing_success")}`;
             cdEl.style.display = 'block';
             cdEl.style.color = '#40ff90';
             cdEl.style.borderColor = 'rgba(64, 255, 144, 0.6)';
@@ -504,7 +504,6 @@ const Game = (() => {
         state.outOfFuel = true; // déclenche la fin normale
         state.inputs.throttle = 0;
         playRocketeerSound('success');
-        flashHUD(`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3"/><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5"/></svg> LANDED! Ship recovered!`, '#40ff90');
 
         // Fin immédiate
         state.ended = true;
@@ -610,7 +609,6 @@ const Game = (() => {
 
         let decouplerIds = new Set();
         let engineIds = new Set();
-        let flashMsg = 'STAGE ACTIVATED!';
 
         currentStageDef.elements.forEach(el => {
             if (el.type === 'engine') engineIds.add(el.partId);
@@ -631,7 +629,6 @@ const Game = (() => {
 
         // Handle decouplers
         if (decouplerIds.size > 0) {
-            flashMsg = 'STAGE SEPARATED!';
             playRocketeerSound('staging');
             let currentParts = [...state.rocket.placedParts];
 
@@ -716,7 +713,7 @@ const Game = (() => {
             state.state.bottomOffset = newRocket._bottomOffset;
         }
 
-        flashHUD(`STAGE ${stageIndex} ACTIVATED`, '#ff8030');
+        flashHUD(t('rocketeer.game.stage_activated').replace('{stage}', stageIndex), '#ff8030');
     }
 
     function centerCamera() {
@@ -867,11 +864,11 @@ const Game = (() => {
             if (state._landingCountdownActive) {
                 // Ne pas toucher — géré par startLandingCountdown()
             } else if (state.outOfFuel && state.countdown != null) {
-                cdEl.textContent = `⚠ OUT OF FUEL — End in ${state.countdown}s`;
+                cdEl.textContent = t('rocketeer.game.fuel_countdown').replace('{count}', state.countdown);
                 cdEl.style.display = 'block';
                 if (state.timeScale !== 1) setTimeScale(1);
             } else if (phy.fuelMass <= 0) {
-                cdEl.textContent = '⚠ FUEL DEPLETED';
+                cdEl.textContent = t('rocketeer.game.fuel_empty');
                 cdEl.style.display = 'block';
             } else {
                 cdEl.style.display = 'none';
@@ -919,7 +916,7 @@ const Game = (() => {
         const stEl = document.getElementById('hud-stage');
         const total = Math.max(1, state.stages.length);
         const current = Math.min(state.currentStage, total);
-        if (stEl) stEl.textContent = `Stage ${current}/${total}`;
+        if (stEl) stEl.textContent = `${t('rocketeer.game.btn_stage').charAt(0).toUpperCase() + t('rocketeer.game.btn_stage').slice(1).toLowerCase()} ${current}/${total}`;
 
         const btnStage = document.getElementById('btn-stage');
         if (btnStage) {
@@ -972,8 +969,6 @@ const Game = (() => {
 
         if (state.crashed) reward = 0;
 
-        // TODO : GERER LE PARAVHUTE : REWARD + PRIX FUSEE REMBOURSÉ
-
         if (!state.crashed) {
             playRocketeerSound('success');
         }
@@ -995,7 +990,7 @@ const Game = (() => {
         const titleEl = overlay.querySelector('.end-title');
         const iconContainer = document.getElementById('end-icon-svg');
 
-        if (titleEl) titleEl.textContent = state.crashed ? 'KABOOM — Mission Failed' : 'Mission Success';
+        if (titleEl) titleEl.textContent = state.crashed ? t("rocketeer.game.mission_failed") : t("rocketeer.game.mission_success");
         if (iconContainer) {
             iconContainer.innerHTML = state.crashed
                 ? `<svg width="48" height="48" viewBox="0 0 32 32" style="vertical-align: middle; margin-right: 8px; filter: drop-shadow(0 0 3px #ff4000);"><path d="M16 2 L19 11 L28 8 L22 16 L30 22 L20 22 L16 30 L12 22 L2 22 L10 16 L4 8 L13 11 Z" fill="#ffff00" stroke="#ff4000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" /></svg>`
@@ -1035,7 +1030,7 @@ const Game = (() => {
         saveGhost();
         const cost = state.rocket._buildCost || 0;
         if (state.money < cost) {
-            alert("Not enough credits to rebuild the rocket!");
+            alert(t('rocketeer.warnings.rebuild').replace('{amount}', (cost - state.money).toLocaleString()));
             goToBuilder();
             return;
         }
@@ -1091,7 +1086,7 @@ const Game = (() => {
         if (lbl) lbl.textContent = `x${v}`;
 
         // Feedback visuel
-        flashHUD(`Time Scale: x${v}`, '#40c0ff');
+        flashHUD(t('rocketeer.game.time_scale') + `x${v}`, '#40c0ff');
 
         // Fermer le menu
         const menu = document.getElementById('time-scale-menu');
@@ -1116,10 +1111,6 @@ const Game = (() => {
     return { init, retryFlight, goToBuilder, stageRocket, centerCamera, togglePause, _getTime, _setThrottle, setTimeScale, toggleTimeScale };
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
-    Game.init();
-});
-
 document.querySelectorAll('.ts-option').forEach(opt => {
     opt.addEventListener('click', () => {
         const v = parseFloat(opt.dataset.v);
@@ -1132,52 +1123,28 @@ window.Game = Game;
 // ─── RULES PAGINATION ───────────────────────────────────
 const Rules = (() => {
     let currentPage = 0;
-    const pages = [
-        {
-            title: "1. Assembly",
-            content: `
-                <p>Drag parts from the catalog. They snap to connection nodes.</p>
-                <ul>
-                    <li><b>Core:</b> Every rocket needs a Cockpit, Fuel, and Engine.</li>
-                    <li><b>Staging:</b> Use Decouplers to drop empty tanks and ignite the next phase.</li>
-                    <li><b>TWR:</b> Thrust-to-Weight Ratio must be > 1.0 to lift off.</li>
-                </ul>
-            `
-        },
-        {
-            title: "2. Flight Controls",
-            content: `
-                <ul>
-                    <li><span class="key">Shift</span> / <span class="key">Ctrl</span> Throttle Control</li>
-                    <li><span class="key">Space</span> Next Stage / Decouple</li>
-                    <li><span class="key">T</span> Cycle Time Scale (1x, 2x, 4x, 8x, 15x)</li>
-                    <li><span class="key">C</span> Center Camera</li>
-                    <li><b>Note:</b> Manual rotation is disabled. Balancing is done via design!</li>
-                </ul>
-            `
-        },
-        {
-            title: "3. Economy",
-            content: `
-                <ul>
-                    <li><b>Distance:</b> 1¢ per 100m reached.</li>
-                    <li><b>Speed Bonus:</b> Faster missions earn up to +10% extra!</li>
-                    <li><b>Milestones:</b> Massive grants for reaching 100km, 500km, etc.</li>
-                    <li><b>R&D:</b> Spend credits to improve ISP, Thrust, and Science.</li>
-                </ul>
-            `
-        },
-        {
-            title: "4. Realism & Physics",
-            content: `
-                <ul>
-                    <li><b>Torque:</b> If thrust is off-center from the Center of Mass (CoM), the rocket will tilt.</li>
-                    <li><b>Aerodynamics:</b> Air density drops with altitude. Fins help stabilize in low atmosphere.</li>
-                    <li><b>Heat:</b> High-speed descent in atmosphere is dangerous!</li>
-                </ul>
-            `
-        }
-    ];
+    let pages = [];
+
+    function buildPages() {
+        return [
+            {
+                title: t("rocketeer.manual.page1_title"),
+                content: t("rocketeer.manual.page1_content")
+            },
+            {
+                title: t("rocketeer.manual.page2_title"),
+                content: t("rocketeer.manual.page2_content")
+            },
+            {
+                title: t("rocketeer.manual.page3_title"),
+                content: t("rocketeer.manual.page3_content")
+            },
+            {
+                title: t("rocketeer.manual.page4_title"),
+                content: t("rocketeer.manual.page4_content")
+            }
+        ];
+    }
 
     function showPage(idx) {
         currentPage = Math.max(0, Math.min(pages.length - 1, idx));
@@ -1197,14 +1164,21 @@ const Rules = (() => {
     }
 
     return {
-        init: () => showPage(0),
+        init: () => {
+            pages = buildPages();
+            showPage(0);
+        },
         nextPage: () => showPage(currentPage + 1),
-        prevPage: () => showPage(currentPage - 1)
+        prevPage: () => showPage(currentPage - 1),
+        reload: () => { pages = buildPages(); showPage(currentPage); }
     };
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n();
     Rules.init();
+    Game.init();
+    refreshTexts();
 });
 
 window.Rules = Rules;

@@ -18,27 +18,27 @@
     <div id="hud">
         <div class="hud-telemetry">
             <div class="hud-cell">
-                <div class="hud-label">Altitude</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_altitude">Altitude</div>
                 <div class="hud-value" id="hud-alt">0 m</div>
             </div>
             <div class="hud-cell">
-                <div class="hud-label">Speed</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_speed">Speed</div>
                 <div class="hud-value" id="hud-speed">0 m/s</div>
             </div>
             <div class="hud-cell">
-                <div class="hud-label">Dist Max</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_dist_max">Dist Max</div>
                 <div class="hud-value" id="hud-dist">0 m</div>
             </div>
             <div class="hud-cell">
-                <div class="hud-label">TWR</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_twr">TWR</div>
                 <div class="hud-value" id="hud-twr">0.00</div>
             </div>
             <div class="hud-cell">
-                <div class="hud-label">Credits</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_credits">Credits</div>
                 <div class="hud-value" id="hud-money">0 ¢</div>
             </div>
             <div class="hud-cell">
-                <div class="hud-label">Time</div>
+                <div class="hud-label" data-i18n="rocketeer.game.hud_time">Time</div>
                 <div class="hud-value" id="hud-time">0s</div>
             </div>
         </div>
@@ -48,15 +48,15 @@
         </div>
 
         <div class="hud-top-right">
-            <div class="hud-stage-display" id="hud-stage">Stage 1/1</div>
+            <div class="hud-stage-display" id="hud-stage" data-i18n="rocketeer.game.hud_stage">Stage 1/1</div>
             <div class="hud-sas-display" id="hud-sas" onclick="Game.toggleSAS()">⬆ SAS ON</div>
         </div>
 
-        <div id="fuel-countdown">⚠ OUT OF FUEL — End in 10s</div>
+        <div id="fuel-countdown" data-i18n="rocketeer.game.hud_fuel_countdown">⚠ OUT OF FUEL — End in 10s</div>
         <div id="hud-flash"></div>
 
         <div class="throttle-panel">
-            <div class="throttle-label">THR</div>
+            <div class="throttle-label" data-i18n="rocketeer.game.hud_throttle">THR</div>
             <div class="throttle-track" id="throttle-track" onclick="handleThrottleClick(event)">
                 <div class="throttle-fill" id="throttle-fill" style="height:0%"></div>
             </div>
@@ -75,7 +75,7 @@
                         <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
                         <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
                     </svg>
-                    <span>STAGE</span>
+                    <span data-i18n="rocketeer.game.btn_stage">STAGE</span>
                 </button>
             </div>
 
@@ -86,7 +86,7 @@
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
-                    <span class="label">CENTER</span>
+                    <span class="label" data-i18n="rocketeer.game.btn_center">CENTER</span>
                 </button>
             </div>
 
@@ -108,7 +108,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    <span>BUILDER</span>
+                    <span data-i18n="rocketeer.game.btn_builder">BUILDER</span>
                 </button>
                 <div class="control-group time" id="time-scale-menu">
                     <div class="ts-option" data-v="0">x0</div>
@@ -131,14 +131,14 @@
                     <rect x="6" y="4" width="4" height="16" />
                     <rect x="14" y="4" width="4" height="16" />
                 </svg>
-                <h2>PAUSED</h2>
+                <h2 data-i18n="rocketeer.game.paused">PAUSED</h2>
             </div>
             <div class="pause-btns">
                 <button class="btn btn-primary" onclick="Game.togglePause()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="m5 3 14 9-14 9V3z" />
                     </svg>
-                    Resume
+                    <span data-i18n="rocketeer.game.resume">Resume</span>
                 </button>
                 <button class="btn" onclick="document.getElementById('rules-in-game').style.display='flex'">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -146,13 +146,13 @@
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
-                    Flight Manual
+                    <span data-i18n="rocketeer.game.flight_manual">Flight Manual</span>
                 </button>
                 <button class="btn" onclick="window.location.href='index.html'">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    Back to Builder
+                    <span data-i18n="rocketeer.game.back_to_builder">Back to Builder</span>
                 </button>
             </div>
         </div>
@@ -163,21 +163,24 @@
         <div class="end-card">
             <div class="end-header">
                 <div id="end-icon-svg" style="width:48px;height:48px;margin:0 auto 12px;color:var(--accent)"></div>
-                <div class="end-title">Mission Status</div>
+                <div class="end-title" data-i18n="rocketeer.game.mission_status">Mission Status</div>
             </div>
 
             <div
                 style="font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;text-align:center">
-                MAX DISTANCE</div>
+                <span data-i18n="rocketeer.game.max_distance">MAX DISTANCE</span>
+            </div>
             <div class="end-distance-val" id="end-distance" style="text-align:center">0 m</div>
 
             <div class="end-stats">
-                <div class="end-reward-row"><span>Research Grant</span><span id="end-reward">+0 ¢</span></div>
+                <div class="end-reward-row"><span data-i18n="rocketeer.game.research_grant">Research
+                        Grant</span><span id="end-reward">+0 ¢</span></div>
                 <div class="end-reward-row" id="end-recovery-row" style="display:none">
-                    <span>Ship Recovery</span>
+                    <span data-i18n="rocketeer.game.ship_recovery">Ship Recovery</span>
                     <span id="end-recovery" style="color:#40c080">+0 ¢</span>
                 </div>
-                <div class="end-total-row"><span>Total Credits</span><span id="end-total">0 ¢</span></div>
+                <div class="end-total-row"><span data-i18n="rocketeer.game.total_credits">Total Credits</span><span
+                        id="end-total">0 ¢</span></div>
             </div>
 
             <div class="end-buttons">
@@ -186,13 +189,13 @@
                         <path d="M21 2v6h-6" />
                         <path d="M21 13a9 9 0 1 1-3-7.7L21 8" />
                     </svg>
-                    Retry
+                    <span data-i18n="rocketeer.game.btn_retry">Retry</span>
                 </button>
                 <button class="btn" onclick="Game.goToBuilder()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    Builder
+                    <span data-i18n="rocketeer.game.btn_builder">Builder</span>
                 </button>
             </div>
         </div>
@@ -218,7 +221,8 @@
                     <button class="btn btn-sm" id="rules-next" onclick="Rules.nextPage()">→</button>
                 </div>
                 <button class="btn btn-primary" onclick="document.getElementById('rules-in-game').style.display='none'"
-                    style="width:100%;margin-top:12px">Back to Flight</button>
+                    style="width:100%;margin-top:12px"><span data-i18n="rocketeer.game.back_to_flight">Back to
+                        Flight</span></button>
             </div>
         </div>
     </div>
@@ -241,6 +245,7 @@
     <script src="js/physics.js"></script>
     <script src="js/rocket.js"></script>
     <script src="js/renderer.js"></script>
+    <script src="../../js/utils/i18n.js"></script>
     <script src="js/game.js"></script>
     <script type="module">
         import { playRocketeerSound } from '../../js/utils/audio.js';

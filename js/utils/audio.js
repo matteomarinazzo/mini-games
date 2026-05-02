@@ -4,9 +4,8 @@
 // ─────────────────────────────────────────────
 
 let audioCtx = null;
-let isSoundEnabled = localStorage.getItem("fallingBlocks_sound") !== "false";
-let isMusicEnabled = localStorage.getItem("fallingBlocks_music") !== "false";
-
+let isSoundEnabled = localStorage.getItem("mg_sound") !== "false";
+let isMusicEnabled = localStorage.getItem("mg_music") !== "false";
 
 function getAudioCtx() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2573,6 +2572,594 @@ export function toggleGqMusic() {
     return isMusicEnabled;
 }
 export function getGqMusicEnabled() { return isMusicEnabled; }
+
+// ─────────────────────────────────────────────
+// AUDIO ENGINE — ROCKETEER
+// ─────────────────────────────────────────────
+export function playRocketeerSound(type) {
+    if (!isSoundEnabled) return;
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // BUILD
+    // ── BUY : Achat d'une pièce (tintement métallique satisfaisant) ─────────
+    // ── BUY : Achat / déverrouillage R&D (caisse enregistreuse satisfaisante) ─────────
+    if (type === 'buy') {
+        const master = out(ctx, 0.7);
+
+        // Ding montant cristallin (caisse enregistreuse)
+        const freqs = [660, 880, 1320];
+        freqs.forEach((f, i) => {
+            const t = now + i * 0.06;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(0.4, t + 0.008);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.25);
+        });
+
+        // Click mécanique initial
+        const click = ctx.createOscillator();
+        const cg = ctx.createGain();
+        click.type = 'square';
+        click.frequency.setValueAtTime(1800, now);
+        click.frequency.exponentialRampToValueAtTime(400, now + 0.015);
+        cg.gain.setValueAtTime(0.25, now);
+        cg.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+        click.connect(cg); cg.connect(master);
+        click.start(now); click.stop(now + 0.02);
+
+        // Sub-thump (sensation physique)
+        const sub = ctx.createOscillator();
+        const sg = ctx.createGain();
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(80, now);
+        sub.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+        sg.gain.setValueAtTime(0.5, now);
+        sg.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        sub.connect(sg); sg.connect(master);
+        sub.start(now); sub.stop(now + 0.1);
+    }
+
+    // ── PLACE : Poser une pièce (clunk mécanique précis + magnétique) ────────────────
+    else if (type === 'place') {
+        const master = out(ctx, 0.75);
+
+        // Impact principal (clunk métallique lourd)
+        const thump = ctx.createOscillator();
+        const tg = ctx.createGain();
+        thump.type = 'triangle';
+        thump.frequency.setValueAtTime(220, now);
+        thump.frequency.exponentialRampToValueAtTime(55, now + 0.1);
+        tg.gain.setValueAtTime(0, now);
+        tg.gain.linearRampToValueAtTime(0.8, now + 0.003);
+        tg.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        thump.connect(tg); tg.connect(master);
+        thump.start(now); thump.stop(now + 0.14);
+
+        // Snap mécanique (emboîtement)
+        const snap = ctx.createOscillator();
+        const snapG = ctx.createGain();
+        snap.type = 'square';
+        snap.frequency.setValueAtTime(2400, now);
+        snap.frequency.exponentialRampToValueAtTime(600, now + 0.018);
+        snapG.gain.setValueAtTime(0.3, now);
+        snapG.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
+        snap.connect(snapG); snapG.connect(master);
+        snap.start(now); snap.stop(now + 0.022);
+
+        // Résonance métallique (vibration de la structure)
+        const ring = ctx.createOscillator();
+        const rg = ctx.createGain();
+        const ringFilter = ctx.createBiquadFilter();
+        ring.type = 'sine';
+        ring.frequency.setValueAtTime(480, now + 0.01);
+        ringFilter.type = 'bandpass';
+        ringFilter.frequency.value = 480;
+        ringFilter.Q.value = 8;
+        rg.gain.setValueAtTime(0.22, now + 0.01);
+        rg.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        ring.connect(ringFilter); ringFilter.connect(rg); rg.connect(master);
+        ring.start(now + 0.01); ring.stop(now + 0.2);
+
+        // Bruit blanc court (friction mécanique)
+        const nBuf = ctx.createBuffer(1, ctx.sampleRate * 0.025, ctx.sampleRate);
+        const nData = nBuf.getChannelData(0);
+        for (let i = 0; i < nData.length; i++) nData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.005));
+        const nSrc = ctx.createBufferSource();
+        nSrc.buffer = nBuf;
+        const nFilter = ctx.createBiquadFilter();
+        nFilter.type = 'bandpass';
+        nFilter.frequency.value = 3000;
+        nFilter.Q.value = 1;
+        const nG = ctx.createGain();
+        nG.gain.setValueAtTime(0.35, now);
+        nG.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+        nSrc.connect(nFilter); nFilter.connect(nG); nG.connect(master);
+        nSrc.start(now); nSrc.stop(now + 0.025);
+    }
+
+    // ── UPDATE : Upgrade R&D (synthé sci-fi montant + énergie) ────────────────
+    else if (type === 'update') {
+        const master = out(ctx, 0.65);
+
+
+        // Arpège final (confirmation positive)
+        [523, 659, 784].forEach((f, i) => {
+            const t = now + 0.25 + i * 0.07;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(0.35, t + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.2);
+        });
+
+        // Bruit de soudure / plasma (texture)
+        const buf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.04));
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const bFilter = ctx.createBiquadFilter();
+        bFilter.type = 'bandpass';
+        bFilter.frequency.value = 1200;
+        bFilter.Q.value = 3;
+        const ng = ctx.createGain();
+        ng.gain.setValueAtTime(0.2, now);
+        ng.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        src.connect(bFilter); bFilter.connect(ng); ng.connect(master);
+        src.start(now); src.stop(now + 0.15);
+    }
+
+    // GAME
+    // ── STAGING : Séparation d'étage (explosifs + déverrouillage méca) ───
+    else if (type === 'staging') {
+        const master = out(ctx, 1.1);
+
+        // ─────────────────────────────
+        // 1) CHARGE PYROTECHNIQUE (bang sec)
+        // ─────────────────────────────
+        const pyroBuf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+        const pyroData = pyroBuf.getChannelData(0);
+        for (let i = 0; i < pyroData.length; i++) {
+            pyroData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.01));
+        }
+        const pyro = ctx.createBufferSource();
+        pyro.buffer = pyroBuf;
+
+        const pyroFilter = ctx.createBiquadFilter();
+        pyroFilter.type = 'highpass';
+        pyroFilter.frequency.value = 600;
+
+        const pyroG = ctx.createGain();
+        pyroG.gain.value = 1.0;
+
+        pyro.connect(pyroFilter);
+        pyroFilter.connect(pyroG);
+        pyroG.connect(master);
+
+        pyro.start(now);
+        pyro.stop(now + 0.08);
+
+        // ─────────────────────────────
+        // 2) WHOOSH DE SÉPARATION (gaz sous pression)
+        // ─────────────────────────────
+        const airBuf = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate);
+        const airData = airBuf.getChannelData(0);
+        for (let i = 0; i < airData.length; i++) {
+            airData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.05));
+        }
+
+        const air = ctx.createBufferSource();
+        air.buffer = airBuf;
+
+        const airFilter = ctx.createBiquadFilter();
+        airFilter.type = 'bandpass';
+        airFilter.frequency.value = 450;
+        airFilter.Q.value = 1.2;
+
+        const airG = ctx.createGain();
+        airG.gain.value = 0.6;
+
+        air.connect(airFilter);
+        airFilter.connect(airG);
+        airG.connect(master);
+
+        air.start(now + 0.02);
+        air.stop(now + 0.25);
+
+        // ─────────────────────────────
+        // 3) MÉTAL (verrous qui claquent)
+        // ─────────────────────────────
+        for (let i = 0; i < 4; i++) {
+            const t = now + 0.05 + i * 0.03;
+
+            const click = ctx.createOscillator();
+            const clickG = ctx.createGain();
+            const clickFilter = ctx.createBiquadFilter();
+
+            click.type = 'triangle';
+            click.frequency.setValueAtTime(900 + Math.random() * 600, t);
+
+            clickFilter.type = 'bandpass';
+            clickFilter.frequency.value = 1500;
+            clickFilter.Q.value = 4;
+
+            clickG.gain.setValueAtTime(0.25, t);
+            clickG.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
+            click.connect(clickFilter);
+            clickFilter.connect(clickG);
+            clickG.connect(master);
+
+            click.start(t);
+            click.stop(t + 0.05);
+        }
+
+        // ─────────────────────────────
+        // 4) RÉVERB MÉCANIQUE COURTE (réalisme)
+        // ─────────────────────────────
+        const revBuf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+        const revData = revBuf.getChannelData(0);
+        for (let i = 0; i < revData.length; i++) {
+            revData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.03));
+        }
+
+        const rev = ctx.createBufferSource();
+        rev.buffer = revBuf;
+
+        const revFilter = ctx.createBiquadFilter();
+        revFilter.type = 'bandpass';
+        revFilter.frequency.value = 800;
+        revFilter.Q.value = 0.6;
+
+        const revG = ctx.createGain();
+        revG.gain.value = 0.25;
+
+        rev.connect(revFilter);
+        revFilter.connect(revG);
+        revG.connect(master);
+
+        rev.start(now + 0.1);
+        rev.stop(now + 0.15);
+    }
+
+    // ── THRUSTER_SOUND : Bruit continu du moteur selon throttle ──────────
+    else if (type === 'thruster_loop') {
+        const master = out(ctx, 0.8);
+        const throttle = window._currentThrottle || 0;
+
+        // ─────────────────────────────
+        // 1) SUB-BASS sale (vibration moteur)
+        // ─────────────────────────────
+        const sub = ctx.createOscillator();
+        const subG = ctx.createGain();
+        const subShaper = ctx.createWaveShaper();
+
+        // courbe de distorsion douce
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) curve[i] = Math.tanh((i - 128) / 32);
+        subShaper.curve = curve;
+
+        sub.type = 'sine';
+        sub.frequency.value = 22 + throttle * 8; // très grave, pas de tonalité
+        subG.gain.value = 0.15 + throttle * 0.25;
+
+        sub.connect(subShaper);
+        subShaper.connect(subG);
+        subG.connect(master);
+
+        sub.start(now);
+        sub.stop(now + 0.15);
+
+        // ─────────────────────────────
+        // 2) ROAR (combustion turbulente)
+        // ─────────────────────────────
+        const roarBuf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+        const roarData = roarBuf.getChannelData(0);
+        for (let i = 0; i < roarData.length; i++) {
+            // bruit blanc + turbulence exponentielle
+            roarData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.02));
+        }
+
+        const roar = ctx.createBufferSource();
+        roar.buffer = roarBuf;
+
+        const roarFilter = ctx.createBiquadFilter();
+        roarFilter.type = 'bandpass';
+        roarFilter.frequency.value = 250 + throttle * 600; // 250 → 850 Hz
+        roarFilter.Q.value = 0.7;
+
+        const roarG = ctx.createGain();
+        roarG.gain.value = 0.35 + throttle * 0.45;
+
+        roar.connect(roarFilter);
+        roarFilter.connect(roarG);
+        roarG.connect(master);
+
+        roar.start(now);
+        roar.stop(now + 0.15);
+
+        // ─────────────────────────────
+        // 3) SOUFFLE (exhaust)
+        // ─────────────────────────────
+        const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+        const noiseData = noiseBuf.getChannelData(0);
+        for (let i = 0; i < noiseData.length; i++) {
+            noiseData[i] = (Math.random() * 2 - 1);
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuf;
+
+        const noiseFilter = ctx.createBiquadFilter();
+        noiseFilter.type = 'lowpass';
+        noiseFilter.frequency.value = 500 + throttle * 1500;
+
+        const noiseG = ctx.createGain();
+        noiseG.gain.value = 0.15 + throttle * 0.25;
+
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseG);
+        noiseG.connect(master);
+
+        noise.start(now);
+        noise.stop(now + 0.15);
+    }
+
+    // ── CRASH : Explosion + débris métalliques ───────────────────────────
+    else if (type === 'crash') {
+        const master = out(ctx, 2.2);
+        const now = ctx.currentTime;
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 0) SHOCKWAVE CRACK (snap initial ultra réaliste)
+        // ═══════════════════════════════════════════════════════════════════
+        const crackBuf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
+        const crackData = crackBuf.getChannelData(0);
+        for (let i = 0; i < crackData.length; i++) {
+            crackData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.002));
+        }
+        const crackSrc = ctx.createBufferSource();
+        const crackG = ctx.createGain();
+        crackG.gain.setValueAtTime(1.4, now);
+        crackG.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        crackSrc.buffer = crackBuf;
+        crackSrc.connect(crackG);
+        crackG.connect(master);
+        crackSrc.start(now);
+        crackSrc.stop(now + 0.04);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 1) THUMP PHYSIQUE
+        // ═══════════════════════════════════════════════════════════════════
+        const thumpBuf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+        const thumpData = thumpBuf.getChannelData(0);
+        let brown = 0;
+        for (let i = 0; i < thumpData.length; i++) {
+            brown = (brown + (Math.random() - 0.5) * 0.05) * 0.98;
+            const env = i < ctx.sampleRate * 0.02
+                ? 1.0
+                : Math.exp(-(i - ctx.sampleRate * 0.02) / (ctx.sampleRate * 0.15));
+            thumpData[i] = brown * env * (1.8 + Math.random() * 0.6);
+        }
+        const thumpSrc = ctx.createBufferSource();
+        const thumpFilter = ctx.createBiquadFilter();
+        thumpFilter.type = 'lowpass';
+        thumpFilter.frequency.setValueAtTime(220, now);
+        thumpFilter.frequency.exponentialRampToValueAtTime(30, now + 0.6);
+        const thumpG = ctx.createGain();
+        thumpG.gain.setValueAtTime(0, now);
+        thumpG.gain.linearRampToValueAtTime(1.6, now + 0.003);
+        thumpG.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        thumpSrc.buffer = thumpBuf;
+        thumpSrc.connect(thumpFilter);
+        thumpFilter.connect(thumpG);
+        thumpG.connect(master);
+        thumpSrc.start(now);
+        thumpSrc.stop(now + 1.2);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 2) DÉCHIRURE MÉTALLIQUE
+        // ═══════════════════════════════════════════════════════════════════
+        const tearCarrier = ctx.createOscillator();
+        const tearMod = ctx.createOscillator();
+        const tearModG = ctx.createGain();
+        const tearG = ctx.createGain();
+
+        tearCarrier.type = 'sawtooth';
+        tearMod.type = 'triangle';
+
+        tearCarrier.frequency.setValueAtTime(90 + Math.random() * 40, now);
+        tearCarrier.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+
+        tearMod.frequency.setValueAtTime(220 + Math.random() * 120, now);
+
+        tearModG.gain.setValueAtTime(0, now);
+        tearModG.gain.linearRampToValueAtTime(320, now + 0.006);
+        tearModG.gain.exponentialRampToValueAtTime(0.1, now + 0.35);
+
+        tearG.gain.setValueAtTime(0, now + 0.01);
+        tearG.gain.linearRampToValueAtTime(1.0, now + 0.02);
+        tearG.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        tearMod.connect(tearModG);
+        tearModG.connect(tearCarrier.frequency);
+        tearCarrier.connect(tearG);
+        tearG.connect(master);
+
+        tearCarrier.start(now);
+        tearMod.start(now);
+        tearCarrier.stop(now + 0.4);
+        tearMod.stop(now + 0.4);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 3) BOOM GRAVE (instable réaliste)
+        // ═══════════════════════════════════════════════════════════════════
+        const boomOsc = ctx.createOscillator();
+        const boomG = ctx.createGain();
+
+        boomOsc.type = 'sine';
+
+        boomOsc.frequency.setValueAtTime(32 + Math.random() * 10, now + 0.04);
+
+        for (let i = 0; i < 6; i++) {
+            boomOsc.frequency.setValueAtTime(
+                20 + Math.random() * 15,
+                now + 0.05 + i * 0.08
+            );
+        }
+
+        boomOsc.frequency.exponentialRampToValueAtTime(8, now + 1.0);
+
+        boomG.gain.setValueAtTime(0, now + 0.04);
+        boomG.gain.linearRampToValueAtTime(1.5, now + 0.06);
+        boomG.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
+        boomOsc.connect(boomG);
+        boomG.connect(master);
+
+        boomOsc.start(now + 0.04);
+        boomOsc.stop(now + 1.1);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 4) SOUFFLE GAZ (plus sale)
+        // ═══════════════════════════════════════════════════════════════════
+        const gasBuf = ctx.createBuffer(1, ctx.sampleRate * 1.2, ctx.sampleRate);
+        const gasData = gasBuf.getChannelData(0);
+
+        for (let i = 0; i < gasData.length; i++) {
+            const noise = Math.random() * 2 - 1;
+            gasData[i] = noise * Math.exp(-i / (ctx.sampleRate * 0.25)) * (0.8 + Math.random() * 0.4);
+        }
+
+        const gasSrc = ctx.createBufferSource();
+        const gasFilter = ctx.createBiquadFilter();
+        const gasG = ctx.createGain();
+
+        gasFilter.type = 'bandpass';
+        gasFilter.frequency.setValueAtTime(500, now + 0.12);
+        gasFilter.frequency.exponentialRampToValueAtTime(100, now + 0.9);
+
+        gasG.gain.setValueAtTime(0, now + 0.1);
+        gasG.gain.linearRampToValueAtTime(0.5, now + 0.18);
+        gasG.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+
+        gasSrc.buffer = gasBuf;
+        gasSrc.connect(gasFilter);
+        gasFilter.connect(gasG);
+        gasG.connect(master);
+
+        gasSrc.start(now + 0.1);
+        gasSrc.stop(now + 1.4);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 5) DÉBRIS (moins tonal, plus réaliste)
+        // ═══════════════════════════════════════════════════════════════════
+        const heavyDebris = [10, 14, 18, 22, 26, 30];
+
+        heavyDebris.forEach((delay) => {
+            const t = now + 0.12 + delay * 0.02;
+
+            const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+            const data = noiseBuf.getChannelData(0);
+
+            for (let i = 0; i < data.length; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.08));
+            }
+
+            const src = ctx.createBufferSource();
+            const filter = ctx.createBiquadFilter();
+            const gain = ctx.createGain();
+
+            filter.type = 'bandpass';
+            filter.frequency.value = 300 + Math.random() * 1200;
+
+            gain.gain.setValueAtTime(0.6 + Math.random() * 0.4, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+
+            src.buffer = noiseBuf;
+            src.connect(filter);
+            filter.connect(gain);
+            gain.connect(master);
+
+            src.start(t);
+            src.stop(t + 0.25);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 6) RÉSONANCE FINALE
+        // ═══════════════════════════════════════════════════════════════════
+        const groanOsc = ctx.createOscillator();
+        const groanMod = ctx.createOscillator();
+        const groanModG = ctx.createGain();
+        const groanG = ctx.createGain();
+
+        groanOsc.type = 'sawtooth';
+        groanMod.type = 'sine';
+
+        groanOsc.frequency.setValueAtTime(80 + Math.random() * 20, now + 0.55);
+        groanMod.frequency.setValueAtTime(3 + Math.random() * 3, now + 0.55);
+
+        groanModG.gain.setValueAtTime(15, now + 0.55);
+
+        groanG.gain.setValueAtTime(0, now + 0.55);
+        groanG.gain.linearRampToValueAtTime(0.3, now + 0.6);
+        groanG.gain.exponentialRampToValueAtTime(0.001, now + 1.7);
+
+        groanMod.connect(groanModG);
+        groanModG.connect(groanOsc.frequency);
+        groanOsc.connect(groanG);
+        groanG.connect(master);
+
+        groanOsc.start(now + 0.55);
+        groanMod.start(now + 0.55);
+        groanOsc.stop(now + 1.7);
+        groanMod.stop(now + 1.7);
+    }
+
+
+
+
+    // ── SUCCESS : Mission réussie (trompette / orchestre de victoire) ────
+    else if (type === 'success') {
+        const master = out(ctx, 0.85);
+
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((f, i) => {
+            const t = now + i * 0.15;
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(0.5, t + 0.05);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + 0.6);
+
+            // Harmonique pour un son plus riche
+            const osc2 = ctx.createOscillator();
+            const g2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(f * 2.5, t);
+            g2.gain.setValueAtTime(0.12, t);
+            g2.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+            osc2.connect(g2); g2.connect(master);
+            osc2.start(t); osc2.stop(t + 0.5);
+        });
+    }
+}
 
 // ─────────────────────────────────────────────
 // GESTION DE LA VISIBILITÉ DE LA PAGE

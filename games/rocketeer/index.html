@@ -78,7 +78,7 @@
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
-                    <span>Manual</span>
+                    <span data-i18n="rocketeer.menu.manual">Manual</span>
                 </button>
                 <button class="btn" id="restart-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -88,7 +88,7 @@
                         <!-- Pointe de la flèche -->
                         <path d="M21 3v5h-5" />
                     </svg>
-                    <span>Restart</span>
+                    <span data-i18n="rocketeer.menu.restart">Restart</span>
                 </button>
 
                 <button class="btn" onclick="window.location.href='../../index.html'" title="Back to menu">
@@ -96,7 +96,7 @@
                         style="width:14px;height:14px;margin-right:4px">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    <span>Menu</span>
+                    <span data-i18n="rocketeer.menu.back_to_menu">Menu</span>
                 </button>
             </div>
         </header>
@@ -117,7 +117,8 @@
                 </svg>
 
                 <!-- Texte normal qui suit ton CSS -->
-                <span style="border-bottom: 1px solid rgba(160, 200, 232, 0.3); padding-bottom: 2px;">
+                <span style="border-bottom: 1px solid rgba(160, 200, 232, 0.3); padding-bottom: 2px;"
+                    data-i18n="rocketeer.menu.parts_catalog">
                     PARTS CATALOG
                 </span>
             </div>
@@ -128,7 +129,9 @@
 
         <main class="build-area">
             <canvas id="build-canvas"></canvas>
-            <div class="build-hint">Right-click or <kbd>Del</kbd> to remove · Drag to move · Drag empty space to pan
+            <div class="build-hint" data-i18n="rocketeer.menu.build_hint">Right-click or <kbd>Del</kbd> to remove · Drag
+                to move ·
+                Drag empty space to pan
             </div>
         </main>
 
@@ -155,26 +158,26 @@
                 </svg>
 
                 <!-- Texte HTML (hérite de ton CSS) -->
-                <span style="letter-spacing: 1px;">
+                <span style="letter-spacing: 1px;" data-i18n="rocketeer.menu.rocket_stats">
                     ROCKET STATS
                 </span>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-box">
-                    <div class="stat-label">Cost</div>
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_cost">Cost</div>
                     <div class="stat-value" id="stat-cost">0 ¢</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Mass</div>
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_mass">Mass</div>
                     <div class="stat-value" id="stat-mass">0 t</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">ΔV</div>
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_dv">ΔV</div>
                     <div class="stat-value" id="stat-dv">0 m/s</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Parts</div>
+                    <div class="stat-label" data-i18n="rocketeer.menu.stat_parts">Parts</div>
                     <div class="stat-value" id="stat-parts">0</div>
                 </div>
             </div>
@@ -184,12 +187,13 @@
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
                 </svg>
-                Part Info
+                <span data-i18n="rocketeer.menu.part_info">Part Info</span>
             </div>
             <div id="part-info-panel">
                 <div
                     style="color:var(--text-dim);font-size:11px;text-align:center;padding:20px;font-family:var(--mono)">
-                    Select a part to analyze specs</div>
+                    <span data-i18n="rocketeer.menu.select_part_hint">Select a part to analyze specs</span>
+                </div>
             </div>
         </aside>
 
@@ -199,14 +203,14 @@
                     style="width:14px;height:14px;margin-right:6px">
                     <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                 </svg>
-                Clear
+                <span data-i18n="rocketeer.menu.btn_clear">Clear</span>
             </button>
             <button class="btn btn-primary" onclick="deleteSelectedPart()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     style="width:14px;height:14px;margin-right:6px">
                     <path d="M12 22 22 12 12 2 2 12z" />
                 </svg>
-                Remove
+                <span data-i18n="rocketeer.menu.btn_remove">Remove</span>
             </button>
             <button class="btn btn-launch" id="launch-btn" onclick="launchRocket()" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -218,7 +222,7 @@
                     <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
                     <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
                 </svg>
-                LAUNCH
+                <span data-i18n="rocketeer.menu.btn_launch">LAUNCH</span>
             </button>
         </footer>
     </div>
@@ -226,24 +230,21 @@
     <!-- ─── RESTART CONFIRM ─────────────────────────────────── -->
     <div class="modal-overlay" id="restart-confirm-overlay">
         <div class="modal-card">
-            <div class="modal-header">Restart Game</div>
+            <div class="modal-header" data-i18n="rocketeer.modals.restart_title">Restart Game</div>
 
             <div class="modal-body">
-                <p>Are you sure you want to restart the game?</p>
+                <p data-i18n="rocketeer.modals.restart_body">Are you sure you want to restart the game?</p>
                 <br />
-                <p>
+                <p data-i18n="rocketeer.modals.restart_warning">
                     All current progress will be lost
                     <strong style="letter-spacing: -2px; margin-left: 5px; color: #a0c8e8;">:'(</strong>
                 </p>
-
-
             </div>
 
             <div class="modal-footer">
                 <!-- Bouton Annuler : on cache l'overlay -->
-                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'">
-                    ✕ Cancel
-                </button>
+                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'"
+                    data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
 
                 <!-- Bouton Confirmer -->
                 <button class="btn btn-launch" onclick="confirmRestart()">
@@ -252,27 +253,32 @@
                         <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
                         <path d="M21 3v5h-5" />
                     </svg>
-                    Restart
+                    <span data-i18n="rocketeer.modals.btn_restart">Restart</span>
                 </button>
             </div>
         </div>
     </div>
+
     <!-- ─── LAUNCH CONFIRM ─────────────────────────────────── -->
     <div class="modal-overlay" id="launch-confirm-overlay">
         <div class="modal-card">
-            <div class="modal-header">Pre-Flight Checklist</div>
+            <div class="modal-header" data-i18n="rocketeer.modals.preflight_title">Pre-Flight Checklist</div>
 
-            <div class="modal-row"><span>Total Mass</span><span id="lc-mass">—</span></div>
-            <div class="modal-row"><span>Total Thrust</span><span id="lc-thrust">—</span></div>
-            <div class="modal-row"><span>TWR</span><span id="lc-twr">—</span></div>
-            <div class="modal-row"><span>Total ΔV</span><span id="lc-dv">—</span></div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_mass">Total Mass</span><span
+                    id="lc-mass">—</span>
+            </div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_thrust">Total Thrust</span><span
+                    id="lc-thrust">—</span></div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_twr">TWR</span><span id="lc-twr">—</span>
+            </div>
+            <div class="modal-row"><span data-i18n="rocketeer.modals.preflight_dv">Total ΔV</span><span
+                    id="lc-dv">—</span></div>
 
             <div class="modal-body" id="lc-warning">—</div>
 
             <div class="modal-footer">
-                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'">
-                    ✕ Cancel
-                </button>
+                <button class="btn" onclick="this.closest('.modal-overlay').style.display='none'"
+                    data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
                 <button class="btn btn-launch" onclick="confirmLaunch()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         style="width:14px;height:14px;margin-right:6px;vertical-align:middle">
@@ -283,7 +289,7 @@
                         <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
                         <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
                     </svg>
-                    Ignition
+                    <span data-i18n="rocketeer.modals.btn_ignition">Ignition</span>
                 </button>
             </div>
         </div>
@@ -292,8 +298,10 @@
     <!-- ─── CUSTOM MODAL ─────────────────────────────────────── -->
     <div class="modal-overlay" id="generic-modal-overlay">
         <div class="modal-card" style="border-color: rgba(180, 180, 255, 0.4);">
-            <div class="modal-subtitle" id="modal-subtitle">LOGS</div>
-            <div class="modal-header" id="modal-title" style="margin-bottom:10px">Notification</div>
+            <div class="modal-subtitle" id="modal-subtitle" data-i18n="rocketeer.modals.modal_subtitle_default">LOGS
+            </div>
+            <div class="modal-header" id="modal-title" style="margin-bottom:10px"
+                data-i18n="rocketeer.modals.modal_title_default">Notification</div>
 
             <div class="modal-body" id="modal-message"
                 style="background:none; text-align:left; font-size:14px; line-height:1.6; color:var(--text-secondary)">
@@ -301,7 +309,7 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn" id="modal-cancel">✕ Cancel</button>
+                <button class="btn" id="modal-cancel" data-i18n="rocketeer.modals.btn_cancel">✕ Cancel</button>
                 <button class="btn btn-primary" id="modal-confirm"
                     style="background:var(--accent); color:#000; font-weight:bold">
                     OK
@@ -331,7 +339,7 @@
                     <button class="btn btn-sm" id="rules-next" onclick="Rules.nextPage()">→</button>
                 </div>
                 <button class="btn btn-primary" onclick="document.getElementById('rules-overlay').style.display='none'"
-                    style="width:100%;margin-top:12px">Dismiss</button>
+                    style="width:100%;margin-top:12px" data-i18n="rocketeer.modals.modal_dismiss">Dismiss</button>
             </div>
         </div>
     </div>
@@ -349,6 +357,7 @@
     </script>
     <script src="js/rocket.js"></script>
     <script src="js/renderer.js"></script>
+    <script src="../../js/utils/i18n.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/mobile_builder.js"></script>
     <script type="module">

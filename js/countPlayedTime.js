@@ -1,11 +1,11 @@
 // countPlayedTime.js
 import { checkRealConnection } from "./network.js";
-import { getSecret } from "./utils/secretManager.js";
+import { notifyHeartbeat, notifyNewPlayer } from "./utils/webhooks.js";
 console.log("🕒 Compteur de temps initialisé");
 
 let counterInterval = null;
 
-// Fonction principale d’incrément / synchro
+// Fonction principale d'incrément / synchro
 async function incrementTime() {
     try {
         const isOnline = await checkRealConnection();
@@ -14,7 +14,7 @@ async function incrementTime() {
             // Import Firebase seulement si on est en ligne
             const { incrementFirebaseStat } = await import("./firebaseWrk.js");
 
-            // Envoyer d’abord les minutes stockées localement
+            // Envoyer d'abord les minutes stockées localement
             let incrementBy = Number(localStorage.getItem("minutesPlayed") || 0);
 
             if (incrementBy > 0) {
@@ -25,9 +25,7 @@ async function incrementTime() {
 
             // Envoyer 1 minute en direct
             const result = await incrementFirebaseStat("totalMinutesPlayed");
-            await sendDiscordMessage(
-                `⏱️ +1 min | 🕒 ${new Date().toLocaleTimeString()}`
-            );
+            await notifyHeartbeat();
             if (result) console.log("✅ Minute synchronisée sur Firebase");
 
             // détecter si nouveau joueur 
@@ -35,12 +33,7 @@ async function incrementTime() {
                 console.log("Nouvelle connexion");
                 localStorage.setItem("isAlreadyCounted", true);
                 localStorage.setItem("isNewPlayer", true);
-
-                const isOnline = await checkRealConnection();
-                console.log("isOnline : ", isOnline);
-                await sendDiscordMessage(
-                    `🆕 Nouveau joueur | 🕒 ${new Date().toLocaleTimeString()}`
-                );
+                await notifyNewPlayer();
             }
             if (localStorage.getItem("isNewPlayer")) {
                 await incrementFirebaseStat("totalPlayers");
@@ -94,31 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
         screen.orientation.lock("portrait").catch(() => { });
     }
 });
-
-let webhookUrl = null;
-
-async function sendDiscordMessage(content) {
-    try {
-        if (!webhookUrl) {
-            webhookUrl = await getSecret("DISCORD_WEBHOOK_URL");
-        }
-
-        if (!webhookUrl) return;
-
-        await fetch(webhookUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                content: content
-            })
-        });
-
-    } catch (e) {
-        console.warn("Erreur webhook Discord", e);
-    }
-}
 
 // Export pour utilisation ailleurs si besoin
 export { incrementTime, startCounter, stopCounter };

@@ -124,7 +124,7 @@ function renderPartsList() {
         if (!grouped[cat]) continue;
         const catDiv = document.createElement('div');
         catDiv.className = 'part-category';
-        catDiv.innerHTML = `<div class="cat-header"><span>${meta.icon}</span> ${meta.label}</div>`;
+        catDiv.innerHTML = `<div class="cat-header"><span>${meta.icon}</span> ${t(`rocketeer.parts.categories.${cat}`)}</div>`;
 
         for (const part of grouped[cat]) {
             const isUnlocked = builderState.unlockedParts.includes(part.id);
@@ -157,9 +157,9 @@ function renderPartsList() {
             item.innerHTML = `
               <div class="part-svg-thumb">${part.svg}</div>
               <div class="part-info">
-                <div class="part-name"><span>${part.name}</span> ${statusIcon}</div>
+                <div class="part-name"><span>${t(`rocketeer.parts.${part.id}.name`)}</span> ${statusIcon}</div>
                 <div class="part-price">${costLabel}</div>
-                <div class="part-desc">${part.description}</div>
+                <div class="part-desc">${t(`rocketeer.parts.${part.id}.description`)}</div>
               </div>`;
 
             if (isUnlocked) {
@@ -178,10 +178,10 @@ function unlockPart(partId) {
     const def = PARTS_CATALOG[partId];
     if (!def) return;
     if (builderState.money < def.price) {
-        showModal('R&D FAILED', `Not enough money for R&D! Need extra ${def.price - builderState.money} ¢`, 'SYSTEM ERROR');
+        showModal(t("rocketeer.warnings.rd_failed"), t("rocketeer.warnings.no_money_rd").replace("{amount}", def.price - builderState.money) + " ¢", 'SYSTEM ERROR');
         return;
     }
-    showModal(`UNLOCK ${def.name.toUpperCase()}?`, `${def.description}\nResearch cost: ${def.price} ¢\nBuild cost: ${def.buildCost} ¢`, 'R&D APPROVAL REQUIRED', () => {
+    showModal(t("rocketeer.warnings.unlock_title").replace("{partName}", def.name.toUpperCase()), t("rocketeer.warnings.unlock_body").replace("{description}", t(`rocketeer.parts.${partId}.description`)).replace("{price}", def.price).replace("{buildCost}", def.buildCost), t("rocketeer.warnings.rd_approval"), () => {
         builderState.money -= def.price;
         builderState.unlockedParts.push(partId);
         playRocketeerSound('buy');
@@ -515,9 +515,7 @@ function _snapWorld(partId, wx, wy, excludeId = null) {
         const left = pp.x - pd.width / 2, right = pp.x + pd.width / 2;
 
         // Pour les pièces empilables (verticales)
-        // On élargit la tolérance horizontale : on snap si les centres sont proches
         if (!def.isSidePart && Math.abs(x - pp.x) < Math.max(def.width, pd.width) * 0.8) {
-            // ✅ CORRECTION : TOUJOURS centrer la NOUVELLE pièce sur l'EXISTANTE
             // Le centre de la nouvelle pièce = centre de la pièce existante
             let sxCalc = pp.x;
 
@@ -816,7 +814,7 @@ function onCanvasMouseUp(e) {
             pp.x = builderState.dragItem.lastValidX ?? builderState.dragItem.startX;
             pp.y = builderState.dragItem.lastValidY ?? builderState.dragItem.startY;
             pp.flipped = builderState.dragItem.lastFlipped ?? (pp.flipped ?? false);
-            showToast('Chevauchement — pièce replacée');
+            showToast(t("rocketeer.warnings.overlap"));
         }
     }
     builderState.dragItem = null;
@@ -929,8 +927,8 @@ function updateStats() {
         const grid = document.querySelector('.stats-grid');
         if (grid) {
             grid.insertAdjacentHTML('beforeend',
-                `<div class="stat-box"><div class="stat-label">TWR</div><div class="stat-value" id="stat-twr">—</div></div>
-                 <div class="stat-box"><div class="stat-label">Thrust</div><div class="stat-value" id="stat-thrust" style="color:#ff8030">— kN</div></div>`);
+                `<div class="stat-box"><div class="stat-label" >${t("rocketeer.menu.stat_twr")}</div><div class="stat-value" id="stat-twr">—</div></div>
+                 <div class="stat-box"><div class="stat-label" >${t("rocketeer.menu.stat_thrust")}</div><div class="stat-value" id="stat-thrust" style="color:#ff8030">— kN</div></div>`);
             twrEl = document.getElementById('stat-twr');
         }
     }
@@ -942,10 +940,10 @@ function updateStats() {
     const btn = document.getElementById('launch-btn');
     if (btn) {
         btn.disabled = !canLaunch;
-        btn.title = canLaunch ? 'Launch!'
-            : !hasCockpit ? 'Need cockpit'
-                : !hasEngine ? 'Need engine'
-                    : 'Need fuel';
+        btn.title = canLaunch ? t("rocketeer.menu.btn_launch")
+            : !hasCockpit ? t("rocketeer.warnings.need_cockpit")
+                : !hasEngine ? t("rocketeer.warnings.need_engine")
+                    : t("rocketeer.warnings.need_fuel");
     }
 
     // Mobile
@@ -979,19 +977,19 @@ function showPartInfo(partId, instanceId = null) {
     }
 
     let statsHtml = '';
-    if (def.thrust) statsHtml += `<div class="info-row"><span>Thrust</span><span>${(def.thrust / 1000).toFixed(1)} kN</span></div>`;
-    if (def.isp) statsHtml += `<div class="info-row"><span>ISP</span><span>${def.isp} s</span></div>`;
-    if (def.fuelMass) statsHtml += `<div class="info-row"><span>Fuel Cap</span><span>${def.fuelMass} kg</span></div>`;
+    if (def.thrust) statsHtml += `<div class="info-row"><span>${t("rocketeer.part_info.thrust")}</span><span>${(def.thrust / 1000).toFixed(1)} kN</span></div>`;
+    if (def.isp) statsHtml += `<div class="info-row"><span>${t("rocketeer.part_info.isp")}</span><span>${def.isp} s</span></div>`;
+    if (def.fuelMass) statsHtml += `<div class="info-row"><span>${t("rocketeer.part_info.fuel_cap")}</span><span>${def.fuelMass} kg</span></div>`;
 
     let configHtml = '';
     if (instanceId && pp) {
-        configHtml = '<div class="config-section"><div class="config-header">CONFIGURATION</div>';
+        configHtml = `<div class="config-section"><div class="config-header">${t("rocketeer.menu.part_info")}</div>`;
 
         if (def.category === 'tank') {
             const ratio = config?.fuelRatio ?? 1;
             configHtml += `
                 <div class="config-row">
-                    <label>Fuel Amt: <span id="fuel-ratio-lbl-${instanceId}">${(ratio * 100).toFixed(0)}%</span></label>
+                    <label>${t("rocketeer.part_info.fuel_amt")} <span id="fuel-ratio-lbl-${instanceId}">${(ratio * 100).toFixed(0)}%</span></label>
                     <input type="range" min="0" max="1" step="0.05" value="${ratio}" 
                         onmousedown="event.stopPropagation()"
                         oninput="document.getElementById('fuel-ratio-lbl-${instanceId}').textContent=Math.round(this.value*100)+'%'; updatePartConfig(${instanceId}, 'fuelRatio', parseFloat(this.value), true)"
@@ -1010,7 +1008,7 @@ function showPartInfo(partId, instanceId = null) {
                 <div class="config-row">
                     <button class="btn-small ${isMain ? 'active' : ''}" 
                         onclick="setAsMainCockpit(${instanceId})">
-                        ${isMain ? '⭐ PRIMARY COCKPIT' : 'SET AS PRIMARY'}
+                        ${isMain ? t("rocketeer.part_info.primary_cockpit") : t("rocketeer.part_info.set_as_primary")}
                     </button>
                 </div>`;
         }
@@ -1026,16 +1024,15 @@ function showPartInfo(partId, instanceId = null) {
 
             configHtml += `
                 <div class="config-section" style="margin-top:10px;">
-                    <div class="config-header">R&D UPGRADES (LVL ${level})</div>
-                    <div class="info-row"><span>Current Bonus</span><span>+${Math.round((currVal - 1) * 100)}%</span></div>
-                    <div class="info-row"><span>Construction</span><span>${buildPrice} ¢</span></div>
+                    <div class="config-header">${t("rocketeer.part_info.rd_upgrades").replace("{level}", level)}</div>
+                    <div class="info-row"><span>${t("rocketeer.part_info.current_bonus")}</span><span>+${Math.round((currVal - 1) * 100)}%</span></div>
+                    <div class="info-row"><span>${t("rocketeer.part_info.construction")}</span><span>${buildPrice} ¢</span></div>
                     <div style="margin-top:10px; padding:8px; background:rgba(58,143,212,0.1); border-radius:6px; border:1px dashed var(--accent);">
-                        <div style="font-size:9px; color:var(--accent); margin-bottom:4px;">NEXT UPGRADE:</div>
-                        <div class="info-row" style="border:none; padding:2px 0;"><span>New Bonus</span><span>+${Math.round((nextVal - 1) * 100)}%</span></div>
-                        <div class="info-row" style="border:none; padding:2px 0;"><span>New Const.</span><span>${nextBuildPrice} ¢</span></div>
+                        <div style="font-size:9px; color:var(--accent); margin-bottom:4px;">${t("rocketeer.part_info.next_upgrade")}</div>
+                        <div class="info-row" style="border:none; padding:2px 0;"><span>${t("rocketeer.part_info.new_bonus")}</span><span>+${Math.round((nextVal - 1) * 100)}%</span></div>
+                        <div class="info-row" style="border:none; padding:2px 0;"><span>${t("rocketeer.part_info.new_construction")}</span><span>${nextBuildPrice} ¢</span></div>
                         <button class="btn-small active" style="width:100%; margin-top:8px;" 
-                                onclick="upgradeBonusPart('${def.id}')">
-                            🚀 UPGRADE R&D (${rdPrice} ¢)
+                                onclick="upgradeBonusPart('${def.id}')"> ${t("rocketeer.part_info.btn_upgrade").replace("{amount}", rdPrice)}
                         </button>
                     </div>
                 </div>`;
@@ -1056,10 +1053,9 @@ function showPartInfo(partId, instanceId = null) {
         const val = (def.bonus[bonusKey] + level * 0.25);
         const percent = Math.round((val - 1) * 100);
 
-        if (bonusKey === 'thrustBoost') description = `Boosts all engine thrust by ${percent}%.`;
-        if (bonusKey === 'fuelBonus') description = `Grants +${percent}% total fuel capacity.`;
-        if (bonusKey === 'sasBoost') description = `Improves SAS by ${percent}%.`;
-        if (bonusKey === 'rewardMultiplier') description = `Grants +${percent}% mission reward.`;
+        if (bonusKey === 'thrustBoost') description = t("rocketeer.bonus_descriptions.thrustBoost").replace("{percent}", percent);
+        if (bonusKey === 'fuelBonus') description = t("rocketeer.bonus_descriptions.fuelBonus").replace("{percent}", percent);
+        if (bonusKey === 'rewardMultiplier') description = t("rocketeer.bonus_descriptions.rewardMultiplier").replace("{percent}", percent);
     }
 
     info.innerHTML = `
@@ -1069,7 +1065,7 @@ function showPartInfo(partId, instanceId = null) {
             </div>
             <div class="info-name">${def.name}</div>
             <div class="info-desc">${description}</div>
-            <div class="info-row"><span>Mass (Wet)</span><span>${massVal} kg</span></div>
+            <div class="info-row"><span>${t("rocketeer.part_info.mass_wet")}</span><span>${massVal} kg</span></div>
             ${statsHtml}
             ${configHtml}
         </div>`;
@@ -1141,13 +1137,13 @@ function launchRocket() {
 
         // Utilisation de symboles système typés "Aérospatial"
         let warning = twr < 1
-            ? 'TWR < 1 — rocket won\'t lift off!'
+            ? t("rocketeer.warnings.twr_too_low")
             : twr < 1.2
-                ? 'Low TWR — slow ascent'
-                : 'Ready to launch!';
+                ? t("rocketeer.warnings.twr_low")
+                : t("rocketeer.warnings.ready");
 
         if (!canAffordBuild) {
-            warning = `INSUFFICIENT FUNDS: Need ${buildTotal} ¢`;
+            warning = t("rocketeer.warnings.insufficient_funds").replace("{amount}", buildTotal);
         }
 
         // Mise à jour de l'élément avec une classe de couleur dynamique
@@ -1175,7 +1171,7 @@ function confirmLaunch() {
         return s + (def?.buildCost || 0) * Math.pow(1.1, level);
     }, 0);
     if (builderState.money < buildTotal) {
-        alert("Pas assez d'argent pour construire la fusée !");
+        alert(t("rocketeer.warnings.insufficient_funds").replace("{amount}", buildTotal));
         return;
     }
 
@@ -1203,7 +1199,7 @@ function confirmLaunch() {
 
 function clearRocket() {
     if (builderState.placedParts.length === 0) return;
-    showModal('CLEAR BLUEPRINT?', 'Resetting the layout is free. All parts will be removed.', 'CONSTRUCTION LOGS', () => {
+    showModal(t("rocketeer.warnings.clear_blueprint"), t("rocketeer.warnings.clear_blueprint_body"), 'CONSTRUCTION LOGS', () => {
         builderState.placedParts = [];
         builderState.stages = [{ id: 0, elements: [] }];
         builderState.selectedPartId = null;
@@ -1222,9 +1218,9 @@ function clearRocket() {
 function showModal(title, message, subtitle, onConfirm = null, showCancel = false) {
     const overlay = document.getElementById('generic-modal-overlay');
     if (!overlay) return;
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
-    document.getElementById('modal-subtitle').textContent = subtitle || 'ROCKETEER OS';
+    document.getElementById('modal-title').innerHTML = title;
+    document.getElementById('modal-message').innerHTML = message;
+    document.getElementById('modal-subtitle').innerHTML = subtitle || 'ROCKETEER OS';
 
     const cancelBtn = document.getElementById('modal-cancel');
     const confirmBtn = document.getElementById('modal-confirm');
@@ -1249,7 +1245,6 @@ function showModal(title, message, subtitle, onConfirm = null, showCancel = fals
     overlay.style.display = 'flex';
 }
 
-window.addEventListener('DOMContentLoaded', initBuilder);
 window.launchRocket = launchRocket;
 window.confirmLaunch = confirmLaunch;
 window.clearRocket = clearRocket;
@@ -1263,8 +1258,8 @@ function renderStagingUI() {
 
     let html = `<div class="staging-panel" style="display:flex; flex-direction:column; height:100%; padding-top:10px; overflow:hidden;">
         <div class="staging-header" style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <span style="font-weight:bold; color:#40c0ff; letter-spacing:1px; font-size:14px;">MANUAL STAGING</span>
-            <button class="btn-small" style="background:#203040; border-color:#40c0ff; color:#40c0ff;" onclick="addStage()">+ Add Stage</button>
+            <span style="font-weight:bold; color:#40c0ff; letter-spacing:1px; font-size:14px;">${t("rocketeer.staging.title")}</span>
+            <button class="btn-small" style="background:#203040; border-color:#40c0ff; color:#40c0ff;" onclick="addStage()">${t("rocketeer.staging.btn_add_stage")}</button>
         </div>
         <div class="stages-list" style="flex:1; overflow-y:auto; padding-right:5px; display:flex; flex-direction:column; gap:12px; min-height:0;">`;
 
@@ -1280,13 +1275,13 @@ function renderStagingUI() {
                  onmouseenter="highlightStage(${stage.id}, true)"
                  onmouseleave="highlightStage(${stage.id}, false)">
                 <div class="stage-title" style="display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:bold; color:#a0b0c0; margin-bottom:10px;">
-                    <span>Stage ${stageNum}</span>
-                    ${stage.id !== 0 ? `<button class="btn-small" style="padding:2px 8px; font-size:11px; background:rgba(255,60,60,0.1); color:#ff6040; border:1px solid #602020;" onclick="removeStage(${stage.id})">Remove</button>` : '<span></span>'}
+                    <span>${t("rocketeer.staging.stage_label").replace("{n}", stage.id)}</span>
+                    ${stage.id !== 0 ? `<button class="btn-small" style="padding:2px 8px; font-size:11px; background:rgba(255,60,60,0.1); color:#ff6040; border:1px solid #602020;" onclick="removeStage(${stage.id})">${t("rocketeer.staging.btn_remove_stage")}</button>` : '<span></span>'}
                 </div>
                 <div class="stage-items" style="display:flex; flex-direction:column; gap:6px; min-height:36px; background:rgba(0,0,0,0.2); border-radius:6px; padding:6px;">`;
 
         if (stage.elements.length === 0) {
-            html += `<div class="stage-empty" style="color:#607080; font-style:italic; font-size:12px; text-align:center; padding:8px;">Drag engines or decouplers here</div>`;
+            html += `<div class="stage-empty" style="color:#607080; font-style:italic; font-size:12px; text-align:center; padding:8px;">${t("rocketeer.staging.stage_empty")}</div>`;
         } else {
             stage.elements.forEach((el) => {
                 const partDef = builderState.placedParts.find(p => p.id === el.partId);
@@ -1453,7 +1448,7 @@ function upgradeBonusPart(partId) {
             if (pp && pp.partId === partId) showPartInfo(partId, pp.id);
         }
     } else {
-        alert("Not enough credits for R&D!");
+        showModal(title = t("rocketeer.warnings.no_money_rd").replace("{amount}", price));
     }
 }
 window.upgradeBonusPart = upgradeBonusPart;
@@ -1461,52 +1456,28 @@ window.upgradeBonusPart = upgradeBonusPart;
 // ─── RULES PAGINATION ───────────────────────────────────
 const Rules = (() => {
     let currentPage = 0;
-    const pages = [
-        {
-            title: "1. Assembly",
-            content: `
-                <p>Drag parts from the catalog. They snap to connection nodes.</p>
-                <ul>
-                    <li><b>Core:</b> Every rocket needs a Cockpit, Fuel, and Engine.</li>
-                    <li><b>Staging:</b> Use Decouplers to drop empty tanks and ignite the next phase.</li>
-                    <li><b>TWR:</b> Thrust-to-Weight Ratio must be > 1.0 to lift off.</li>
-                </ul>
-            `
-        },
-        {
-            title: "2. Flight Controls",
-            content: `
-                <ul>
-                    <li><span class="key">Shift</span> / <span class="key">Ctrl</span> Throttle Control</li>
-                    <li><span class="key">Space</span> Next Stage / Decouple</li>
-                    <li><span class="key">T</span> Cycle Time Scale (1x, 2x, 4x, 8x, 15x)</li>
-                    <li><span class="key">C</span> Center Camera &nbsp;</li>
-                    <li><b>Note:</b> Manual rotation is disabled. Balancing is done via design!</li>
-                </ul>
-            `
-        },
-        {
-            title: "3. Economy",
-            content: `
-                <ul>
-                    <li><b>Distance:</b> 1¢ per 100m reached.</li>
-                    <li><b>Speed Bonus:</b> Faster missions earn up to +10% extra!</li>
-                    <li><b>Milestones:</b> Massive grants for reaching 100km, 500km, etc.</li>
-                    <li><b>R&D:</b> Spend credits to improve ISP, Thrust, and Science.</li>
-                </ul>
-            `
-        },
-        {
-            title: "4. Realism & Physics",
-            content: `
-                <ul>
-                    <li><b>Torque:</b> If thrust is off-center from the Center of Mass (CoM), the rocket will tilt.</li>
-                    <li><b>Aerodynamics:</b> Air density drops with altitude. Fins help stabilize in low atmosphere.</li>
-                    <li><b>Heat:</b> High-speed descent in atmosphere is dangerous!</li>
-                </ul>
-            `
-        }
-    ];
+    let pages = [];
+
+    function buildPages() {
+        return [
+            {
+                title: t("rocketeer.manual.page1_title"),
+                content: t("rocketeer.manual.page1_content")
+            },
+            {
+                title: t("rocketeer.manual.page2_title"),
+                content: t("rocketeer.manual.page2_content")
+            },
+            {
+                title: t("rocketeer.manual.page3_title"),
+                content: t("rocketeer.manual.page3_content")
+            },
+            {
+                title: t("rocketeer.manual.page4_title"),
+                content: t("rocketeer.manual.page4_content")
+            }
+        ];
+    }
 
     function showPage(idx) {
         currentPage = Math.max(0, Math.min(pages.length - 1, idx));
@@ -1526,13 +1497,19 @@ const Rules = (() => {
     }
 
     return {
-        init: () => showPage(0),
+        init: () => {
+            pages = buildPages();
+            showPage(0);
+        },
         nextPage: () => showPage(currentPage + 1),
-        prevPage: () => showPage(currentPage - 1)
+        prevPage: () => showPage(currentPage - 1),
+        reload: () => { pages = buildPages(); showPage(currentPage); }
     };
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n();
     Rules.init();
+    refreshTexts();
     initBuilder();
 });

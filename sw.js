@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.15.2026-04-30";
+const CACHE_NAME = "mini-games-cache-v1.15.2026-05-02";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -30,10 +30,17 @@ const ASSETS_TO_CACHE = [
     'js/network.js',
     'js/BuyMeACoffee.js',
     'js/utils/audio.js',
+    'js/utils/i18n.js',
+    'js/utils/webhooks.js',
 
     // Assets data
     'assets/data/games.json',
     'assets/data/versions.json',
+
+    // Assets lang
+    'assets/lang/fr.json',
+    'assets/lang/en.json',
+    'assets/lang/de.json',
 
     // Assets logos
     'assets/logos/logo.png',
@@ -65,6 +72,7 @@ const ASSETS_TO_CACHE = [
     'about/about.css',
     'about/about.js',
 
+    // offline page
     'games/offline.html',
 
     // Game: ball-sort

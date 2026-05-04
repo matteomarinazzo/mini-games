@@ -22,6 +22,8 @@ const difficultySettings = {
 };
 
 const settings = difficultySettings[config.difficulty];
+const TARGET_FRAME_MS = 1000 / 60;
+const MAX_FRAME_SCALE = 2;
 
 // Canvas
 const canvas = document.getElementById("gameCanvas");
@@ -98,8 +100,8 @@ class Paddle {
     ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 
-  move() {
-    this.x += this.dx;
+  move(frameScale = 1) {
+    this.x += this.dx * frameScale;
 
     // Limites
     if (this.x < 0) this.x = 0;
@@ -150,9 +152,9 @@ class Ball {
     this.dy = -Math.cos(angle) * this.speed;
   }
 
-  move() {
-    this.x += this.dx;
-    this.y += this.dy;
+  move(frameScale = 1) {
+    this.x += this.dx * frameScale;
+    this.y += this.dy * frameScale;
 
     // Collision avec les murs
     if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
@@ -372,6 +374,7 @@ let isDragging = false;
 
 const TAP_MAX_DURATION = 200; // ms
 const TAP_MAX_MOVE = 10; // px
+const touchListenerOptions = { passive: false };
 
 document.addEventListener("keydown", (e) => {
   keys[e.key] = true;
@@ -418,17 +421,26 @@ document.addEventListener("keyup", (e) => {
   keys[e.key] = false;
 });
 
-// Mouse control
-canvas.addEventListener("mousemove", (e) => {
+function getCanvasX(clientX) {
   const rect = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  gameState.paddle.x = mouseX - gameState.paddle.width / 2;
+  return (clientX - rect.left) * (canvas.width / rect.width);
+}
 
-  // Limites
+function clampPaddle() {
   if (gameState.paddle.x < 0) gameState.paddle.x = 0;
   if (gameState.paddle.x + gameState.paddle.width > canvas.width) {
     gameState.paddle.x = canvas.width - gameState.paddle.width;
   }
+}
+
+function movePaddleTo(x) {
+  gameState.paddle.x = x - gameState.paddle.width / 2;
+  clampPaddle();
+}
+
+// Mouse control
+canvas.addEventListener("mousemove", (e) => {
+  movePaddleTo(getCanvasX(e.clientX));
 });
 
 // Buttons
@@ -456,32 +468,24 @@ document
 canvas.addEventListener("touchstart", (e) => {
   e.preventDefault();
   const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
 
-  touchStartX = touch.clientX - rect.left;
+  touchStartX = getCanvasX(touch.clientX);
   touchStartTime = Date.now();
   isDragging = false;
-});
+}, touchListenerOptions);
 
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const x = touch.clientX - rect.left;
+  const x = getCanvasX(touch.clientX);
 
   if (Math.abs(x - touchStartX) > TAP_MAX_MOVE) {
     isDragging = true;
   }
 
   // Déplacer la raquette
-  gameState.paddle.x = x - gameState.paddle.width / 2;
-
-  // Limites
-  if (gameState.paddle.x < 0) gameState.paddle.x = 0;
-  if (gameState.paddle.x + gameState.paddle.width > canvas.width) {
-    gameState.paddle.x = canvas.width - gameState.paddle.width;
-  }
-});
+  movePaddleTo(x);
+}, touchListenerOptions);
 
 canvas.addEventListener("touchend", (e) => {
   e.preventDefault();
@@ -496,13 +500,29 @@ canvas.addEventListener("touchend", (e) => {
       togglePause();
     }
   }
-});
+}, touchListenerOptions);
+
+canvas.addEventListener("touchcancel", (e) => {
+  e.preventDefault();
+  isDragging = false;
+}, touchListenerOptions);
 
 // resize quand la fenêtre change
 window.addEventListener("resize", resizeCanvas);
 
 // Game Loop
-function update() {
+let lastUpdateTime = null;
+
+function update(timestamp) {
+  const now = typeof timestamp === "number" ? timestamp : performance.now();
+  const elapsed =
+    lastUpdateTime === null ? TARGET_FRAME_MS : now - lastUpdateTime;
+  lastUpdateTime = now;
+  const frameScale = Math.min(
+    Math.max(elapsed / TARGET_FRAME_MS, 0),
+    MAX_FRAME_SCALE,
+  );
+
   if (gameState.isPaused || gameState.isGameOver || gameState.isWin) {
     requestAnimationFrame(update);
     return;
@@ -517,10 +537,10 @@ function update() {
     gameState.paddle.dx = 0;
   }
 
-  gameState.paddle.move();
+  gameState.paddle.move(frameScale);
 
   if (gameState.ballLaunched) {
-    gameState.ball.move();
+    gameState.ball.move(frameScale);
     checkBrickCollisions();
   } else {
     // La balle suit la raquette

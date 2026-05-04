@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.15.2026-05-02";
+const CACHE_NAME = "mini-games-cache-v1.15.2026-05-04";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
     'rating-modal.css',
     'manifest.json',
     'fonts.css',
+    'privacy',
 
     // firebase
     'https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js',
@@ -71,6 +72,10 @@ const ASSETS_TO_CACHE = [
     'about/about.html',
     'about/about.css',
     'about/about.js',
+
+    // Fonts Google (CSS)
+    'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap',
+    'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,200&family=JetBrains+Mono:wght@300;400&display=swap',
 
     // offline page
     'games/offline.html',
@@ -346,7 +351,19 @@ self.addEventListener('fetch', (event) => {
         );
     }
 
-    // ÉTAPE B : Stratégie Cache First pour tout le reste
+    // ÉTAPE B : Éviter les erreurs console pour les scripts de pub/tracking hors-ligne
+    if (url.hostname.includes('google-analytics.com') ||
+        url.hostname.includes('googletagmanager.com') ||
+        url.hostname.includes('profitablecpmratenetwork.com') ||
+        url.hostname.includes('fundingchoicesmessages.google.com') ||
+        url.hostname.includes('adtrafficquality.google') ||
+        url.hostname.includes('pagead2.googlesyndication.com')) {
+        return event.respondWith(
+            fetch(event.request).catch(() => new Response('', { status: 200, headers: { 'Content-Type': 'text/javascript' } }))
+        );
+    }
+
+    // ÉTAPE C : Stratégie Cache First pour tout le reste
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then((cached) => {
             // 1. Si présent en cache, on sert immédiatement

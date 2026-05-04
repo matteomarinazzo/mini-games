@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Draw & Guess - Jeu</title>
+    <title>Draw & Guess – Jeu de dessin multijoueur gratuit en ligne | Mini‑Games</title>
     <meta name="robots" content="noindex, nofollow" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -208,7 +208,9 @@
 
             <section class="canvas-wrapper">
                 <div class="canvas-inner">
-                    <canvas id="gameCanvas"></canvas>
+                    <canvas id="gameCanvasLocked"
+                        style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                    <canvas id="gameCanvas" style="position: relative; z-index: 1; background: transparent;"></canvas>
                 </div>
             </section>
         </div>

@@ -21,6 +21,8 @@ const speedSettings = {
 };
 
 const ballSpeed = speedSettings[config.ballSpeed];
+const TARGET_FRAME_MS = 1000 / 60;
+const MAX_FRAME_SCALE = 2;
 
 // Canvas
 const canvas = document.getElementById("gameCanvas");
@@ -87,17 +89,17 @@ class Paddle {
   draw() {
     const gradient = isVertical
       ? ctx.createLinearGradient(
-          this.x,
-          this.y,
-          this.x + this.width,
-          this.y + this.height,
-        )
+        this.x,
+        this.y,
+        this.x + this.width,
+        this.y + this.height,
+      )
       : ctx.createLinearGradient(
-          this.x,
-          this.y,
-          this.x + this.width,
-          this.y + this.height,
-        );
+        this.x,
+        this.y,
+        this.x + this.width,
+        this.y + this.height,
+      );
 
     gradient.addColorStop(0, this.isPlayer1 ? "#667eea" : "#764ba2");
     gradient.addColorStop(1, this.isPlayer1 ? "#764ba2" : "#667eea");
@@ -119,14 +121,14 @@ class Paddle {
     ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 
-  move() {
+  move(frameScale = 1) {
     if (isVertical) {
-      this.y += this.dy;
+      this.y += this.dy * frameScale;
       if (this.y < 0) this.y = 0;
       if (this.y + this.height > GAME_HEIGHT)
         this.y = GAME_HEIGHT - this.height;
     } else {
-      this.x += this.dx;
+      this.x += this.dx * frameScale;
       if (this.x < 0) this.x = 0;
       if (this.x + this.width > GAME_WIDTH) this.x = GAME_WIDTH - this.width;
     }
@@ -208,9 +210,9 @@ class Ball {
     }
   }
 
-  move() {
-    this.x += this.dx;
-    this.y += this.dy;
+  move(frameScale = 1) {
+    this.x += this.dx * frameScale;
+    this.y += this.dy * frameScale;
 
     if (isVertical) {
       // Collision haut/bas
@@ -390,6 +392,7 @@ document.addEventListener("keyup", (e) => {
 const touchControls = document.getElementById("touchControls");
 const player1Touch = document.getElementById("player1Touch");
 const player2Touch = document.getElementById("player2Touch");
+const touchListenerOptions = { passive: false };
 
 touchControls.className = `touch-controls ${config.orientation}`;
 
@@ -397,6 +400,7 @@ touchControls.className = `touch-controls ${config.orientation}`;
 
 // Joueur 1
 player1Touch.addEventListener("touchstart", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     touchState.player1.touching = true;
     touchState.player1.id = touch.identifier; // mémoriser le doigt
@@ -410,27 +414,39 @@ player1Touch.addEventListener("touchstart", (e) => {
       gameState.ballLaunched = true;
     }
   }
-});
+}, touchListenerOptions);
 
 player1Touch.addEventListener("touchmove", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     if (touchState.player1.touching && touch.identifier === touchState.player1.id) {
       touchState.player1.currentY = touch.clientY;
       touchState.player1.currentX = touch.clientX;
     }
   }
-});
+}, touchListenerOptions);
 
 player1Touch.addEventListener("touchend", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     if (touch.identifier === touchState.player1.id) {
       touchState.player1.touching = false;
     }
   }
-});
+}, touchListenerOptions);
+
+player1Touch.addEventListener("touchcancel", (e) => {
+  e.preventDefault();
+  for (let touch of e.changedTouches) {
+    if (touch.identifier === touchState.player1.id) {
+      touchState.player1.touching = false;
+    }
+  }
+}, touchListenerOptions);
 
 // Touch events pour joueur 2 (seulement en mode PvP)
 player2Touch.addEventListener("touchstart", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     touchState.player2.touching = true;
     touchState.player2.id = touch.identifier; // mémoriser le doigt
@@ -444,28 +460,40 @@ player2Touch.addEventListener("touchstart", (e) => {
       gameState.ballLaunched = true;
     }
   }
-});
+}, touchListenerOptions);
 
 player2Touch.addEventListener("touchmove", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     if (touchState.player2.touching && touch.identifier === touchState.player2.id) {
       touchState.player2.currentY = touch.clientY;
       touchState.player2.currentX = touch.clientX;
     }
   }
-});
+}, touchListenerOptions);
 
 player2Touch.addEventListener("touchend", (e) => {
+  e.preventDefault();
   for (let touch of e.changedTouches) {
     if (touch.identifier === touchState.player2.id) {
       touchState.player2.touching = false;
     }
   }
-});
+}, touchListenerOptions);
+
+player2Touch.addEventListener("touchcancel", (e) => {
+  e.preventDefault();
+  for (let touch of e.changedTouches) {
+    if (touch.identifier === touchState.player2.id) {
+      touchState.player2.touching = false;
+    }
+  }
+}, touchListenerOptions);
 
 // Touch sur le canvas pour lancer/pause
 let lastTapTime = 0;
 canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
   const now = Date.now();
   if (now - lastTapTime < 300) {
     // Double tap = pause
@@ -482,7 +510,7 @@ canvas.addEventListener("touchstart", (e) => {
     gameState.ballLaunched = true;
   }
   lastTapTime = now;
-});
+}, touchListenerOptions);
 
 // Boutons
 document.getElementById("resumeBtn").addEventListener("click", togglePause);
@@ -511,9 +539,8 @@ if (isVertical) {
         <span>Monter / Descendre</span>
       </div>
     </div>
-    ${
-      config.gameMode === "pvp"
-        ? `
+    ${config.gameMode === "pvp"
+      ? `
     <div class="player-controls">
       <span class="player-label">Joueur 2:</span>
       <div class="control-item">
@@ -522,7 +549,7 @@ if (isVertical) {
       </div>
     </div>
     `
-        : ""
+      : ""
     }
     <div class="control-item">
       <kbd>Espace</kbd>
@@ -538,9 +565,8 @@ if (isVertical) {
         <span>Gauche / Droite</span>
       </div>
     </div>
-    ${
-      config.gameMode === "pvp"
-        ? `
+    ${config.gameMode === "pvp"
+      ? `
     <div class="player-controls">
       <span class="player-label">Joueur 2:</span>
       <div class="control-item">
@@ -549,7 +575,7 @@ if (isVertical) {
       </div>
     </div>
     `
-        : ""
+      : ""
     }
     <div class="control-item">
       <kbd>Espace</kbd>
@@ -559,7 +585,18 @@ if (isVertical) {
 }
 
 // Game Loop
-function update() {
+let lastUpdateTime = null;
+
+function update(timestamp) {
+  const now = typeof timestamp === "number" ? timestamp : performance.now();
+  const elapsed =
+    lastUpdateTime === null ? TARGET_FRAME_MS : now - lastUpdateTime;
+  lastUpdateTime = now;
+  const frameScale = Math.min(
+    Math.max(elapsed / TARGET_FRAME_MS, 0),
+    MAX_FRAME_SCALE,
+  );
+
   if (gameState.isPaused || gameState.isGameOver) {
     requestAnimationFrame(update);
     return;
@@ -596,13 +633,13 @@ function update() {
       touchState.player1.startY = touchState.player1.currentY;
     } else {
       const deltaX = touchState.player1.currentX - touchState.player1.startX;
-      paddle1.x += deltaX  * paddleSpeed;
+      paddle1.x += deltaX * paddleSpeed;
       paddle1.x = Math.max(0, Math.min(GAME_WIDTH - paddle1.width, paddle1.x));
       touchState.player1.startX = touchState.player1.currentX;
     }
   }
 
-  paddle1.move();
+  paddle1.move(frameScale);
 
   // Contrôles Joueur 2 ou IA
   if (config.gameMode === "pvp") {
@@ -646,17 +683,17 @@ function update() {
       }
     }
 
-    paddle2.move();
+    paddle2.move(frameScale);
   } else {
     // IA
     if (gameState.ballLaunched) {
       paddle2.aiMove(ball);
-      paddle2.move();
+      paddle2.move(frameScale);
     }
   }
 
   if (gameState.ballLaunched) {
-    ball.move();
+    ball.move(frameScale);
   }
 
   requestAnimationFrame(update);

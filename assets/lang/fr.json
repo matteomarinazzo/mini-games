@@ -24,6 +24,8 @@
         "sound": "Son",
         "about": "ℹ️ À propos",
         "contact": "📧 Contact",
+        "ads_support": "Soutenez Mini Games",
+        "ads_message": "Une petite publicité nous aide à garder la plateforme gratuite !",
         "games": {
             "battleship": {
                 "name": "Bataille navale",
@@ -96,6 +98,10 @@
             "snow-digger": {
                 "name": "Snow Digger",
                 "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif."
+            },
+            "pancake": {
+                "name": "Pancake",
+                "description": "Lance une crêpe depuis une poêle et fais-la atterrir sur des objets improbables !"
             }
         },
         "badges": {
@@ -150,7 +156,8 @@
             "culture": "🎓 Culture",
             "clicker": "🎮 Clicker",
             "digger": "🪏 Pelle",
-            "snow": "❄️ Neige"
+            "snow": "❄️ Neige",
+            "flipping": "🥞 Lancer"
         }
     },
     "about": {
@@ -161,8 +168,8 @@
         "subtitle": "Une passion pour les jeux, une plateforme pour tous",
         "mission_title": "Notre Mission",
         "mission_p1": "Mini Games est né d'une passion simple : <strong>créer des jeux fun et accessibles à tous</strong>. Nous croyons que les meilleurs moments de jeu sont ceux qu'on partage, que ce soit pour quelques minutes de détente ou des heures de challenge.",
-        "mission_p2": "Chaque jeu est conçu avec soin pour offrir une expérience unique, addictive et totalement gratuite. Pas de publicités invasives, pas de pay-to-win, juste du pur plaisir de jeu.",
-        "story_title": "Notre Histoire",
+        "mission_p2": "Chaque jeu est accessible gratuitement et sans mécanique de pay-to-win. Pour maintenir nos serveurs et continuer à créer de nouveaux défis, nous intégrons quelques publicités. Nous nous efforçons de les équilibrer pour que votre plaisir de jeu reste notre priorité absolue.",
+        "story": "Notre Histoire",
         "january": "Janvier",
         "february": "Février",
         "march": "Mars",
@@ -191,7 +198,12 @@
         "contact_title": "Restons connectés",
         "contact_p": "Un bug à signaler ? Une suggestion ? N'hésitez pas à nous contacter !",
         "contact_btn": "Envoyer un email",
+        "privacy_title": "Confidentialité",
+        "privacy_p": "Nous respectons votre vie privée. Pour en savoir plus, consultez notre politique de confidentialité.",
         "footer": "Made with ❤️ by You | © 2026 Mini Games | Version :"
+    },
+    "privacy": {
+        "button": "Confidentialité"
     },
     "morpion": {
         "title": "Morpion",
@@ -452,6 +464,28 @@
             "fuelBonus": "Accorde +{percent}% de capacité carburant totale.",
             "sasBoost": "Améliore le SAS de {percent}%.",
             "rewardMultiplier": "Accorde +{percent}% de récompense de mission."
+        }
+    },
+    "pancake": {
+        "menu": {
+            "title": "Crêpe Flip",
+            "play": "Jouer",
+            "level": "Niveau",
+            "levels": "Niveaux",
+            "completed": "Complétés",
+            "total_levels": "Niveaux",
+            "progress": "Progression",
+            "back": "Menu",
+            "description": "Lance une crêpe depuis une poêle et fais-la atterrir sur des objets improbables !"
+        },
+        "game": {
+            "tap_to_flip": "Tape pour lancer !",
+            "success": "Bravo !",
+            "fail": "Raté !",
+            "next_level": "Niveau suivant",
+            "retry": "Réessayer",
+            "all_done": "Félicitations !",
+            "all_done_sub": "Tu as complété tous les niveaux !"
         }
     }
 }

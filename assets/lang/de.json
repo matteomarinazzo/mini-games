@@ -24,6 +24,8 @@
         "sound": "Ton",
         "about": "ℹ️ Über",
         "contact": "📧 Kontakt",
+        "ads_support": "Unterstütze Mini Games",
+        "ads_message": "Eine kleine Werbung hilft uns, die Plattform kostenlos zu halten!",
         "games": {
             "battleship": {
                 "name": "Schiffe versenken",
@@ -96,6 +98,10 @@
             "snow-digger": {
                 "name": "Snow Digger",
                 "description": "Räume den Schnee, verdiene Geld und räume schneller. Einfach, schnell, süchtig machend."
+            },
+            "pancake": {
+                "name": "Pancake",
+                "description": "Wirf einen Pfannkuchen aus einer Pfanne und lasse ihn auf unwahrscheinlichen Objekten landen!"
             }
         },
         "badges": {
@@ -150,7 +156,8 @@
             "culture": "🎓 Kultur",
             "clicker": "🎮 Clicker",
             "digger": "🪏 Gräber",
-            "snow": "❄️ Schnee"
+            "snow": "❄️ Schnee",
+            "flipping": "🥞 Wurf"
         }
     },
     "about": {
@@ -161,8 +168,8 @@
         "subtitle": "Eine Leidenschaft für Spiele, eine Plattform für alle",
         "mission_title": "Unsere Mission",
         "mission_p1": "Mini Games entstand aus einer einfachen Leidenschaft: <strong>unterhaltsame und zugängliche Spiele für alle zu schaffen</strong>. Wir glauben, dass die besten Spielmomente die sind, die man teilt – ob für ein paar Minuten Entspannung oder stundenlange Herausforderungen.",
-        "mission_p2": "Jedes Spiel ist sorgfältig gestaltet, um ein einzigartiges, süchtig machendes und völlig kostenloses Erlebnis zu bieten. Keine aufdringliche Werbung, kein Pay-to-Win – nur reinen Spielspaß.",
-        "story_title": "Unsere Geschichte",
+        "mission_p2": "Jedes Spiel ist kostenlos zugänglich und kommt ohne Pay-to-Win-Mechaniken aus. Um unsere Server zu finanzieren und weiterhin neue Herausforderungen zu entwickeln, binden wir einige Werbeanzeigen ein. Wir bemühen uns um eine ausgewogene Balance, damit dein Spielvergnügen unsere oberste Priorität bleibt.",
+        "story": "Unsere Geschichte",
         "january": "Januar",
         "february": "Februar",
         "march": "März",
@@ -191,7 +198,12 @@
         "contact_title": "In Verbindung bleiben",
         "contact_p": "Einen Bug melden? Einen Vorschlag? Zögere nicht, uns zu kontaktieren!",
         "contact_btn": "E-Mail senden",
+        "privacy_title": "Datenschutz",
+        "privacy_p": "Wir respektieren Ihre Privatsphäre. Um mehr zu erfahren, lesen Sie unsere Datenschutzerklärung.",
         "footer": "Made with ❤️ by You | © 2026 Mini Games | Version:"
+    },
+    "privacy": {
+        "button": "Datenschutz"
     },
     "morpion": {
         "title": "Tic Tac Toe",
@@ -452,6 +464,28 @@
             "fuelBonus": "Gewährt +{percent}% Gesamttreibstoffkapazität.",
             "sasBoost": "Verbessert SAS um {percent}%.",
             "rewardMultiplier": "Gewährt +{percent}% Missionsbelohnung."
+        }
+    },
+    "pancake": {
+        "menu": {
+            "title": "Pancake",
+            "play": "Spielen",
+            "level": "Level",
+            "levels": "Level",
+            "completed": "Abgeschlossen",
+            "total_levels": "Level",
+            "progress": "Fortschritt",
+            "back": "Menü",
+            "description": "Wirf einen Pfannkuchen aus einer Pfanne und lasse ihn auf unwahrscheinlichen Objekten landen!"
+        },
+        "game": {
+            "tap_to_flip": "Tippen zum Werfen!",
+            "success": "Super!",
+            "fail": "Daneben!",
+            "next_level": "Nächstes Level",
+            "retry": "Nochmal",
+            "all_done": "Glückwunsch!",
+            "all_done_sub": "Du hast alle Level abgeschlossen!"
         }
     }
 }

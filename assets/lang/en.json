@@ -24,6 +24,8 @@
         "sound": "Sound",
         "about": "ℹ️ About",
         "contact": "📧 Contact",
+        "ads_support": "Support Mini Games",
+        "ads_message": "A small ad helps us keep the platform free!",
         "games": {
             "battleship": {
                 "name": "Battleship",
@@ -96,6 +98,10 @@
             "snow-digger": {
                 "name": "Snow Digger",
                 "description": "Clear the snow, earn money, and clear faster. Simple, fast, addictive."
+            },
+            "pancake": {
+                "name": "Pancake",
+                "description": "Flip a pancake from a pan and land it on unlikely objects!"
             }
         },
         "badges": {
@@ -150,7 +156,8 @@
             "culture": "🎓 Culture",
             "clicker": "🎮 Clicker",
             "digger": "🪏 Digger",
-            "snow": "❄️ Snow"
+            "snow": "❄️ Snow",
+            "flipping": "🥞 Flipping"
         }
     },
     "about": {
@@ -161,8 +168,8 @@
         "subtitle": "A passion for games, a platform for everyone",
         "mission_title": "Our Mission",
         "mission_p1": "Mini Games was born from a simple passion: <strong>creating fun and accessible games for everyone</strong>. We believe the best gaming moments are those we share, whether for a few minutes of relaxation or hours of challenge.",
-        "mission_p2": "Each game is carefully designed to offer a unique, addictive and completely free experience. No invasive ads, no pay-to-win, just pure gaming fun.",
-        "story_title": "Our Story",
+        "mission_p2": "Each game is accessible for free and without pay-to-win mechanics. To maintain our servers and keep creating new challenges, we integrate a few advertisements. We strive to balance them so that your gaming enjoyment remains our top priority.",
+        "story": "Our Story",
         "january": "January",
         "february": "February",
         "march": "March",
@@ -191,7 +198,12 @@
         "contact_title": "Stay connected",
         "contact_p": "A bug to report? A suggestion? Feel free to contact us!",
         "contact_btn": "Send an email",
+        "privacy_title": "Privacy",
+        "privacy_p": "We respect your privacy. To learn more, check our privacy policy.",
         "footer": "Made with ❤️ by You | © 2026 Mini Games | Version:"
+    },
+    "privacy": {
+        "button": "Privacy"
     },
     "morpion": {
         "title": "Tic Tac Toe",
@@ -452,6 +464,28 @@
             "fuelBonus": "Grants +{percent}% total fuel capacity.",
             "sasBoost": "Improves SAS by {percent}%.",
             "rewardMultiplier": "Grants +{percent}% mission reward."
+        }
+    },
+    "pancake": {
+        "menu": {
+            "title": "Pancake",
+            "play": "Play",
+            "level": "Level",
+            "levels": "Levels",
+            "completed": "Completed",
+            "total_levels": "Levels",
+            "progress": "Progress",
+            "back": "Menu",
+            "description": "Flip a pancake from a pan and land it on unlikely objects!"
+        },
+        "game": {
+            "tap_to_flip": "Tap to flip!",
+            "success": "Nice one!",
+            "fail": "Missed!",
+            "next_level": "Next Level",
+            "retry": "Try Again",
+            "all_done": "Congratulations!",
+            "all_done_sub": "You completed all levels!"
         }
     }
 }

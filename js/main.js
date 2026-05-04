@@ -199,7 +199,6 @@ function generateGameCards() {
   };
 
   const addHeader = (title) => {
-    // Le grid-column: 1 / -1 est ajouté car ces headers existent à l'intérieur de mainGamesGrid.
     const headerHTML = `
     <div class="category-header"
       style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; margin: 20px auto 20px; width: 100%; gap: 20px;">
@@ -224,48 +223,121 @@ function generateGameCards() {
     gamesGrid.appendChild(spacer);
   };
 
+  // Liste plate des éléments à rendre
+  const allItems = [];
+
+  // Favoris
   if (currentFilter === 'Tout' || currentFilter === 'Favoris') {
     const myLikedGames = likedList.filter(id => games[id]);
     if (myLikedGames.length > 0) {
-      addHeader(t('menu.favorites'));
+      allItems.push({ type: 'header', title: t('menu.favorites') });
       let count = 0;
       [...myLikedGames].reverse().forEach(gameId => {
-        addCardToGrid(createGameCard(gameId, games[gameId]));
+        allItems.push({ type: 'card', id: gameId, data: games[gameId] });
         count++;
       });
-      if (count % 2 !== 0 && currentFilter === 'Tout') {
-        addSpacer();
-      }
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      if (!isMobile && count % 2 !== 0 && currentFilter === 'Tout') allItems.push({ type: 'spacer' });
     }
   }
 
+  // Catégories
   for (const [catName, catGames] of Object.entries(categoriesData)) {
     if (currentFilter !== 'Tout' && currentFilter !== catName) continue;
     if (currentFilter === 'Favoris') continue;
 
-    addHeader(catName);
-
+    allItems.push({ type: 'header', title: catName });
     let count = 0;
     Object.entries(catGames).forEach(([gameId, game]) => {
-      addCardToGrid(createGameCard(gameId, game));
+      allItems.push({ type: 'card', id: gameId, data: game });
       count++;
     });
-
-    if (count % 2 !== 0 && currentFilter === 'Tout') {
-      addSpacer();
-    }
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile && count % 2 !== 0 && currentFilter === 'Tout') allItems.push({ type: 'spacer' });
   }
 
-  localStorage.setItem("gamesAvailableCount", Object.keys(games).length);
-  const gamesNumberEl = document.getElementById("gamesNumber");
-  if (gamesNumberEl) gamesNumberEl.innerText = Object.keys(games).length;
+  // Rendu progressif pour le TBT, mais on rend les 6 premiers immédiatement pour le CLS
+  let currentIndex = 0;
+  const initialBurst = 6;
+  const firstBatch = Math.min(initialBurst, allItems.length);
 
-  initGameCards();
-  filterGames();
+  for (let i = 0; i < firstBatch; i++) {
+    const item = allItems[currentIndex];
+    if (item.type === 'header') addHeader(item.title);
+    else if (item.type === 'card') addCardToGrid(createGameCard(item.id, item.data, true)); // Priority for LCP
+    else if (item.type === 'spacer') addSpacer();
+    currentIndex++;
+  }
+
+  const renderNextChunk = () => {
+    const chunkSize = 4;
+    const end = Math.min(currentIndex + chunkSize, allItems.length);
+
+    for (let i = currentIndex; i < end; i++) {
+      const item = allItems[currentIndex];
+      if (item.type === 'header') addHeader(item.title);
+      else if (item.type === 'card') addCardToGrid(createGameCard(item.id, item.data));
+      else if (item.type === 'spacer') addSpacer();
+      currentIndex++;
+    }
+
+    if (currentIndex < allItems.length) {
+      if (window.requestIdleCallback) requestIdleCallback(renderNextChunk);
+      else setTimeout(renderNextChunk, 16);
+    } else {
+      finalizeGrid();
+    }
+  };
+
+  const finalizeGrid = () => {
+    localStorage.setItem("gamesAvailableCount", Object.keys(games).length);
+    const gamesNumberEl = document.getElementById("gamesNumber");
+    if (gamesNumberEl) gamesNumberEl.innerText = Object.keys(games).length;
+    initGameCards();
+    filterGames();
+  };
+
+  if (currentIndex < allItems.length) {
+    renderNextChunk();
+  } else {
+    finalizeGrid();
+  }
 }
 
+// ... (createGameCard and other functions)
+
+// Accessibilité Globale : Observer TOUTES les iframes (AdSense, Monetag, etc.)
+const fixIframes = () => {
+  const iframes = document.querySelectorAll('iframe');
+  iframes.forEach(iframe => {
+    if (!iframe.title) iframe.title = "Publicité";
+  });
+};
+
+const globalIframeObserver = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.type === 'childList') {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeName === 'IFRAME') {
+          node.title = "Publicité";
+        } else if (node.querySelectorAll) {
+          const iframes = node.querySelectorAll('iframe');
+          iframes.forEach(iframe => {
+            iframe.title = "Publicité";
+          });
+        }
+      });
+    }
+  });
+});
+
+globalIframeObserver.observe(document.body, { childList: true, subtree: true });
+// Sécurité supplémentaire : un check toutes les 2s pour les iframes injectées de façon exotique
+setInterval(fixIframes, 2000);
+fixIframes();
+
 // Créer une carte de jeu avec la structure HTML exacte
-function createGameCard(gameId, game) {
+function createGameCard(gameId, game, isPriority = false) {
   // Créer l'élément principal de la carte
   const card = document.createElement("div");
   card.className = "game-card";
@@ -290,7 +362,10 @@ function createGameCard(gameId, game) {
       <span class="badge badge-${game.badge}">${t("menu.badges." + game.badge)}</span>
     </div>
     <div class="card-image">
-      <img src="assets/logos/${gameId}.webp" alt="${t("menu.games." + gameId + ".name")}" />
+      <img src="assets/logos/${gameId}.webp" 
+           alt="${t("menu.games." + gameId + ".name")}" 
+           ${isPriority ? 'fetchpriority="high"' : 'loading="lazy"'} 
+           width="130" height="130" />
       <div class="card-overlay">
         <div class="play-button">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -319,7 +394,7 @@ function createGameCard(gameId, game) {
         <span class="stars">${game.stars}</span>
         <span class="rating-text">${game.rating}</span>
       </div>
-      <button class="btn-play">${t('menu.play')}</button></button>
+      <button class="btn-play">${t('menu.play')}</button>
     </div>
   `;
 
@@ -683,6 +758,82 @@ document.querySelectorAll('a[href*="about.html"]').forEach(link => {
     notifyAboutVisit();
   });
 });
+
+// ─── PUBLICITÉS (POPUP) ──────────────────────────────────────────────────────
+async function checkAndShowAdPopup() {
+  let homeVisits = parseInt(localStorage.getItem('homeVisits') || '0', 10);
+  homeVisits++;
+  localStorage.setItem('homeVisits', homeVisits);
+  const isOnline = await checkRealConnection();
+
+  // Affiche la pub tous les 3 chargements de la page d'accueil
+  if (homeVisits % 3 === 0 && isOnline) {
+    // Petit délai pour laisser la page charger visuellement avant la popup
+    setTimeout(showAdPopup, 800);
+  }
+}
+
+function showAdPopup() {
+  const popup = document.getElementById('adPopup');
+  const container = document.getElementById('adContainer');
+  const closeBtn = document.getElementById('adPopupClose');
+  if (!popup || !container) return;
+
+  // 1. Injecter le script immédiatement en arrière-plan
+  if (container.innerHTML.trim() === '') {
+    const script1 = document.createElement('script');
+    script1.text = `atOptions = {'key': '08b99ce828f8ebd5169a179ffed50dff','format': 'iframe','height': 250,'width': 300,'params': {}};`;
+    const script2 = document.createElement('script');
+    script2.src = "https://www.highperformanceformat.com/08b99ce828f8ebd5169a179ffed50dff/invoke.js";
+
+    container.appendChild(script1);
+    container.appendChild(script2);
+  }
+
+  // 2. On attend 1.5s que la pub charge avant d'afficher la popup visuellement
+  setTimeout(() => {
+    popup.classList.remove('hidden');
+
+    // 3. Compte à rebours avant d'afficher la croix cliquable
+    if (closeBtn) {
+      let timeLeft = 3;
+      closeBtn.classList.remove('hidden');
+      closeBtn.textContent = timeLeft;
+      closeBtn.style.pointerEvents = 'none'; // Désactiver le clic au début
+      closeBtn.style.opacity = '0.8';
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          closeBtn.textContent = timeLeft;
+        } else {
+          clearInterval(timer);
+          closeBtn.textContent = '×';
+          closeBtn.style.pointerEvents = 'auto'; // Réactiver le clic
+          closeBtn.style.opacity = '1';
+          closeBtn.style.fontSize = '16px'; // Un peu plus grand pour la croix
+        }
+      }, 1000);
+    }
+  }, 1500);
+
+  // Événement de fermeture (avec redirection au premier clic)
+  if (closeBtn) {
+    let firstClickDone = false;
+    closeBtn.onclick = () => {
+      if (!firstClickDone) {
+        window.open("https://www.profitablecpmratenetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d", "_blank");
+        firstClickDone = true;
+        popup.classList.add('hidden');
+      } else {
+        popup.classList.add('hidden');
+      }
+    };
+  }
+}
+
+// Vérifier si on affiche la pub
+checkAndShowAdPopup();
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };

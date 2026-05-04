@@ -24,6 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  touch-action: none;
 }
 
 /* ========================================
@@ -94,6 +95,9 @@ body {
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.1);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ========================================
@@ -208,7 +212,7 @@ kbd {
 ======================================== */
 @media (max-aspect-ratio: 1/1) {
   body {
-    touch-action: manipulation;
+    touch-action: none;
   }
   .hud {
     padding: 15px 20px;

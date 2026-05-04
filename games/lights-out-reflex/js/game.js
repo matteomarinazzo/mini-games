@@ -43,12 +43,20 @@ const LS_AVG = 'lightsout_avg';
 const LS_TOTAL = 'lightsout_total';
 const LS_COUNT = 'lightsout_count';
 const LS_HISTORY = 'lightsout_history';
+const LS_BEST_AVG = 'lightsout_best_avg';
 
 let localBest = parseFloat(localStorage.getItem(LS_BEST)) || Infinity;
 let localAvg = parseFloat(localStorage.getItem(LS_AVG)) || Infinity;
+let localBestAvg = parseFloat(localStorage.getItem(LS_BEST_AVG)) || Infinity;
 let totalTime = parseFloat(localStorage.getItem(LS_TOTAL)) || 0;
 let attemptCount = parseInt(localStorage.getItem(LS_COUNT)) || 0;
 let history = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+
+// Migration : si localBestAvg n'existe pas encore mais qu'on a déjà des essais
+if (localBestAvg === Infinity && localAvg !== Infinity && attemptCount >= 3) {
+    localBestAvg = localAvg;
+    localStorage.setItem(LS_BEST_AVG, localBestAvg.toString());
+}
 
 let globalBest = Infinity;
 let globalAvg = Infinity;
@@ -290,17 +298,19 @@ async function recordAttempt(time, isPenalty) {
     const newAvg = totalTime / attemptCount;
 
     const prevBest = localBest;
-    const prevAvg = localAvg;
-
-    const newBest = time < localBest ? time : localBest;
-    const newAvgFinal = newAvg;
+    const prevBestAvg = localBestAvg;
 
     // Sauvegarder
     if (time < localBest) localBest = time;
-    localAvg = newAvgFinal;
+    localAvg = newAvg;
+
+    if (attemptCount >= 3 && newAvg < localBestAvg) {
+        localBestAvg = newAvg;
+    }
 
     localStorage.setItem(LS_BEST, localBest.toString());
     localStorage.setItem(LS_AVG, localAvg.toString());
+    localStorage.setItem(LS_BEST_AVG, localBestAvg.toString());
     localStorage.setItem(LS_TOTAL, totalTime.toString());
     localStorage.setItem(LS_COUNT, attemptCount.toString());
 
@@ -314,7 +324,7 @@ async function recordAttempt(time, isPenalty) {
 
     // Vérifier records
     const beatPersonalBest = time < prevBest && prevBest !== Infinity;
-    const beatPersonalAvg = newAvg < prevAvg && prevAvg !== Infinity && attemptCount >= 3;
+    const beatPersonalAvg = newAvg < prevBestAvg && prevBestAvg !== Infinity && attemptCount >= 3;
 
     const isOnline = await checkRealConnection();
     const beatGlobalBest = isOnline && time < globalBest;
@@ -324,7 +334,7 @@ async function recordAttempt(time, isPenalty) {
 
     if (anyRecord) {
         pendingRecords = {
-            time, newAvg, prevBest, prevAvg,
+            time, newAvg, prevBest, prevBestAvg,
             beatPersonalBest, beatPersonalAvg,
             beatGlobalBest, beatGlobalAvg,
             isGlobalBeat: beatGlobalBest || beatGlobalAvg
@@ -360,8 +370,8 @@ async function showRecordPopup(rec) {
         </div>`;
     }
 
-    if (rec.beatGlobalAvg) { //if (rec.beatPersonalAvg || rec.beatGlobalAvg) {
-        const oldAvgVal = rec.beatGlobalAvg ? formatGlobalAvg(rec.prevAvg) : fmt(rec.prevAvg);
+    if (rec.beatPersonalAvg || rec.beatGlobalAvg) {
+        const oldAvgVal = rec.beatGlobalAvg ? formatGlobalAvg(rec.prevBestAvg) : fmt(rec.prevBestAvg);
         const newAvgVal = fmt(rec.newAvg);
         html += `<div class="record-row">
             <span class="label">${rec.beatGlobalAvg ? '🌍 MOYENNE MONDIALE' : '👤 Moyenne perso'}</span>
@@ -433,7 +443,7 @@ function closeRecordPopup() {
 // ─── RECORDS OVERLAY ──────────────────────────────────────────────────────────
 async function openRecords() {
     recPersonalBest.textContent = localBest !== Infinity ? fmt(localBest) : '—';
-    recPersonalAvg.textContent = localAvg !== Infinity ? fmt(localAvg) : '—';
+    recPersonalAvg.textContent = localBestAvg !== Infinity ? fmt(localBestAvg) : '—';
     recGlobalBest.textContent = '…';
     recGlobalAvg.textContent = '…';
     recStatus.textContent = 'Synchronisation…';

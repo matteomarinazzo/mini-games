@@ -68,6 +68,19 @@
   <link rel="stylesheet" href="./rating-modal.css" />
   <link rel="stylesheet" href="./fonts.css" />
   <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+  <meta name="monetag" content="e0ef3a14662af27c3cb4ad0ca53eec07">
+  <meta name="02f1de76da1e4270a6cebfe9d965aa7991f16c2f" content="02f1de76da1e4270a6cebfe9d965aa7991f16c2f" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <!-- Preconnect to improve performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+    as="style">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap">
+  <link rel="preconnect" href="https://www.highperformanceformat.com">
 </head>
 
 
@@ -199,6 +212,9 @@
       <div class="footer-links">
         <a href="./about/about.html" class="footer-link" data-i18n="menu.about">ℹ️ À propos</a>
         <span class="separator">•</span>
+        <a href="https://mini-games.ch/privacy" class="footer-link" target="_blank" rel="noopener noreferrer">⚖️ <span
+            data-i18n="privacy.button">Confidentialité</span></a>
+        <span class="separator">•</span>
         <a href="mailto:contact@mini-games.ch" class="footer-link" data-i18n="menu.contact">📧 Contact</a>
       </div>
       <div class="social-links">
@@ -263,13 +279,28 @@
       </button>
     </div>
   </div>
+
+  <!-- Ad Popup Overlay -->
+  <div id="adPopup" class="ad-popup-overlay hidden">
+    <div class="ad-popup-box">
+      <button id="adPopupClose" class="ad-popup-close" title="Fermer">×</button>
+      <div id="adContainer" class="ad-container"></div>
+    </div>
+  </div>
+
 </body>
+
+<!-- PUBLICITÉS -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+  crossorigin="anonymous"></script>
+
+<script defer
+  src="https://pl29320862.profitablecpmratenetwork.com/89/6a/dd/896add25a788dcbea38a6fc5dbb07a44.js"></script>
 
 <script src="./js/utils/i18n.js"></script>
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/countPlayedTime.js"></script>
 
 <script type="module" src="./js/app.js"></script>
-
 
 </html>

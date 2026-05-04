@@ -316,9 +316,9 @@ function addBackButtonTransition() {
 }
 
 // Lancer au chargement
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
-  initI18n();
+  await initI18n();
   refreshTexts();
 
   notifyAboutVisit();

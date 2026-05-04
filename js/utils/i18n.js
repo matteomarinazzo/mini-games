@@ -1,4 +1,5 @@
-const BASE = '/perso/mini-games-plateform/';
+const isTestEnv = window.location.pathname.includes('/perso/mini-games-plateform/');
+const BASE = isTestEnv ? '/perso/mini-games-plateform/' : '/';
 
 window.I18N = {
     lang: "EN",

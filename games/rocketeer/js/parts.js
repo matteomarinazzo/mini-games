@@ -1215,7 +1215,7 @@ const PARTS_CATALOG = {
   // ─── BONUS MODULES ───────────────────────────────────────
   bonus_science: {
     id: 'bonus_science', name: 'Science Bay', category: 'bonus',
-    price: 5000, buildCost: 1000, mass: 1500, width: 50, height: 60, dragCoeff: 0.12,
+    price: 5000, buildCost: 1000, mass: 750, width: 50, height: 60, dragCoeff: 0.12,
     attachTop: true, attachBottom: true,
     description: 'Heavy scientific payload. Grants +25% mission reward.',
     bonus: { rewardMultiplier: 1.25 },
@@ -1273,7 +1273,7 @@ const PARTS_CATALOG = {
 
   bonus_cargo: {
     id: 'bonus_cargo', name: 'Cargo Bay XL', category: 'bonus',
-    price: 8000, buildCost: 1200, mass: 3000, width: 60, height: 80, dragCoeff: 0.15,
+    price: 8000, buildCost: 1200, mass: 1000, width: 60, height: 80, dragCoeff: 0.15,
     attachTop: true, attachBottom: true,
     description: 'Massive cargo bay. Initially heavy, but grants +25% total fuel capacity.',
     bonus: { fuelBonus: 1.25 },
@@ -1346,7 +1346,7 @@ const PARTS_CATALOG = {
 
   bonus_thruster_boost: {
     id: 'bonus_thruster_boost', name: 'Afterburner Pack', category: 'bonus',
-    price: 6000, buildCost: 1000, mass: 800, width: 40, height: 35, dragCoeff: 0.08,
+    price: 6000, buildCost: 1000, mass: 500, width: 40, height: 35, dragCoeff: 0.08,
     attachTop: true, attachBottom: true,
     description: 'Experimental combustion enhancer. Boosts all engine thrust by 25%.',
     bonus: { thrustBoost: 1.25 },

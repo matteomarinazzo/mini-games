@@ -101,7 +101,7 @@
         const modeChain = document.getElementById('modeChain');
         const nameInput = document.getElementById('playerNameInput');
 
-        const savedName = localStorage.getItem('drawguess_name') || localStorage.getItem('battleship_playerName') || "";
+        const savedName = localStorage.getItem('drawguess_name') || localStorage.getItem('mg_player_name') || localStorage.getItem('battleship_playerName') || "";
         if (savedName) nameInput.value = savedName;
 
         function checkName() {
@@ -112,6 +112,7 @@
                 return null;
             }
             localStorage.setItem('drawguess_name', name);
+            localStorage.setItem('mg_player_name', name);
             return name;
         }
 

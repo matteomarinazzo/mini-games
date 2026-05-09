@@ -6,7 +6,8 @@
   <title>Casse‑Briques – Jeu d’arcade gratuit en ligne | Mini‑Games</title>
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="https://mini-games.ch/games/casse-briques/" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <link rel="stylesheet" href="css/game.css" />
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🧱</text></svg>" />
@@ -44,7 +45,13 @@
     <!-- Overlay de pause -->
     <div class="game-overlay" id="pauseOverlay" style="display: none;">
       <div class="overlay-content">
-        <h2>⏸️ Pause</h2>
+        <h2 class="pause-title">
+          <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="6" y="4" width="4" height="16" rx="2"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="2"></rect>
+          </svg>
+          <span>Pause</span>
+        </h2>
         <button class="btn-primary" id="resumeBtn">Reprendre</button>
         <button class="btn-secondary" id="restartBtn">Recommencer</button>
         <button class="btn-secondary" id="menuBtn">Menu principal</button>

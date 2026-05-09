@@ -1,0 +1,409 @@
+[
+    {
+        "id": "first_launch",
+        "icon": "🎮",
+        "name": "Premier Lancement",
+        "nameEN": "First Launch",
+        "nameDE": "Erster Start",
+        "description": "Lance ton premier jeu",
+        "descriptionEN": "Launch your first game",
+        "descriptionDE": "Starte dein erstes Spiel",
+        "condition": {
+            "type": "games_played",
+            "value": 1
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "sessions_10",
+        "icon": "🔄",
+        "name": "Habitué",
+        "nameEN": "Regular",
+        "nameDE": "Stammgast",
+        "description": "Lance 10 sessions de jeu",
+        "descriptionEN": "Start 10 game sessions",
+        "descriptionDE": "Starte 10 Spielsitzungen",
+        "condition": {
+            "type": "games_played",
+            "value": 10
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "sessions_50",
+        "icon": "🎯",
+        "name": "Acharné",
+        "nameEN": "Dedicated",
+        "nameDE": "Eingefleischter",
+        "description": "Lance 50 sessions de jeu",
+        "descriptionEN": "Start 50 game sessions",
+        "descriptionDE": "Starte 50 Spielsitzungen",
+        "condition": {
+            "type": "games_played",
+            "value": 50
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "sessions_100",
+        "icon": "🌟",
+        "name": "Centurion",
+        "nameEN": "Centurion",
+        "nameDE": "Zenturio",
+        "description": "Lance 100 sessions de jeu",
+        "descriptionEN": "Start 100 game sessions",
+        "descriptionDE": "Starte 100 Spielsitzungen",
+        "condition": {
+            "type": "games_played",
+            "value": 100
+        },
+        "rarity": "epic"
+    },
+    {
+        "id": "sessions_200",
+        "icon": "🔥",
+        "name": "Marathonien",
+        "nameEN": "Marathoner",
+        "nameDE": "Marathonläufer",
+        "description": "Lance 200 sessions de jeu",
+        "descriptionEN": "Start 200 game sessions",
+        "descriptionDE": "Starte 200 Spielsitzungen",
+        "condition": {
+            "type": "games_played",
+            "value": 200
+        },
+        "rarity": "epic"
+    },
+    {
+        "id": "sessions_500",
+        "icon": "💎",
+        "name": "Vétéran",
+        "nameEN": "Veteran",
+        "nameDE": "Veteran",
+        "description": "Lance 500 sessions de jeu",
+        "descriptionEN": "Start 500 game sessions",
+        "descriptionDE": "Starte 500 Spielsitzungen",
+        "condition": {
+            "type": "games_played",
+            "value": 500
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "explorer_5",
+        "icon": "🗺️",
+        "name": "Explorateur",
+        "nameEN": "Explorer",
+        "nameDE": "Entdecker",
+        "description": "Teste 5 jeux différents",
+        "descriptionEN": "Try 5 different games",
+        "descriptionDE": "Teste 5 verschiedene Spiele",
+        "condition": {
+            "type": "unique_games",
+            "value": 5
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "explorer_10",
+        "icon": "🧭",
+        "name": "Grand Explorateur",
+        "nameEN": "Great Explorer",
+        "nameDE": "Großer Entdecker",
+        "description": "Teste 10 jeux différents",
+        "descriptionEN": "Try 10 different games",
+        "descriptionDE": "Teste 10 verschiedene Spiele",
+        "condition": {
+            "type": "unique_games",
+            "value": 10
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "all_games",
+        "icon": "🏆",
+        "name": "Collectionneur",
+        "nameEN": "Collector",
+        "nameDE": "Sammler",
+        "description": "Teste tous les jeux disponibles",
+        "descriptionEN": "Try every available game",
+        "descriptionDE": "Teste alle verfügbaren Spiele",
+        "condition": {
+            "type": "unique_games_all",
+            "value": 0
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "playtime_1h",
+        "icon": "⏱️",
+        "name": "Accro",
+        "nameEN": "Hooked",
+        "nameDE": "Süchtig",
+        "description": "Joue 1 heure au total",
+        "descriptionEN": "Play for 1 hour total",
+        "descriptionDE": "Spiele insgesamt 1 Stunde",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 60
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "playtime_5h",
+        "icon": "🕐",
+        "name": "Sans vie",
+        "nameEN": "No-Life",
+        "nameDE": "Zocker",
+        "description": "Joue 5 heures au total",
+        "descriptionEN": "Play for 5 hours total",
+        "descriptionDE": "Spiele insgesamt 5 Stunden",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 300
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "playtime_10h",
+        "icon": "⏰",
+        "name": "Noctambule",
+        "nameEN": "Night Crawler",
+        "nameDE": "Nachtschwärmer",
+        "description": "Joue 10 heures au total",
+        "descriptionEN": "Play for 10 hours total",
+        "descriptionDE": "Spiele insgesamt 10 Stunden",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 600
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "playtime_24h",
+        "icon": "💀",
+        "name": "Légende",
+        "nameEN": "Legend",
+        "nameDE": "Legende",
+        "description": "Joue 24 heures au total",
+        "descriptionEN": "Play for 24 hours total",
+        "descriptionDE": "Spiele insgesamt 24 Stunden",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 1440
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "playtime_50h",
+        "icon": "🌙",
+        "name": "Insomniaque",
+        "nameEN": "Insomniac",
+        "nameDE": "Schlaflosen",
+        "description": "Joue 50 heures au total",
+        "descriptionEN": "Play for 50 hours total",
+        "descriptionDE": "Spiele insgesamt 50 Stunden",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 3000
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "playtime_100h",
+        "icon": "💀",
+        "name": "No Life II",
+        "nameEN": "No Life II",
+        "nameDE": "No Life II",
+        "description": "Joue 100 heures au total",
+        "descriptionEN": "Play for 100 hours total",
+        "descriptionDE": "Spiele insgesamt 100 Stunden",
+        "condition": {
+            "type": "play_time_minutes",
+            "value": 6000
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "favorite_3",
+        "icon": "❤️",
+        "name": "Curateur",
+        "nameEN": "Curator",
+        "nameDE": "Kurator",
+        "description": "Ajoute 3 jeux en favoris",
+        "descriptionEN": "Add 3 games to favorites",
+        "descriptionDE": "Füge 3 Spiele zu Favoriten hinzu",
+        "condition": {
+            "type": "liked_games",
+            "value": 3
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "random_3",
+        "icon": "🎲",
+        "name": "Aventurier",
+        "nameEN": "Adventurer",
+        "nameDE": "Abenteurer",
+        "description": "Utilise le jeu aléatoire 3 fois",
+        "descriptionEN": "Use random game 3 times",
+        "descriptionDE": "Benutze Zufallsspiel 3 Mal",
+        "condition": {
+            "type": "random_used",
+            "value": 3
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "random_10",
+        "icon": "🎰",
+        "name": "Lucky",
+        "nameEN": "Lucky",
+        "nameDE": "Glückspilz",
+        "description": "Utilise le jeu aléatoire 10 fois",
+        "descriptionEN": "Use random game 10 times",
+        "descriptionDE": "Benutze Zufallsspiel 10 Mal",
+        "condition": {
+            "type": "random_used",
+            "value": 10
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "night_owl",
+        "icon": "🦉",
+        "name": "Oiseau de Nuit",
+        "nameEN": "Night Owl",
+        "nameDE": "Nachtmensch",
+        "description": "Joue entre minuit et 5h du matin",
+        "descriptionEN": "Play between midnight and 5am",
+        "descriptionDE": "Spiele zwischen Mitternacht und 5 Uhr",
+        "condition": {
+            "type": "time_of_day",
+            "from": 0,
+            "to": 5
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "streak_3",
+        "icon": "🔁",
+        "name": "Fidèle",
+        "nameEN": "Faithful",
+        "nameDE": "Treuer",
+        "description": "Joue 3 jours de suite",
+        "descriptionEN": "Play 3 days in a row",
+        "descriptionDE": "Spiele 3 Tage in Folge",
+        "condition": {
+            "type": "streak_days",
+            "value": 3
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "streak_7",
+        "icon": "🗓️",
+        "name": "Assidu",
+        "nameEN": "Consistent",
+        "nameDE": "Beständig",
+        "description": "Joue 7 jours de suite",
+        "descriptionEN": "Play 7 days in a row",
+        "descriptionDE": "Spiele 7 Tage in Folge",
+        "condition": {
+            "type": "streak_days",
+            "value": 7
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "streak_30",
+        "icon": "📅",
+        "name": "Dévoué",
+        "nameEN": "Devoted",
+        "nameDE": "Hingegeben",
+        "description": "Joue 30 jours de suite",
+        "descriptionEN": "Play 30 days in a row",
+        "descriptionDE": "Spiele 30 Tage in Folge",
+        "condition": {
+            "type": "streak_days",
+            "value": 30
+        },
+        "rarity": "legendary"
+    },
+    {
+        "id": "rated_5",
+        "icon": "⭐",
+        "name": "Critique",
+        "nameEN": "Critic",
+        "nameDE": "Kritiker",
+        "description": "Note 5 jeux différents",
+        "descriptionEN": "Rate 5 different games",
+        "descriptionDE": "Bewerte 5 verschiedene Spiele",
+        "condition": {
+            "type": "games_rated",
+            "value": 5
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "rated_10",
+        "icon": "👑",
+        "name": "Connaisseur",
+        "nameEN": "Connoisseur",
+        "nameDE": "Kenner",
+        "description": "Note 10 jeux différents",
+        "descriptionEN": "Rate 10 different games",
+        "descriptionDE": "Bewerte 10 verschiedene Spiele",
+        "condition": {
+            "type": "games_rated",
+            "value": 10
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "xmas",
+        "icon": "🎄",
+        "name": "Festif",
+        "nameEN": "Festive",
+        "nameDE": "Festlich",
+        "description": "Joue le 25 décembre",
+        "descriptionEN": "Play on December 25th",
+        "descriptionDE": "Spiele am 25. Dezember",
+        "condition": {
+            "type": "date_special",
+            "month": 12,
+            "day": 25
+        },
+        "rarity": "epic"
+    },
+    {
+        "id": "new_year",
+        "icon": "🎂",
+        "name": "Bonne Année",
+        "nameEN": "Happy New Year",
+        "nameDE": "Frohes Neues Jahr",
+        "description": "Joue le 1er janvier",
+        "descriptionEN": "Play on January 1st",
+        "descriptionDE": "Spiele am 1. Januar",
+        "condition": {
+            "type": "date_special",
+            "month": 1,
+            "day": 1
+        },
+        "rarity": "epic"
+    },
+    {
+        "id": "supporter",
+        "icon": "💎",
+        "name": "Mécène",
+        "nameEN": "Patron",
+        "nameDE": "Mäzen",
+        "description": "Effectue un achat in-game",
+        "descriptionEN": "Make an in-game purchase",
+        "descriptionDE": "Führe einen In-Game-Kauf durch",
+        "condition": {
+            "type": "has_purchase"
+        },
+        "rarity": "legendary"
+    }
+]

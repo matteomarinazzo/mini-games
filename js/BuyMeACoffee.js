@@ -12,7 +12,7 @@ export function showBMC() {
     bmcScript.setAttribute("data-id", "minigames");
     bmcScript.setAttribute("data-description", "Support me on Buy me a coffee!");
     bmcScript.setAttribute("data-message", message);
-    bmcScript.setAttribute("data-color", "#BD5FFF");
+    bmcScript.setAttribute("data-color", getBMCColor());
     bmcScript.setAttribute("data-position", "Right");
     bmcScript.setAttribute("data-x_margin", "18");
     bmcScript.setAttribute("data-y_margin", "18");
@@ -52,7 +52,10 @@ export function hideBMC() {
     document.querySelectorAll("[id^='bmc']").forEach(el => el.remove());
 }
 
+let _currentMessage = null;
+
 function getRandomMessage() {
+    if (_currentMessage) return _currentMessage;
     const messages = [
         "Un café pour moi = plus de jeux pour toi ! ☕🎮",
 
@@ -74,5 +77,43 @@ function getRandomMessage() {
         "Ton soutien m'aide à maintenir le site et à ajouter des jeux ! ☕✨",
         "Un café, c'est 3 minutes de bonheur. Un jeu, c'est des heures de fun ! ☕🎮",
     ];
-    return messages[Math.floor(Math.random() * messages.length)];
+    _currentMessage = messages[Math.floor(Math.random() * messages.length)];
+    return _currentMessage;
 }
+
+// Couleurs BMC par thème (correspondent aux --primary de chaque thème)
+const BMC_COLORS = {
+    default: '#7259b5', // --secondary default
+    sunset: '#f093fb', // --secondary sunset  
+    ocean: '#00f2fe', // --secondary ocean
+    forest: '#38f9d7', // --secondary forest
+    fire: '#f7971e', // --secondary fire (orange, coin bas-droit)
+    dark: '#4a4a5a', // --secondary dark (très sombre)
+    cyberpunk: '#00ffff',
+    lavender: '#fbc2eb',
+    midnight: '#414345',
+};
+
+export function updateBMCTheme(themeName) {
+    const color = BMC_COLORS[themeName] || BMC_COLORS.default;
+
+    // Si le widget est déjà là, on le recharge avec la nouvelle couleur
+    const bmcBtn = document.getElementById('bmc-wgt-main');
+    const bmcScript = document.getElementById('bmc-script');
+
+    if (bmcBtn || bmcScript) {
+        // Détruire proprement
+        hideBMC();
+
+        // Réinjecter après un court délai (laisser le DOM se nettoyer)
+        setTimeout(() => showBMC(), 100);
+    }
+    // Si le widget n'est pas encore chargé, getBMCColor() lira la bonne clé au moment de showBMC()
+}
+
+function getBMCColor() {
+    const theme = localStorage.getItem('mg_theme') || 'default';
+    return BMC_COLORS[theme] || BMC_COLORS.default;
+}
+
+export { BMC_COLORS }

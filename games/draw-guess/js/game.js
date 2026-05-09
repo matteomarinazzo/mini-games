@@ -106,11 +106,11 @@ let phaseFinished = false;
 let currentCarouselIndex = 0;
 let shownChainNotifications = new Set();
 
-let playerName = localStorage.getItem('drawguess_name');
-if (!playerName) {
-    playerName = prompt("Veuillez entrer votre prénom :") || "Anonyme";
-    localStorage.setItem('drawguess_name', playerName);
-}
+let playerName = localStorage.getItem('drawguess_name')
+    || localStorage.getItem('mg_player_name')
+    || 'Joueur';
+// Sync both keys so they stay consistent
+localStorage.setItem('drawguess_name', playerName);
 
 // ═══════════════════════════════════════════════════════════════
 // INIT

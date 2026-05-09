@@ -123,13 +123,16 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 30px) scale(0.9);
   }
@@ -169,10 +172,12 @@ body {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -334,13 +339,11 @@ body {
   transition: var(--transition);
 }
 
-.radio-card input:checked + .radio-content {
+.radio-card input:checked+.radio-content {
   border-color: var(--primary);
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1),
-    rgba(118, 75, 162, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.1),
+      rgba(118, 75, 162, 0.1));
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
@@ -366,12 +369,10 @@ body {
 ======================================== */
 .config-divider {
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--border),
-    transparent
-  );
+  background: linear-gradient(to right,
+      transparent,
+      var(--border),
+      transparent);
   margin: 40px 0;
 }
 
@@ -458,10 +459,12 @@ body {
 }
 
 @keyframes ballPulse {
+
   0%,
   100% {
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
   }
+
   50% {
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
   }
@@ -548,6 +551,7 @@ body {
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -559,6 +563,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -611,13 +616,13 @@ body {
   }
 
   /* Affiché uniquement quand l'input est disabled */
-  input:disabled ~ .radio-content .mobile-warning {
+  input:disabled~.radio-content .mobile-warning {
     display: block;
   }
 
   /* Optionnel : masquer la description d'origine pour faire de la place */
-  input:disabled ~ .radio-content .radio-description,
-  input:disabled ~ .radio-content .controls-hint {
+  input:disabled~.radio-content .radio-description,
+  input:disabled~.radio-content .controls-hint {
     display: none;
   }
 

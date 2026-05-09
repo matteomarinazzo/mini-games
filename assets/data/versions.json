@@ -1,7 +1,29 @@
 {
-    "currentVersion": "1.15.2026-05-02",
-    "lastUpdate": "2026-05-02",
+    "currentVersion": "1.16.2026-05-09",
+    "lastUpdate": "2026-05-09",
     "history": [
+        {
+            "version": "1.16.2026-05-09",
+            "date": "2026-05-09",
+            "changes": [
+                "Ajout de profil personnalisé",
+                "Ajout de badges et de thèmes",
+                "Amélioration css pong et casse-briques",
+                "Amélioration du jeu Rocketeer",
+                "Progression de la traduction"
+            ]
+        },
+        {
+            "version": "1.15.2026-05-04",
+            "date": "2026-05-04",
+            "changes": [
+                "Correction de la vitesse de la balle dans Pong et casse-briques sur mobile",
+                "Mise à jour du sw.js pour éviter les erreurs console pour les fonts",
+                "Optimisation du chargement de la page d'accueil",
+                "Mise à jour du fichier privacy",
+                "Uniformisation du title des pages html"
+            ]
+        },
         {
             "version": "1.15.2026-05-02",
             "date": "2026-05-02",

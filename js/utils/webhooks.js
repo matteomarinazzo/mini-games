@@ -53,9 +53,10 @@ export async function sendDiscordMessage(content) {
  */
 export async function notifyHeartbeat() {
     const uid = await getFirebaseUid();
+    const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     const page = document.title || location.pathname;
     await sendDiscordMessage(
-        `⏱️ **+1 min Jouée**\n👤 UID : \`${uid}\`\n📄 Page : \`${page}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `⏱️ **+1 min Jouée**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📄 Page : \`${page}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 
@@ -64,8 +65,9 @@ export async function notifyHeartbeat() {
  */
 export async function notifyNewPlayer() {
     const uid = await getFirebaseUid();
+    const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     await sendDiscordMessage(
-        `🆕 **Nouveau joueur !**\n👤 UID : \`${uid}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `🆕 **Nouveau joueur !**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 
@@ -74,8 +76,9 @@ export async function notifyNewPlayer() {
  */
 export async function notifyGameLaunch(gameId, gameName) {
     const uid = await getFirebaseUid();
+    const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     await sendDiscordMessage(
-        `🎮 **Lancement : ${gameName || gameId}**\n👤 UID : \`${uid}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `🎮 **Lancement : ${gameName || gameId}**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 
@@ -84,8 +87,9 @@ export async function notifyGameLaunch(gameId, gameName) {
  */
 export async function notifyBackToHome() {
     const uid = await getFirebaseUid();
+    const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     await sendDiscordMessage(
-        `🏠 **Retour à l'Accueil**\n👤 UID : \`${uid}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `🏠 **Retour à l'Accueil**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 
@@ -94,7 +98,8 @@ export async function notifyBackToHome() {
  */
 export async function notifyAboutVisit() {
     const uid = await getFirebaseUid();
+    const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     await sendDiscordMessage(
-        `ℹ️ **Visite page À propos**\n👤 UID : \`${uid}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `ℹ️ **Visite page À propos**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }

@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const savedName = localStorage.getItem("lostBelow_playerName");
+    const savedName = localStorage.getItem("lostBelow_playerName") || localStorage.getItem('mg_player_name') || '';
     if (savedName) {
         document.getElementById("playerNameInput").value = savedName;
     }
@@ -51,8 +51,9 @@ createBtn.onclick = async () => {
         return;
     }
 
-    // Sauvegarder pour la prochaine fois
+    // Sauvegarder pour la prochaine fois + mettre à jour le nom global
     localStorage.setItem("lostBelow_playerName", chosenName);
+    localStorage.setItem('mg_player_name', chosenName);
 
     createBtn.disabled = true;
     createBtn.textContent = "⌛ Création...";
@@ -114,8 +115,9 @@ joinBtn.onclick = async () => {
         return;
     }
 
-    // Sauvegarder pour la prochaine fois
+    // Sauvegarder pour la prochaine fois + mettre à jour le nom global
     localStorage.setItem("lostBelow_playerName", chosenName);
+    localStorage.setItem('mg_player_name', chosenName);
 
     joinBtn.disabled = true;
     joinBtn.textContent = "⌛ Connexion...";

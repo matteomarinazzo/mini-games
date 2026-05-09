@@ -74,10 +74,12 @@ checkRealConnection().then(isOnline => {
 // ═══════════════════════════════════════════════════
 // PLAYER NAME
 // ═══════════════════════════════════════════════════
-const savedName = localStorage.getItem('whereAmI_name') || '';
+const savedName = localStorage.getItem('whereAmI_name') || localStorage.getItem('mg_player_name') || '';
 if (savedName) playerNameInput.value = savedName;
 playerNameInput.addEventListener('input', () => {
-    localStorage.setItem('whereAmI_name', playerNameInput.value.trim());
+    const n = playerNameInput.value.trim();
+    localStorage.setItem('whereAmI_name', n);
+    if (n) localStorage.setItem('mg_player_name', n);
 });
 
 function getPlayerName() {
@@ -85,6 +87,7 @@ function getPlayerName() {
     if (!n) { playerNameInput.focus(); playerNameInput.style.borderColor = 'var(--rose)'; return null; }
     playerNameInput.style.borderColor = '';
     localStorage.setItem('whereAmI_name', n);
+    localStorage.setItem('mg_player_name', n);
     return n;
 }
 

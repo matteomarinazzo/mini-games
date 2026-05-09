@@ -11,6 +11,9 @@ import {
   getSoundEnabled
 } from './utils/audio.js';
 import { notifyGameLaunch, notifyBackToHome, notifyAboutVisit } from './utils/webhooks.js';
+import { initProfilePanel, updateStreak, updateProfileLanguage, checkPremiumReturn } from './profilePanel.js';
+import { reportGamePlayed, reportRandomUsed, checkAndUnlockBadges, checkPendingBadges } from './utils/badges.js';
+import { initAds, handleSmartLink, checkPendingGameLaunch } from './utils/ads.js';
 
 var games = {};
 let categoriesData = {};
@@ -51,9 +54,20 @@ fetch("./assets/data/games.json")
 
     initCategoryFilters();
     generateGameCards();
+    initProfilePanel(Object.keys(games).length);
 
     // On lance la vérification initiale
     await refreshStatus();
+    checkPremiumReturn();
+    checkAndUnlockBadges();
+    // Initiliasiser le nom du joueur
+    if (!localStorage.getItem('mg_player_name')) {
+      localStorage.setItem('mg_player_name', 'Joueur');
+    }
+
+    // Gestion des pubs (Social Bar et retour Smart Link)
+    initAds();
+    checkPendingGameLaunch(launchGame);
   })
   .catch((err) => {
     console.error(err);
@@ -88,6 +102,7 @@ function initLangSelector() {
       // Mettre à jour l'interface avec la nouvelle langue
       initCategoryFilters();
       generateGameCards();
+      updateProfileLanguage();
       refreshStatus();
     });
   });
@@ -100,6 +115,7 @@ function initRandomGameButton() {
 
   randomBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+    reportRandomUsed();
 
     const gameIds = Object.keys(games);
     if (gameIds.length === 0) return;
@@ -435,6 +451,7 @@ function initGameCards() {
         heartBtn.classList.toggle("liked", liked);
         // On met à jour les filtres (par ex. pour afficher "Favoris" si 1er favori)
         initCategoryFilters();
+        checkAndUnlockBadges();
       });
     }
 
@@ -447,6 +464,9 @@ function initGameCards() {
 
 // Lancer un jeu
 function launchGame(gameId) {
+  // Vérifier si on doit afficher une pub (Smart Link) avant de lancer
+  if (handleSmartLink(gameId)) return;
+
   const game = games[gameId];
 
   if (!game) {
@@ -465,6 +485,8 @@ function launchGame(gameId) {
 
   // Sauvegarder dans localStorage pour tracking
   saveGameLaunch(gameId);
+  updateStreak();
+  reportGamePlayed(gameId);
 
   // Notification Discord
   notifyGameLaunch(gameId, game.name);
@@ -758,82 +780,6 @@ document.querySelectorAll('a[href*="about.html"]').forEach(link => {
     notifyAboutVisit();
   });
 });
-
-// ─── PUBLICITÉS (POPUP) ──────────────────────────────────────────────────────
-async function checkAndShowAdPopup() {
-  let homeVisits = parseInt(localStorage.getItem('homeVisits') || '0', 10);
-  homeVisits++;
-  localStorage.setItem('homeVisits', homeVisits);
-  const isOnline = await checkRealConnection();
-
-  // Affiche la pub tous les 3 chargements de la page d'accueil
-  if (homeVisits % 3 === 0 && isOnline) {
-    // Petit délai pour laisser la page charger visuellement avant la popup
-    setTimeout(showAdPopup, 800);
-  }
-}
-
-function showAdPopup() {
-  const popup = document.getElementById('adPopup');
-  const container = document.getElementById('adContainer');
-  const closeBtn = document.getElementById('adPopupClose');
-  if (!popup || !container) return;
-
-  // 1. Injecter le script immédiatement en arrière-plan
-  if (container.innerHTML.trim() === '') {
-    const script1 = document.createElement('script');
-    script1.text = `atOptions = {'key': '08b99ce828f8ebd5169a179ffed50dff','format': 'iframe','height': 250,'width': 300,'params': {}};`;
-    const script2 = document.createElement('script');
-    script2.src = "https://www.highperformanceformat.com/08b99ce828f8ebd5169a179ffed50dff/invoke.js";
-
-    container.appendChild(script1);
-    container.appendChild(script2);
-  }
-
-  // 2. On attend 1.5s que la pub charge avant d'afficher la popup visuellement
-  setTimeout(() => {
-    popup.classList.remove('hidden');
-
-    // 3. Compte à rebours avant d'afficher la croix cliquable
-    if (closeBtn) {
-      let timeLeft = 3;
-      closeBtn.classList.remove('hidden');
-      closeBtn.textContent = timeLeft;
-      closeBtn.style.pointerEvents = 'none'; // Désactiver le clic au début
-      closeBtn.style.opacity = '0.8';
-
-      const timer = setInterval(() => {
-        timeLeft--;
-        if (timeLeft > 0) {
-          closeBtn.textContent = timeLeft;
-        } else {
-          clearInterval(timer);
-          closeBtn.textContent = '×';
-          closeBtn.style.pointerEvents = 'auto'; // Réactiver le clic
-          closeBtn.style.opacity = '1';
-          closeBtn.style.fontSize = '16px'; // Un peu plus grand pour la croix
-        }
-      }, 1000);
-    }
-  }, 1500);
-
-  // Événement de fermeture (avec redirection au premier clic)
-  if (closeBtn) {
-    let firstClickDone = false;
-    closeBtn.onclick = () => {
-      if (!firstClickDone) {
-        window.open("https://www.profitablecpmratenetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d", "_blank");
-        firstClickDone = true;
-        popup.classList.add('hidden');
-      } else {
-        popup.classList.add('hidden');
-      }
-    };
-  }
-}
-
-// Vérifier si on affiche la pub
-checkAndShowAdPopup();
 
 // Export pour utilisation dans d'autres fichiers
 export { launchGame, saveGameLaunch, getGamesStats };

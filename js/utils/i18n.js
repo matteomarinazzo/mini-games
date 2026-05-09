@@ -85,6 +85,18 @@ function refreshTexts() {
             el.textContent = val;
         }
     });
+
+    // Placeholders via data-i18n-placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const val = t(el.dataset.i18nPlaceholder);
+        if (val) el.placeholder = val;
+    });
+
+    // Titles (tooltips) via data-i18n-title
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const val = t(el.dataset.i18nTitle);
+        if (val) el.title = val;
+    });
 }
 
 // EXPOSE GLOBAL

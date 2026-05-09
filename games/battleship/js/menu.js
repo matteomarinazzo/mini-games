@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const savedName = localStorage.getItem("battleship_playerName");
+    const savedName = localStorage.getItem("battleship_playerName") || localStorage.getItem('mg_player_name') || '';
     if (savedName) {
         nameInput.value = savedName;
     }
@@ -56,6 +56,7 @@ createBtn.onclick = async () => {
     await firebaseReady;
 
     localStorage.setItem("battleship_playerName", chosenName);
+    localStorage.setItem('mg_player_name', chosenName);
     const roomID = generateRoomID();
     const user = auth.currentUser;
 
@@ -117,6 +118,7 @@ joinBtn.onclick = async () => {
     await firebaseReady;
 
     localStorage.setItem("battleship_playerName", chosenName);
+    localStorage.setItem('mg_player_name', chosenName);
     const user = auth.currentUser;
     const playerData = {
         uid: user.uid,

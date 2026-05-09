@@ -37,7 +37,7 @@ const GAME_HEIGHT = isVertical ? 600 : 800;
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
 
-const paddleSpeed = 0.5;
+const paddleSpeed = 1;
 
 // Ajouter la classe pour le mode horizontal
 if (!isVertical) {

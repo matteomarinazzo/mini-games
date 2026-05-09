@@ -6,6 +6,8 @@ const Game = (() => {
     const MIN_NORMAL_ZOOM = 0.2;
     const MAX_NORMAL_ZOOM = 50;
     const DEFAULT_NORMAL_ZOOM = 10;
+    const startEnginesBtn = document.getElementById('btn-start-engines');
+    const stopEnginesBtn = document.getElementById('btn-stop-engines');
 
     function clampNormalZoom(value) {
         return Math.max(MIN_NORMAL_ZOOM, Math.min(MAX_NORMAL_ZOOM, value));
@@ -113,7 +115,19 @@ const Game = (() => {
         localStorage.setItem('rocketeer_ghosts', JSON.stringify(saved));
     }
 
-    // activateStageEngines removed as it's no longer used
+    function toggleStopEngines() {
+        state.inputs.throttle = 0;
+        updateThrottleUI();
+        stopEnginesBtn.style.display = 'none';
+        startEnginesBtn.style.display = 'flex';
+    }
+
+    function toggleStartEngines() {
+        state.inputs.throttle = 1;
+        updateThrottleUI();
+        stopEnginesBtn.style.display = 'flex';
+        startEnginesBtn.style.display = 'none';
+    }
 
     function initCanvases() {
         const nc = document.getElementById('game-canvas');
@@ -144,8 +158,8 @@ const Game = (() => {
         document.addEventListener('keydown', e => {
             state.keys[e.code] = true;
             switch (e.code) {
-                case 'KeyX': state.inputs.throttle = 0; updateThrottleUI(); break;
-                case 'KeyZ': state.inputs.throttle = 1; updateThrottleUI(); break;
+                case 'KeyX': toggleStopEngines(); break;
+                case 'KeyZ': toggleStartEngines(); break;
                 case 'KeyP': togglePause(); break;
                 case 'KeyT': cycleTimeScale(); break;
                 case 'Enter': case 'Space': e.preventDefault(); stageRocket(); break;
@@ -416,9 +430,9 @@ const Game = (() => {
         state.zoom += (tz - state.zoom) * 0.1;
 
         if (state.cameraLocked) {
-            // Smoothly follow the rocket
-            state.camX += (phy.x - state.camX) * 0.1 * state.timeScale;
-            state.camY += (phy.y + 50 / state.zoom - state.camY) * 0.1 * state.timeScale;
+            // Direct follow to avoid "jerks" and speed mismatches
+            state.camX = phy.x;
+            state.camY = phy.y + 50 / state.zoom;
             // Clear manual offsets when locked
             state.camOffsetX = 0;
             state.camOffsetY = 0;
@@ -714,6 +728,7 @@ const Game = (() => {
         }
 
         flashHUD(t('rocketeer.game.stage_activated').replace('{stage}', stageIndex), '#ff8030');
+        centerCamera();
     }
 
     function centerCamera() {
@@ -1108,7 +1123,7 @@ const Game = (() => {
 
 
 
-    return { init, retryFlight, goToBuilder, stageRocket, centerCamera, togglePause, _getTime, _setThrottle, setTimeScale, toggleTimeScale };
+    return { init, retryFlight, goToBuilder, stageRocket, centerCamera, toggleStartEngines, toggleStopEngines, togglePause, _getTime, _setThrottle, setTimeScale, toggleTimeScale };
 })();
 
 document.querySelectorAll('.ts-option').forEach(opt => {

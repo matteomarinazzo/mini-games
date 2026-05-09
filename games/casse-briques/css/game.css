@@ -69,6 +69,7 @@ body {
   font-weight: 800;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -128,6 +129,7 @@ body {
   margin-bottom: 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -214,6 +216,7 @@ kbd {
   body {
     touch-action: none;
   }
+
   .hud {
     padding: 15px 20px;
     display: flex;
@@ -239,19 +242,31 @@ kbd {
     max-width: none;
   }
 
-  .overlay-content h2 {
-    font-size: 8vw;
+  #pauseOverlay .pause-title {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 34px;
+    line-height: 1.1;
   }
 
-  .game-overlay h2 {
-    font-size: 4.5vw;
+  #pauseOverlay .pause-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    display: block;
   }
 
-  .game-overlay p {
-    font-size: 4vw;
+  #pauseOverlay .pause-icon rect {
+    fill: #667eea;
   }
 
-  .game-overlay button {
-    font-size: 3.5vw;
+  #pauseOverlay .pause-icon rect:last-child {
+    fill: #764ba2;
+  }
+
+  #pauseOverlay .pause-title span {
+    display: inline-block;
   }
 }

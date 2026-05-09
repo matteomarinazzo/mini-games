@@ -19,7 +19,8 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* Empêche le défilement */
+  overflow: hidden;
+  /* Empêche le défilement */
 }
 
 body {
@@ -48,7 +49,8 @@ body {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
-  flex-shrink: 0; /* Empêche le HUD de rétrécir */
+  flex-shrink: 0;
+  /* Empêche le HUD de rétrécir */
 }
 
 .hud-player {
@@ -135,9 +137,9 @@ body {
   -webkit-user-select: none;
 }
 
-  body.horizontal #gameCanvas {
-    width: calc(var(--canvas-height) * 3/4);
-  }
+body.horizontal #gameCanvas {
+  width: calc(var(--canvas-height) * 3/4);
+}
 
 /* ========================================
    TOUCH CONTROLS (Mobile)
@@ -363,17 +365,20 @@ kbd {
     font-size: 4vw;
   }
 
-  .player-name, .player-lives {
+  .player-name,
+  .player-lives {
     font-size: 3vw;
   }
 
-  .touch-controls, #gameCanvas {
+  .touch-controls,
+  #gameCanvas {
     margin-top: -15vh;
   }
 
   #gameCanvas {
     width: var(--game-width);
-    max-width: var(--game-width);;
+    max-width: var(--game-width);
+    ;
     height: calc(var(--game-width) * 3 / 4);
   }
 
@@ -385,11 +390,79 @@ kbd {
     display: none;
   }
 
-  .overlay-content h2 {
-    font-size: 6vw;
+  .game-overlay {
+    padding: 16px;
   }
 
-  .overlay-content p, .overlay-content button {
-    font-size: 3.5vw;
+  .overlay-content {
+    width: min(360px, calc(100vw - 28px));
+    max-width: 100%;
+    padding: 26px 20px;
+    border-radius: 20px;
+  }
+
+  .overlay-content h2 {
+    font-size: 34px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .winner-text {
+    font-size: 21px;
+    line-height: 1.35;
+    margin-bottom: 14px;
+  }
+
+  .final-score {
+    font-size: 18px;
+    line-height: 1.3;
+    margin-bottom: 22px;
+  }
+
+  .final-score span {
+    font-size: 26px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 18px;
+    padding: 15px 18px;
+    margin: 9px 0;
+    border-radius: 12px;
+  }
+
+  #pauseOverlay h2 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 34px;
+    line-height: 1.1;
+  }
+
+  #pauseOverlay .pause-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    display: block;
+  }
+
+  #pauseOverlay .pause-icon rect {
+    fill: #667eea;
+  }
+
+  #pauseOverlay .pause-icon rect:last-child {
+    fill: #764ba2;
+  }
+
+  #pauseOverlay .pause-title span {
+    display: inline-block;
+  }
+
+  #pauseOverlay .pause-title {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

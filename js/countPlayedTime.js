@@ -1,22 +1,46 @@
 // countPlayedTime.js
 import { checkRealConnection } from "./network.js";
 import { notifyHeartbeat, notifyNewPlayer } from "./utils/webhooks.js";
+import { reportPlayTime } from "./utils/badges.js";
+import { updateStreak } from "./profilePanel.js";
+
 console.log("🕒 Compteur de temps initialisé");
 
+// ─── CLÉ LOCALE POUR LE PROFIL ────────────────────────────────────────────────
+// Stocke le temps total joué par CE joueur sur CET appareil (en minutes).
+// Distinct de "minutesPlayed" qui est le buffer offline Firebase.
+const LOCAL_TIME_KEY = 'mg_stat_play_time_min';
+
+function getLocalTotalMinutes() {
+    return parseInt(localStorage.getItem(LOCAL_TIME_KEY) || '0', 10);
+}
+
+function incrementLocalTime() {
+    const current = getLocalTotalMinutes();
+    const next = current + 1;
+    localStorage.setItem(LOCAL_TIME_KEY, next);
+    return next;
+}
+
+// ─── COMPTEUR ─────────────────────────────────────────────────────────────────
 let counterInterval = null;
 
-// Fonction principale d'incrément / synchro
 async function incrementTime() {
     try {
+        // 1. Incrémenter le temps local du joueur (toujours, online ou non)
+        const totalMin = incrementLocalTime();
+
+        // 2. Notifier le système de badges (vérifie les conditions de temps)
+        reportPlayTime(totalMin);
+
+        // 3. Sync Firebase si en ligne
         const isOnline = await checkRealConnection();
 
         if (isOnline) {
-            // Import Firebase seulement si on est en ligne
-            const { incrementFirebaseStat } = await import("./firebaseWrk.js");
+            const { incrementFirebaseStat, pushNow } = await import("./firebaseWrk.js");
 
-            // Envoyer d'abord les minutes stockées localement
+            // Envoyer d'abord les minutes stockées localement (offline buffer)
             let incrementBy = Number(localStorage.getItem("minutesPlayed") || 0);
-
             if (incrementBy > 0) {
                 await incrementFirebaseStat("totalMinutesPlayed", incrementBy);
                 console.log(`✅ Minutes locales synchronisées sur Firebase (${incrementBy} minutes)`);
@@ -28,7 +52,7 @@ async function incrementTime() {
             await notifyHeartbeat();
             if (result) console.log("✅ Minute synchronisée sur Firebase");
 
-            // détecter si nouveau joueur 
+            // Détecter si nouveau joueur
             if (!localStorage.getItem("isAlreadyCounted")) {
                 console.log("Nouvelle connexion");
                 localStorage.setItem("isAlreadyCounted", true);
@@ -40,8 +64,10 @@ async function incrementTime() {
                 localStorage.removeItem("isNewPlayer");
             }
 
+            pushNow();
+
         } else {
-            // Sinon stocker localement
+            // Stocker dans le buffer offline Firebase
             let minutesPlayed = Number(localStorage.getItem("minutesPlayed") || 0);
             minutesPlayed++;
             localStorage.setItem("minutesPlayed", minutesPlayed);
@@ -49,18 +75,19 @@ async function incrementTime() {
         }
     } catch (e) {
         console.warn("⚠️ Échec synchro temps (Firebase indisponible)", e);
+        // Toujours incrémenter localement même si Firebase plante
+        incrementLocalTime();
     }
 }
 
-// Démarrer le compteur
+// ─── START / STOP ─────────────────────────────────────────────────────────────
 function startCounter() {
     if (!counterInterval) {
-        counterInterval = setInterval(incrementTime, 60000); // toutes les minutes
+        counterInterval = setInterval(incrementTime, 60000);
         console.log("▶️ Compteur démarré");
     }
 }
 
-// Arrêter le compteur
 function stopCounter() {
     if (counterInterval) {
         clearInterval(counterInterval);
@@ -69,7 +96,7 @@ function stopCounter() {
     }
 }
 
-// Contrôle de visibilité
+// ─── VISIBILITÉ ───────────────────────────────────────────────────────────────
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         stopCounter();
@@ -78,15 +105,13 @@ document.addEventListener("visibilitychange", () => {
     }
 });
 
-// Lancer au chargement si la page est visible
 if (!document.hidden) startCounter();
 
-// TRICHE : bloquer l'orientation sur toutes les pages
+// ─── ORIENTATION ──────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
     if (screen.orientation && screen.orientation.lock) {
         screen.orientation.lock("portrait").catch(() => { });
     }
 });
 
-// Export pour utilisation ailleurs si besoin
 export { incrementTime, startCounter, stopCounter };

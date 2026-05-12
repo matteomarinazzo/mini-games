@@ -1,15 +1,4 @@
-/**
- * badges.js — Gestionnaire de badges Mini Games
- * Chemin : js/utils/badges.js
- *
- * Usage dans un jeu :
- *   import { reportGameScore, reportGamePlayed } from '../utils/badges.js';
- *   reportGameScore('snow-digger', 750);   // après chaque partie
- *   reportGamePlayed('snow-digger');        // au lancement
- *
- * Usage dans main.js (déjà intégré) :
- *   import { reportGamePlayed, checkAndUnlockBadges } from './utils/badges.js';
- */
+import { getLevel } from './xpSystem.js';
 
 // ─── CLÉS LOCALSTORAGE ────────────────────────────────────────────────────────
 const KEYS = {
@@ -224,6 +213,12 @@ export async function checkAndUnlockBadges(totalGamesCount = null) {
                 break;
             }
 
+            case 'level_gte': {
+                const level = getLevel();
+                earned = level >= condition.value;
+                break;
+            }
+
             default:
                 break;
         }
@@ -274,7 +269,9 @@ function showBadgeNotification(badge) {
     // Créer le toast
     const toast = document.createElement('div');
     toast.className = `badge-toast badge-toast-${badge.rarity}`;
-    const toastTitle = lang === 'EN' ? 'Badge unlocked!' : lang === 'DE' ? 'Abzeichen freigeschaltet!' : 'Badge débloqué !';
+    const toastTitle = window.t
+        ? window.t('badges.unlocked_title')
+        : (lang === 'EN' ? 'Badge unlocked!' : lang === 'DE' ? 'Abzeichen freigeschaltet!' : 'Badge débloqué !');
     toast.innerHTML = `
     <div class="badge-toast-icon">${badge.icon}</div>
     <div class="badge-toast-content">

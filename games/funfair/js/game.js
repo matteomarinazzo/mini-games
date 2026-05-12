@@ -1,5 +1,6 @@
 import { initSettingsUI } from '../../../js/utils/settingsUI.js';
 import { startFunfairMusic, playFunfairSound } from '../../../js/utils/audio.js';
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 initSettingsUI('funfair');
 
@@ -87,6 +88,11 @@ function setTickets(amount) {
 function addTickets(amount) {
   const current = getTickets();
   setTickets(current + amount);
+
+  checkDailyChallenge({
+    gameId: 'funfair',
+    totalTickets: getTickets(),
+  });
 }
 
 function removeTickets(amount) {
@@ -105,17 +111,32 @@ function updateStats(won, ticketsWon) {
     totalGames: 0,
     totalWins: 0,
     totalTicketsWon: 0,
-    biggestWin: 0
+    biggestWin: 0,
+    winStreak: 0
   };
 
   statsObj.totalGames++;
-  if (won) statsObj.totalWins++;
+  if (won) {
+    statsObj.totalWins++;
+    statsObj.winStreak = (statsObj.winStreak || 0) + 1;
+  } else {
+    statsObj.winStreak = 0;
+  }
+
   if (ticketsWon > 0) {
     statsObj.totalTicketsWon += ticketsWon;
     statsObj.biggestWin = Math.max(statsObj.biggestWin, ticketsWon);
   }
 
   localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(statsObj));
+
+  // ── Daily Challenge ──
+  if (won) {
+    checkDailyChallenge({
+      gameId: 'funfair',
+      winStreak: statsObj.winStreak,
+    });
+  }
 }
 
 // ========================================
@@ -303,7 +324,6 @@ function initCupsGame() {
       return;
     }
     removeTickets(1);
-    updateStats(false, 0);
     if (cupsGameState.animationId) cancelAnimationFrame(cupsGameState.animationId);
     initCupsGame();
     document.getElementById('cupsResult').className = 'result-message';
@@ -650,7 +670,6 @@ function initShootingGame() {
       return;
     }
     removeTickets(5);
-    updateStats(false, 0);
     if (shootingGameState.animationId) cancelAnimationFrame(shootingGameState.animationId);
     initShootingGame();
     document.getElementById('shootingResult').className = 'result-message';
@@ -931,7 +950,6 @@ function initBeerpongGame() {
       return;
     }
     removeTickets(5);
-    updateStats(false, 0);
     if (beerpongGameState.animationId) cancelAnimationFrame(beerpongGameState.animationId);
     initBeerpongGame();
     document.getElementById('beerpongResult').className = 'result-message';
@@ -1357,7 +1375,6 @@ function initDartsGame() {
       return;
     }
     removeTickets(2);
-    updateStats(false, 0);
     if (dartsGameState.animationId) cancelAnimationFrame(dartsGameState.animationId);
     initDartsGame();
     document.getElementById('dartsResult').className = 'result-message';
@@ -1925,9 +1942,6 @@ function validateCoverSpot(ctx, canvas) {
   const coverage = coverageRaw;              // pour la logique
   const coverageDisplay = coverageRaw.toFixed(1) // pour l'affichage
 
-  console.log("test" + coverageRaw, coverage, coverageDisplay)
-
-
   coverspotGameState.coverage = coverage;
   coverspotGameState.finished = true;
 
@@ -1937,6 +1951,13 @@ function validateCoverSpot(ctx, canvas) {
   if (coverage === 100) {
     tickets = 5;
     resType = 'win';
+
+    // ── Daily Challenge ──
+    checkDailyChallenge({
+      gameId: 'funfair',
+      perfectMinigame: 'couvre_tout',
+    });
+
   } else if (coverage >= 95) {
     tickets = 3;
     resType = 'partial';

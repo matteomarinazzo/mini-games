@@ -405,5 +405,95 @@
             "type": "has_purchase"
         },
         "rarity": "legendary"
+    },
+    {
+        "id": "level_2",
+        "icon": "🌱",
+        "name": "Apprenti",
+        "nameEN": "Apprentice",
+        "nameDE": "Lehrling",
+        "description": "Atteins le niveau 2",
+        "descriptionEN": "Reach level 2",
+        "descriptionDE": "Erreiche Level 2",
+        "condition": {
+            "type": "level_gte",
+            "value": 2
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "level_5",
+        "icon": "⚡",
+        "name": "Aventurier",
+        "nameEN": "Adventurer",
+        "nameDE": "Abenteurer",
+        "description": "Atteins le niveau 5",
+        "descriptionEN": "Reach level 5",
+        "descriptionDE": "Erreiche Level 5",
+        "condition": {
+            "type": "level_gte",
+            "value": 5
+        },
+        "rarity": "common"
+    },
+    {
+        "id": "level_10",
+        "icon": "🔥",
+        "name": "Vétéran",
+        "nameEN": "Veteran",
+        "nameDE": "Veteran",
+        "description": "Atteins le niveau 10",
+        "descriptionEN": "Reach level 10",
+        "descriptionDE": "Erreiche Level 10",
+        "condition": {
+            "type": "level_gte",
+            "value": 10
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "level_15",
+        "icon": "🌟",
+        "name": "Expert",
+        "nameEN": "Expert",
+        "nameDE": "Experte",
+        "description": "Atteins le niveau 15",
+        "descriptionEN": "Reach level 15",
+        "descriptionDE": "Erreiche Level 15",
+        "condition": {
+            "type": "level_gte",
+            "value": 15
+        },
+        "rarity": "rare"
+    },
+    {
+        "id": "level_20",
+        "icon": "💫",
+        "name": "Maître",
+        "nameEN": "Master",
+        "nameDE": "Meister",
+        "description": "Atteins le niveau 20",
+        "descriptionEN": "Reach level 20",
+        "descriptionDE": "Erreiche Level 20",
+        "condition": {
+            "type": "level_gte",
+            "value": 20
+        },
+        "rarity": "epic"
+    },
+    {
+        "id": "level_50",
+        "icon": "👑",
+        "name": "Légende",
+        "nameEN": "Legend",
+        "nameDE": "Legende",
+        "description": "Atteins le niveau 50",
+        "descriptionEN": "Reach level 50",
+        "descriptionDE": "Erreiche Level 50",
+        "condition": {
+            "type": "level_gte",
+            "value": 50
+        },
+        "rarity": "legendary"
     }
 ]

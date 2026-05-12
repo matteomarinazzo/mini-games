@@ -1,7 +1,18 @@
 {
-    "currentVersion": "1.16.2026-05-09",
-    "lastUpdate": "2026-05-09",
+    "currentVersion": "1.17.2026-05-12",
+    "lastUpdate": "2026-05-12",
     "history": [
+        {
+            "version": "1.17.2026-05-12",
+            "date": "2026-05-12",
+            "changes": [
+                "Ajout de la gestion des niveaux et des xp",
+                "Ajout des défis quotidiens",
+                "Ajout de thèmes déblocable avec l'xp",
+                "Ajout de nouveaux badges",
+                "Correction de l'affichage des étoiles"
+            ]
+        },
         {
             "version": "1.16.2026-05-09",
             "date": "2026-05-09",

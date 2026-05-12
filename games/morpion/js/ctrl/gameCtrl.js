@@ -13,6 +13,7 @@ import { initFullscreenSystem } from "../../../../js/fullScreen.js";
 import { standard3x3AI } from "../ai/standard3x3AI.js";
 import { big5x5AI } from "../ai/big5x5AI.js";
 import { ultimateAI } from "../ai/ultimateAI.js";
+import { checkDailyChallenge } from "../../../../js/utils/dailyChallenge.js";
 
 /* =============================================
    CONFIG & ETAT PARTAGÉ
@@ -485,6 +486,19 @@ export function resetGame(lastWinner = null) {
 function announceWinner(winner) {
     disableAllCells();
     addScore(`player${winner}`);
+
+    // ── Daily Challenge ──────────────────────────
+    const mode = localStorage.getItem("morpionMode");
+    const difficulty = localStorage.getItem("morpionDifficulty");
+    const isAiWin = mode === "solo" && winner === 1;
+    const gridMap = { standard3x3: '3x3', big5x5: '5x5', ultimate: '9x9' };
+
+    checkDailyChallenge({
+        gameId: 'morpion',
+        wins: gameConfig.scores.player1 || 0,  // total victoires joueur 1
+        beatAiExpert: isAiWin && difficulty === 'expert',
+        grid: gridMap[gameType] ?? '3x3',
+    });
 
     const popup = document.getElementById("winnerPopup");
     const overlay = document.getElementById("popupOverlay");

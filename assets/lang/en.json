@@ -26,6 +26,15 @@
         "contact": "Contact",
         "ads_support": "Support Mini Games",
         "ads_message": "A small ad helps us keep the platform free!",
+        "daily_challenge": {
+            "btn_label": "Daily challenge",
+            "modal_title": "DAILY CHALLENGE",
+            "modal_game": "GAME",
+            "modal_reward": "{xp} XP if successful",
+            "modal_button": "PLAY NOW",
+            "modal_not_ready": "Not now",
+            "success": "Daily challenge completed!"
+        },
         "games": {
             "battleship": {
                 "name": "Battleship",
@@ -520,7 +529,11 @@
         "cloud_id_label": "Your save ID",
         "cloud_id_hint": "Keep this ID to restore your progress on another device.",
         "cloud_import_placeholder": "Paste a save ID...",
-        "cloud_btn_import": "Import"
+        "cloud_btn_import": "Import",
+        "level": "Level",
+        "xp_hint": "Earn XP by completing daily challenges",
+        "xp_to_next": "{xp} XP until level {level}",
+        "level_up_title": "Level Up!"
     },
     "badges": {
         "unlocked_title": "Badge unlocked!"

@@ -1,14 +1,3 @@
-/**
- * profilePanel.js — Contrôleur du panneau profil
- * Chemin : js/profilePanel.js
- *
- * Gère :
- *  - Ouverture/fermeture du panneau
- *  - Affichage des stats, badges, paramètres
- *  - Changement de thème (CSS variables)
- *  - Changement du mode d'affichage (grille / liste)
- */
-
 import {
   loadBadgeDefs,
   getPlayerStats,
@@ -20,6 +9,9 @@ import { updateBMCTheme } from './BuyMeACoffee.js';
 import { getCloudUID, importUID, pushNow } from './firebaseWrk.js';
 import { checkRealConnection } from './network.js';
 import { getSecret } from './utils/secretManager.js';
+import { getDailyChallengeStats } from './utils/dailyChallenge.js';
+import { getLevel, getXPInLevel } from './utils/xpSystem.js';
+
 
 const t = (path) => window.t ? window.t(path) : path;
 
@@ -165,9 +157,9 @@ const THEMES = {
     labelKey: 'profile.theme_lavender',
     sortOrder: 55,
     locked: true,
-    unlockType: 'badges',
-    unlockValue: 25,
-    unlockLabel: '25 badges débloqués',
+    unlockType: 'level',
+    unlockValue: 5,
+    unlockLabel: 'Niveau 5',
     '--primary': '#a18cd1',
     '--secondary': '#fbc2eb',
     '--accent': '#e0c3fc',
@@ -184,9 +176,9 @@ const THEMES = {
     labelKey: 'profile.theme_cyberpunk',
     sortOrder: 90,
     locked: true,
-    unlockType: 'badges',
-    unlockValue: 50,
-    unlockLabel: '50 badges débloqués',
+    unlockType: 'level',
+    unlockValue: 10,
+    unlockLabel: 'Niveau 10',
     '--primary': '#ff00ff',
     '--secondary': '#00ffff',
     '--accent': '#ffff00',
@@ -211,12 +203,18 @@ const THEME_UI_TEXT = {
     starter_theme: 'Disponible',
     badge_track: 'Badges',
     unlock_badges_short: '{count} badges',
+    badges_requirement_short: '{count} badges',
     always_available: 'Toujours disponible',
     unlocked_ready: 'Prêt à être activé',
     premium_owned: 'Pack Premium actif',
     premium_code_needed: 'Pack Premium ou badges',
     badges_progress: '{current}/{required} badges',
     badges_requirement_long: 'Débloque {count} badges pour obtenir ce thème.',
+    level_requirement: 'Niveau {current}/{required}',
+    level_requirement_short: 'Niveau {count}',
+    level_requirement_progress: 'Niveau {current}/{required}',
+    level_requirement_long: 'Atteins le niveau {count} pour obtenir ce thème.',
+    unlock_level_unlock_long: 'Atteins le niveau {count} pour obtenir ce thème.',
     theme_active: 'Actif',
     theme_unlocked: 'Débloqué',
     theme_locked: 'Verrouillé',
@@ -234,6 +232,7 @@ const THEME_UI_TEXT = {
     unlock_success: '🎨 Pack Premium débloqué ! Tous les thèmes sont disponibles.',
     locked_badges_title: 'Deux options pour ce thème',
     locked_badges_copy: 'Paye 1 CHF pour tout débloquer tout de suite, ou continue à jouer pour atteindre le nombre de badges demandé.',
+    locked_level_copy: 'Paye 1 CHF pour tout débloquer tout de suite, ou continue à jouer pour atteindre le niveau demandé.',
     locked_premium_title: 'Pack Premium',
     locked_premium_copy: 'Le Pack Premium débloque instantanément tous les thèmes de ton profil.',
     current_progress: 'Progression actuelle',
@@ -253,12 +252,18 @@ const THEME_UI_TEXT = {
     starter_theme: 'Available',
     badge_track: 'Badges',
     unlock_badges_short: '{count} badges',
+    badges_requirement_short: '{count} badges',
     always_available: 'Always available',
     unlocked_ready: 'Ready to use',
     premium_owned: 'Premium Pack active',
     premium_code_needed: 'Premium Pack or badges',
     badges_progress: '{current}/{required} badges',
     badges_requirement_long: 'Unlock {count} badges to get this theme.',
+    level_requirement: 'Level {current}/{required}',
+    level_requirement_short: 'Level {count}',
+    level_requirement_progress: 'Level {current}/{required}',
+    level_requirement_long: 'Reach level {count} to get this theme.',
+    unlock_level_unlock_long: 'Reach level {count} to get this theme.',
     theme_active: 'Active',
     theme_unlocked: 'Unlocked',
     theme_locked: 'Locked',
@@ -276,6 +281,7 @@ const THEME_UI_TEXT = {
     unlock_success: '🎨 Premium Pack unlocked! Every theme is now available.',
     locked_badges_title: 'Two ways to unlock this theme',
     locked_badges_copy: 'Pay 1 CHF to unlock everything right away, or keep playing until you reach the required badge count.',
+    locked_level_copy: 'Pay 1 CHF to unlock everything right away, or keep playing until you reach the required level.',
     locked_premium_title: 'Premium Pack',
     locked_premium_copy: 'The Premium Pack instantly unlocks every theme in your profile.',
     current_progress: 'Current progress',
@@ -300,7 +306,12 @@ const THEME_UI_TEXT = {
     premium_owned: 'Premium-Paket aktiv',
     premium_code_needed: 'Premium-Paket oder Abzeichen',
     badges_progress: '{current}/{required} Abzeichen',
+    badges_requirement_short: '{count} Abzeichen',
     badges_requirement_long: 'Schalte {count} Abzeichen frei, um dieses Thema zu bekommen.',
+    level_requirement: 'Level {current}/{required}',
+    level_requirement_short: 'Level {count}',
+    level_requirement_progress: 'Level {current}/{required}',
+    level_requirement_long: 'Erreiche Level {count} um dieses Thema freizuschalten.',
     theme_active: 'Aktiv',
     theme_unlocked: 'Freigeschaltet',
     theme_locked: 'Gesperrt',
@@ -318,6 +329,7 @@ const THEME_UI_TEXT = {
     unlock_success: '🎨 Premium-Paket freigeschaltet! Alle Themen sind jetzt verfugbar.',
     locked_badges_title: 'Zwei Wege fur dieses Thema',
     locked_badges_copy: 'Zahle 1 CHF, um sofort alles freizuschalten, oder spiele weiter bis du genug Abzeichen hast.',
+    locked_level_copy: 'Zahle 1 CHF, um sofort alles freizuschalten, oder spiele weiter bis du das benotigte Level erreichst.',
     locked_premium_title: 'Premium-Paket',
     locked_premium_copy: 'Das Premium-Paket schaltet sofort alle Themen in deinem Profil frei.',
     current_progress: 'Aktueller Fortschritt',
@@ -388,11 +400,18 @@ function getThemePreview(theme) {
   return `linear-gradient(135deg, ${theme['--primary']}, ${theme['--secondary']})`;
 }
 
-export function isThemeUnlocked(themeName) {
+function isThemeUnlocked(themeName) {
   const theme = THEMES[themeName];
   if (!theme || !theme.locked) return true;
   if (hasPremiumPack()) return true;
-  return getPlayerStats().unlockedBadges.length >= Number(theme.unlockValue || 0);
+
+  if (theme.unlockType === 'level') {
+    return getLevel() >= theme.unlockValue;
+  }
+  if (theme.unlockType === 'badges') {
+    return getPlayerStats().unlockedBadges.length >= theme.unlockValue;
+  }
+  return false;
 }
 
 function getSavedThemeName() {
@@ -403,12 +422,18 @@ function getSavedThemeName() {
 function getThemeChipLabel(themeName) {
   const theme = THEMES[themeName];
   if (!theme?.locked) return themeText('starter_theme');
-  return themeText('unlock_badges_short', { count: theme.unlockValue });
+  if (theme.unlockType === 'level') return themeText('level_requirement_short', { count: theme.unlockValue });
+  return themeText('badges_requirement_short', { count: theme.unlockValue });
 }
 
 function getThemeConditionLabel(themeName) {
   const theme = THEMES[themeName];
   if (!theme?.locked) return themeText('always_available');
+
+  if (theme.unlockType === 'level') {
+    return themeText('level_requirement_long', { count: theme.unlockValue });
+  }
+
   return themeText('badges_requirement_long', { count: theme.unlockValue });
 }
 
@@ -416,6 +441,13 @@ function getThemeStatusLine(themeName) {
   const theme = THEMES[themeName];
   if (!theme?.locked) return themeText('always_available');
   if (hasPremiumPack()) return themeText('premium_owned');
+
+  if (theme.unlockType === 'level') {
+    const currentLevel = getLevel();
+    return isThemeUnlocked(themeName)
+      ? themeText('unlocked_ready')
+      : themeText('level_requirement_progress', { current: currentLevel, required: theme.unlockValue });
+  }
 
   const currentBadges = getPlayerStats().unlockedBadges.length;
   return isThemeUnlocked(themeName)
@@ -655,81 +687,105 @@ function _showThemeLockedDialog(themeName) {
   const theme = THEMES[themeName];
   if (!theme) return;
 
-  const badgeCount = getPlayerStats().unlockedBadges.length;
   const preview = getThemePreview(theme);
   const dialog = document.createElement('div');
   dialog.className = 'theme-dialog-overlay';
 
-  const progressMarkup = `
-    <div class="theme-dialog-progress-wrap">
-      <div class="theme-dialog-progress-label">
-        <span>${escapeHtml(themeText('current_progress'))}</span>
-        <span>${escapeHtml(themeText('badges_progress', {
-    current: Math.min(badgeCount, theme.unlockValue),
-    required: theme.unlockValue,
-  }))}</span>
+  let progressMarkup = '';
+
+  if (theme.unlockType === 'level') {
+    const currentLevel = getLevel();
+    const progressPercent = Math.min(100, Math.round((currentLevel / theme.unlockValue) * 100));
+
+    progressMarkup = `
+      <div class="theme-dialog-progress-wrap">
+        <div class="theme-dialog-progress-label">
+          <span>${escapeHtml(themeText('current_progress'))}</span>
+          <span>${escapeHtml(themeText('level_requirement_progress', {
+      current: currentLevel,
+      required: theme.unlockValue
+    }))}</span>
+        </div>
+        <div class="theme-dialog-progress">
+          <span style="width:${progressPercent}%"></span>
+        </div>
       </div>
-      <div class="theme-dialog-progress">
-        <span style="width:${Math.min(100, Math.round((badgeCount / theme.unlockValue) * 100))}%"></span>
+    `;
+  } else {
+    const badgeCount = getPlayerStats().unlockedBadges.length;
+    const progressPercent = Math.min(100, Math.round((badgeCount / theme.unlockValue) * 100));
+
+    progressMarkup = `
+      <div class="theme-dialog-progress-wrap">
+        <div class="theme-dialog-progress-label">
+          <span>${escapeHtml(themeText('current_progress'))}</span>
+          <span>${escapeHtml(themeText('badges_progress', {
+      current: Math.min(badgeCount, theme.unlockValue),
+      required: theme.unlockValue,
+    }))}</span>
+        </div>
+        <div class="theme-dialog-progress">
+          <span style="width:${progressPercent}%"></span>
+        </div>
       </div>
+    `;
+  }
+
+  const actions = `
+    <div class="theme-dialog-actions">
+      <button type="button" class="theme-dialog-btn primary" id="dialog-buy">
+        ${escapeHtml(themeText('dialog_buy'))}
+      </button>
+      <button type="button" class="theme-dialog-btn secondary" id="dialog-close">
+        ${escapeHtml(themeText('dialog_close'))}
+      </button>
     </div>
   `;
+  const lockedCopyKey = theme.unlockType === 'level' ? 'locked_level_copy' : 'locked_badges_copy';
 
-  dialog.innerHTML = `
+  const html = `
     <div class="theme-dialog">
-      <button type="button" class="theme-dialog-close" data-theme-action="close-dialog" aria-label="Close">×</button>
-      <div class="theme-dialog-preview" style="background:${preview}">
+      <button type="button" class="theme-dialog-close" id="dialog-x" aria-label="Close">×</button>
+      <div class="theme-dialog-preview" style="background: ${preview}">
         <span class="theme-dialog-chip">${escapeHtml(getThemeChipLabel(themeName))}</span>
         <span class="theme-dialog-lock">🔒</span>
       </div>
       <div class="theme-dialog-body">
         <div class="theme-dialog-kicker">${escapeHtml(themeText('locked_badges_title'))}</div>
-        <h3 class="theme-dialog-title">${escapeHtml(getThemeLabel(themeName))}</h3>
-        <p class="theme-dialog-copy">${escapeHtml(themeText('locked_badges_copy'))}</p>
-        <p class="theme-dialog-condition">${escapeHtml(getThemeConditionLabel(themeName))}</p>
+        <div class="theme-dialog-title">${escapeHtml(getThemeLabel(themeName))}</div>
+        <div class="theme-dialog-copy">${escapeHtml(themeText(lockedCopyKey))}</div>
+        <div class="theme-dialog-condition">${escapeHtml(getThemeConditionLabel(themeName))}</div>
         ${progressMarkup}
         <div class="theme-dialog-offer">
           <div class="theme-dialog-offer-title">${escapeHtml(themeText('premium_offer_title'))}</div>
           <div class="theme-dialog-offer-copy">${escapeHtml(themeText('premium_offer_copy'))}</div>
           <div class="theme-dialog-offer-price">1 CHF</div>
         </div>
-        <div class="theme-dialog-actions">
-          <button type="button" class="theme-dialog-btn primary" data-theme-action="buy-pack">
-            ${escapeHtml(themeText('dialog_buy'))}
-          </button>
-          <button type="button" class="theme-dialog-btn secondary" data-theme-action="close-dialog">
-            ${escapeHtml(themeText('dialog_close'))}
-          </button>
-        </div>
+        ${actions}
       </div>
     </div>
   `;
 
-  dialog.addEventListener('click', async (event) => {
-    const actionButton = event.target.closest('[data-theme-action]');
-
-    if (event.target === dialog) {
-      _closeThemeDialog(dialog);
-      return;
-    }
-
-    if (!actionButton) return;
-
-    const { themeAction } = actionButton.dataset;
-
-    if (themeAction === 'close-dialog') {
-      _closeThemeDialog(dialog);
-      return;
-    }
-
-    if (themeAction === 'buy-pack') {
-      const result = await _openPremiumPackPurchase();
-      if (result.ok) _closeThemeDialog(dialog);
-    }
-  });
-
+  dialog.innerHTML = html;
   document.body.appendChild(dialog);
   requestAnimationFrame(() => dialog.classList.add('open'));
+
+  dialog.querySelector('#dialog-buy')?.addEventListener('click', async () => {
+    const result = await _openPremiumPackPurchase();
+    if (result.ok) _closeThemeDialog(dialog);
+  });
+
+  dialog.querySelector('#dialog-close')?.addEventListener('click', () => {
+    _closeThemeDialog(dialog);
+  });
+
+  dialog.querySelector('#dialog-x')?.addEventListener('click', () => {
+    _closeThemeDialog(dialog);
+  });
+
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) _closeThemeDialog(dialog);
+  });
 }
 
 async function _openPremiumPackPurchase() {
@@ -838,7 +894,9 @@ export function initProfilePanel(totalGamesCount = 0) {
         _renderBadges();
         _clearNewBadges(); // vider la pastille dès qu'on ouvre l'onglet
       }
-      if (target === 'stats') _renderStats();
+      if (target === 'stats') {
+        _renderStats();
+      }
       if (target === 'settings') _renderThemeSettings();
     });
   });
@@ -864,6 +922,10 @@ export function initProfilePanel(totalGamesCount = 0) {
       _restoreTheme();
       _renderStats();
       _renderThemeSettings();
+    });
+
+    window.addEventListener('mg:xp_updated', () => {
+      _renderStats();
     });
   }
 }
@@ -989,6 +1051,13 @@ function _renderStats() {
   const mostLabel = document.getElementById('pstat-most-label');
   if (mostLabel) mostLabel.textContent = mostPlayed.name || '—';
 
+  // ── Défis du jour ──
+  const { done: challengeDone, total: challengeTotal } = getDailyChallengeStats();
+  setVal('pstat-challenge-label', `${challengeDone} / ${challengeTotal}`);
+
+  // ── Progression XP ──
+  _renderXP();
+
   // Barre de progression badges
   loadBadgeDefs().then(defs => {
     const total = defs.length;
@@ -1017,6 +1086,33 @@ function _renderStats() {
     : '—';
   const since = document.getElementById('profileSince');
   if (since) since.textContent = t("profile.last_session_played").replace("{date}", lastSession);
+}
+
+function _renderXP() {
+  const level = getLevel();
+  const currentXP = getXPInLevel();
+  const xpPerLevel = 250; // On pourrait l'importer de xpSystem
+  const toNext = xpPerLevel - currentXP;
+  const progressPct = Math.round((currentXP / xpPerLevel) * 100);
+
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setVal('xp-level', level);
+  setVal('xp-value', `${currentXP} / ${xpPerLevel} XP`);
+
+  const bar = document.getElementById('xp-bar-fill');
+  if (bar) bar.style.width = `${progressPct}%`;
+
+  const nextEl = document.getElementById('xp-to-next');
+  if (nextEl) {
+    const template = t('profile.xp_to_next');
+    nextEl.textContent = template
+      .replace('{xp}', toNext)
+      .replace('{level}', level + 1);
+  }
 }
 
 // ─── STREAK ───────────────────────────────────────────────────────────────────

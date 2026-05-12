@@ -2,6 +2,9 @@
 //import { database, ref, onValue, get, set } from "../js/config/firebase-config.js";
 import { listenToRatingChanges, getRating, saveRating, saveUserRating, getLocalRating, getUserRating, calculateAverage, updateRatingDisplay, generateStars } from "../js/firebaseWrk.js";
 
+const STAR_ICON = "\u2605";
+const subscribedRatings = new Set();
+
 // Initialiser le système de notation
 export async function initRatingSystem() {
   await loadAndDisplayRatings();
@@ -19,131 +22,13 @@ async function loadAndDisplayRatings() {
 
     const ratingData = await getRating(gameId);
     updateRatingDisplay(gameId, ratingData);
-    listenToRatingChanges(gameId);
-  }
-}
 
-// Écouter les changements en temps réel
-/*function listenToRatingChanges(gameId) {
-  const ratingRef = ref(database, `ratings/${gameId}`);
-
-  onValue(
-    ratingRef,
-    (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        updateRatingDisplay(gameId, data);
-      }
-    },
-    (error) => {
-      console.error(`Erreur d'écoute des changements pour ${gameId}:`, error);
-    },
-  );
-}
-
-// Obtenir la note d'un jeu
-async function getRating(gameId) {
-  if (navigator.onLine) {
-    try {
-      const ratingRef = ref(database, `ratings/${gameId}`);
-      const snapshot = await get(ratingRef);
-
-      if (snapshot.exists()) {
-        return snapshot.val();
-      }
-      console.log(
-        `ℹ️ Pas de données Firebase pour ${gameId}, initialisation à 0.`,
-      );
-      return { total: 0, count: 0 };
-    } catch (error) {
-      console.error("Erreur lecture Firebase:", error);
-      return getLocalRating(gameId);
+    if (!subscribedRatings.has(gameId)) {
+      const isSubscribed = await listenToRatingChanges(gameId);
+      if (isSubscribed) subscribedRatings.add(gameId);
     }
-  } else {
-    return console.log("Vous êtes hors ligne");
   }
 }
-
-// Sauvegarder une note
-async function saveRating(gameId, ratingData) {
-  try {
-    const ratingRef = ref(database, `ratings/${gameId}`);
-    await set(ratingRef, ratingData);
-    console.log(`✅ Sauvegarde Firebase réussie pour ${gameId}:`, ratingData);
-    return true;
-  } catch (error) {
-    console.error("❌ Erreur sauvegarde Firebase:", error);
-    return saveLocalRating(gameId, ratingData);
-  }
-}
-
-// Fallback: Obtenir depuis localStorage
-function getLocalRating(gameId) {
-  const ratings = JSON.parse(localStorage.getItem("gameRatings") || "{}");
-  return ratings[gameId] || { total: 0, count: 0 };
-}
-
-// Obtenir la note de l'utilisateur
-function getUserRating(gameId) {
-  const userRatings = JSON.parse(localStorage.getItem("userRatings") || "{}");
-  return userRatings[gameId] || null;
-}
-
-// Fallback: Sauvegarder en local
-function saveLocalRating(gameId, ratingData) {
-  try {
-    const ratings = JSON.parse(localStorage.getItem("gameRatings") || "{}");
-    ratings[gameId] = ratingData;
-    localStorage.setItem("gameRatings", JSON.stringify(ratings));
-    return true;
-  } catch (error) {
-    console.error("Erreur sauvegarde locale:", error);
-    return false;
-  }
-}
-
-// Sauvegarder la note de l'utilisateur
-function saveUserRating(gameId, rating) {
-  const userRatings = JSON.parse(localStorage.getItem("userRatings") || "{}");
-  userRatings[gameId] = rating;
-  localStorage.setItem("userRatings", JSON.stringify(userRatings));
-}*/
-
-// Calculer la moyenne
-/*function calculateAverage(total, count) {
-  return count > 0 ? (total / count).toFixed(1) : 0;
-}
-
-// Mettre à jour l'affichage
-function updateRatingDisplay(gameId, ratingData) {
-  const card = document.querySelector(`[data-game="${gameId}"]`);
-  if (!card) return;
-
-  const average = calculateAverage(ratingData.total, ratingData.count);
-  const starsContainer = card.querySelector(".stars");
-  const ratingText = card.querySelector(".rating-text");
-  const ratingCount = card.querySelector(".rating-count");
-
-  if (starsContainer) starsContainer.innerHTML = generateStars(average);
-  if (ratingText) ratingText.textContent = average;
-  if (ratingCount) {
-    ratingCount.textContent = `(${ratingData.count} ${ratingData.count > 1 ? "votes" : "vote"})`;
-  }
-}
-
-// Générer les étoiles
-function generateStars(rating) {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-  let html = "";
-  for (let i = 0; i < fullStars; i++) html += "★";
-  if (hasHalfStar) html += "⯨";
-  for (let i = 0; i < emptyStars; i++) html += "☆";
-
-  return html;
-}*/
 
 // Configurer les listeners
 function setupRatingListeners() {
@@ -193,7 +78,7 @@ async function openRatingModal(gameId) {
         (star) => `
           <input type="radio" id="star${star}-${gameId}" name="rating" value="${star}" 
                  ${userRating === star ? "checked" : ""}>
-          <label for="star${star}-${gameId}" title="${star} étoile${star > 1 ? "s" : ""}">★</label>
+          <label for="star${star}-${gameId}" title="${star} \u00e9toile${star > 1 ? "s" : ""}">${STAR_ICON}</label>
         `,
       )
       .join("")}
@@ -202,7 +87,7 @@ async function openRatingModal(gameId) {
       <div class="modal-stats">
         <p>Note moyenne: <strong>${calculateAverage(ratingData.total, ratingData.count)}/5</strong></p>
         <p>Nombre de votes: <strong>${ratingData.count}</strong></p>
-        ${hasRated ? `<p>Votre note: <strong>${userRating} ★</strong></p>` : ""}
+        ${hasRated ? `<p>Votre note: <strong>${userRating} ${STAR_ICON}</strong></p>` : ""}
       </div>
       
       <div class="modal-buttons">

@@ -26,6 +26,15 @@
         "contact": "Kontakt",
         "ads_support": "Unterstütze Mini Games",
         "ads_message": "Eine kleine Werbung hilft uns, die Plattform kostenlos zu halten!",
+        "daily_challenge": {
+            "btn_label": "Tägliche Herausforderung",
+            "modal_title": "TÄGLICHE HERAUSFORDERUNG",
+            "modal_game": "SPIEL",
+            "modal_reward": "{xp} XP wenn abgeschlossen",
+            "modal_button": "JETZT SPIELEN",
+            "modal_not_ready": "Noch nicht verfügbar",
+            "success": "Tägliche Herausforderung abgeschlossen!"
+        },
         "games": {
             "battleship": {
                 "name": "Schiffe versenken",
@@ -520,7 +529,11 @@
         "cloud_id_label": "Deine Speicher-ID",
         "cloud_id_hint": "Bewahre diese ID auf, um deinen Fortschritt auf einem anderen Gerät wiederherzustellen.",
         "cloud_import_placeholder": "Speicher-ID einfügen...",
-        "cloud_btn_import": "Importieren"
+        "cloud_btn_import": "Importieren",
+        "level": "Stufe",
+        "xp_hint": "Verdiene XP durch tägliche Herausforderungen",
+        "xp_to_next": "{xp} XP bis Stufe {level}",
+        "level_up_title": "Stufe aufgestiegen!"
     },
     "badges": {
         "unlocked_title": "Abzeichen freigeschaltet!"

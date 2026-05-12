@@ -61,13 +61,15 @@ export async function incrementFirebaseStat(statName, incrementBy = 1) {
 export async function listenToRatingChanges(gameId) {
     const { _ref, _onValue } = getDbTools();
     const isOnline = await checkRealConnection();
-    if (!isOnline || !database || !_onValue) return;
+    if (!isOnline || !database || !_onValue) return false;
 
     const ratingRef = _ref(database, `ratings/${gameId}`);
     _onValue(ratingRef, (snapshot) => {
         const data = snapshot.val();
         if (data) updateRatingDisplay(gameId, data);
     });
+
+    return true;
 }
 
 export async function getRating(gameId) {
@@ -145,7 +147,7 @@ export function updateRatingDisplay(gameId, ratingData) {
     const ratingText = card.querySelector(".rating-text");
     const ratingCount = card.querySelector(".rating-count");
 
-    if (starsContainer) starsContainer.innerHTML = generateStars(average);
+    if (starsContainer) starsContainer.textContent = generateStars(average);
     if (ratingText) ratingText.textContent = average;
     if (ratingCount) {
         ratingCount.textContent = `(${ratingData.count} ${ratingData.count > 1 ? "votes" : "vote"})`;
@@ -158,12 +160,13 @@ export function generateStars(rating) {
     const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-    let html = "";
-    for (let i = 0; i < fullStars; i++) html += "â˜…";
-    if (hasHalfStar) html += "â¯¨";
-    for (let i = 0; i < emptyStars; i++) html += "â˜†";
+    const fullStar = "\u2605";
+    const halfStar = "\u2BE8";
+    const emptyStar = "\u2606";
 
-    return html;
+    return fullStar.repeat(fullStars)
+        + (hasHalfStar ? halfStar : "")
+        + emptyStar.repeat(emptyStars);
 }
 
 /*================ ROOMS ================*/

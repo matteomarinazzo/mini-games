@@ -1,6 +1,7 @@
 import { getFirebaseRecordData, setFirebaseLeaderboard } from "../../../js/firebaseWrk.js";
 import { checkRealConnection } from "../../../js/network.js";
 import { playReflexSound } from "../../../js/utils/audio.js";
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 // ─── LOCALSTORAGE KEYS ────────────────────────────────────────────────────────
 const LS_CHRONO_BEST = 'punch_reflex_chrono_best';
@@ -442,6 +443,13 @@ function endGame() {
     } else {
         playReflexSound('punch_fail');
     }
+
+    checkDailyChallenge({
+        gameId: 'punch-reflex',
+        survived: MODE === 'survie' ? (survivalMs / 1000) : null,
+        avgReactionMs: avgReaction ?? null,
+        mode: MODE === 'chrono' ? `chrono_${DURATION}s` : 'survival',
+    });
 
     showEndOverlay(score, avgReaction, peakMs, errors, newRecords);
 }

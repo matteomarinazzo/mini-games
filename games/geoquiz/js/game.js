@@ -2,6 +2,7 @@
 import { COUNTRIES, CONTINENTS } from './countries.js';
 import { playGameSound, startGqMusic, stopGqMusic } from '../../../js/utils/audio.js';
 import { initSettingsUI } from '../../../js/utils/settingsUI.js';
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 // Initialisation des réglages
 initSettingsUI('geoquiz');
@@ -542,8 +543,11 @@ function showEnd() {
     const emoji = category.emojis[randomIdx];
 
     // Jouer le son du résultat
-    if (pct === 100) playGameSound('gq_result_perfect');
-    else if (pct >= 80) playGameSound('gq_result_good');
+    let isPerfect = false;
+    if (pct === 100) {
+        isPerfect = true;
+        playGameSound('gq_result_perfect');
+    } else if (pct >= 80) playGameSound('gq_result_good');
     else if (pct >= 50) playGameSound('gq_result_meh');
     else playGameSound('gq_result_bad');
 
@@ -558,6 +562,17 @@ function showEnd() {
     <div class="gq-end-stat"><strong>${pct}%</strong><small>Réussite</small></div>
   `;
     endScreen.style.display = 'flex';
+
+    // ── Daily Challenge ──
+    const modeKey = MODE === 'flag' ? 'guess_flag' : 'guess_shape';
+    checkDailyChallenge({
+        gameId: 'geoquiz',
+        mode: modeKey,
+        difficulty: DIFF,
+        perfectMinigame: isPerfect,
+        score: score,
+        correctCount: correctCount
+    });
 }
 
 // ─── Offline / cache flags ───────────────────────────────────────────────────

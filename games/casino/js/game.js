@@ -1,5 +1,6 @@
 import { initSettingsUI } from '../../../js/utils/settingsUI.js';
 import { startCasinoMusic, playCasinoSound } from '../../../js/utils/audio.js';
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 initSettingsUI('casino');
 
@@ -24,6 +25,22 @@ const STORAGE_KEYS = {
   MONEY: "global_money",
   STATS: "casino_stats",
 };
+
+// ========================================
+// DAILY CHALLENGE TRACKING
+// ========================================
+const DC_KEYS = {
+  WIN_STREAK: 'casino_dc_win_streak',         // streak global toutes parties
+  SCRATCH_WIN_STREAK: 'casino_dc_scratch_win_streak', // streak scratch card
+  START_BALANCE: 'global_initial_budget',      // solde au début de la session
+};
+
+// Enregistrer le solde de départ une seule fois par session
+function _initDCTracking() {
+  if (!sessionStorage.getItem(DC_KEYS.START_BALANCE)) {
+    sessionStorage.setItem(DC_KEYS.START_BALANCE, getMoney());
+  }
+}
 
 // ========================================
 // GAME CONFIGURATION
@@ -188,6 +205,7 @@ function init() {
   }
 
   updateMoneyDisplay();
+  _initDCTracking();
 }
 
 // ========================================
@@ -236,20 +254,51 @@ function getStats() {
   return JSON.parse(stats);
 }
 
-function updateStats(won, winAmount = 0) {
+function updateStats(won, winAmount = 0, gameType = null) {
   const stats = getStats();
-
   stats.totalGames++;
   if (won) {
     stats.totalWins++;
     stats.totalEarnings += winAmount;
-    if (winAmount > stats.biggestWin) {
-      stats.biggestWin = winAmount;
-    }
+    if (winAmount > stats.biggestWin) stats.biggestWin = winAmount;
+  }
+  localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats));
+
+  // ── Daily Challenge tracking ──────────────────────────────────────────────
+  // Streak global
+  const prevStreak = parseInt(sessionStorage.getItem(DC_KEYS.WIN_STREAK) || '0');
+  const newStreak = won ? prevStreak + 1 : 0;
+  sessionStorage.setItem(DC_KEYS.WIN_STREAK, newStreak);
+
+  // Streak scratch card spécifique
+  if (gameType === 'scratch') {
+    const prevScratch = parseInt(sessionStorage.getItem(DC_KEYS.SCRATCH_WIN_STREAK) || '0');
+    const newScratch = won ? prevScratch + 1 : 0;
+    sessionStorage.setItem(DC_KEYS.SCRATCH_WIN_STREAK, newScratch);
   }
 
-  localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats));
+  // Tester les défis après chaque partie
+  _checkCasinoChallenges(gameType);
 }
+
+async function _checkCasinoChallenges(gameType = null) {
+  const balance = getMoney();
+  const winStreak = parseInt(sessionStorage.getItem(DC_KEYS.WIN_STREAK) || '0');
+  const scratchStreak = parseInt(sessionStorage.getItem(DC_KEYS.SCRATCH_WIN_STREAK) || '0');
+  // Correction : Utiliser la bonne clé et lire depuis localStorage
+  const startBalance = parseInt(localStorage.getItem(STORAGE_KEYS.INITIAL_BUDGET) || '0');
+
+  await checkDailyChallenge({
+    gameId: 'casino',
+    balance,
+    winStreak,
+    scratchWinStreak: scratchStreak,
+    startBalance,
+    lostAll: balance === 0 && gameType === 'wheel',
+    _gameType: gameType,
+  });
+}
+
 
 // ========================================
 // SCRATCH CARD GAME
@@ -412,13 +461,13 @@ function checkScratchWin() {
     });
 
     addWinnings(prize);
-    updateStats(true, prize);
+    updateStats(true, prize, 'scratch');
 
     playCasinoSound('win');
     resultDiv.textContent = `🎉 GAGNÉ ! ${winningSymbol} × 3 = ${prize}€`;
     resultDiv.className = "result-message win";
   } else {
-    updateStats(false);
+    updateStats(false, 0, 'scratch');
 
     playCasinoSound('lose');
     resultDiv.textContent = `😔 Perdu ! Aucun symbole identique trouvé.`;
@@ -567,7 +616,7 @@ function checkSlotsWin(symbols) {
     const prize = SLOTS_CONFIG.prizes[symbols[0]];
 
     addWinnings(prize);
-    updateStats(true, prize);
+    updateStats(true, prize, 'wheel');
 
     playCasinoSound('jackpot');
     resultDiv.textContent = `🎊 JACKPOT ! ${symbols[0]} × 3 = ${prize}€`;
@@ -677,7 +726,7 @@ function checkCardWin() {
     resultDiv.textContent = `🎉 ${currentCard.display} ! Vous gagnez ${prize}€ !`;
     resultDiv.className = "result-message win";
   } else {
-    updateStats(false);
+    updateStats(false, 0, 'wheel');
 
     playCasinoSound('lose');
     resultDiv.textContent = `😔 ${currentCard.display}... Pas de gain cette fois.`;

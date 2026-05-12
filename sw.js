@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.16.2026-05-09";
+const CACHE_NAME = "mini-games-cache-v1.17.2026-05-12";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -25,18 +25,25 @@ const ASSETS_TO_CACHE = [
     'js/countPlayedTime.js',
     'js/fullScreen.js',
     'js/firebaseWrk.js',
-    'js/config/firebase-config.js',
-    'js/utils/formatNumber.js',
     'js/app.js',
     'js/network.js',
     'js/BuyMeACoffee.js',
+    'js/profilePanel.js',
+    'js/config/firebase-config.js',
+    'js/utils/formatNumber.js',
     'js/utils/audio.js',
     'js/utils/i18n.js',
     'js/utils/webhooks.js',
+    'js/utils/ads.js',
+    'js/utils/badges.js',
+    'js/utils/settingsUI.js',
+    'js/utils/dailyChallenge.js',
+    'js/utils/xpSystem.js',
 
     // Assets data
     'assets/data/games.json',
     'assets/data/versions.json',
+    'assets/data/badges.json',
 
     // Assets lang
     'assets/lang/fr.json',

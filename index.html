@@ -111,6 +111,24 @@
       </button>
     </div>
 
+    <!-- Défi du jour -->
+    <div class="daily-challenge-wrapper">
+      <button id="dailyChallengeBtn" class="daily-challenge-btn" title="Défi du jour">
+        <span class="challenge-btn-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+            <path d="M4 22h16" />
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+          </svg>
+        </span>
+        <span class="challenge-btn-label" data-i18n="menu.daily_challenge.btn_label">Défi du jour</span>
+      </button>
+    </div>
+
     <!-- Language Selector -->
     <div class="lang-selector">
       <button id="langBtn" class="lang-btn">
@@ -363,7 +381,6 @@
           </div>
 
           <!-- Challenges du jour -->
-          <!--
           <div class="profile-stat-card pstat-card-challenge">
             <div class="pstat-icon" id="pstat-challenge">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -379,7 +396,6 @@
             <div class="pstat-value pstat-challenge-name" id="pstat-challenge-label">— / —</div>
             <div class="pstat-label" data-i18n="profile.daily_challenges">Challenges du jour</div>
           </div>
-          -->
         </div>
 
         <!-- Barre de progression globale -->
@@ -392,6 +408,28 @@
             <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
           </div>
         </div>
+
+
+        <!-- Niveaux et XP -->
+        <div class="profile-section profile-xp-section">
+          <div class="xp-header">
+            <div class="xp-level-badge">
+              <div class="xp-level-label" data-i18n="profile.level">Niveau</div>
+              <div class="xp-level-number" id="xp-level">1</div>
+            </div>
+            <div class="xp-info">
+              <div class="xp-value" id="xp-value">0 / 250 XP</div>
+              <div class="xp-bar-track">
+                <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
+              </div>
+              <div class="xp-to-next" id="xp-to-next" data-i18n="profile.xp_to_next">250 XP avant niveau 2</div>
+            </div>
+          </div>
+          <div class="xp-source-hint" data-i18n="profile.xp_hint">
+            Gagne de l'XP en réussissant les défis quotidiens
+          </div>
+        </div>
+
       </div>
 
       <!-- Tab: Badges -->
@@ -612,7 +650,6 @@
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/countPlayedTime.js"></script>
 <script type="module" src="./js/profilePanel.js"></script>
-
 <script type="module" src="./js/app.js"></script>
 
 </html>

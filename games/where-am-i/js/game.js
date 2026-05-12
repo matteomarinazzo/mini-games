@@ -6,6 +6,7 @@
 
 import { auth, firebaseReady, getServerTimestamp } from "../../../js/config/firebase-config.js";
 import { updateRoom, listenToRoomChanges, getRoom } from "../../../js/firebaseWrk.js";
+import { checkDailyChallenge } from "../../../js/utils/dailyChallenge.js";
 
 // ═══════════════════════════════════════════════════
 // URL PARAMS
@@ -932,6 +933,21 @@ function showRoundResult(dist, points, allGuesses) {
     };
 
     roundResultOverlay.style.display = 'flex';
+
+    if (IS_SOLO) {
+        const validGuesses = roundScores.filter(r => r.dist != null);
+        const bestDistance = validGuesses.length > 0
+            ? Math.min(...validGuesses.map(r => r.dist))
+            : Infinity;
+
+        const distanceM = bestDistance === Infinity ? null : Math.round(bestDistance * 1000);
+        console.log('Best distance:', distanceM);
+
+        checkDailyChallenge({
+            gameId: 'where-am-i',
+            distanceM: distanceM
+        });
+    }
 }
 
 async function advanceMultiRound(gameId) {

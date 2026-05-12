@@ -7,6 +7,7 @@ import {
   canvasWidth,
   config,
 } from "./common.js";
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 const isMobile =
   "ontouchstart" in window ||
@@ -347,6 +348,16 @@ function win() {
   gameState.isWin = true;
   document.getElementById("winScore").textContent = gameState.score;
   document.getElementById("winOverlay").style.display = "flex";
+
+  const noLifeLost = gameState.lives === 3;
+
+  checkDailyChallenge({
+    gameId: 'casse-brique',
+    score: gameState.score,
+    noLifeLost,
+    brickResistance: config.brickLives,
+    difficulty: config.difficulty,
+  }).catch(console.error);
 }
 
 // Game Over

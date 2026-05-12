@@ -25,6 +25,7 @@ import {
   getNumberSnowFlakes,
   updateWindStrength,
 } from "../ctrl/weatherCtrl.js";
+import { checkDailyChallenge } from "../../../../js/utils/dailyChallenge.js";
 
 updateSnowflakeCount(getNumberSnowFlakes());
 startWeatherSystem();
@@ -39,6 +40,10 @@ export const snowBackground = createSnowPattern(
 let showMobileInstructions = isMobile;
 let instructionsTimer = null;
 
+// Vérification périodique du défi 90% de surface
+let surfaceCheckCounter = 0;
+const SURFACE_CHECK_INTERVAL = 60; // toutes les 60 frames (~1s)
+
 export function startLoop() {
   // Masquer les instructions après 10 secondes
   if (isMobile) {
@@ -46,7 +51,7 @@ export function startLoop() {
       showMobileInstructions = false;
     }, 10000);
   }
-  
+
   requestAnimationFrame(loop);
 }
 
@@ -91,7 +96,7 @@ function update() {
     );
 
     afficherFloatingText(changedTiles);
-    
+
     // Masquer les instructions dès la première interaction
     if (showMobileInstructions) {
       showMobileInstructions = false;
@@ -106,7 +111,7 @@ function update() {
       disableSkierSpawningTemporarily(i === 0);
       mouse.right = false;
     }
-    
+
     // Masquer les instructions
     if (showMobileInstructions) {
       showMobileInstructions = false;
@@ -127,10 +132,20 @@ function update() {
 
   updateSkiers();
   updateFloatingTexts();
-  
+
   const sbCtx = snowBackground.getContext("2d");
   snowFall(getSnowAmountPerTick(), sbCtx);
   updateGameData();
+
+  // === DAILY CHALLENGE : 90% de surface déblayée ===
+  surfaceCheckCounter++;
+  if (surfaceCheckCounter >= SURFACE_CHECK_INTERVAL) {
+    surfaceCheckCounter = 0;
+    checkDailyChallenge({
+      gameId: 'snow-digger',
+      surfacePct: parseFloat(gameData.percentTransformed),
+    });
+  }
 }
 
 // =========================
@@ -141,12 +156,12 @@ function draw() {
   drawSkiers(ctx, camera);
   const directions = getCameraDirections(camera, canvas, gameData);
   drawCameraHints(directions);
-  
+
   // Ne pas dessiner le curseur sur mobile
   if (!isMobile) {
     drawCursor();
   }
-  
+
   updateUI();
   drawFloatingTexts(ctx, camera);
 
@@ -223,7 +238,7 @@ function drawMobileControls() {
   // Joystick virtuel
   if (virtualJoystick.active) {
     ctx.save();
-    
+
     // Base du joystick (cercle extérieur)
     ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
@@ -232,7 +247,7 @@ function drawMobileControls() {
     ctx.arc(virtualJoystick.centerX, virtualJoystick.centerY, virtualJoystick.maxRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    
+
     // Stick (cercle intérieur)
     ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     ctx.strokeStyle = "rgba(74, 159, 255, 0.8)";
@@ -241,7 +256,7 @@ function drawMobileControls() {
     ctx.arc(virtualJoystick.currentX, virtualJoystick.currentY, 35, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    
+
     // Croix directionnelle au centre du stick
     ctx.strokeStyle = "rgba(74, 159, 255, 0.9)";
     ctx.lineWidth = 2;
@@ -251,10 +266,10 @@ function drawMobileControls() {
     ctx.moveTo(virtualJoystick.currentX, virtualJoystick.currentY - 12);
     ctx.lineTo(virtualJoystick.currentX, virtualJoystick.currentY + 12);
     ctx.stroke();
-    
+
     ctx.restore();
   }
-  
+
   // Zone du joystick (indicateur visuel quand inactif)
   if (!virtualJoystick.active && showMobileInstructions) {
     ctx.save();
@@ -262,24 +277,24 @@ function drawMobileControls() {
     ctx.strokeStyle = "rgba(74, 159, 255, 0.3)";
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
-    
+
     const joystickZoneSize = 150;
     ctx.fillRect(0, canvas.height - joystickZoneSize, joystickZoneSize, joystickZoneSize);
     ctx.strokeRect(0, canvas.height - joystickZoneSize, joystickZoneSize, joystickZoneSize);
-    
+
     // Texte "Caméra"
     ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
     ctx.font = "bold 14px Arial";
     ctx.textAlign = "center";
     ctx.fillText("🎮 Caméra", joystickZoneSize / 2, canvas.height - joystickZoneSize / 2);
-    
+
     ctx.restore();
   }
-  
+
   // Instructions tactiles
   if (showMobileInstructions) {
     ctx.save();
-    
+
     // Fond semi-transparent
     const padding = 15;
     const lineHeight = 22;
@@ -290,29 +305,29 @@ function drawMobileControls() {
       "• 2 doigts = Skieur",
       "• Coin bas-gauche = Caméra"
     ];
-    
+
     const boxWidth = 250;
     const boxHeight = instructions.length * lineHeight + padding * 2;
     const boxX = canvas.width - boxWidth - 20;
     const boxY = canvas.height - boxHeight - 170; // Au-dessus du joystick
-    
+
     // Fond
     ctx.fillStyle = "rgba(44, 82, 130, 0.9)";
     ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-    
+
     // Bordure
     ctx.strokeStyle = "rgba(74, 159, 255, 0.8)";
     ctx.lineWidth = 2;
     ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-    
+
     // Texte
     ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
     ctx.font = "13px Arial";
     ctx.textAlign = "left";
-    
+
     instructions.forEach((text, i) => {
       const y = boxY + padding + (i + 1) * lineHeight - 5;
-      
+
       if (i === 0) {
         ctx.font = "bold 14px Arial";
         ctx.fillText(text, boxX + padding, y);
@@ -321,11 +336,11 @@ function drawMobileControls() {
         ctx.fillText(text, boxX + padding, y);
       }
     });
-    
+
     ctx.restore();
   }
-  
-  
+
+
 }
 
 function afficherFloatingText(changedTiles) {

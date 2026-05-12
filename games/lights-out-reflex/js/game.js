@@ -1,6 +1,7 @@
 import { playReflexSound } from "../../../js/utils/audio.js";
 import { getFirebaseRecordData, setFirebaseLeaderboard } from "../../../js/firebaseWrk.js";
 import { checkRealConnection } from "../../../js/network.js";
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 // ─── DOM ──────────────────────────────────────────────────────────────────────
 const lights = [0, 1, 2, 3, 4].map(i => document.getElementById(`light${i}`));
@@ -346,6 +347,13 @@ async function recordAttempt(time, isPenalty) {
 
         await showRecordPopup(pendingRecords);
     }
+
+    checkDailyChallenge({
+        gameId: 'lights-out-reflex',
+        reactionMs: Math.round(time * 1000),
+        avgReactionMs: Math.round(newAvg * 1000),
+        beatWorldRecord: beatGlobalBest,
+    });
 }
 
 // ─── POPUP RECORDS ────────────────────────────────────────────────────────────

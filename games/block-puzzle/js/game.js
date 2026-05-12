@@ -3,6 +3,7 @@ import { playGameSound, startBpMusic, stopBpMusic, toggleBpMusic, toggleSound, g
 import { auth, firebaseReady } from "../../../js/config/firebase-config.js";
 import { updateRoom, listenToRoomChanges, deleteRoom, setFirebaseLeaderboard, getFirebaseLeaderboard, getFirebaseRecordData } from "../../../js/firebaseWrk.js";
 import { checkRealConnection } from "../../../js/network.js";
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 let best_score_ever = 0;
 
@@ -97,6 +98,7 @@ const SHAPES = ALL_VARIANTS;
 let grid = makeEmptyGrid();
 let score = 0;
 let bestScore = parseInt(localStorage.getItem('blockPuzzleBest_v2') || '0');
+let sessionStartBest = bestScore;
 let gameMode = 'libre';
 let timeLeft = 0;
 let timerInterval = null;
@@ -859,6 +861,9 @@ function updateScore() {
 async function triggerGameOver(reason) {
   if (isGameOver) return;
   isGameOver = true;
+
+  const beatPersonalBestFree = score > sessionStartBest && gameMode === 'libre';
+
   if (gameMode !== 'confrontation') {
     stopBpMusic();
     playGameSound('bp_gameover');
@@ -875,15 +880,17 @@ async function triggerGameOver(reason) {
     best_score_ever = score;
   }
 
-  // Préparer les données pour la popup si un record est battu
-  if (isGlobalScoreBroken) {
-    window.pendingRecordData = {
-      score: score,
-      isScoreBroken: true
-    };
-  } else {
-    window.pendingRecordData = null;
-  }
+  checkDailyChallenge({
+    gameId: 'block-puzzle',
+    score,
+    mode: gameMode === 'libre' ? 'free'
+      : gameMode === 'defi' ? `challenge_${parseInt(new URLSearchParams(window.location.search).get('duration') || '60')}s`
+        : gameMode,
+    beatWorldRecordScore: isGlobalScoreBroken,
+    beatPersonalBest: beatPersonalBestFree,
+    wonDuo: gameMode === 'confrontation' && reason.includes('VICTOIRE'),
+  });
+
 
   endTitle.textContent = reason;
   finalScoreEl.textContent = score;
@@ -1221,6 +1228,8 @@ async function init() {
 
   setupEventListeners();
   if (gameMode !== 'confrontation') startBpMusic();
+
+  sessionStartBest = bestScore;
 }
 
 init();

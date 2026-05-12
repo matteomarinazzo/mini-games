@@ -1,11 +1,10 @@
-//import { initRatingSystem } from "./rating-system.js";
+import { initRatingSystem } from "./rating-system.js";
 import { checkRealConnection } from './network.js';
 import { showBMC, hideBMC } from './BuyMeACoffee.js';
 import {
   playGameSound,
   startMenuMusic,
   stopMenuMusic,
-  toggleMenuMusic,
   toggleSound,
   getMusicEnabled,
   getSoundEnabled
@@ -14,6 +13,7 @@ import { notifyGameLaunch, notifyBackToHome, notifyAboutVisit } from './utils/we
 import { initProfilePanel, updateStreak, updateProfileLanguage, checkPremiumReturn } from './profilePanel.js';
 import { reportGamePlayed, reportRandomUsed, checkAndUnlockBadges, checkPendingBadges } from './utils/badges.js';
 import { initAds, handleSmartLink, checkPendingGameLaunch } from './utils/ads.js';
+import { initDailyChallenge } from './utils/dailyChallenge.js';
 
 var games = {};
 let categoriesData = {};
@@ -310,6 +310,7 @@ function generateGameCards() {
     const gamesNumberEl = document.getElementById("gamesNumber");
     if (gamesNumberEl) gamesNumberEl.innerText = Object.keys(games).length;
     initGameCards();
+    initRatingSystem().catch(() => { });
     filterGames();
   };
 
@@ -319,8 +320,6 @@ function generateGameCards() {
     finalizeGrid();
   }
 }
-
-// ... (createGameCard and other functions)
 
 // Accessibilité Globale : Observer TOUTES les iframes (AdSense, Monetag, etc.)
 const fixIframes = () => {
@@ -621,6 +620,8 @@ async function displayAppVersion() {
 /*============================
 == REFRESH DU STATUS ET BMC ==
 ============================*/
+let _dailyChallengeInited = false;
+
 async function refreshStatus() {
   const isOnline = await checkRealConnection();
   const statusBadge = document.querySelector(".status-badge");
@@ -647,6 +648,12 @@ async function refreshStatus() {
       statusBadge.style.boxShadow = "0 0 10px rgba(207, 81, 102, 0.95)";
       statusText.innerText = t('menu.offline');
     }
+  }
+
+  // Toujours initialiser le bouton défi (gère lui-même le offline)
+  if (!_dailyChallengeInited) {
+    _dailyChallengeInited = true;
+    initDailyChallenge();
   }
 }
 

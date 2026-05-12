@@ -17,6 +17,7 @@ import {
     getSoundEnabled,
     getMusicEnabled
 } from "../../../js/utils/audio.js";
+import { checkDailyChallenge } from "../../../js/utils/dailyChallenge.js";
 
 let best_score_ever = await getFirebaseLeaderboard("layer_pile", "best_score")
 let best_layer_ever = await getFirebaseLeaderboard("layer_pile", "best_layer")
@@ -599,6 +600,9 @@ function triggerGameOver() {
     let isGlobalScoreBroken = false;
     let isGlobalLayerBroken = false;
 
+    const prevBestScore = parseInt(localStorage.getItem('layerpile_best') || '0');
+    const prevBestLevel = parseInt(localStorage.getItem('layerpile_bestLevel') || '0');
+
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem('layerpile_best', bestScore);
@@ -638,6 +642,19 @@ function triggerGameOver() {
     goScore.textContent = score;
     goBest.textContent = bestScore;
     goHeight.textContent = level;
+
+    // ── Daily Challenge ──────────────────────────────
+    checkDailyChallenge({
+        gameId: 'layer-pile',
+        score: score,
+        floors: level,
+        beatPersonalBest: score > prevBestScore || level > prevBestLevel,
+        beatPersonalBestScore: score > prevBestScore,
+        beatPersonalBestFloors: level > prevBestLevel,
+        beatWorldRecord: isGlobalScoreBroken || isGlobalLayerBroken,
+        beatWorldRecordScore: isGlobalScoreBroken,
+        beatWorldRecordFloors: isGlobalLayerBroken,
+    });
 
     // 🎥 Redescendre la caméra vers 0 puis afficher la popup
     function animateCamera() {

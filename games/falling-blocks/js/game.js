@@ -1,6 +1,7 @@
 import { playGameSound, startMusic, toggleSound, toggleMusic, getSoundEnabled, getMusicEnabled } from "../../../js/utils/audio.js";
 import { checkRealConnection } from "../../../js/network.js";
 import { getFirebaseLeaderboard, getFirebaseRecordData, setFirebaseLeaderboard } from "../../../js/firebaseWrk.js";
+import { checkDailyChallenge } from "../../../js/utils/dailyChallenge.js";
 
 /* DOM */
 const gridEl = document.getElementById("grid");
@@ -552,11 +553,21 @@ async function triggerGameOver(reason) {
     endTitle.textContent = reason;
     finalScoreEl.textContent = score;
 
+    const prevBest = parseInt(localStorage.getItem("fallingBlocks_best") || "0");
+
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem("fallingBlocks_best", bestScore);
     }
     finalBestEl.textContent = bestScore;
+
+    checkDailyChallenge({
+        gameId: 'falling-blocks',
+        score: score,
+        survived: secondsElapsed,
+        beatPersonalBest: score > prevBest,
+        beatWorldRecord: isGlobalScoreBroken,
+    });
 
     if (window.pendingRecordData) {
         recordMessagePopup.style.display = 'flex';

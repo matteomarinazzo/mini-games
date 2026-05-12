@@ -11,7 +11,7 @@ window.I18N = {
 // Charger une langue
 async function loadLanguage(lang) {
     try {
-        const res = await fetch(`${BASE}assets/lang/${lang.toLowerCase()}.json`);
+        const res = await fetch(`${BASE}assets/lang/${lang.toLowerCase()}.json?v=1.1`);
         I18N.data = await res.json();
         I18N.lang = lang;
     } catch (e) {
@@ -21,7 +21,7 @@ async function loadLanguage(lang) {
 
 // Charger fallback (FR)
 async function loadFallback() {
-    const res = await fetch(`${BASE}assets/lang/fr.json`);
+    const res = await fetch(`${BASE}assets/lang/fr.json?v=1.1`);
     I18N.fallbackData = await res.json();
 }
 

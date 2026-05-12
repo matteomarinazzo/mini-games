@@ -1,3 +1,5 @@
+import { checkDailyChallenge } from "../../../js/utils/dailyChallenge.js";
+
 // Récupérer la configuration
 const config = JSON.parse(sessionStorage.getItem("pongConfig")) || {
   gameMode: "pvp",
@@ -351,6 +353,15 @@ function gameOver() {
   document.getElementById("finalScore1").textContent = gameState.score1;
   document.getElementById("finalScore2").textContent = gameState.score2;
   document.getElementById("gameOverOverlay").style.display = "flex";
+
+  // === DAILY CHALLENGE ===
+  const wonVsAi = config.gameMode === "ai" && gameState.winner === 1;
+  checkDailyChallenge({
+    gameId: 'pong',
+    wonVsAi,
+    ballSpeed: config.ballSpeed,        // 'slow', 'normal', 'fast', 'insane'
+    paddleSize: config.paddleSize,      // taille en px
+  });
 }
 
 // Pause

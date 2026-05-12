@@ -1,4 +1,5 @@
 import { initFullscreenSystem } from '../../../../js/fullScreen.js';
+import { checkDailyChallenge } from "../../../../js/utils/dailyChallenge.js"
 
 const WORLD_WIDTH = window.innerWidth;
 const WORLD_HEIGHT = window.innerHeight;
@@ -49,6 +50,11 @@ export function updateGameData(newlyClearedTiles = 0) {
   if (newlyClearedTiles > 0) {
     gameData.totalClearedTiles += newlyClearedTiles;
     gameData.coins += newlyClearedTiles * gameData.ratioCoins;
+
+    checkDailyChallenge({
+      gameId: 'snow-digger',
+      coins: gameData.coins,
+    });
   }
 
   // stats VISUELLES uniquement

@@ -7,6 +7,7 @@ import {
   getSoundEnabled,
   getMusicEnabled
 } from "../../../js/utils/audio.js";
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
 
 // Récupérer la configuration
 const config = JSON.parse(sessionStorage.getItem("ballSortConfig")) || {
@@ -314,6 +315,14 @@ function checkWin() {
 function showWinOverlay() {
   document.getElementById("finalMoves").textContent = gameState.moves;
   document.getElementById("finalTime").textContent = formatTime(gameState.time);
+
+  // ── Daily Challenge ───────────────────────────────
+  checkDailyChallenge({
+    gameId: 'ball-sort',
+    finishedInSec: gameState.time,
+    mode: config.difficulty,
+  });
+
   document.getElementById("winOverlay").style.display = "flex";
 }
 

@@ -79,6 +79,20 @@ body {
   font-size: 24px;
 }
 
+.pause-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+.pause-icon rect {
+  fill: #667eea;
+}
+
+.pause-icon rect:last-child {
+  fill: #764ba2;
+}
+
 /* ========================================
    GAME CONTAINER
 ======================================== */

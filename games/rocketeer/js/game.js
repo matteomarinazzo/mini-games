@@ -1,3 +1,5 @@
+import { checkDailyChallenge } from '../../../js/utils/dailyChallenge.js';
+
 // ============================================================
 // ROCKETEER
 // ============================================================
@@ -87,6 +89,13 @@ const Game = (() => {
         state.ghosts = JSON.parse(localStorage.getItem('rocketeer_ghosts') || '[]');
         state.running = true;
         state.startTime = performance.now();
+
+        // ── Daily Challenge : valeur fusée au lancement ──
+        const rocketValue = state.rocket?._buildCost || 0;
+        checkDailyChallenge({
+            gameId: 'rocketeer',
+            rocketValue: rocketValue,
+        });
 
         // Execute Stage 0 immediately upon launch
         stageRocket();
@@ -346,6 +355,14 @@ const Game = (() => {
                 setTimeScale(1);
             }
 
+            // ── Daily Challenge ──
+            const maxAltitudeKm = (state.maxDistance || 0) / 1000;
+            checkDailyChallenge({
+                gameId: 'rocketeer',
+                landed: false,
+                maxAltitudeKm: maxAltitudeKm,
+            });
+
             if (!state.paused) {
                 // Crash detection
                 if (state.state.crashed && !state.ended && !state._crashHandled) {
@@ -518,6 +535,14 @@ const Game = (() => {
         state.outOfFuel = true; // déclenche la fin normale
         state.inputs.throttle = 0;
         playRocketeerSound('success');
+
+        // ── Daily Challenge : atterrissage réussi ──
+        const maxAltitudeKm = (state.maxDistance || 0) / 1000;
+        checkDailyChallenge({
+            gameId: 'rocketeer',
+            landed: true,
+            maxAltitudeKm: maxAltitudeKm,
+        });
 
         // Fin immédiate
         state.ended = true;

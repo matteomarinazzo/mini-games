@@ -1,6 +1,6 @@
 import { gameData } from "../ctrl/mainCtrl.js";
-
 import { formatCoins } from "../../../../js/utils/formatNumber.js";
+import { checkDailyChallenge } from "../../../../js/utils/dailyChallenge.js"
 
 /* GESTION DES UPGRADES */
 
@@ -83,6 +83,11 @@ function onUpgradeShovel() {
     console.log("Pas assez de pièces pour agrandir la pelle !");
   }
   updateHUD();
+
+  checkDailyChallenge({
+    gameId: 'snow-digger',
+    shovelLevel: gameData.shovelSize,
+  });
 }
 
 function onUpgradeCoins() {
@@ -152,6 +157,11 @@ function onSpawnRateSkier() {
     gameData.coins -= cost;
     gameData.spawnRate += 1;
     console.log(`Taux de spawn augmenté ! Nouveau taux : ${gameData.spawnRate}`);
+
+    checkDailyChallenge({
+      gameId: 'snow-digger',
+      skiers: gameData.spawnRate,
+    });
   } else {
     console.log("Pas assez de pièces pour augmenter le taux de spawn !");
   }

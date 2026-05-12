@@ -26,6 +26,17 @@
         "contact": "Contact",
         "ads_support": "Soutenez Mini Games",
         "ads_message": "Une petite publicité nous aide à garder la plateforme gratuite !",
+        "daily_challenge": {
+            "btn_label": "Défi du jour",
+            "modal_title": "DÉFI DU JOUR",
+            "modal_game": "JEU",
+            "modal_reward": "{xp} XP si réussi",
+            "modal_button": "JOUER MAINTENANT",
+            "modal_not_ready": "Pas maintenant",
+            "success": "Défi du jour complété !",
+            "offline_title": "Connexion requise",
+            "offLine_message": "Le défi du jour nécessite une connexion internet."
+        },
         "games": {
             "battleship": {
                 "name": "Bataille navale",
@@ -520,7 +531,11 @@
         "cloud_id_label": "Ton ID de sauvegarde",
         "cloud_id_hint": "Conserve cet ID pour restaurer ta progression sur un autre appareil.",
         "cloud_import_placeholder": "Colle un ID de sauvegarde…",
-        "cloud_btn_import": "Importer"
+        "cloud_btn_import": "Importer",
+        "level": "Niveau",
+        "xp_hint": "Gagne de l'XP en réussissant les défis quotidiens",
+        "xp_to_next": "{xp} XP avant niveau {level}",
+        "level_up_title": "Niveau atteint !"
     },
     "badges": {
         "unlocked_title": "Badge débloqué !"

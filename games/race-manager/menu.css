@@ -68,5 +68,15 @@
 .choice small { display: block; color: var(--muted); }
 .dept-preview { margin-top: 1rem; }
 
+/* Étape 3 — variantes de loyauté */
+.driver__warn--hard  { color: #ef4444; } /* très fidèle → rouge */
+.driver__warn--cascade { color: #a78bfa; } /* cascade → violet */
+
 /* Étape 5 */
 .recap section { margin-bottom: 1.25rem; }
+
+/* Bloc cascade de transferts dans le récap */
+.transfers { margin-top: .5rem; }
+.transfers__list { display: grid; gap: .35rem; }
+.transfers__list li { padding: .4rem .6rem; border-left: 3px solid var(--line); border-radius: 0 6px 6px 0; font-size: .9rem; }
+.transfer-item--poach { border-left-color: #a78bfa; background: color-mix(in srgb, #a78bfa 8%, transparent); }

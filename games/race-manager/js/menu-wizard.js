@@ -137,13 +137,20 @@ export function startWizard({ slotId, mount, onExit }) {
   }
 
   function showDetails(d) {
+    const loyaltyLabel = d.teamId
+      ? d.loyalty >= 70 ? `Très fidèle à son écurie (${d.loyalty}/100) — difficile à recruter`
+        : d.loyalty >= 50 ? `Fidèle (${d.loyalty}/100) — peut être débauché par une équipe puissante`
+          : d.loyalty >= 30 ? `Neutre (${d.loyalty}/100) — ouvert à un changement d'écurie`
+            : `Peu attaché (${d.loyalty}/100) — très mobile sur le marché`
+      : 'Sans contrat — disponible immédiatement';
     showModal({
       title: `${d.displayName} (${d.abbr})`,
       body: h('div', {},
         h('p', { class: 'muted', text: `${CATEGORIES[d.category]} · ${d.nationality} · ${d.age != null ? `${d.age} ans` : 'âge inconnu'}${d.fictional ? ' · pilote fictif' : ''}` }),
         h('div', { class: 'stats' }, ratingBar('Note globale', driverOverall(d)), STAT_KEYS.map((k) => ratingBar(STAT_LABELS[k], d.stats[k]))),
         kv([['Potentiel', String(d.potential)], ['Expérience', `${d.experience} an(s)`], ['Prix de recrutement', formatMoney(d.cost)], ['Salaire annuel', formatMoney(d.salary)],
-          ['Écurie actuelle', d.teamId ? TEAM_NAME_BY_ID.get(d.teamId) : 'Aucune (disponible)']])),
+        ['Fidélité à l\'écurie', loyaltyLabel],
+        ['Écurie actuelle', d.teamId ? TEAM_NAME_BY_ID.get(d.teamId) : 'Aucune (disponible)']])),
       actions: [{ label: 'Fermer', value: true, autofocus: true }],
     });
   }
@@ -215,7 +222,7 @@ export function startWizard({ slotId, mount, onExit }) {
             h('strong', { text: d.displayName }), h('span', { class: 'tag', text: d.abbr }), h('span', { class: 'tag', text: CATEGORIES[d.category] }),
             selected ? h('span', { class: 'tag tag--sel', text: '✓ Sélectionné' }) : null),
           h('p', { class: 'driver__meta', text: `Note ${driverOverall(d)} · ${formatMoney(d.cost)} · ${d.teamId ? `Actuellement chez ${TEAM_NAME_BY_ID.get(d.teamId)}` : 'Sans écurie'}` }),
-          d.teamId ? h('p', { class: 'driver__warn', text: 'Sa place sera reprise par un pilote de réserve.' }) : null,
+          d.teamId ? h('p', { class: 'driver__warn', text: 'Son équipe devra lui trouver un remplaçant.' }) : null,
           h('div', { class: 'driver__actions' },
             h('button', { type: 'button', class: 'btn btn--small', 'aria-label': `Détails de ${d.displayName}`, text: 'Détails', onClick: () => showDetails(d) }),
             selected
@@ -231,7 +238,7 @@ export function startWizard({ slotId, mount, onExit }) {
     renderList();
     renderSummary();
     return h('div', {},
-      h('p', { text: 'Choisissez deux pilotes. Le prix total est déduit du budget de départ à la création de la partie. Un pilote déjà engagé en F1 quitte son écurie : un pilote de réserve prend sa place.' }),
+      h('p', { text: 'Choisissez deux pilotes. Le prix total est déduit du budget de départ à la création de la partie. Si vous recrutez un pilote actif en F1, son écurie lancera une recherche de remplaçant — pouvant déclencher une cascade de transferts.' }),
       summary, hint,
       h('div', { class: 'filters' }, field('Catégorie', cat), field('Note minimale', minR), field('Prix maximal (M€)', maxC), field('Trier par', sort)),
       count, list);
@@ -276,9 +283,7 @@ export function startWizard({ slotId, mount, onExit }) {
         h('p', { class: 'muted', text: `Note globale de l’écurie : ${teamOverall(team)}` })),
       h('section', {}, h('h3', { text: 'Difficulté' }), kv([['Note de départ des départements', START_LEVELS[state.startLevel].label], ['Difficulté d’amélioration', UPGRADE_LEVELS[state.upgradeLevel].label]])),
       h('section', {}, h('h3', { text: `Grille ${SEASON}` }), kv([['Écuries', String(save.teams.length)], ['Pilotes', String(save.drivers.length)]]),
-        plan.replacements.length
-          ? h('ul', { class: 'plain' }, plan.replacements.map((r) => h('li', { text: `${r.leavingName} quitte ${r.teamName} ; ${r.replacementName} le remplace.` })))
-          : h('p', { class: 'muted', text: 'Aucun pilote de la grille ne quitte son écurie.' })));
+        h('p', { class: 'muted', text: 'Les transferts éventuels des écuries adverses seront annoncés après la création de la partie.' })));
   }
   const validateRecapStep = () => (createNewGame(payload(), slotId).ok ? null : 'Une condition n’est plus remplie : revenez aux étapes précédentes.');
 
@@ -297,6 +302,23 @@ export function startWizard({ slotId, mount, onExit }) {
     const w = writeSlot(slotId, res.save);
     if (!w.ok) return fail(w.error);
     setLastSlot(slotId);
+
+    if (res.plan.replacements.length > 0) {
+      await showModal({
+        title: 'Cascade de transferts',
+        body: h('div', { class: 'transfers' },
+          h('p', { class: 'muted', text: 'Suite à votre recrutement, voici les mouvements effectués par les autres écuries dans l\'ordre :' }),
+          h('ul', { class: 'plain transfers__list' }, res.plan.replacements.map((r) => {
+            const icon = r.isPoaching ? '🔄' : '✅';
+            const origin = r.fromTeamId ? `ex-${r.fromTeamName}` : 'agent libre';
+            const text = `${icon} ${r.teamName} recrute ${r.replacementName} (${origin}) pour remplacer ${r.leavingName}.`;
+            return h('li', { class: `transfer-item${r.isPoaching ? ' transfer-item--poach' : ''}`, text });
+          }))
+        ),
+        actions: [{ label: 'Continuer vers le QG', value: true, autofocus: true, variant: 'btn--primary' }]
+      });
+    }
+
     location.href = `home.html?slot=${slotId}`;
   }
 

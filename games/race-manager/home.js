@@ -10,8 +10,10 @@ import { readSlot, writeSlot, downloadSave, setLastSlot } from './js/core/storag
 import { driverOverall, teamOverall, validateTeamName, validateColor } from './js/core/validation.js';
 import { TEAMS_2026 } from './js/data/teams-2026.js';
 import { formatMoney, formatPlayTime, formatGameDate } from './js/core/utils.js';
-import { h, kv, ratingBar, toast } from './js/ui.js';
+import { h, kv, ratingBar, toast, confirmDialog, showModal } from './js/ui.js';
 import { runImportFlow } from './js/import-flow.js';
+import { CALENDAR_2026 } from './js/data/calendar-2026.js';
+import { advanceOneDay, advanceToNextEvent, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost } from './js/core/progression.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);
@@ -82,28 +84,207 @@ function run(save) {
   function driverCard(d) {
     return h('article', { class: 'card driver-card' },
       h('div', { class: 'driver-card__head' },
-        h('div', {}, h('h3', { text: d.name }), h('p', { class: 'muted', text: `${d.abbr} · ${CATEGORIES[d.category]} · ${d.nationality}${d.age != null ? ` · ${d.age} ans` : ''}` })),
+        h('div', {}, h('h3', { text: d.name }), h('p', { class: 'muted', text: `${d.abbr} · ${d.nationality}${d.age != null ? ` · ${d.age} ans` : ''}` })),
         h('div', { class: 'ovr', 'aria-label': `Note globale ${driverOverall(d)}` }, h('span', { text: String(driverOverall(d)) }), h('small', { text: 'Note' }))),
       h('div', { class: 'stats' }, STAT_KEYS.map((k) => ratingBar(STAT_LABELS[k], d.stats[k]))),
       kv([['Salaire annuel', formatMoney(d.contract.salary)], ['Contrat', `jusqu’à la fin de la saison ${d.contract.endSeason}`]]));
   }
 
+  const eventTitle = (event) => {
+    if (!event) return 'Saison terminée';
+    if (event.type === 'upgrade') return `Amélioration terminée · ${DEPT_LABELS[event.upgrade.dept]}`;
+    const labels = { training: 'Entraînement pilotes', qualifying: 'Qualifications', race: 'Course' };
+    return `${labels[event.type]} · R${event.round.round} · ${event.round.name}`;
+  };
+
+  function eventIcon(type) {
+    const paths = {
+      training: ['M5 3v4', 'M19 3v4', 'M3 8h18', 'M5 12h4v7H5z', 'M15 12h4v7h-4z'],
+      qualifying: ['M5 4h10l-2 5 2 5H5z', 'M5 4v16'],
+      race: ['M4 16h16', 'M6 16l2-7h8l2 7', 'M9 9V6h6v3', 'M7 19h.01', 'M17 19h.01'],
+      upgrade: ['M14 4a4 4 0 0 0-4 5l-6 6 5 5 6-6a4 4 0 0 0 5-4l-4 1z'],
+    };
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', `event-icon event-icon--${type}`);
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    for (const d of paths[type] || []) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      svg.append(path);
+    }
+    return svg;
+  }
+
+  function weekCalendarNode() {
+    const events = eventsForWeek(save, save.gameDate);
+    const weekDates = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(`${save.gameDate}T12:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + index);
+      return date.toISOString().slice(0, 10);
+    });
+    const labels = { training: 'Entraînement', qualifying: 'Qualifications V3', race: 'Course V3', upgrade: 'Amélioration terminée' };
+    const formatDay = new Intl.DateTimeFormat('fr-CH', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+    return h('section', { class: 'weekly-calendar', 'aria-labelledby': 'weekTitle' },
+      h('div', { class: 'weekly-calendar__head' },
+        h('div', {}, h('h2', { id: 'weekTitle', text: 'Les 7 prochains jours' }), h('p', { class: 'muted', text: `Du ${formatGameDate(weekDates[0])} au ${formatGameDate(weekDates.at(-1))}.` })),
+        h('div', { class: 'weekly-calendar__actions' },
+          h('button', { type: 'button', class: 'btn', text: 'Avancer d’un jour', onClick: advanceDay, disabled: !nextProgression(save) }),
+          h('button', { type: 'button', class: 'btn btn--primary', text: 'Aller au prochain événement', onClick: advanceCalendar, disabled: !nextProgression(save) }))),
+      h('div', { class: 'week-grid' }, weekDates.map((date) => {
+        const daysEvents = events.filter((event) => event.date === date && (event.type !== 'upgrade' || event.upgrade.teamId === save.playerTeamId));
+        return h('article', { class: `week-day${date === save.gameDate ? ' is-today' : ''}` },
+          h('h3', { text: formatDay.format(new Date(`${date}T12:00:00Z`)) }),
+          daysEvents.length
+            ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', { text: labels[event.type] }), event.round ? h('small', { text: `R${event.round.round}` }) : null)))
+            : h('p', { class: 'week-empty', text: 'Aucun événement' }));
+      })));
+  }
+
+  async function advanceCalendar() {
+    const next = nextProgression(save);
+    if (!next) return toast('La saison 2026 est terminée.', { error: true });
+    if (next.blocked) {
+      await showModal({
+        title: next.type === 'qualifying' ? 'Qualifications disponibles en V3' : 'Course disponible en V3',
+        body: h('p', { text: `${next.round.name} est prévu le ${formatGameDate(next.date)}. Cette étape n’est pas simulée dans la V2, afin de ne pas créer de résultat fictif.` }),
+      });
+      return;
+    }
+
+    const btns = document.querySelectorAll('.weekly-calendar__actions button');
+    btns.forEach(b => b.disabled = true);
+
+    while (true) {
+      const result = advanceOneDay(save);
+      persist();
+      paintHeader();
+
+      // Update UI without triggering scroll/focus of show()
+      main.replaceChildren(panels['home'].build());
+
+      if (!result.ok || result.events?.length > 0) {
+        if (result.blocked) {
+          await showModal({ title: result.error, body: h('p', { text: `${eventTitle(result.event)} est prévu le ${formatGameDate(result.event.date)}. Cette étape n’est pas simulée dans la V2.` }) });
+        } else if (result.events?.length > 0) {
+          toast(`Événement exécuté : ${eventTitle(result.event)}.`);
+        } else if (!result.ok) {
+          toast(result.error, { error: true });
+        }
+        break;
+      }
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+  }
+
+  async function advanceDay() {
+    const result = advanceOneDay(save);
+    if (!result.ok) {
+      const written = result.events?.length ? persist() : { ok: true };
+      paintHeader();
+      show('home');
+      if (result.blocked) await showModal({ title: result.error, body: h('p', { text: `${eventTitle(result.event)} est prévu le ${formatGameDate(result.event.date)}. Cette étape n’est pas simulée dans la V2.` }) });
+      if (!written.ok) toast(written.error, { error: true });
+      return;
+    }
+    const written = persist();
+    paintHeader();
+    show('home');
+    toast(written.ok ? (result.event ? `Événement exécuté : ${eventTitle(result.event)}.` : `Calendrier avancé au ${formatGameDate(save.gameDate)}.`) : written.error, { error: !written.ok });
+  }
+
+  async function orderUpgrade(dept) {
+    const team = teamOf();
+    const cost = upgradeCost(team, dept, save.difficulty.upgradeDifficulty);
+    const approved = await confirmDialog({
+      title: `Améliorer ${DEPT_LABELS[dept]} ?`,
+      message: `Coût immédiat : ${formatMoney(cost)}. La note augmentera de 1 point dans trois jours simulés.`,
+      confirmLabel: 'Lancer l’amélioration',
+    });
+    if (!approved) return;
+    const result = startUpgrade(save, team.id, dept);
+    if (!result.ok) return toast(result.error, { error: true });
+    const written = persist();
+    paintHeader();
+    show('home');
+    toast(written.ok ? 'Amélioration planifiée.' : written.error, { error: !written.ok });
+  }
+
+  function trainingHistoryNode() {
+    const last = save.activities.trainingHistory[0];
+    if (!last) return h('p', { class: 'muted', text: 'Aucun entraînement terminé. Le premier est prévu le mercredi précédant le Grand Prix d’Australie.' });
+    return h('div', { class: 'history-list' }, save.activities.trainingHistory.slice(0, 3).map((entry) =>
+      h('article', { class: 'history-entry' },
+        h('strong', { text: `R${CALENDAR_2026.find((round) => round.id === entry.roundId)?.round} · ${formatGameDate(entry.date)}` }),
+        entry.gains.map((gain) => h('p', { text: `${gain.name} : note ${gain.before} → ${gain.after} · +${(gain.statsAfter.start - gain.statsBefore.start).toFixed(2)} par statistique` }))
+      )));
+  }
+
   function homePanel() {
     const t = teamOf();
     const mine = save.drivers.filter((d) => d.teamId === t.id);
+    const next = nextProgression(save);
+    const activeUpgrades = save.activities.upgrades.filter((upgrade) => upgrade.teamId === t.id);
     return h('div', { class: 'stack' },
-      h('section', { class: 'card hero' },
+      h('section', { class: 'card hero dashboard-head' },
         h('h1', { text: t.name }),
-        kv([['Emplacement', String(slotId)], ['Saison', `${SEASON} · ${formatGameDate(save.gameDate)} (date simulée)`], ['Solde actuel', formatMoney(t.balance)], ['Temps de jeu', formatPlayTime(save.playTimeSeconds)],
-        ['Difficulté', `Départements : ${START_LEVELS[save.difficulty.startingDepartmentLevel].label} · Améliorations : ${UPGRADE_LEVELS[save.difficulty.upgradeDifficulty].label}`]])),
-      h('section', { class: 'card card--notice', role: 'note' },
-        h('h2', { text: 'Version 1 : création de l’écurie' }),
-        h('p', { text: 'Aucun calendrier n’est encore jouable : la saison n’a pas commencé et aucune course, qualification ou amélioration n’est disponible pour l’instant. Vous pouvez consulter votre écurie, enregistrer et exporter votre partie.' })),
+        h('div', { class: 'dashboard-head__grid' },
+          kv([['Date simulée', formatGameDate(save.gameDate)], ['Saison', `${SEASON} · R${save.calendar.currentRound || 1}/24`], ['Solde actuel', formatMoney(t.balance)], ['Temps de jeu', formatPlayTime(save.playTimeSeconds)]]),
+          h('div', { class: 'next-event' },
+            h('span', { class: 'eyebrow', text: next?.blocked ? 'Étape suivante' : 'Prochain événement' }),
+            h('strong', { text: eventTitle(next) }),
+            h('p', { class: 'muted', text: next ? formatGameDate(next.date) : 'La saison est terminée.' }))
+        ),
+        h('p', { class: 'muted', text: `Difficulté des améliorations : ${UPGRADE_LEVELS[save.difficulty.upgradeDifficulty].label}.` })
+      ),
+      weekCalendarNode(),
+      h('section', { class: 'dashboard-grid' },
+        h('article', { class: 'card' }, h('h2', { text: 'Entraînements' }), trainingHistoryNode()),
+        h('article', { class: 'card' }, h('h2', { text: 'Amélioration en cours' }),
+          activeUpgrades.length
+            ? h('div', { class: 'active-upgrades' }, activeUpgrades.map((upgrade) => h('p', {}, h('strong', { text: DEPT_LABELS[upgrade.dept] }), ` · fin prévue le ${formatGameDate(upgrade.completesOn)} · ${formatMoney(upgrade.cost)} payé.`)))
+            : h('p', { class: 'muted', text: 'Aucune amélioration en cours.' }))),
       h('section', { 'aria-labelledby': 'drvTitle' }, h('h2', { id: 'drvTitle', text: 'Vos pilotes' }), h('div', { class: 'grid2' }, mine.map(driverCard))),
       h('section', { class: 'card', 'aria-labelledby': 'depTitle' },
         h('h2', { id: 'depTitle', text: 'Départements' }),
-        DEPT_KEYS.map((k) => ratingBar(DEPT_LABELS[k], t.departmentRatings[k])),
-        h('p', { class: 'overall', text: `Note globale de l’écurie : ${teamOverall(t)}` })));
+        h('div', { class: 'upgrade-grid' }, DEPT_KEYS.map((k) => {
+          const cost = upgradeCost(t, k, save.difficulty.upgradeDifficulty);
+          return h('div', { class: 'upgrade-option' }, ratingBar(DEPT_LABELS[k], t.departmentRatings[k]), h('button', { type: 'button', class: 'btn btn--small', text: `Améliorer · ${formatMoney(cost)}`, onClick: () => orderUpgrade(k), disabled: activeUpgrades.some((upgrade) => upgrade.dept === k) || t.departmentRatings[k] >= 100 || t.balance < cost }));
+        })),
+        h('p', { class: 'overall', text: `Note globale de l’écurie : ${teamOverall(t)}` })),
+      h('section', { class: 'card' }, h('h2', { text: 'Journal de l’écurie' }),
+        save.eventLog.length ? h('ul', { class: 'event-log' }, save.eventLog.slice(0, 8).map((entry) => h('li', {}, h('time', { text: formatGameDate(entry.date) }), entry.message))) : h('p', { class: 'muted', text: 'Les événements importants de la saison apparaîtront ici.' }))
+    );
+  }
+
+  function roundCalendarCard(round) {
+    const passed = round.raceDate < save.gameDate;
+    return h('article', { class: `card season-round${passed ? ' is-past' : ''}` },
+      h('div', { class: 'season-round__head' }, h('div', {}, h('h3', { text: `R${round.round} · ${round.name}` }), h('p', { class: 'muted', text: round.circuit })), h('span', { class: 'badge', text: roundStatus(round, save.gameDate) })),
+      h('ol', { class: 'round-events' },
+        ...round.trainingDates.map((date) => h('li', {}, eventIcon('training'), h('span', { text: `Entraînement pilotes · ${formatGameDate(date)}` }))),
+        h('li', {}, eventIcon('qualifying'), h('span', { text: `Qualifications · ${formatGameDate(round.qualifyingDate)} · V3` })),
+        h('li', {}, eventIcon('race'), h('span', { text: `Course · ${formatGameDate(round.raceDate)} · V3` }))),
+    );
+  }
+
+  function calendarPanel() {
+    const passed = CALENDAR_2026.filter((round) => round.raceDate < save.gameDate);
+    const upcoming = CALENDAR_2026.filter((round) => round.raceDate >= save.gameDate);
+    const playerUpgrades = save.activities.upgrades.filter((upgrade) => upgrade.teamId === save.playerTeamId);
+    return h('div', { class: 'stack' },
+      h('section', { class: 'card' }, h('h1', { text: `Calendrier ${SEASON}` }), h('p', { class: 'muted', text: 'Chaque week-end comprend trois journées d’entraînement, les qualifications du samedi et la course du dimanche.' })),
+      playerUpgrades.length ? h('section', { class: 'card' }, h('h2', { text: 'Améliorations planifiées' }), h('ul', { class: 'round-events' }, playerUpgrades.map((upgrade) => {
+        const team = save.teams.find((entry) => entry.id === upgrade.teamId);
+        return h('li', {}, eventIcon('upgrade'), h('span', { text: `${team.name} · ${DEPT_LABELS[upgrade.dept]} · fin le ${formatGameDate(upgrade.completesOn)}` }));
+      }))) : null,
+      passed.length ? h('section', { class: 'season-section' }, h('h2', { text: 'Manches passées' }), h('div', { class: 'season-rounds' }, passed.map(roundCalendarCard))) : null,
+      h('section', { class: 'season-section' }, h('h2', { text: 'Manches à venir' }), h('div', { class: 'season-rounds' }, upcoming.map(roundCalendarCard))));
   }
 
   function settingsPanel() {
@@ -156,6 +337,7 @@ function run(save) {
 
   const panels = {
     home: { title: 'Accueil', build: homePanel },
+    calendar: { title: 'Calendrier', build: calendarPanel },
     standings: { title: 'Classements', build: () => placeholder('Classements', 'Les classements pilotes et écuries apparaîtront quand des courses pourront être disputées.') },
     drivers: { title: 'Pilotes / mercato', build: () => placeholder('Pilotes / mercato', 'La gestion des contrats et des transferts de pilotes sera ajoutée plus tard.') },
     settings: { title: 'Paramètres et sauvegarde', build: settingsPanel },

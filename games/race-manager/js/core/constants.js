@@ -5,7 +5,7 @@
  */
 export const GAME_ID = 'mon-jeu';
 export const GAME_TITLE = 'The Race Manager';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 3;
 export const SEASON = 2026;
 export const START_DATE = '2026-01-01';
 export const SLOT_COUNT = 3;
@@ -73,3 +73,7 @@ export const UPGRADE_LEVELS = {
   normal: { label: 'Normale', costMultiplier: 1, description: 'Coût des améliorations standard (effet appliqué à partir de la V2).' },
   hard: { label: 'Difficile', costMultiplier: 1.3, description: 'Améliorations 30 % plus chères (effet appliqué à partir de la V2).' },
 };
+
+/** Règles V2 de progression : les notes pilotes restent décimales en sauvegarde. */
+export const TRAINING_GAIN = 0.12;
+export const UPGRADE_DURATION_DAYS = 3;

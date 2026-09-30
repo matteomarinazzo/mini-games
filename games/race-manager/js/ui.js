@@ -79,17 +79,23 @@ export async function confirmDialog({ title, message, confirmLabel = 'Confirmer'
   return res === true;
 }
 
-let toastTimer;
 /** Notification annoncée par les lecteurs d'écran (région aria-live). */
 export function toast(message, { error = false } = {}) {
-  let el = document.getElementById('toast');
-  if (!el) {
-    el = h('div', { id: 'toast', class: 'toast', role: 'status', 'aria-live': 'polite' });
-    document.body.append(el);
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = h('div', { id: 'toast-container', role: 'status', 'aria-live': 'polite' });
+    document.body.append(container);
   }
-  el.textContent = message;
-  el.classList.toggle('toast--error', error);
+  
+  const el = h('div', { class: `toast${error ? ' toast--error' : ''}`, text: message });
+  container.append(el);
+  
+  // Force le reflow pour que l'animation CSS se déclenche
+  el.getBoundingClientRect();
   el.classList.add('is-visible');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('is-visible'), 5000);
+  
+  setTimeout(() => {
+    el.classList.remove('is-visible');
+    setTimeout(() => el.remove(), 250); // Attend la fin de la transition CSS
+  }, 5000);
 }

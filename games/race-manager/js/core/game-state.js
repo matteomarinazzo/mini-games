@@ -64,9 +64,9 @@ function toStateDriver(ref, teamId, signingCost = 0) {
  *         | { ok: false, error: string }}
  */
 export function planGrid(selectedIds, refDrivers = DRIVERS_2026, refTeams = TEAMS_2026) {
-  const byId       = new Map(refDrivers.map((d) => [d.id, d]));
-  const teamById   = new Map(refTeams.map((t) => [t.id, t]));
-  const selected   = selectedIds.map((id) => byId.get(id));
+  const byId = new Map(refDrivers.map((d) => [d.id, d]));
+  const teamById = new Map(refTeams.map((t) => [t.id, t]));
+  const selected = selectedIds.map((id) => byId.get(id));
 
   if (selected.length !== 2 || selected.some((d) => !d) || selected[0].id === selected[1].id) {
     return { ok: false, error: 'Sélection de pilotes invalide.' };
@@ -342,7 +342,9 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
     difficulty: { startingDepartmentLevel: input.startLevel, upgradeDifficulty: input.upgradeLevel },
     teams,
     drivers: plan.drivers,
-    calendar: { currentRound: 0, completedRounds: [] },
+    calendar: { currentRound: 0, completedRounds: [], trainingCompletedEvents: [] },
+    activities: { upgrades: [], trainingHistory: [] },
+    eventLog: [],
     standings: { drivers: [], teams: [] },
   };
   const check = validateSave(save);
@@ -350,8 +352,22 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
   return { ok: true, save, plan, totalCost: sel.totalCost };
 }
 
-/** Point d'extension : conversion des anciens schémas vers le schéma courant (V1 : rien à faire). */
+/** Migrations V1/V2 → V3 : conserve chaque slot et initialise les événements de saison. */
 export function migrateSave(save) {
+  if (!save || typeof save !== 'object') return save;
+  if (save.schemaVersion === 1) {
+    return {
+      ...save,
+      schemaVersion: SCHEMA_VERSION,
+      calendar: { ...save.calendar, trainingCompletedEvents: [] },
+      activities: { upgrades: [], trainingHistory: [] },
+      eventLog: [{ id: 'migration-v3', date: save.gameDate, type: 'migration', message: 'Sauvegarde V1 mise à jour pour le calendrier de saison.' }],
+    };
+  }
+  if (save.schemaVersion === 2) {
+    const completed = (save.calendar?.trainingCompletedRounds || []).map((roundId) => `${roundId}-legacy`);
+    return { ...save, schemaVersion: SCHEMA_VERSION, calendar: { ...save.calendar, trainingCompletedEvents: completed } };
+  }
   return save;
 }
 
@@ -371,7 +387,7 @@ export function summarizeSave(save) {
     lastPlayedAt: save.lastPlayedAt,
     playTimeSeconds: save.playTimeSeconds,
     balance: team.balance,
-    raceStatus: started ? `Prochaine course : manche ${save.calendar.currentRound + 1}` : 'Saison non commencée',
+    raceStatus: started ? `Prochaine course : R${save.calendar.currentRound + 1}` : 'Saison non commencée',
     drivers,
     startLevelLabel: START_LEVELS[save.difficulty.startingDepartmentLevel].label,
     upgradeLabel: UPGRADE_LEVELS[save.difficulty.upgradeDifficulty].label,

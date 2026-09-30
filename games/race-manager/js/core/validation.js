@@ -142,8 +142,11 @@ export function validateSave(s) {
   if (!isObj(s.difficulty) || !(s.difficulty.startingDepartmentLevel in START_LEVELS) || !(s.difficulty.upgradeDifficulty in UPGRADE_LEVELS)) {
     err('Difficulté invalide.');
   }
-  if (!isObj(s.calendar) || !Number.isInteger(s.calendar.currentRound) || s.calendar.currentRound < 0 || !Array.isArray(s.calendar.completedRounds)) {
+  if (!isObj(s.calendar) || !Number.isInteger(s.calendar.currentRound) || s.calendar.currentRound < 0 || !Array.isArray(s.calendar.completedRounds) || !Array.isArray(s.calendar.trainingCompletedEvents)) {
     err('Calendrier invalide.');
+  }
+  if (!isObj(s.activities) || !Array.isArray(s.activities.upgrades) || !Array.isArray(s.activities.trainingHistory) || !Array.isArray(s.eventLog)) {
+    err('Activités de saison invalides.');
   }
   if (!isObj(s.standings) || !Array.isArray(s.standings.drivers) || !Array.isArray(s.standings.teams)) err('Classements invalides.');
 

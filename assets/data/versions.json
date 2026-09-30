@@ -1,7 +1,35 @@
 {
-    "currentVersion": "1.17.2026-05-12",
-    "lastUpdate": "2026-05-12",
+    "currentVersion": "1.20.2026-09-30",
+    "lastUpdate": "2026-09-30",
     "history": [
+        {
+            "version": "1.20.2026-09-30",
+            "date": "2026-09-30",
+            "changes": [
+                "Ajout de la V1 du jeu Race Manager"
+            ]
+        },
+        {
+            "version": "1.19.2026-06-06",
+            "date": "2026-06-06",
+            "changes": [
+                "Masquage du bouton buy me a coffee dans le profil",
+                "Ajout du jeu Minesweeper",
+                "Correction du bouton musique home",
+                "Correction erreur badge.js dans tous les jeux",
+                "Mise à jour automatique quand nouvelle version",
+                "Ajout de la statistique 'Nombre de sessions'",
+                "Mise à jour page about.html"
+            ]
+        },
+        {
+            "version": "1.18.2026-05-13",
+            "date": "2026-05-12",
+            "changes": [
+                "Mise à jour automatiqe des fichiers",
+                "Correction 404 badges.json dans les jeux"
+            ]
+        },
         {
             "version": "1.17.2026-05-12",
             "date": "2026-05-12",

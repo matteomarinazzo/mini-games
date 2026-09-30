@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.17.2026-05-12";
+const CACHE_NAME = "mini-games-cache-v1.17.2026-05-13";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -39,6 +39,7 @@ const ASSETS_TO_CACHE = [
     'js/utils/settingsUI.js',
     'js/utils/dailyChallenge.js',
     'js/utils/xpSystem.js',
+    'js/utils/secretManager.js',
 
     // Assets data
     'assets/data/games.json',
@@ -281,34 +282,26 @@ const ASSETS_TO_CACHE = [
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────
-
 self.addEventListener('install', (event) => {
-    // Force le SW à prendre le contrôle immédiatement sans attendre la fermeture des onglets
     self.skipWaiting();
-
     event.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
             console.log(`[SW] 📦 Mise en cache de ${CACHE_NAME}...`);
-
-            // Traitement par lots (batch) pour éviter ERR_INSUFFICIENT_RESOURCES sur mobile
             const BATCH_SIZE = 15;
             for (let i = 0; i < ASSETS_TO_CACHE.length; i += BATCH_SIZE) {
                 const batch = ASSETS_TO_CACHE.slice(i, i + BATCH_SIZE);
                 await Promise.all(
                     batch.map(async (url) => {
                         try {
-                            const cacheRequest = new Request(url);
-                            const response = await fetch(cacheRequest);
-
-                            // On accepte response.ok OU type 'opaque' (pour requêtes sans CORS direct)
+                            // ⚠️ IMPORTANT : cache: 'reload' force à bypasser le cache HTTP du navigateur
+                            const response = await fetch(url, { cache: 'reload' });
                             if (response.ok || response.type === 'opaque') {
-                                //console.log(`✅ Mis en cache : ${url}`);
                                 await cache.put(url, response);
                             } else {
                                 console.warn(`⚠️ Fichier ignoré (Status ${response.status}): ${url}`);
                             }
                         } catch (err) {
-                            console.error(`❌ Erreur réseau pour : ${url}`);
+                            console.error(`❌ Erreur : ${url}`);
                         }
                     })
                 );
@@ -317,48 +310,52 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// ─── 2. Activation ──────────────────────────────────────────────────────────
-
+// ─── 2. Activation ────────────────────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('[SW] 🗑️ Nettoyage ancien cache :', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
+        (async () => {
+            // Supprime tous les anciens caches
+            const cacheNames = await caches.keys();
+            await Promise.all(
+                cacheNames
+                    .filter(name => name !== CACHE_NAME)
+                    .map(name => {
+                        console.log('[SW] 🗑️ Suppression :', name);
+                        return caches.delete(name);
+                    })
             );
-        }).then(() => self.clients.claim())
+            await self.clients.claim();
+
+            // 🔥 Notifier tous les clients qu'une nouvelle version est active
+            const clients = await self.clients.matchAll({ type: 'window' });
+            clients.forEach(client => {
+                client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+            });
+        })()
     );
 });
 
-// ─── 3. Fetch : Stratégie Cache First + Ping Bypass ─────────────────────────
-
+// ─── 3. Fetch ─────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
+    const request = event.request;
 
-    // ÉTAPE A : Gérer le test de connexion (Ping)
-    // On force le réseau SANS passer par le cache pour avoir un résultat réel
+    // A. Ping bypass (avec AbortController pour libérer les connexions)
     if (url.search.includes('ping=')) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+
         return event.respondWith(
-            // Timeout explicitly in the SW because mobile browser SWs ignore the client's AbortController
-            Promise.race([
-                fetch(event.request),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1200))
-            ]).catch(() => {
-                // On renvoie une 200 (pas de rouge console) 
-                // mais avec un header spécial 'X-Offline'
-                return new Response('', {
-                    status: 200,
-                    headers: { 'X-Offline': 'true' }
-                });
-            })
+            fetch(request, { signal: controller.signal })
+                .then(res => {
+                    clearTimeout(timeoutId);
+                    return res;
+                })
+                .catch(() => new Response('', { status: 200, headers: { 'X-Offline': 'true' } }))
         );
     }
 
-    // ÉTAPE B : Éviter les erreurs console pour les scripts de pub/tracking hors-ligne
+    // B. Trackers / pubs
     if (url.hostname.includes('google-analytics.com') ||
         url.hostname.includes('googletagmanager.com') ||
         url.hostname.includes('profitablecpmratenetwork.com') ||
@@ -366,42 +363,75 @@ self.addEventListener('fetch', (event) => {
         url.hostname.includes('adtrafficquality.google') ||
         url.hostname.includes('pagead2.googlesyndication.com')) {
         return event.respondWith(
-            fetch(event.request).catch(() => new Response('', { status: 200, headers: { 'Content-Type': 'text/javascript' } }))
+            fetch(request).catch(() => new Response('', { status: 200, headers: { 'Content-Type': 'text/javascript' } }))
         );
     }
 
-    // ÉTAPE C : Stratégie Cache First pour tout le reste
-    event.respondWith(
-        caches.match(event.request, { ignoreSearch: true }).then((cached) => {
-            // 1. Si présent en cache, on sert immédiatement
-            if (cached) return cached;
+    // C. 🔥 NETWORK FIRST (avec timeout) pour HTML + versions.json + sw.js
+    //    => garantit que les utilisateurs voient la dernière version, mais sans bloquer si le réseau est lent
+    const isHTML = request.mode === 'navigate' ||
+        request.destination === 'document' ||
+        url.pathname.endsWith('.html');
+    const isVersionFile = url.pathname.endsWith('versions.json') ||
+        url.pathname.endsWith('sw.js');
 
-            // 2. Sinon, on tente le réseau
-            return fetch(event.request).then((response) => {
-                // Mise en cache dynamique des Google Fonts (CSS et polices)
-                if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
+    if (isHTML || isVersionFile) {
+        return event.respondWith(
+            new Promise((resolve) => {
+                let isResolved = false;
+                const timeoutId = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        caches.match(request, { ignoreSearch: true })
+                            .then(cached => resolve(cached || caches.match('index.html')));
+                    }
+                }, 3000); // 3 secondes de tolérance max
+
+                fetch(request)
+                    .then(response => {
+                        if (!isResolved) {
+                            isResolved = true;
+                            clearTimeout(timeoutId);
+                            if (response && response.ok) {
+                                const clone = response.clone();
+                                caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+                            }
+                            resolve(response);
+                        }
+                    })
+                    .catch(() => {
+                        if (!isResolved) {
+                            isResolved = true;
+                            clearTimeout(timeoutId);
+                            caches.match(request, { ignoreSearch: true })
+                                .then(cached => resolve(cached || caches.match('index.html')));
+                        }
                     });
+            })
+        );
+    }
+
+    // D. CACHE FIRST pour le reste (CSS, JS, images, fonts)
+    event.respondWith(
+        caches.match(request, { ignoreSearch: true }).then(cached => {
+            if (cached) return cached;
+            return fetch(request).then(response => {
+                if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
                 }
                 return response;
-            }).catch(() => {
-                // 3. Fallback en cas de panne réseau totale
-                if (event.request.mode === 'navigate') {
-                    return caches.match('index.html');
-                }
+            }).catch((err) => {
+                console.error('[SW] Échec fetch:', request.url, err);
                 return new Response('Hors-ligne', { status: 404 });
             });
         })
     );
 });
 
-// Forcer la mise à jour du cache
-self.addEventListener("install", event => {
-    self.skipWaiting();
-});
-
-self.addEventListener("activate", event => {
-    clients.claim();
+// ─── 4. Écoute des messages du client ─────────────────────────────────────────
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

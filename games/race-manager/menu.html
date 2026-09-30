@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Race Manager – Sauvegardes | Mini‑Games</title>
+
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/mon-jeu/" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="menu.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏎️</text></svg>" />
+</head>
+
+<body class="am-page page-menu">
+  <header class="topbar">
+    <a class="btn btn--ghost" href="../../index.html">← Retour</a>
+    <h1>The Race Manager</h1>
+  </header>
+
+  <main class="container" id="main">
+    <div id="storageBanner" class="banner" role="alert" hidden></div>
+
+    <section id="slotsView" aria-labelledby="slotsTitle">
+      <div class="section-head">
+        <h2 id="slotsTitle" tabindex="-1">Vos sauvegardes</h2>
+      </div>
+      <div id="slots" class="slots"></div>
+      <p class="muted">Les parties sont enregistrées dans ce navigateur. Exportez-les en JSON depuis le menu principal
+        pour les conserver ou les transférer.</p>
+    </section>
+
+    <section id="wizardView" aria-label="Création d'une nouvelle partie" hidden></section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>
+    <p class="container">Ce jeu nécessite JavaScript.</p>
+  </noscript>
+
+  <script type="module" src="menu.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

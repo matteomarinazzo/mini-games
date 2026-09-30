@@ -1,0 +1,414 @@
+/* The Race Manager — styles communs. Préfixes de portée : pages du jeu uniquement (body.am-*). */
+:root {
+  --bg: #0b0f16;
+  --surface: #131a25;
+  --surface-2: #1b2433;
+  --line: #2b3648;
+  --text: #eef2f8;
+  --muted: #a3afc2;
+  --accent: #ffc21a;
+  --team: var(--accent);
+  --danger: #ff6b70;
+  --ok: #45d99a;
+  --radius: 12px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body.am-page {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--font);
+  font-variant-numeric: tabular-nums;
+}
+
+.am-page h1,
+.am-page h2,
+.am-page h3 {
+  line-height: 1.2;
+  margin: 0 0 .5rem;
+}
+
+.am-page h1 {
+  font-size: 1.7rem;
+}
+
+.am-page h2 {
+  font-size: 1.3rem;
+}
+
+.am-page h3 {
+  font-size: 1.05rem;
+}
+
+.am-page p {
+  margin: 0 0 .75rem;
+}
+
+.am-page a {
+  color: inherit;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.am-page [hidden] {
+  display: none !important;
+}
+
+/* Focus clavier visible partout */
+.am-page :focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #000;
+}
+
+/* Mise en page */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  background: var(--surface);
+  border-bottom: 3px solid var(--team);
+}
+
+.topbar h1 {
+  font-size: 1.15rem;
+  margin: 0;
+  flex: 1;
+}
+
+.container {
+  width: min(100%, 68rem);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Boutons (cibles de 44 px minimum pour le pouce) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 44px;
+  padding: .5rem 1rem;
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--muted);
+}
+
+.btn--primary {
+  background: var(--team);
+  border-color: var(--team);
+  color: #0b0f16;
+}
+
+.btn--primary:hover {
+  filter: brightness(1.1);
+  border-color: var(--team);
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+.btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #1a0506;
+}
+
+.btn--danger-ghost {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn--small {
+  min-height: 40px;
+  padding: .3rem .8rem;
+  font-size: .95rem;
+}
+
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* État d'erreur : bouton rouge, jamais le seul indicateur (un message texte l'accompagne) */
+.btn.is-error:disabled {
+  background: #4a1418;
+  border-color: var(--danger);
+  color: #ffd6d8;
+  opacity: 1;
+}
+
+/* Formulaires */
+.field {
+  display: grid;
+  gap: .3rem;
+  margin-bottom: .9rem;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field--inline {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  padding: .5rem .75rem;
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  background: #0d131c;
+  color: var(--text);
+  font: inherit;
+}
+
+input[type="range"] {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--team);
+}
+
+.color-input {
+  width: 64px;
+  height: 44px;
+  padding: 2px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 0 0 1rem;
+  padding: .75rem 1rem 1rem;
+}
+
+legend {
+  font-weight: 700;
+  padding: 0 .4rem;
+}
+
+.form-error {
+  color: #ffd1d3;
+  background: #3a1216;
+  border: 2px solid var(--danger);
+  border-radius: 10px;
+  padding: .6rem .8rem;
+  margin: .75rem 0;
+  font-weight: 600;
+}
+
+/* Cartes et listes de valeurs */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid2 {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-bottom: .75rem;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .25rem 1rem;
+  margin: 0 0 .75rem;
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  display: inline-block;
+  padding: .1rem .6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.badge--ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.badge--bad {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.dot {
+  display: inline-block;
+  width: .9em;
+  height: .9em;
+  border-radius: 50%;
+  background: var(--c, var(--team));
+  border: 2px solid #fff;
+  vertical-align: -.1em;
+  margin-right: .4em;
+}
+
+.team-name {
+  font-weight: 700;
+}
+
+/* Jauges de notes : la valeur numérique est toujours affichée */
+.rating {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .1rem .75rem;
+  align-items: center;
+  margin-bottom: .45rem;
+}
+
+.rating__num {
+  font-weight: 800;
+}
+
+.rating__bar {
+  grid-column: 1 / -1;
+  height: 6px;
+  background: #0d131c;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rating__bar i {
+  display: block;
+  height: 100%;
+  width: var(--v);
+  background: var(--team);
+}
+
+/* Dialogues natifs */
+.modal {
+  width: min(92vw, 30rem);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1.25rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.modal--wide {
+  width: min(94vw, 40rem);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, .7);
+}
+
+.modal__title {
+  margin-bottom: .75rem;
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* Notification */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translate(-50%, 150%);
+  max-width: min(92vw, 30rem);
+  padding: .75rem 1rem;
+  border-radius: 10px;
+  background: #fff;
+  color: #0b0f16;
+  font-weight: 700;
+  transition: transform .2s;
+  z-index: 50;
+}
+
+.toast.is-visible {
+  transform: translate(-50%, 0);
+}
+
+.toast--error {
+  background: var(--danger);
+}
+
+.banner {
+  background: #3a2a06;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: none;
+  }
+}

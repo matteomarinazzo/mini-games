@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Race Manager – Menu principal | Mini‑Games</title>
+
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/mon-jeu/" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="home.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏎️</text></svg>" />
+</head>
+
+<body class="am-page page-home">
+  <header class="topbar">
+    <a class="btn btn--ghost" id="backLink" href="menu.html">← Sauvegardes</a>
+    <div class="topbar__team"><span class="dot" aria-hidden="true"></span><strong id="hdrTeam"></strong></div>
+    <div class="topbar__balance" id="hdrBalance"></div>
+  </header>
+
+  <nav class="tabs" id="gameNav" aria-label="Navigation principale">
+    <button type="button" data-panel="home" aria-current="page"><span class="ico" aria-hidden="true">🏁</span><span
+        class="lbl">Accueil</span></button>
+    <button type="button" data-panel="standings"><span class="ico" aria-hidden="true">🏆</span><span
+        class="lbl">Classements</span></button>
+    <button type="button" data-panel="drivers"><span class="ico" aria-hidden="true">👤</span><span
+        class="lbl">Pilotes</span></button>
+    <button type="button" data-panel="settings"><span class="ico" aria-hidden="true">⚙</span><span
+        class="lbl">Paramètres</span></button>
+  </nav>
+
+  <main class="container" id="content" tabindex="-1"></main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>
+    <p class="container">Ce jeu nécessite JavaScript.</p>
+  </noscript>
+
+  <script type="module" src="home.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

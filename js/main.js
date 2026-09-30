@@ -4,7 +4,7 @@ import { showBMC, hideBMC } from './BuyMeACoffee.js';
 import {
   playGameSound,
   startMenuMusic,
-  stopMenuMusic,
+  toggleMenuMusic,
   toggleSound,
   getMusicEnabled,
   getSoundEnabled
@@ -222,7 +222,7 @@ function generateGameCards() {
         style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
       </div>
       <span
-        style="color: #fff; font-size: 1.4em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); white-space: nowrap;">${t("menu.categories." + title)}</span>
+        style="color: #fff; font-size: 1.4em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); white-space: nowrap;">${title}</span>
       <div
         style="flex-grow: 1; height: 2px; border-radius: 2px; background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0.8)); opacity: 0.7; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);">
       </div>

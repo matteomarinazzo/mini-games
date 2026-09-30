@@ -24,7 +24,9 @@ let _badgeDefs = null;
 export async function loadBadgeDefs() {
     if (_badgeDefs) return _badgeDefs;
     try {
-        const res = await fetch('./assets/data/badges.json');
+        const url = new URL('../../assets/data/badges.json', import.meta.url);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         _badgeDefs = await res.json();
     } catch (e) {
         console.warn('[badges] Impossible de charger badges.json', e);

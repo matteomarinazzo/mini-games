@@ -1,4 +1,4 @@
-﻿import { database, auth, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate, getRemove } from "./config/firebase-config.js";
+import { database, auth, getRef, getGet, getSet, getRunTransaction, getOnValue, firebaseReady, getUpdate, getRemove } from "./config/firebase-config.js";
 import { checkRealConnection } from "./network.js";
 import { checkAndUnlockBadges } from "./utils/badges.js";
 
@@ -190,14 +190,15 @@ export async function joinRoom(gameId, playerData) {
     await waitForFirebase();
     const { _ref, _set, _get } = getDbTools();
     const isOnline = await checkRealConnection();
-    if (!isOnline || !database || !_set || !_get) return false;
+    if (!isOnline) return "Erreur: Pas de connexion Internet.";
+    if (!database || !_set || !_get) return "Erreur: Firebase non initialisé.";
 
     try {
         const snapshot = await _get(_ref(database, `rooms/${gameId}`));
 
         if (!snapshot.exists()) {
-            console.log("La room n'existe pas !");
-            return false;
+            console.log("La room n'existe pas ! Path: " + `rooms/${gameId}`);
+            return `Erreur: La room n'existe pas dans Firebase (recherché: rooms/${gameId})`;
         }
 
         const room = snapshot.val();
@@ -205,10 +206,9 @@ export async function joinRoom(gameId, playerData) {
         const players = room.players || {};
         const currentCount = Object.keys(players).length;
 
-        // ðŸ”’ EmpÃªcher si la room est pleine
         if (currentCount >= room.numPlayers) {
             console.log("La room est pleine !");
-            return false;
+            return "Erreur: La room est pleine.";
         }
 
         // âœ… Ajouter le joueur
@@ -222,7 +222,7 @@ export async function joinRoom(gameId, playerData) {
 
     } catch (e) {
         console.error(e);
-        return false;
+        return "Erreur Firebase: " + e.message;
     }
 }
 

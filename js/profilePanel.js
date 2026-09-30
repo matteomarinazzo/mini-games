@@ -5,7 +5,7 @@ import {
   checkAndUnlockBadges,
 } from './utils/badges.js';
 
-import { updateBMCTheme } from './BuyMeACoffee.js';
+import { hideBMC, showBMC, updateBMCTheme } from './BuyMeACoffee.js';
 import { getCloudUID, importUID, pushNow } from './firebaseWrk.js';
 import { checkRealConnection } from './network.js';
 import { getSecret } from './utils/secretManager.js';
@@ -1016,6 +1016,9 @@ function openPanel() {
   checkAndUnlockBadges(_totalGames);
   _updateProfileBadgeCount();
   document.getElementById('floating-menu-settings').style.display = 'none';
+
+  // Masquer BMC
+  hideBMC();
 }
 
 function closePanel() {
@@ -1025,6 +1028,9 @@ function closePanel() {
   document.body.classList.remove('no-scroll');
   setTimeout(() => panel.classList.add('hidden'), 350);
   document.getElementById('floating-menu-settings').style.display = 'flex';
+
+  // Afficher BMC
+  showBMC();
 }
 
 // ─── RENDER STATS ─────────────────────────────────────────────────────────────
@@ -1045,6 +1051,10 @@ function _renderStats() {
   // ── Streak (jours consécutifs) ──
   const streak = getStreak();
   setVal('pstat-streak', streak > 0 ? `${streak}j` : '—');
+
+  // ── Sessions ──
+  const sessions = getSessions();
+  setVal('pstat-session', sessions > 0 ? sessions : '—');
 
   // ── Jeu le plus joué ──
   const mostPlayed = getMostPlayedGame();
@@ -1134,9 +1144,21 @@ export function getStreak() {
   } catch { return 0; }
 }
 
+// ─── SESSIONS ───────────────────────────────────────────────────────────────────
+/**
+ * Calcule le nombre de sessions depuis mg_session_data.
+ * Structure localStorage 'mg_session_data' : { lastDate: 'YYYY-MM-DD', count: number }
+ * Appelé à chaque ouverture du panneau — la mise à jour est faite dans updateSession().
+ */
+export function getSessions() {
+  try {
+    return localStorage.getItem('mg_stat_games_played') || 0;
+  } catch { return 0; }
+}
+
 /**
  * À appeler à chaque lancement de jeu (depuis main.js via reportGamePlayed).
- * Met à jour le streak si nécessaire.
+ * Met à jour le session si nécessaire.
  */
 export function updateStreak() {
   try {

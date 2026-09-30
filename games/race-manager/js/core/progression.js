@@ -125,6 +125,12 @@ export function advanceToNextEvent(save) {
 export function advanceOneDay(save) {
   const targetDate = addDays(save.gameDate, 1);
   const events = timelineEvents(save).filter((event) => event.date === targetDate);
+  const todayEvents = timelineEvents(save).filter((event) => event.date === save.gameDate);
+  const todayRace = todayEvents.find((event) => event.type === 'race');
+  if (todayRace && !save.weekends?.[todayRace.round.id]?.race) {
+    return { ok: false, blocked: true, event: todayRace, events: [], error: 'Terminez la course avant de passer au jour suivant.' };
+  }
+
   const race = events.find((event) => event.type === 'race');
   if (race && !save.weekends?.[race.round.id]?.qualifying?.grid?.length) {
     return { ok: false, blocked: true, event: race, events: [], error: 'Terminez les qualifications avant de passer à la course.' };

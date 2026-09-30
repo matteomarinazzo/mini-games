@@ -356,22 +356,33 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
 /** Migrations V1/V2/V3 → V4 : conserve les résultats et initialise les week-ends. */
 export function migrateSave(save) {
   if (!save || typeof save !== 'object') return save;
-  if (save.schemaVersion === 1) {
-    return {
-      ...save,
-      schemaVersion: SCHEMA_VERSION,
-      calendar: { ...save.calendar, trainingCompletedEvents: [] },
+  let s = { ...save };
+  if (s.schemaVersion === 1) {
+    s = {
+      ...s,
+      schemaVersion: 2,
+      calendar: { ...s.calendar, trainingCompletedEvents: [] },
       activities: { upgrades: [], trainingHistory: [] },
       weekends: {},
-      eventLog: [{ id: 'migration-v3', date: save.gameDate, type: 'migration', message: 'Sauvegarde V1 mise à jour pour le calendrier de saison.' }],
+      eventLog: [{ id: 'migration-v3', date: s.gameDate, type: 'migration', message: 'Sauvegarde V1 mise à jour pour le calendrier de saison.' }],
     };
   }
-  if (save.schemaVersion === 2) {
-    const completed = (save.calendar?.trainingCompletedRounds || []).map((roundId) => `${roundId}-legacy`);
-    return { ...save, schemaVersion: SCHEMA_VERSION, calendar: { ...save.calendar, trainingCompletedEvents: completed }, weekends: {} };
+  if (s.schemaVersion === 2) {
+    const completed = (s.calendar?.trainingCompletedRounds || []).map((roundId) => `${roundId}-legacy`);
+    s = { ...s, schemaVersion: 3, calendar: { ...s.calendar, trainingCompletedEvents: completed }, weekends: {} };
   }
-  if (save.schemaVersion === 3) return { ...save, schemaVersion: SCHEMA_VERSION, weekends: {} };
-  return save;
+  if (s.schemaVersion === 3) {
+    s = { ...s, schemaVersion: 4, weekends: s.weekends || {} };
+  }
+  if (s.schemaVersion === 4) {
+    for (const w of Object.values(s.weekends)) {
+      if (w.race && w.race.results && !w.race.state) {
+        w.race = { state: null, results: w.race.results, completedAt: w.race.completedAt, rewards: null, log: [] };
+      }
+    }
+    s = { ...s, schemaVersion: 5 };
+  }
+  return s;
 }
 
 /** Données prêtes à afficher pour une carte de slot ou un résumé d'import. */

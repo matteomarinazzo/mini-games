@@ -148,14 +148,16 @@ function run(save) {
     const formatDay = new Intl.DateTimeFormat('fr-CH', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
     const qualifyingRound = CALENDAR_2026.find((round) => round.qualifyingDate === save.gameDate);
     const pendingQualifying = qualifyingRound && !save.weekends[qualifyingRound.id]?.qualifying?.grid?.length;
-    const pendingRace = CALENDAR_2026.some((round) => round.raceDate === save.gameDate && !save.weekends[round.id]?.race);
+    const raceRound = CALENDAR_2026.find((round) => round.raceDate === save.gameDate && !save.weekends[round.id]?.race);
+    const pendingRace = !!raceRound;
     const enterQualifying = () => { location.href = `qualifying.html?slot=${slotId}&round=${encodeURIComponent(qualifyingRound.id)}`; };
+    const enterRace = () => { location.href = `race.html?slot=${slotId}&round=${encodeURIComponent(raceRound.id)}`; };
     return h('section', { class: 'weekly-calendar', 'aria-labelledby': 'weekTitle' },
       h('div', { class: 'weekly-calendar__head' },
         h('div', {}, h('h2', { id: 'weekTitle', text: 'Les 7 prochains jours' }), h('p', { class: 'muted', text: `Du ${formatGameDate(weekDates[0])} au ${formatGameDate(weekDates.at(-1))}.` })),
         h('div', { class: 'weekly-calendar__actions' },
           h('button', { type: 'button', class: 'btn', text: 'Avancer d’un jour', onClick: advanceDay, disabled: !nextProgression(save) || pendingQualifying || pendingRace }),
-          h('button', { type: 'button', class: 'btn btn--primary', text: pendingQualifying ? 'Passer aux qualifications' : pendingRace ? 'Course disponible en V3.1' : 'Aller au prochain événement', onClick: pendingQualifying ? enterQualifying : advanceCalendar, disabled: pendingRace || !nextProgression(save) }))),
+          h('button', { type: 'button', class: 'btn btn--primary', text: pendingQualifying ? 'Passer aux qualifications' : pendingRace ? 'Passer à la course' : 'Aller au prochain événement', onClick: pendingQualifying ? enterQualifying : pendingRace ? enterRace : advanceCalendar, disabled: !nextProgression(save) && !pendingQualifying && !pendingRace }))),
       h('div', { class: 'week-grid' }, weekDates.map((date) => {
         const daysEvents = events.filter((event) => event.date === date && (event.type !== 'upgrade' || event.upgrade.teamId === save.playerTeamId));
         return h('article', { class: `week-day${date === save.gameDate ? ' is-today' : ''}` },
@@ -164,19 +166,6 @@ function run(save) {
             ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', { text: labels[event.type] }), event.round ? h('small', { text: `R${event.round.round}` }) : null)))
             : h('p', { class: 'week-empty', text: 'Aucun événement' }));
       })));
-  }
-
-  function weekendControlNode() {
-    const round = CALENDAR_2026.find((entry) => entry.qualifyingDate === save.gameDate || entry.raceDate === save.gameDate);
-    if (!round) return null;
-    const weekend = weekendFor(save, round.id);
-    if (save.gameDate === round.qualifyingDate && !weekend.qualifying.grid.length) {
-      return h('section', { class: 'card weekend-control' }, h('h2', { text: `Qualifications · R${round.round}` }), h('p', { text: `${round.name} · format 24 → 17 → 10.` }), h('a', { class: 'btn btn--primary', href: `qualifying.html?slot=${slotId}&round=${encodeURIComponent(round.id)}`, text: 'Passer aux qualifications' }));
-    }
-    if (save.gameDate === round.raceDate && weekend.qualifying.grid.length && !weekend.race) {
-      return h('section', { class: 'card weekend-control' }, h('h2', { text: `Course · R${round.round}` }), h('p', { class: 'muted', text: 'La grille est prête. La stratégie et le lancement de la course seront ajoutés en V3.1.' }));
-    }
-    return null;
   }
 
   async function advanceCalendar() {
@@ -266,7 +255,6 @@ function run(save) {
         h('p', { class: 'muted', text: `Difficulté des améliorations : ${UPGRADE_LEVELS[save.difficulty.upgradeDifficulty].label}.` })
       ),
       weekCalendarNode(),
-      weekendControlNode(),
       h('section', { class: 'dashboard-grid' },
         h('article', { class: 'card' }, h('h2', { text: 'Entraînements' }), trainingHistoryNode()),
         h('article', { class: 'card' }, h('h2', { text: 'Amélioration en cours' }),

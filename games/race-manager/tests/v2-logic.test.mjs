@@ -29,7 +29,12 @@ assert.ok(save.drivers.find((driver) => driver.teamId === save.playerTeamId).sta
 assert.ok(save.drivers.find((driver) => driver.teamId !== save.playerTeamId).stats.start > rivalBefore);
 assert.equal(advanceToNextEvent(save).event.type, 'training');
 assert.equal(advanceToNextEvent(save).event.type, 'training');
-assert.equal(advanceToNextEvent(save).blocked, true);
+let reachedQualifyingDay = false;
+for (let index = 0; index < 12; index++) {
+  advanceToNextEvent(save);
+  if (save.gameDate === '2026-03-07') { reachedQualifyingDay = true; break; }
+}
+assert.equal(reachedQualifyingDay, true);
 assert.equal(validateSave(save).ok, true);
 
 const dailyGame = createNewGame({
@@ -41,11 +46,11 @@ assert.equal(dailyGame.gameDate, '2026-01-02');
 
 const v1 = { ...save, schemaVersion: 1, calendar: { currentRound: 0, completedRounds: [] } };
 const migrated = migrateSave(v1);
-assert.equal(migrated.schemaVersion, 3);
+assert.equal(migrated.schemaVersion, 4);
 assert.equal(validateSave(migrated).ok, true);
 
 const migratedV2 = migrateSave({ ...save, schemaVersion: 2, calendar: { ...save.calendar, trainingCompletedRounds: [] } });
-assert.equal(migratedV2.schemaVersion, 3);
+assert.equal(migratedV2.schemaVersion, 4);
 assert.equal(validateSave(migratedV2).ok, true);
 
 console.log('V2 logic checks passed.');

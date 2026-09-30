@@ -344,6 +344,7 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
     drivers: plan.drivers,
     calendar: { currentRound: 0, completedRounds: [], trainingCompletedEvents: [] },
     activities: { upgrades: [], trainingHistory: [] },
+    weekends: {},
     eventLog: [],
     standings: { drivers: [], teams: [] },
   };
@@ -352,7 +353,7 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
   return { ok: true, save, plan, totalCost: sel.totalCost };
 }
 
-/** Migrations V1/V2 → V3 : conserve chaque slot et initialise les événements de saison. */
+/** Migrations V1/V2/V3 → V4 : conserve les résultats et initialise les week-ends. */
 export function migrateSave(save) {
   if (!save || typeof save !== 'object') return save;
   if (save.schemaVersion === 1) {
@@ -361,13 +362,15 @@ export function migrateSave(save) {
       schemaVersion: SCHEMA_VERSION,
       calendar: { ...save.calendar, trainingCompletedEvents: [] },
       activities: { upgrades: [], trainingHistory: [] },
+      weekends: {},
       eventLog: [{ id: 'migration-v3', date: save.gameDate, type: 'migration', message: 'Sauvegarde V1 mise à jour pour le calendrier de saison.' }],
     };
   }
   if (save.schemaVersion === 2) {
     const completed = (save.calendar?.trainingCompletedRounds || []).map((roundId) => `${roundId}-legacy`);
-    return { ...save, schemaVersion: SCHEMA_VERSION, calendar: { ...save.calendar, trainingCompletedEvents: completed } };
+    return { ...save, schemaVersion: SCHEMA_VERSION, calendar: { ...save.calendar, trainingCompletedEvents: completed }, weekends: {} };
   }
+  if (save.schemaVersion === 3) return { ...save, schemaVersion: SCHEMA_VERSION, weekends: {} };
   return save;
 }
 

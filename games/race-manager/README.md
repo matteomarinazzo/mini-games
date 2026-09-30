@@ -1,8 +1,8 @@
-# The Race Manager — V1 (dossier `games/race-manager/`)
+# The Race Manager — V2 (dossier `games/race-manager/`)
 
 Jeu de management d'écurie de sport automobile pour mini-games.ch. HTML, CSS et JavaScript vanilla (modules ES), sans framework, sans build, sans backend. Poids total : ~110 Ko de texte, aucune image.
 
-**Périmètre V1 :** 3 slots de sauvegarde, création d'écurie en 5 étapes, menu principal de la partie, sauvegarde localStorage, export/import JSON. Rien d'autre (voir « Réservé aux versions suivantes »).
+**Périmètre V2 :** calendrier 2026, avancement jusqu’aux événements disponibles, entraînements des pilotes, améliorations de départements, simulation économique déterministe des adversaires, sauvegarde localStorage et import/export JSON. Les qualifications et les courses restent réservées à la V3.
 
 ## Fichiers
 
@@ -16,6 +16,7 @@ games/race-manager/
 ├── js/
 │   ├── data/teams-2026.js, drivers-2026.js   données de référence (gelées, jamais modifiées)
 │   ├── core/constants.js    règles et libellés (limites, niveaux de difficulté, palette)
+│   ├── core/progression.js  moteur V2 (calendrier, entraînement, améliorations, IA)
 │   ├── core/utils.js        formats, hash, clone, gel profond
 │   ├── core/validation.js   notes, nom d'écurie, budget, pilotes, schéma de sauvegarde
 │   ├── core/game-state.js   création de partie, règle de transition, résumé, migration
@@ -59,7 +60,7 @@ Tests de logique (Node 22.12+), depuis `games/race-manager/` : `node tests/logic
 2. Vérifier que `https://mini-games.ch/js/countPlayedTime.js` existe (chemin relatif `../../js/`).
 3. Ajouter l'image `assets/logos/race-manager.webp` référencée par `index.html` (Open Graph), ou modifier cette balise.
 
-## Format de sauvegarde (schemaVersion 1)
+## Format de sauvegarde (schemaVersion 3)
 
 ```json
 {
@@ -75,14 +76,16 @@ Tests de logique (Node 22.12+), depuis `games/race-manager/` : `node tests/logic
                  "stats": { "start", "aggression", "overtaking", "attack", "raceManagement", "qualifying", "tyres" },
                  "potential", "experience", "available",
                  "contract": { "salary", "signingCost", "startSeason", "endSeason" } } ],
-  "calendar": { "currentRound": 0, "completedRounds": [] },
+  "calendar": { "currentRound": 0, "completedRounds": [], "trainingCompletedEvents": [] },
+  "activities": { "upgrades": [], "trainingHistory": [] },
+  "eventLog": [],
   "standings": { "drivers": [], "teams": [] }
 }
 ```
 
 - Montants (`balance`, `salary`, `signingCost`) en **millions**.
 - Les notes globales ne sont **pas** stockées : elles sont calculées.
-- `validateSave()` exige : 12 écuries, 24 pilotes, identifiants uniques, exactement 2 pilotes par écurie, notes entières entre 50 et 100, couleurs `#rrggbb`, difficultés connues. Version inconnue (> 1) → refus explicite.
+- `validateSave()` exige : 12 écuries, 24 pilotes, identifiants uniques, exactement 2 pilotes par écurie, notes entre 50 et 100, couleurs `#rrggbb`, difficultés connues et les activités V2. Version inconnue (> 3) → refus explicite. Les sauvegardes V1 et V2 sont migrées en lecture, sans toucher aux autres slots.
 
 ## Limites connues
 

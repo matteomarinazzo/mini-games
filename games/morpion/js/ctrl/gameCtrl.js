@@ -495,6 +495,7 @@ function announceWinner(winner) {
 
     checkDailyChallenge({
         gameId: 'morpion',
+        mode: mode,
         wins: gameConfig.scores.player1 || 0,  // total victoires joueur 1
         beatAiExpert: isAiWin && difficulty === 'expert',
         grid: gridMap[gameType] ?? '3x3',

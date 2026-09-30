@@ -1,9 +1,24 @@
 {
   "strategy": {
+    "race-manager": {
+      "path": "./games/race-manager/index.html",
+      "name": "The Race Manager",
+      "emoji": "🏎️",
+      "description": "Dirige ta propre écurie de course. Achète tes pilotes, développe ta voiture et gagne les championnats !",
+      "tags": [
+        "real-time",
+        "strategy",
+        "single-player"
+      ],
+      "badge": "strategy",
+      "badgeText": "Stratégie",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "battleship": {
       "path": "./games/battleship/index.html",
       "name": "Bataille navale",
-      "emoji": "",
+      "emoji": "🚢",
       "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
       "tags": [
         "real-time",
@@ -140,6 +155,22 @@
       ],
       "badge": "action",
       "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "minesweeper": {
+      "path": "./games/minesweeper/index.html",
+      "name": "Démineur",
+      "emoji": "💣",
+      "description": "Le classique revisité : solo ou multijoueur en temps réel. Pose les drapeaux au bon endroit et fais exploser les mines adverses.",
+      "tags": [
+        "reflexes",
+        "strategy",
+        "multiplayer",
+        "fast"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }

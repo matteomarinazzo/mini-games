@@ -1,0 +1,36 @@
+/* Vue « menu principal » : navigation en bas sur mobile, à gauche du contenu sur grand écran. */
+body.page-home { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+#content:focus { outline: none; }
+.topbar__team { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; }
+.topbar__team strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar__balance { font-weight: 800; color: var(--team); }
+
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--surface); border-top: 2px solid var(--line); padding-bottom: env(safe-area-inset-bottom);
+}
+.tabs button {
+  min-height: 56px; padding: .3rem .2rem; border: 0; border-top: 4px solid transparent; background: transparent;
+  color: var(--muted); font: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; display: grid; place-items: center; gap: 0;
+}
+.tabs button .ico { font-size: 1.2rem; line-height: 1; }
+.tabs button[aria-current="page"] { color: var(--text); border-top-color: var(--team); background: var(--surface-2); }
+.tabs button[aria-current="page"] .lbl { text-decoration: underline; text-underline-offset: 3px; }
+
+.hero { border-left: 8px solid var(--team); }
+.card--notice { border-color: var(--accent); }
+.card--soon { text-align: center; padding: 2rem 1rem; }
+
+.driver-card__head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; margin-bottom: .75rem; }
+.driver-card__head h3 { margin: 0; }
+.ovr { display: grid; place-items: center; min-width: 3.6rem; padding: .3rem .5rem; border: 3px solid var(--team); border-radius: 10px; }
+.ovr span { font-size: 1.7rem; font-weight: 800; line-height: 1; }
+.ovr small { color: var(--muted); font-size: .7rem; }
+.overall { font-weight: 800; font-size: 1.1rem; margin: .75rem 0 0; }
+
+@media (min-width: 60rem) {
+  body.page-home { padding-bottom: 0; }
+  .tabs { position: sticky; top: 0; bottom: auto; grid-template-columns: repeat(4, minmax(0, 12rem)); justify-content: center; border-top: 0; border-bottom: 2px solid var(--line); padding-bottom: 0; }
+  .tabs button { border-top: 0; border-bottom: 4px solid transparent; grid-auto-flow: column; gap: .5rem; font-size: 1rem; }
+  .tabs button[aria-current="page"] { border-bottom-color: var(--team); }
+}

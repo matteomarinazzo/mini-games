@@ -209,8 +209,12 @@ export function evaluateCondition(condition, gameStats) {
             if (condition.config?.mode && gameStats.mode !== condition.config.mode) return false;
             return !!gameStats.beatPersonalBest;
         case 'wins_gte':
-            if (condition.config?.mode === 'duo' && gameStats.mode !== 'confrontation') return false;
-            return !!gameStats.wonDuo;
+            if (condition.config?.mode) {
+                const isDuo = gameStats.mode === 'duo' || gameStats.mode === 'confrontation';
+                if (condition.config.mode === 'duo' && !isDuo) return false;
+                if (condition.config.mode !== 'duo' && gameStats.mode !== condition.config.mode) return false;
+            }
+            return (gameStats.wins || gameStats.wonDuo || 0) >= condition.value;
         case 'altitude_and_land_km': return gameStats.landed === true && (gameStats.maxAltitudeKm ?? 0) >= condition.value;
         case 'rocket_value_gte': return (gameStats.rocketValue ?? 0) >= condition.value;
         case 'altitude_km_gte': return (gameStats.maxAltitudeKm ?? 0) >= condition.value;

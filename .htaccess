@@ -1,0 +1,29 @@
+# ─────────────────────────────────────────────────────────────
+# Service Worker : JAMAIS de cache HTTP
+# Indispensable pour que les mises à jour soient détectées
+# ─────────────────────────────────────────────────────────────
+<Files "sw.js">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </IfModule>
+</Files>
+
+# ─────────────────────────────────────────────────────────────
+# manifest.json : pas de cache non plus (pour la PWA)
+# ─────────────────────────────────────────────────────────────
+<Files "manifest.json">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </IfModule>
+</Files>
+
+# ─────────────────────────────────────────────────────────────
+# Fichiers HTML : cache court, revalidation systématique
+# ─────────────────────────────────────────────────────────────
+<FilesMatch "\.html$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, must-revalidate"
+    </IfModule>
+</FilesMatch>

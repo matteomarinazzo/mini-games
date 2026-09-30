@@ -1,8 +1,8 @@
-# The Race Manager — V2 (dossier `games/race-manager/`)
+# The Race Manager — V3 (dossier `games/race-manager/`)
 
 Jeu de management d'écurie de sport automobile pour mini-games.ch. HTML, CSS et JavaScript vanilla (modules ES), sans framework, sans build, sans backend. Poids total : ~110 Ko de texte, aucune image.
 
-**Périmètre V2 :** calendrier 2026, avancement jusqu’aux événements disponibles, entraînements des pilotes, améliorations de départements, simulation économique déterministe des adversaires, sauvegarde localStorage et import/export JSON. Les qualifications et les courses restent réservées à la V3.
+**Périmètre V3 :** calendrier 2026, entraînements, améliorations, qualifications Q1/Q2/Q3, Lights Out, grille de départ et sauvegardes locales. Les stratégies pneus et le lancement de course arrivent en V3.1.
 
 ## Fichiers
 
@@ -60,7 +60,7 @@ Tests de logique (Node 22.12+), depuis `games/race-manager/` : `node tests/logic
 2. Vérifier que `https://mini-games.ch/js/countPlayedTime.js` existe (chemin relatif `../../js/`).
 3. Ajouter l'image `assets/logos/race-manager.webp` référencée par `index.html` (Open Graph), ou modifier cette balise.
 
-## Format de sauvegarde (schemaVersion 3)
+## Format de sauvegarde (schemaVersion 4)
 
 ```json
 {
@@ -78,6 +78,7 @@ Tests de logique (Node 22.12+), depuis `games/race-manager/` : `node tests/logic
                  "contract": { "salary", "signingCost", "startSeason", "endSeason" } } ],
   "calendar": { "currentRound": 0, "completedRounds": [], "trainingCompletedEvents": [] },
   "activities": { "upgrades": [], "trainingHistory": [] },
+  "weekends": {},
   "eventLog": [],
   "standings": { "drivers": [], "teams": [] }
 }
@@ -85,7 +86,7 @@ Tests de logique (Node 22.12+), depuis `games/race-manager/` : `node tests/logic
 
 - Montants (`balance`, `salary`, `signingCost`) en **millions**.
 - Les notes globales ne sont **pas** stockées : elles sont calculées.
-- `validateSave()` exige : 12 écuries, 24 pilotes, identifiants uniques, exactement 2 pilotes par écurie, notes entre 50 et 100, couleurs `#rrggbb`, difficultés connues et les activités V2. Version inconnue (> 3) → refus explicite. Les sauvegardes V1 et V2 sont migrées en lecture, sans toucher aux autres slots.
+- `validateSave()` exige : 12 écuries, 24 pilotes, identifiants uniques, exactement 2 pilotes par écurie, notes entre 50 et 100, couleurs `#rrggbb`, difficultés connues, activités et week-ends V3. Version inconnue (> 4) → refus explicite. Les sauvegardes V1, V2 et V3 sont migrées en lecture, sans toucher aux autres slots.
 
 ## Limites connues
 

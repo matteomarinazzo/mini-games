@@ -5,7 +5,7 @@
  */
 export const GAME_ID = 'mon-jeu';
 export const GAME_TITLE = 'The Race Manager';
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 export const SEASON = 2026;
 export const START_DATE = '2026-01-01';
 export const SLOT_COUNT = 3;
@@ -77,3 +77,7 @@ export const UPGRADE_LEVELS = {
 /** Règles V2 de progression : les notes pilotes restent décimales en sauvegarde. */
 export const TRAINING_GAIN = 0.12;
 export const UPGRADE_DURATION_DAYS = 3;
+
+export const TYRE_COMPOUNDS = ['soft', 'medium', 'hard', 'intermediate', 'wet'];
+export const TYRE_LABELS = { soft: 'Soft', medium: 'Medium', hard: 'Hard', intermediate: 'Intermediate', wet: 'Wet' };
+export const RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];

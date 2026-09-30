@@ -42,7 +42,6 @@ export function roundStatus(round, gameDate) {
 export function nextProgression(save) {
   const next = timelineEvents(save).find((event) => dateMs(event.date) > dateMs(save.gameDate));
   if (!next) return null;
-  if (next.type === 'qualifying' || next.type === 'race') return { ...next, blocked: true };
   return next;
 }
 
@@ -126,14 +125,14 @@ export function advanceToNextEvent(save) {
 export function advanceOneDay(save) {
   const targetDate = addDays(save.gameDate, 1);
   const events = timelineEvents(save).filter((event) => event.date === targetDate);
-  const blocked = events.find((event) => event.type === 'qualifying' || event.type === 'race');
+  const race = events.find((event) => event.type === 'race');
+  if (race && !save.weekends?.[race.round.id]?.qualifying?.grid?.length) {
+    return { ok: false, blocked: true, event: race, events: [], error: 'Terminez les qualifications avant de passer à la course.' };
+  }
   const completedUpgrades = events.filter((event) => event.type === 'upgrade');
 
-  // Une amélioration qui finit le jour des qualifications est bien traitée, sans simuler les qualifications.
+  // Une amélioration qui finit le jour des qualifications est bien traitée avant l'accès à la session.
   completedUpgrades.forEach(() => finishUpgrades(save, targetDate));
-  if (blocked) {
-    return { ok: false, blocked: true, event: blocked, events: completedUpgrades, error: blocked.type === 'qualifying' ? 'Qualifications disponibles en V3.' : 'Course disponible en V3.' };
-  }
 
   save.gameDate = targetDate;
   for (const event of events) {

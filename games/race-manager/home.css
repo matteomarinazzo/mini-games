@@ -309,6 +309,23 @@ body.page-home {
   font-size: .9rem;
 }
 
+.weekend-control { display: grid; gap: .75rem; }
+.lights-out { text-align: center; }
+.lights-out__status { font-size: 1.25rem; font-weight: 800; min-height: 2rem; color: var(--accent); }
+.lights-out__button { min-width: 12rem; }
+.session-results { margin-top: .5rem; }
+.result-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.result-list li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) max-content; gap: .5rem; align-items: center; padding: .45rem .25rem; border-bottom: 1px solid var(--line); }
+.result-list li.is-player { background: color-mix(in srgb, var(--team) 18%, transparent); }
+.result-list__position { color: var(--muted); font-weight: 800; }
+.strategy-editor { display: grid; gap: .75rem; }
+.strategy-row { display: grid; grid-template-columns: minmax(10rem, 1fr) minmax(8rem, .7fr) minmax(8rem, .7fr); gap: .75rem; align-items: end; padding: .65rem 0; border-bottom: 1px solid var(--line); }
+.strategy-row label { display: grid; gap: .3rem; font-size: .85rem; color: var(--muted); }
+.strategy-row .input { min-height: 40px; }
+.weekend-summary { margin: .75rem 0 0; color: var(--ok); font-weight: 700; }
+.saved-results { margin-top: .75rem; }
+.saved-results summary { cursor: pointer; color: var(--text); font-weight: 700; }
+
 .card--notice {
   border-color: var(--accent);
 }
@@ -404,6 +421,11 @@ body.page-home {
 
   .week-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .strategy-row {
+    grid-template-columns: 1fr;
+    gap: .4rem;
   }
 
   .calendar-row {

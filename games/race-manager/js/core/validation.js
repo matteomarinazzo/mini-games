@@ -148,6 +148,7 @@ export function validateSave(s) {
   if (!isObj(s.activities) || !Array.isArray(s.activities.upgrades) || !Array.isArray(s.activities.trainingHistory) || !Array.isArray(s.eventLog)) {
     err('Activités de saison invalides.');
   }
+  if (!isObj(s.weekends)) err('Week-ends de Grand Prix invalides.');
   if (!isObj(s.standings) || !Array.isArray(s.standings.drivers) || !Array.isArray(s.standings.teams)) err('Classements invalides.');
 
   // Écuries

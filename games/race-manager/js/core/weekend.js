@@ -88,78 +88,7 @@ function finishQualifying(save, roundId) {
   save.eventLog = save.eventLog.slice(0, 60);
 }
 
-export function saveStrategies(save, roundId, playerStrategies) {
-  const weekend = weekendFor(save, roundId);
-  if (!weekend.qualifying.grid.length) return { ok: false, error: 'La grille de départ doit être établie avant la stratégie.' };
-  if (weekend.race) return { ok: false, error: 'La course est déjà terminée.' };
-  const playerDrivers = save.drivers.filter((driver) => driver.teamId === save.playerTeamId);
-  for (const driver of playerDrivers) {
-    const strategy = playerStrategies[driver.id];
-    if (!strategy || !TYRE_COMPOUNDS.includes(strategy.start) || !TYRE_COMPOUNDS.includes(strategy.stop)) {
-      return { ok: false, error: 'Choisissez les deux pneus pour chaque pilote.' };
-    }
-    weekend.strategies[driver.id] = { start: strategy.start, stop: strategy.stop, controlledByPlayer: true };
-  }
-  for (const driver of save.drivers.filter((entry) => entry.teamId !== save.playerTeamId)) {
-    if (!weekend.strategies[driver.id]) weekend.strategies[driver.id] = aiStrategy(save, weekend, driver);
-  }
-  save.eventLog.unshift({ id: `${roundId}-strategies`, date: save.gameDate, type: 'strategy', message: `Stratégies pneus validées pour R${roundId}.` });
-  save.eventLog = save.eventLog.slice(0, 60);
-  return { ok: true };
-}
 
-function aiStrategy(save, weekend, driver) {
-  const roll = random(`${save.saveId}-${weekend.roundId}-strategy-${driver.id}`);
-  if (weekend.weather === 'rain') return { start: 'wet', stop: 'wet', controlledByPlayer: false };
-  if (weekend.weather === 'mixed') return { start: roll > .5 ? 'intermediate' : 'medium', stop: roll > .5 ? 'medium' : 'intermediate', controlledByPlayer: false };
-  return roll > .64 ? { start: 'soft', stop: 'hard', controlledByPlayer: false } : { start: 'medium', stop: 'hard', controlledByPlayer: false };
-}
-
-export function runRace(save, roundId) {
-  const weekend = weekendFor(save, roundId);
-  if (weekend.race) return { ok: false, error: 'Cette course est déjà terminée.' };
-  if (!weekend.qualifying.grid.length) return { ok: false, error: 'Les qualifications doivent être terminées.' };
-  if (!save.drivers.filter((driver) => driver.teamId === save.playerTeamId).every((driver) => weekend.strategies[driver.id])) return { ok: false, error: 'Validez les stratégies de vos pilotes avant la course.' };
-  const drivers = byId(save.drivers);
-  const teams = byId(save.teams);
-  const entries = weekend.qualifying.grid.map((grid) => {
-    const driver = drivers.get(grid.driverId);
-    const team = teams.get(driver.teamId);
-    const strategy = weekend.strategies[driver.id] || aiStrategy(save, weekend, driver);
-    const strategyScore = tyreScore(strategy, weekend.weather);
-    const performance = driver.stats.raceManagement * .34 + driver.stats.tyres * .20 + driver.stats.attack * .14
-      + driver.stats.overtaking * .10 + teamRating(team) * .22 + strategyScore;
-    const variance = (random(`${save.saveId}-${roundId}-race-${driver.id}`) - .5) * 7;
-    const raceScore = performance + variance - (grid.position - 1) * .14;
-    return { driverId: driver.id, gridPosition: grid.position, score: raceScore, strategy };
-  }).sort((a, b) => b.score - a.score || a.gridPosition - b.gridPosition).map((entry, index) => ({ ...entry, position: index + 1, points: RACE_POINTS[index] || 0 }));
-  weekend.race = { results: entries, completedAt: save.gameDate };
-  if (!save.calendar.completedRounds.includes(roundId)) save.calendar.completedRounds.push(roundId);
-  updateStandings(save, entries);
-  save.eventLog.unshift({ id: `${roundId}-race`, date: save.gameDate, type: 'race', message: `Course de R${roundId} terminée. Résultats enregistrés.` });
-  save.eventLog = save.eventLog.slice(0, 60);
-  return { ok: true, results: entries };
-}
-
-function tyreScore(strategy, weather) {
-  const wetReady = strategy.start === 'wet' || strategy.start === 'intermediate';
-  if (weather === 'rain') return wetReady ? 2.4 : -4.2;
-  if (weather === 'mixed') return wetReady ? 1.2 : -.8;
-  return strategy.start === 'soft' ? 1.2 : strategy.start === 'medium' ? .8 : strategy.start === 'hard' ? .25 : -2.2;
-}
-
-function updateStandings(save, results) {
-  const driverPoints = new Map(save.standings.drivers.map((entry) => [entry.driverId, entry.points]));
-  for (const result of results) driverPoints.set(result.driverId, (driverPoints.get(result.driverId) || 0) + result.points);
-  save.standings.drivers = [...driverPoints].map(([driverId, points]) => ({ driverId, points })).sort((a, b) => b.points - a.points);
-  const drivers = byId(save.drivers);
-  const teamPoints = new Map();
-  for (const entry of save.standings.drivers) {
-    const teamId = drivers.get(entry.driverId).teamId;
-    teamPoints.set(teamId, (teamPoints.get(teamId) || 0) + entry.points);
-  }
-  save.standings.teams = [...teamPoints].map(([teamId, points]) => ({ teamId, points })).sort((a, b) => b.points - a.points);
-}
 
 function driverPotential(driver) {
   return driver.stats.qualifying * .48 + driver.stats.attack * .14 + driver.stats.aggression * .08 + driver.stats.start * .05;

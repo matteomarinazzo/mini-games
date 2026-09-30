@@ -5,7 +5,7 @@
  */
 export const GAME_ID = 'mon-jeu';
 export const GAME_TITLE = 'The Race Manager';
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 export const SEASON = 2026;
 export const START_DATE = '2026-01-01';
 export const SLOT_COUNT = 3;
@@ -81,3 +81,54 @@ export const UPGRADE_DURATION_DAYS = 3;
 export const TYRE_COMPOUNDS = ['soft', 'medium', 'hard', 'intermediate', 'wet'];
 export const TYRE_LABELS = { soft: 'Soft', medium: 'Medium', hard: 'Hard', intermediate: 'Intermediate', wet: 'Wet' };
 export const RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+
+/**
+ * V4.1 — Données de simulation des pneus.
+ *   gripPenaltyMs : temps additionnel par tour (ms) vs le composé le plus rapide (soft).
+ *                   Soft = 0 (référence), medium = +250ms, hard = +550ms.
+ *   wearRate      : % d'état perdu par tour (avant multiplicateurs circuit/rythme).
+ *   cliff         : seuil d'état (%) en-dessous duquel la performance chute fortement.
+ */
+export const TYRE_DATA = {
+  soft: { gripPenaltyMs: 0, wearRate: 2.8, cliff: 30 },
+  medium: { gripPenaltyMs: 250, wearRate: 1.9, cliff: 22 },
+  hard: { gripPenaltyMs: 550, wearRate: 1.2, cliff: 15 },
+  intermediate: { gripPenaltyMs: 800, wearRate: 1.6, cliff: 20 },
+  wet: { gripPenaltyMs: 1200, wearRate: 1.3, cliff: 15 },
+};
+
+/** Multiplicateur de rythme sur l'usure et les probabilités d'incident. */
+export const PACE_MULTIPLIERS = {
+  cautious: { wear: 0.82, incident: 0.6, lapTimeFactor: 1.008 },
+  balanced: { wear: 1.00, incident: 1.0, lapTimeFactor: 1.000 },
+  aggressive: { wear: 1.22, incident: 1.5, lapTimeFactor: 0.993 },
+};
+
+/** Temps de base d'un arrêt aux stands (en secondes, hors temps de passage dans la voie). */
+export const PIT_STOP_BASE = 2.2;
+/** Variance aléatoire max sur un arrêt (en secondes). */
+export const PIT_STOP_VARIANCE = 0.5;
+/** Pénalité si deux pilotes de la même écurie passent au stand au même tour (en secondes). */
+export const DOUBLE_STACK_PENALTY = 3.0;
+
+/** Pénalité de temps (en secondes) ajoutée au total si la règle des 2 composés n'est pas respectée en conditions sèches. */
+export const COMPOUND_RULE_PENALTY_SECONDS = 30;
+
+/** Nombre minimum de composés secs différents requis en course sèche. */
+export const MIN_DRY_COMPOUNDS = 2;
+
+/**
+ * V4.1 — Seuil de risque de crevaison.
+ * En-dessous de ce % d'état restant, le risque de crevaison augmente progressivement.
+ * La valeur 30 signifie : à partir de 30% d'état restant (= 70% d'usure), le risque monte.
+ */
+export const PUNCTURE_THRESHOLD = 30;
+
+/**
+ * V4.1 — Pénalité d'usure au-delà du cliff.
+ * Quand l'état du pneu tombe sous le cliff, on ajoute cette pénalité en ms
+ * multipliée par le ratio de dégradation (0 au cliff → max à 0%).
+ */
+export const CLIFF_PENALTY_MAX_MS = 3000;
+
+

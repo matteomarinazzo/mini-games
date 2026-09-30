@@ -46,37 +46,250 @@ function toStateDriver(ref, teamId, signingCost = 0) {
 }
 
 /**
- * Règle de transition V1 (déterministe) : un pilote de F1 choisi par le joueur quitte son écurie ;
- * sa place est reprise par le premier pilote de réserve (catégorie « autre », sans écurie) non choisi,
- * dans l'ordre du fichier de données. Résultat : 12 écuries × 2 pilotes = 24 pilotes uniques.
+ * Planifie la grille de départ avec cascade de transferts intelligente (V2).
+ *
+ * Algorithme :
+ *  1. Le joueur recrute ses 2 pilotes → leurs écuries respectives sont en "recherche de remplaçant".
+ *  2. Chaque équipe en recherche parcourt le marché des pilotes libres et IN-écurie pour trouver
+ *     le meilleur pilote qu'elle peut se permettre (cost ≤ recruitingBudget ET aucun conflit).
+ *  3. Condition de débauchage inter-équipe : loyalty du cible < POACH_LOYALTY_THRESHOLD.
+ *  4. Si une équipe est débauchée, elle entre à son tour dans la file de recherche → cascade.
+ *  5. En dernier recours (aucun pilote libre acceptable) : pilote libre sans écurie (F2/ancien/F3).
+ *  6. Si même ça échoue : erreur de génération.
+ *
+ * @param {string[]} selectedIds   IDs des 2 pilotes choisis par le joueur.
+ * @param {object[]} refDrivers    Liste de référence des pilotes.
+ * @param {object[]} refTeams      Liste de référence des équipes.
+ * @returns {{ ok: true, drivers: object[], replacements: object[] }
+ *         | { ok: false, error: string }}
  */
 export function planGrid(selectedIds, refDrivers = DRIVERS_2026, refTeams = TEAMS_2026) {
-  const byId = new Map(refDrivers.map((d) => [d.id, d]));
-  const selected = selectedIds.map((id) => byId.get(id));
+  const byId       = new Map(refDrivers.map((d) => [d.id, d]));
+  const teamById   = new Map(refTeams.map((t) => [t.id, t]));
+  const selected   = selectedIds.map((id) => byId.get(id));
+
   if (selected.length !== 2 || selected.some((d) => !d) || selected[0].id === selected[1].id) {
     return { ok: false, error: 'Sélection de pilotes invalide.' };
   }
+
+  /** Seuil de loyalty en dessous duquel un pilote peut être débauché par une autre équipe. */
+  const POACH_LOYALTY_THRESHOLD = 50;
+
+  /**
+   * État mutable de la grille pendant la simulation.
+   * currentTeam[driverId] = teamId (ou PLAYER_TEAM_ID si recruté par le joueur)
+   */
+  const currentTeam = new Map(); // driverId → teamId courant (null = libre)
   const chosen = new Set(selectedIds);
-  const reserves = refDrivers.filter((d) => d.category === 'autre' && !d.teamId && !chosen.has(d.id));
-  let next = 0;
-  const drivers = [];
-  const replacements = [];
+
+  // Initialisation : chaque pilote de grille connaît son équipe de départ.
   for (const team of refTeams) {
     for (const id of team.driverIds) {
-      const ref = byId.get(id);
-      if (!ref) return { ok: false, error: `Donnée de référence manquante : ${id}.` };
-      if (chosen.has(id)) {
-        const rep = reserves[next++];
-        if (!rep) return { ok: false, error: `Aucun pilote de remplacement disponible pour ${team.name} : création impossible.` };
-        replacements.push({ teamId: team.id, teamName: team.name, leavingName: ref.displayName, replacementName: rep.displayName });
-        drivers.push(toStateDriver(rep, team.id));
+      currentTeam.set(id, chosen.has(id) ? null : team.id); // les pilotes recrutés par le joueur sont libérés
+    }
+  }
+
+  // File d'équipes qui ont besoin d'un remplaçant { teamId, missingSlots: number }
+  // On débute avec les équipes qui ont perdu un pilote au profit du joueur.
+  /** @type {Map<string, number>} teamId → nombre de places vacantes */
+  const needsDriver = new Map();
+  for (const d of selected) {
+    if (d.teamId) {
+      needsDriver.set(d.teamId, (needsDriver.get(d.teamId) ?? 0) + 1);
+    }
+  }
+
+  /** Liste finale des mouvements de transfert (pour le récapitulatif narratif). */
+  const replacements = [];
+
+  /**
+   * Renvoie les pilotes disponibles sur le marché libre (pas d'équipe et pas choisis par le joueur).
+   * Triés par note globale décroissante, puis par coût.
+   */
+  const freeAgents = () => {
+    const alreadyAssigned = new Set(replacements.map((r) => r.replacementId));
+    return refDrivers
+      .filter((d) => d.teamId === null && !chosen.has(d.id) && !alreadyAssigned.has(d.id))
+      .sort((a, b) => {
+        const oa = _driverOverallSimple(a);
+        const ob = _driverOverallSimple(b);
+        return ob - oa || a.cost - b.cost;
+      });
+  };
+
+  /**
+   * Renvoie les pilotes actuellement dans une équipe et potentiellement débauchables.
+   * Critères : loyalty < seuil, pas en cours d'utilisation dans la cascade courante.
+   */
+  const poachablePilots = () => refDrivers
+    .filter((d) => {
+      if (!d.teamId) return false;           // pilote sans équipe de départ → pas poachable
+      const cur = currentTeam.get(d.id);
+      if (!cur) return false;                // déjà libéré (recruté par joueur ou autre équipe)
+      if (chosen.has(d.id)) return false;   // recruté par le joueur
+      if (d.loyalty >= POACH_LOYALTY_THRESHOLD) return false; // trop loyal
+      return true;
+    })
+    .sort((a, b) => {
+      const oa = _driverOverallSimple(a);
+      const ob = _driverOverallSimple(b);
+      return ob - oa || a.cost - b.cost;
+    });
+
+  /** Résolution de la cascade de recrutements. */
+  const MAX_ITERATIONS = 30; // garde-fou anti-boucle infinie
+  let iterations = 0;
+
+  while (needsDriver.size > 0 && iterations < MAX_ITERATIONS) {
+    iterations++;
+
+    // Traiter la première équipe dans la file.
+    const [recruitingTeamId, slotsNeeded] = needsDriver.entries().next().value;
+    needsDriver.delete(recruitingTeamId);
+
+    const team = teamById.get(recruitingTeamId);
+    if (!team) return { ok: false, error: `Équipe introuvable : ${recruitingTeamId}.` };
+
+    for (let slot = 0; slot < slotsNeeded; slot++) {
+      let recruited = null;
+      let fromTeamId = null; // si poaching, équipe d'origine
+
+      // 1. Chercher le meilleur agent libre abordable
+      const free = freeAgents().filter((d) => d.cost <= team.recruitingBudget);
+      if (free.length > 0) {
+        recruited = free[0];
+      }
+
+      // 2. Si pas d'agent libre satisfaisant → tenter de débaucher un pilote d'une autre équipe
+      if (!recruited) {
+        const poachable = poachablePilots().filter(
+          (d) => d.cost <= team.recruitingBudget && currentTeam.get(d.id) !== recruitingTeamId,
+        );
+        if (poachable.length > 0) {
+          recruited = poachable[0];
+          fromTeamId = currentTeam.get(recruited.id);
+        }
+      }
+
+      // 3. En dernier recours : n'importe quel agent libre (même hors budget)
+      if (!recruited) {
+        const anyFree = freeAgents();
+        if (anyFree.length > 0) recruited = anyFree[0];
+      }
+
+      if (!recruited) {
+        return {
+          ok: false,
+          error: `Aucun pilote disponible pour remplacer un départ chez ${team.name}. Essayez avec d'autres pilotes.`,
+        };
+      }
+
+
+      // Le pilote recruté quitte son ancienne équipe (si poaching)
+      if (fromTeamId) {
+        currentTeam.set(recruited.id, recruitingTeamId);
+        // L'ancienne équipe a maintenant un poste vacant → entre dans la file
+        needsDriver.set(fromTeamId, (needsDriver.get(fromTeamId) ?? 0) + 1);
+        replacements.push({
+          teamId: recruitingTeamId,
+          teamName: team.name,
+          leavingName: null,           // sera rempli lors du récap si nécessaire
+          replacementId: recruited.id,
+          replacementName: recruited.displayName,
+          fromTeamId,
+          fromTeamName: teamById.get(fromTeamId)?.name ?? fromTeamId,
+          isPoaching: true,
+        });
       } else {
-        drivers.push(toStateDriver(ref, team.id));
+        currentTeam.set(recruited.id, recruitingTeamId);
+        replacements.push({
+          teamId: recruitingTeamId,
+          teamName: team.name,
+          leavingName: null,
+          replacementId: recruited.id,
+          replacementName: recruited.displayName,
+          fromTeamId: null,
+          fromTeamName: null,
+          isPoaching: false,
+        });
       }
     }
   }
+
+  if (needsDriver.size > 0 && iterations >= MAX_ITERATIONS) {
+    return { ok: false, error: 'Impossible de résoudre les transferts en cascade (trop complexe). Changez votre sélection de pilotes.' };
+  }
+
+  // --- Reconstituer la liste finale des pilotes de la sauvegarde ---
+  // Pilotes initialement en grille : on prend leur position FINALE (après cascades)
+  const drivers = [];
+
+  // Construire une map : teamId → [driverId recruté]
+  const teamRoster = new Map(refTeams.map((t) => [t.id, []]));
+
+  // Pilotes non touchés par les transferts (toujours dans leur équipe d'origine)
+  for (const team of refTeams) {
+    for (const id of team.driverIds) {
+      if (!chosen.has(id) && currentTeam.get(id) === team.id) {
+        teamRoster.get(team.id)?.push(id);
+      }
+    }
+  }
+
+  // Pilotes recrutés par les cascades
+  for (const r of replacements) {
+    if (!teamRoster.has(r.teamId)) teamRoster.set(r.teamId, []);
+    teamRoster.get(r.teamId)?.push(r.replacementId);
+  }
+
+  // Générer les objets d'état de pilote
+  for (const team of refTeams) {
+    const roster = teamRoster.get(team.id) ?? [];
+    for (const id of roster) {
+      const ref = byId.get(id);
+      if (!ref) return { ok: false, error: `Donnée de référence manquante : ${id}.` };
+      drivers.push(toStateDriver(ref, team.id));
+    }
+    // Si une équipe manque de pilotes après tout → erreur
+    if (roster.length < team.driverIds.length) {
+      return {
+        ok: false,
+        error: `L'écurie ${team.name} ne dispose pas d'assez de pilotes après les transferts.`,
+      };
+    }
+  }
+
+  // Pilotes du joueur
   selected.forEach((ref) => drivers.push(toStateDriver(ref, PLAYER_TEAM_ID, ref.cost)));
+
+  // Remplir les noms des pilotes partants dans les replacements (pour affichage narratif)
+  // On associe chaque replacement au pilote qui a quitté son équipe d'origine
+  const leavingByTeam = new Map();
+  for (const d of selected) {
+    if (d.teamId) {
+      if (!leavingByTeam.has(d.teamId)) leavingByTeam.set(d.teamId, []);
+      leavingByTeam.get(d.teamId).push(d.displayName);
+    }
+  }
+  for (const r of replacements) {
+    if (r.isPoaching) {
+      // Le pilote poaché laisse une place vacante dans fromTeamId
+      if (!leavingByTeam.has(r.fromTeamId)) leavingByTeam.set(r.fromTeamId, []);
+      leavingByTeam.get(r.fromTeamId).push(r.replacementName); // sera le "partant" pour l'équipe suivante
+    }
+  }
+  for (const r of replacements) {
+    const leaving = leavingByTeam.get(r.teamId);
+    r.leavingName = leaving?.shift() ?? '(pilote inconnu)';
+  }
+
   return { ok: true, drivers, replacements };
+}
+
+/** Note globale simplifiée pour les comparaisons internes (pas d'import circulaire). */
+function _driverOverallSimple(d) {
+  const vals = Object.values(d.stats);
+  return Math.round(vals.reduce((a, v) => a + v, 0) / vals.length);
 }
 
 /**

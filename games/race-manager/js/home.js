@@ -5,16 +5,16 @@
  * Le slot arrive par l'URL (home.html?slot=N) ; il est validé (entier 1–3) puis relu depuis
  * localStorage : l'URL ne transporte jamais de données de partie.
  */
-import { SLOT_COUNT, SEASON, STAT_KEYS, STAT_LABELS, DEPT_KEYS, DEPT_LABELS, CATEGORIES, START_LEVELS, UPGRADE_LEVELS, TEAM_NAME_MAX } from './js/core/constants.js';
-import { readSlot, writeSlot, downloadSave, setLastSlot } from './js/core/storage.js';
-import { driverOverall, teamOverall, validateTeamName, validateColor } from './js/core/validation.js';
-import { TEAMS_2026 } from './js/data/teams-2026.js';
-import { formatMoney, formatPlayTime, formatGameDate } from './js/core/utils.js';
-import { h, kv, ratingBar, toast, confirmDialog } from './js/ui.js';
-import { runImportFlow } from './js/import-flow.js';
-import { CALENDAR_2026 } from './js/data/calendar-2026.js';
-import { advanceOneDay, advanceToNextEvent, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost } from './js/core/progression.js';
-import { weekendFor } from './js/core/weekend.js';
+import { SLOT_COUNT, SEASON, STAT_KEYS, STAT_LABELS, DEPT_KEYS, DEPT_LABELS, CATEGORIES, START_LEVELS, UPGRADE_LEVELS, TEAM_NAME_MAX } from './core/constants.js';
+import { readSlot, writeSlot, downloadSave, setLastSlot } from './core/storage.js';
+import { driverOverall, teamOverall, validateTeamName, validateColor } from './core/validation.js';
+import { TEAMS_2026 } from './data/teams-2026.js';
+import { formatMoney, formatPlayTime, formatGameDate } from './core/utils.js';
+import { h, kv, ratingBar, toast, confirmDialog } from './ui.js';
+import { runImportFlow } from './import-flow.js';
+import { CALENDAR_2026 } from './data/calendar-2026.js';
+import { advanceOneDay, advanceToNextEvent, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost } from './core/progression.js';
+import { weekendFor } from './core/weekend.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);

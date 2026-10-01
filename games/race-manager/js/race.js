@@ -1,10 +1,10 @@
-import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './js/core/constants.js';
-import { readSlot, writeSlot } from './js/core/storage.js';
-import { formatGameDate, formatMoney, round2 } from './js/core/utils.js';
-import { h, showModal, toast } from './js/ui.js';
-import { CALENDAR_2026 } from './js/data/calendar-2026.js';
-import { weekendFor } from './js/core/weekend.js';
-import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap } from './js/core/race-engine.js';
+import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './core/constants.js';
+import { readSlot, writeSlot } from './core/storage.js';
+import { formatGameDate, formatMoney, round2 } from './core/utils.js';
+import { h, showModal, toast } from './ui.js';
+import { CALENDAR_2026 } from './data/calendar-2026.js';
+import { weekendFor } from './core/weekend.js';
+import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap } from './core/race-engine.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);

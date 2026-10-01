@@ -10,9 +10,29 @@ const ensure = (save) => { if (!save.transfers) save.transfers = {}; if (!Array.
 export function ensureTransferState(save) { ensure(save); return save.transfers; }
 export function driverLabel(driver) { return displayName(driver); }
 
+// V6 : Garde-fou pour compter les pilotes engagés
+function countEngagedDrivers(save, teamId, nextSeason, excludeDriverId = null) {
+  let count = 0;
+  for (const d of save.drivers) {
+    if (d.id === excludeDriverId) continue; // Ne pas compter le pilote ciblé (cas renouvellement)
+    const isCurrent = d.contract && d.contract.teamId === teamId && Number(d.contract.endSeason) >= nextSeason;
+    const isFuture = d.futureContract && d.futureContract.teamId === teamId && Number(d.futureContract.startSeason) === nextSeason;
+    if (isCurrent || isFuture) count++;
+  }
+  return count;
+}
+
 export function prospectDriver(save, driverId, date = save.gameDate) {
-  ensure(save); const d = save.drivers.find((x) => x.id === driverId);
+  ensure(save);
+  const d = save.drivers.find((x) => x.id === driverId);
   if (!d) return { ok: false, error: 'Pilote introuvable.' };
+
+  // V6 : Garde-fou prospection
+  const nextSeason = seasonOf(save) + 1;
+  if (countEngagedDrivers(save, save.playerTeamId, nextSeason, driverId) >= 2) {
+    return { ok: false, error: 'Vous avez déjà 2 pilotes engagés pour la saison prochaine.' };
+  }
+
   if (save.transfers.scouting.some((x) => x.driverId === driverId && !x.completed)) return { ok: false, error: 'Une prospection est déjà en cours.' };
   const activeScouting = save.transfers.scouting.filter((x) => !x.completed).length;
   if (activeScouting >= 3) return { ok: false, error: 'Limite de 3 prospections simultanées atteinte.' };
@@ -21,8 +41,17 @@ export function prospectDriver(save, driverId, date = save.gameDate) {
 }
 
 export function offerDriver(save, driverId, slot, salary, years, date = save.gameDate) {
-  ensure(save); const d = save.drivers.find((x) => x.id === driverId); const nSalary = Number(salary); const nYears = Number(years);
+  ensure(save);
+  const d = save.drivers.find((x) => x.id === driverId);
+  const nSalary = Number(salary); const nYears = Number(years);
   if (!d) return { ok: false, error: 'Pilote introuvable.' };
+
+  // V6 : Garde-fou offre
+  const nextSeason = seasonOf(save) + 1;
+  if (countEngagedDrivers(save, save.playerTeamId, nextSeason, driverId) >= 2) {
+    return { ok: false, error: 'Vous avez déjà 2 pilotes engagés pour la saison prochaine.' };
+  }
+
   if (!Number.isFinite(nSalary) || nSalary < 0 || !Number.isInteger(nYears) || nYears < 1) return { ok: false, error: 'Offre invalide.' };
   if (d.teamId === save.playerTeamId && !d.contract) return { ok: false, error: 'Ce pilote est déjà dans votre écurie.' };
   if (d.futureContract || save.transfers.signed.some((x) => x.driverId === driverId)) return { ok: false, error: 'Ce pilote a déjà signé un contrat en attente.' };
@@ -62,7 +91,7 @@ export function applyAcceptedOffer(save, offer, date = save.gameDate) {
   save.transfers.signed.push(signed); return { ok: true, signed };
 }
 
-function replacementCascade(save, oldTeamId, slot, date) {
+export function replacementCascade(save, oldTeamId, slot, date) {
   const free = save.drivers.filter((d) => !d.teamId && !d.futureContract && d.id !== save.playerTeamId).sort((a, b) => driverOverall(b) - driverOverall(a));
   const recruit = free[0]; if (!recruit) return null;
   recruit.teamId = oldTeamId; recruit.contract = { teamId: oldTeamId, salary: recruit.salary ?? 0, startSeason: seasonOf(save), endSeason: seasonOf(save) + 1, loyalty: recruit.loyalty ?? null };
@@ -76,8 +105,11 @@ function applySigned(save, date) {
     const d = save.drivers.find((x) => x.id === signed.driverId); if (!d) continue; const oldTeam = d.teamId; const oldSlot = d.contract?.slot || signed.slot || '1';
     if (oldTeam && oldTeam !== signed.targetTeamId) replacementCascade(save, oldTeam, oldSlot, date);
     const newTeam = save.teams.find((team) => team.id === signed.targetTeamId);
-    if (newTeam && Number.isFinite(newTeam.balance)) newTeam.balance = round2(newTeam.balance - Number(signed.salary || 0));
-    d.teamId = signed.targetTeamId; d.contract = { teamId: signed.targetTeamId, salary: signed.salary, startSeason: signed.startSeason, endSeason: signed.endSeason, loyalty: d.contract?.loyalty ?? d.loyalty ?? null, slot: signed.slot }; delete d.futureContract;
+    // V6 : Le paiement des salaires de début d'année est géré dans initNewSeason (progression.js), 
+    // on ne déduit plus l'argent ici pour éviter les doubles prélèvements à N+1
+    d.teamId = signed.targetTeamId;
+    d.contract = { teamId: signed.targetTeamId, salary: signed.salary, startSeason: signed.startSeason, endSeason: signed.endSeason, loyalty: d.contract?.loyalty ?? d.loyalty ?? null, slot: signed.slot };
+    delete d.futureContract;
     done.push({ ...signed, oldTeamId: oldTeam });
   }
   save.transfers.signed = save.transfers.signed.filter((x) => !pending.includes(x)); return done;

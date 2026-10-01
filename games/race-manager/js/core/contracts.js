@@ -16,7 +16,7 @@ export function listMarketDrivers(drivers, season) {
 
 export function migrateContracts(save, season = save?.season ?? new Date().getFullYear()) {
   if (!save || typeof save !== 'object') return save;
-  return { ...save, drivers: (save.drivers || []).map((d) => ({ ...d, contract: d.contract === null ? null : (d.contract && typeof d.contract === 'object' ? { teamId: d.contract.teamId ?? d.teamId, salary: d.contract.salary ?? 0, signingCost: d.contract.signingCost ?? 0, startSeason: d.contract.startSeason ?? season, endSeason: d.contract.endSeason ?? season + 1, loyalty: d.contract.loyalty ?? null } : { teamId: d.teamId, salary: 0, signingCost: 0, startSeason: season, endSeason: season + 1, loyalty: null }) })) };
+  return { ...save, drivers: (save.drivers || []).map((d) => ({ ...d, contract: d.contract === null ? null : (d.contract && typeof d.contract === 'object' ? { teamId: d.contract.teamId ?? d.teamId, salary: d.contract.salary ?? 0, signingCost: d.contract.signingCost ?? 0, startSeason: d.contract.startSeason ?? season, endSeason: d.contract.endSeason ?? season + 1, loyalty: d.contract.loyalty ?? null, slot: d.contract.slot ?? '1' } : { teamId: d.teamId, salary: 0, signingCost: 0, startSeason: season, endSeason: season + 1, loyalty: null, slot: '1' }) })) };
 }
 
 /** Agrège l'affichage à partir du classement déjà calculé par le moteur. */

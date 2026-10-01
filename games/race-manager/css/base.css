@@ -421,3 +421,127 @@ legend {
     transition: none;
   }
 }
+
+/* Responsive foundation: mobile first, shared by every game screen. */
+:root {
+  --content-max: 72rem;
+  --gutter: clamp(.875rem, 3vw, 1.5rem);
+  --control-height: 2.75rem;
+}
+
+body.am-page {
+  overflow-x: hidden;
+}
+
+.container {
+  width: min(100%, var(--content-max));
+  padding-inline: var(--gutter);
+}
+
+.topbar {
+  padding-inline: var(--gutter);
+}
+
+.topbar>* {
+  min-width: 0;
+}
+
+.card,
+fieldset,
+.modal {
+  min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.input,
+select.input,
+textarea.input {
+  max-width: 100%;
+}
+
+.btn {
+  text-align: center;
+}
+
+.row>.btn {
+  max-width: 100%;
+}
+
+@media (max-width: 32rem) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar h1 {
+    flex-basis: 100%;
+    order: -1;
+  }
+
+  .container {
+    padding-block: .875rem;
+  }
+
+  .kv {
+    grid-template-columns: 1fr;
+    gap: .15rem;
+  }
+
+  .kv dd {
+    margin-bottom: .35rem;
+  }
+
+  .field--inline {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .modal,
+  .modal--wide {
+    width: min(94vw, 40rem);
+    padding: 1rem;
+  }
+
+  #toast-container {
+    right: .75rem;
+    left: .75rem;
+    top: .75rem;
+  }
+
+  .toast {
+    max-width: none;
+  }
+}
+
+@media (min-width: 48rem) {
+  .container {
+    padding-block: 1.25rem;
+  }
+
+  .topbar {
+    padding-block: .9rem;
+  }
+}
+
+@media (min-width: 72rem) {
+  .container {
+    padding-block: 1.5rem;
+  }
+}
+/* Correctifs responsive finaux — contenu fluide sans débordement horizontal. */
+:root { --content-max: 86rem; }
+body.am-page { overflow-x: hidden; }
+.container, .card, .stack, .grid2 { min-width: 0; }
+.container { width: min(100%, var(--content-max)); }

@@ -299,26 +299,11 @@ function run(save, round) {
     }
   }
 
-  let animTimer = null;
-
-  function highlightPositionChanges() {
-    for (const entry of raceState.entries) {
-      if (entry.status === 'dnf' || !entry._posDiff) continue;
-
-      entry._uiFlash = entry._posDiff > 0 ? 'pos-up' : 'pos-down';
-      setTimeout(() => {
-        entry._uiFlash = null;
-      }, 500);
-    }
-  }
-
   function scheduleNextLap() {
-    const delay = 5000 / playSpeed;
-    if (animTimer) clearInterval(animTimer);
+    if (playSpeed <= 0 || raceState.completed) return;
 
     const res = simulateLap(raceState);
     if (res.events.length) raceState.log.unshift(...res.events.reverse());
-    highlightPositionChanges();
 
     let needsPause = false;
     for (const entry of raceState.entries) {
@@ -330,52 +315,24 @@ function run(save, round) {
       }
     }
 
-    // Initialize animation values
-    raceState.entries.forEach(e => {
-      if (e.status === 'dnf') e._animTotalTime = Infinity;
-      else e._animTotalTime = e._oldTotalTime || e.totalTime;
-    });
+    // Le classement et les couleurs sont rendus à partir du même état final du tour.
+    // Aucune interpolation DOM ne peut donc afficher une couleur sur une mauvaise ligne.
+    updateLiveRaceUI();
 
-    const fps = 10;
-    const steps = playSpeed === 0 ? 1 : Math.max(1, delay / (1000 / fps));
-    let step = 0;
+    if (raceState.completed) {
+      finishRaceAndShowResults();
+      return;
+    }
 
-    animTimer = setInterval(() => {
-      step++;
-      const progress = Math.min(1, step / steps);
+    weekend.race.state = serializeRaceState(raceState);
+    weekend.race.log = raceState.log.slice(0, 100);
+    persist();
 
-      raceState.entries.forEach(e => {
-        if (e.status !== 'dnf') {
-          const oldT = e._oldTotalTime || e.totalTime;
-          e._animTotalTime = oldT + (e.totalTime - oldT) * progress;
-        }
-      });
-
-      updateLiveRaceUI();
-
-      if (progress >= 1) {
-        clearInterval(animTimer);
-
-        // Final cleanup
-        raceState.entries.forEach(e => {
-          delete e._oldTotalTime;
-          e._animTotalTime = e.totalTime;
-        });
-
-        if (needsPause) {
-          setPlaySpeed(0);
-        }
-
-        if (!raceState.completed) {
-          weekend.race.state = serializeRaceState(raceState);
-          weekend.race.log = raceState.log.slice(0, 100);
-          persist();
-          if (playSpeed > 0) scheduleNextLap();
-        } else {
-          finishRaceAndShowResults();
-        }
-      }
-    }, 1000 / fps);
+    if (needsPause) {
+      setPlaySpeed(0);
+    } else {
+      simTimer = setTimeout(scheduleNextLap, 5000 / playSpeed);
+    }
   }
 
   function finishRaceAndShowResults() {
@@ -409,7 +366,7 @@ function run(save, round) {
     const sortedEntries = [...raceState.entries].sort((a, b) => {
       if (a.status === 'dnf' && b.status !== 'dnf') return 1;
       if (b.status === 'dnf' && a.status !== 'dnf') return -1;
-      return (a._animTotalTime ?? a.totalTime) - (b._animTotalTime ?? b.totalTime);
+      return a.position - b.position;
     });
 
     const leader = sortedEntries[0];
@@ -426,18 +383,19 @@ function run(save, round) {
       } else if (i === 0) {
         gapText = 'Leader';
       } else {
-        const animT = entry._animTotalTime ?? entry.totalTime;
+        const animT = entry.totalTime;
         if (gapMode === 'leader') {
-          const leadT = leader._animTotalTime ?? leader.totalTime;
+          const leadT = leader.totalTime;
           gapText = `+${((animT - leadT) / 1000).toFixed(1)}s`;
         } else {
           const ahead = sortedEntries[i - 1];
-          const aheadT = ahead._animTotalTime ?? ahead.totalTime;
+          const aheadT = ahead.totalTime;
           gapText = `+${((animT - aheadT) / 1000).toFixed(1)}s`;
         }
       }
 
-      return h('tr', { class: `${entry.isPlayer ? 'is-player' : ''} ${isDnf ? 'is-dnf' : ''} ${entry._uiFlash || ''}` },
+      const positionClass = !isDnf && entry._posDiff ? (entry._posDiff > 0 ? 'pos-up' : 'pos-down') : '';
+      return h('tr', { class: `${entry.isPlayer ? 'is-player' : ''} ${isDnf ? 'is-dnf' : ''} ${positionClass}` },
         h('td', { text: p }),
         h('td', { text: d.abbr, title: d.name }),
         h('td', { class: 'gap', text: gapText }),

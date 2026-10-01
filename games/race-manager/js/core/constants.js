@@ -5,7 +5,7 @@
  */
 export const GAME_ID = 'mon-jeu';
 export const GAME_TITLE = 'The Race Manager';
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 export const SEASON = 2026;
 export const START_DATE = '2026-01-01';
 export const SLOT_COUNT = 3;

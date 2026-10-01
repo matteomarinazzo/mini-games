@@ -352,10 +352,114 @@ function run(save) {
         h('a', { class: 'btn', href: 'menu.html', text: 'Retour au menu des sauvegardes', onClick: () => { persist(); } })));
   }
 
+
+  function standingsPanel() {
+    const playerTeamId = save.playerTeamId;
+    const driversById = new Map(save.drivers.map((driver) => [driver.id, driver]));
+    const teamsById = new Map(save.teams.map((team) => [team.id, team]));
+    const driverStats = new Map();
+    const teamStats = new Map();
+
+    // Les statistiques de course sont lues dans les résultats enregistrés ; aucun point
+    // n'est recalculé ici et l'écurie est celle stockée sur chaque résultat.
+    for (const weekend of Object.values(save.weekends || {})) {
+      for (const result of weekend?.race?.results || []) {
+        const driver = driversById.get(result.driverId);
+        if (!driver) continue;
+        const driverEntry = driverStats.get(result.driverId) || { wins: 0, podiums: 0 };
+        if (result.position === 1) driverEntry.wins += 1;
+        if (result.position <= 3) driverEntry.podiums += 1;
+        driverStats.set(result.driverId, driverEntry);
+
+        const teamEntry = teamStats.get(result.teamId) || { wins: 0, podiums: 0 };
+        if (result.position === 1) teamEntry.wins += 1;
+        if (result.position <= 3) teamEntry.podiums += 1;
+        teamStats.set(result.teamId, teamEntry);
+      }
+    }
+
+    const driverRows = (save.standings?.drivers || []).map((standing, index) => {
+      const driver = driversById.get(standing.driverId);
+      if (!driver) return null;
+      const stats = driverStats.get(driver.id) || { wins: 0, podiums: 0 };
+      return { ...standing, driver, stats, rank: index + 1 };
+    }).filter(Boolean);
+    const teamRows = (save.standings?.teams || []).map((standing, index) => {
+      const team = teamsById.get(standing.teamId);
+      if (!team) return null;
+      const stats = teamStats.get(team.id) || { wins: 0, podiums: 0 };
+      return { ...standing, team, stats, rank: index + 1 };
+    }).filter(Boolean);
+    const leaderPoints = (rows) => rows[0]?.points ?? 0;
+    const gapText = (points, leader) => points === leader ? '—' : `−${leader - points}`;
+
+    const teamCell = (team) => h('span', { class: 'team-cell' },
+      h('span', { class: 'team-swatch', style: { '--team-color': team.color, background: team.color }, 'aria-hidden': 'true' }),
+      h('span', { text: team.name }));
+    const playerMark = h('span', { class: 'standings-player-mark', 'aria-label': 'Écurie du joueur', text: '' });
+
+    const driverTable = () => {
+      const leader = leaderPoints(driverRows);
+      return h('div', { class: 'table-scroll' }, h('table', {},
+        h('caption', { class: 'sr-only', text: 'Classement des pilotes' }),
+        h('thead', {}, h('tr', {}, ['#', 'Pilote', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) => h('th', { scope: 'col', text: label })))),
+        h('tbody', {}, driverRows.length ? driverRows.map((row) => {
+          const isPlayer = row.driver.teamId === playerTeamId;
+          const team = teamsById.get(row.driver.teamId);
+          return h('tr', { class: isPlayer ? 'is-player-team' : '', 'data-team-color': team?.color || '' },
+            h('td', { class: 'standings-rank', text: String(row.rank) }),
+            h('th', { scope: 'row', class: 'standings-name' }, isPlayer ? playerMark.cloneNode(true) : null, h('strong', { text: row.driver.name })),
+            h('td', {}, team ? teamCell(team) : h('span', { class: 'muted', text: '—' })),
+            h('td', { class: 'standings-points', text: String(row.points) }),
+            h('td', { text: gapText(row.points, leader) }),
+            h('td', { text: String(row.stats.wins) }),
+            h('td', { text: String(row.stats.podiums) }));
+        }) : h('tr', {}, h('td', { colspan: '7', class: 'muted', text: 'Aucune course enregistrée.' })))));
+    };
+
+    const teamTable = () => {
+      const leader = leaderPoints(teamRows);
+      return h('div', { class: 'table-scroll' }, h('table', {},
+        h('caption', { class: 'sr-only', text: 'Classement des constructeurs' }),
+        h('thead', {}, h('tr', {}, ['#', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) => h('th', { scope: 'col', text: label })))),
+        h('tbody', {}, teamRows.length ? teamRows.map((row) => {
+          const isPlayer = row.team.id === playerTeamId;
+          return h('tr', { class: isPlayer ? 'is-player-team' : '' },
+            h('td', { class: 'standings-rank', text: String(row.rank) }),
+            h('th', { scope: 'row', class: 'standings-name' }, isPlayer ? playerMark.cloneNode(true) : null, teamCell(row.team)),
+            h('td', { class: 'standings-points', text: String(row.points) }),
+            h('td', { text: gapText(row.points, leader) }),
+            h('td', { text: String(row.stats.wins) }),
+            h('td', { text: String(row.stats.podiums) }));
+        }) : h('tr', {}, h('td', { colspan: '6', class: 'muted', text: 'Aucune course enregistrée.' })))));
+    };
+
+    const driversTab = h('button', { type: 'button', class: 'standings-subtab is-active', role: 'tab', id: 'standings-tab-drivers', 'aria-controls': 'standings-panel-drivers', 'aria-selected': 'true', tabindex: '0', text: 'Pilotes' });
+    const teamsTab = h('button', { type: 'button', class: 'standings-subtab', role: 'tab', id: 'standings-tab-teams', 'aria-controls': 'standings-panel-teams', 'aria-selected': 'false', tabindex: '-1', text: 'Constructeurs' });
+    const driversPanel = h('div', { id: 'standings-panel-drivers', class: 'standings-table-panel', role: 'tabpanel', 'aria-labelledby': 'standings-tab-drivers' }, driverTable());
+    const teamsPanel = h('div', { id: 'standings-panel-teams', class: 'standings-table-panel', role: 'tabpanel', 'aria-labelledby': 'standings-tab-teams', hidden: true }, teamTable());
+    const selectTab = (tab, panel, otherTab, otherPanel) => {
+      tab.classList.add('is-active'); otherTab.classList.remove('is-active');
+      tab.setAttribute('aria-selected', 'true'); otherTab.setAttribute('aria-selected', 'false');
+      tab.tabIndex = 0; otherTab.tabIndex = -1; panel.hidden = false; otherPanel.hidden = true; tab.focus();
+    };
+    driversTab.addEventListener('click', () => selectTab(driversTab, driversPanel, teamsTab, teamsPanel));
+    teamsTab.addEventListener('click', () => selectTab(teamsTab, teamsPanel, driversTab, driversPanel));
+    [driversTab, teamsTab].forEach((tab) => tab.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); (tab === driversTab ? teamsTab : driversTab).click(); }
+    }));
+
+    return h('section', { class: 'card standings-card', 'aria-labelledby': 'standings-title' },
+      h('h1', { id: 'standings-title', text: 'Classements' }),
+      h('p', { class: 'muted', text: 'Points issus du classement officiel de la sauvegarde. Les statistiques sont dérivées des résultats enregistrés.' }),
+      h('div', { class: 'standings-subtabs', role: 'tablist', 'aria-label': 'Type de classement' }, driversTab, teamsTab),
+      driversPanel, teamsPanel);
+  }
+
   const panels = {
     home: { title: 'Accueil', build: homePanel },
     calendar: { title: 'Calendrier', build: calendarPanel },
-    standings: { title: 'Classements', build: () => placeholder('Classements', 'Les classements pilotes et écuries apparaîtront quand des courses pourront être disputées.') },
+    standings: { title: 'Classements', build: standingsPanel },
     drivers: { title: 'Pilotes / mercato', build: () => placeholder('Pilotes / mercato', 'La gestion des contrats et des transferts de pilotes sera ajoutée plus tard.') },
     settings: { title: 'Paramètres et sauvegarde', build: settingsPanel },
   };

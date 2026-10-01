@@ -11,6 +11,7 @@ import {
 } from './constants.js';
 import { clampRating, teamOverall, driverOverall, normalizeName, validateTeamName, validateColor, validateBudget, validateDriverSelection, validateSave } from './validation.js';
 import { clone, round2, hashString, newId } from './utils.js';
+import { migrateContracts } from './contracts.js';
 import { TEAMS_2026, REFERENCE_VERSION } from '../data/teams-2026.js';
 import { DRIVERS_2026 } from '../data/drivers-2026.js';
 
@@ -41,7 +42,14 @@ function toStateDriver(ref, teamId, signingCost = 0) {
     potential: ref.potential,
     experience: ref.experience,
     available: false,
-    contract: { salary: ref.salary, signingCost, startSeason: SEASON, endSeason: SEASON },
+    contract: teamId ? {
+      teamId,
+      salary: ref.salary,
+      signingCost,
+      startSeason: SEASON,
+      endSeason: SEASON + 1 + ((Number(ref.loyalty ?? 50) + Number(ref.age ?? 25)) % 3),
+      loyalty: Number.isFinite(ref.loyalty) ? ref.loyalty : null,
+    } : null,
   };
 }
 
@@ -381,6 +389,9 @@ export function migrateSave(save) {
       }
     }
     s = { ...s, schemaVersion: 5 };
+  }
+  if (s.schemaVersion === 5) {
+    s = { ...migrateContracts(s), schemaVersion: 6 };
   }
   return s;
 }

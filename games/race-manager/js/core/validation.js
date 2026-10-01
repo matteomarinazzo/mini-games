@@ -186,6 +186,9 @@ export function validateSave(s) {
       if (!(d.category in CATEGORIES)) err(`Catégorie invalide pour le pilote ${d.id}.`);
       if (!teamIds.has(d.teamId)) err(`Le pilote ${d.id} n’appartient à aucune écurie connue.`);
       perTeam[d.teamId] = (perTeam[d.teamId] || 0) + 1;
+      if (d.contract !== null && (!isObj(d.contract) || d.contract.teamId !== d.teamId || !Number.isFinite(d.contract.salary) || !Number.isInteger(d.contract.startSeason) || !Number.isInteger(d.contract.endSeason) || d.contract.endSeason < d.contract.startSeason || (d.contract.loyalty !== null && !Number.isFinite(d.contract.loyalty)))) {
+        err(`Contrat invalide pour le pilote ${d.id}.`);
+      }
       if (!isObj(d.stats) || !STAT_KEYS.every((k) => isRating(d.stats[k]))) {
         err(`Statistiques invalides (entre ${RATING_MIN} et ${RATING_MAX}) pour le pilote ${d.id}.`);
       }

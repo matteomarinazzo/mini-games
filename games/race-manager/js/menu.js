@@ -2,13 +2,13 @@
  * Vue « menu des sauvegardes » : 3 slots (vide / occupé / invalide), création, chargement,
  * suppression confirmée, import JSON.
  */
-import { SLOT_COUNT } from './js/core/constants.js';
-import { readSlot, deleteSlot, isStorageAvailable, getLastSlot, setLastSlot } from './js/core/storage.js';
-import { summarizeSave } from './js/core/game-state.js';
-import { h, confirmDialog, toast } from './js/ui.js';
-import { summaryNode } from './js/summary-view.js';
-import { runImportFlow } from './js/import-flow.js';
-import { startWizard } from './js/menu-wizard.js';
+import { SLOT_COUNT } from './core/constants.js';
+import { readSlot, deleteSlot, isStorageAvailable, getLastSlot, setLastSlot } from './core/storage.js';
+import { summarizeSave } from './core/game-state.js';
+import { h, confirmDialog, toast } from './ui.js';
+import { summaryNode } from './summary-view.js';
+import { runImportFlow } from './import-flow.js';
+import { startWizard } from './menu-wizard.js';
 
 const slotsEl = document.getElementById('slots');
 const slotsView = document.getElementById('slotsView');

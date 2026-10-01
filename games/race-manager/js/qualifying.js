@@ -1,9 +1,9 @@
-import { SLOT_COUNT } from './js/core/constants.js';
-import { readSlot, writeSlot } from './js/core/storage.js';
-import { formatGameDate, formatMoney } from './js/core/utils.js';
-import { h, showModal, toast } from './js/ui.js';
-import { CALENDAR_2026 } from './js/data/calendar-2026.js';
-import { nextQualifyingSession, playerQualifyingDrivers, runQualifyingSession, simulateRemainingQualifications, weekendFor } from './js/core/weekend.js';
+import { SLOT_COUNT } from './core/constants.js';
+import { readSlot, writeSlot } from './core/storage.js';
+import { formatGameDate, formatMoney } from './core/utils.js';
+import { h, showModal, toast } from './ui.js';
+import { CALENDAR_2026 } from './data/calendar-2026.js';
+import { nextQualifyingSession, playerQualifyingDrivers, runQualifyingSession, simulateRemainingQualifications, weekendFor } from './core/weekend.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);

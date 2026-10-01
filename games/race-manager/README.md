@@ -9,10 +9,10 @@ Jeu de management d'écurie de sport automobile pour mini-games.ch. HTML, CSS et
 ```
 games/race-manager/
 ├── index.html        entrée (head SEO) → redirige vers menu.html
-├── menu.html / menu.js / menu.css      3 slots + assistant de création
-├── home.html / home.js / home.css      menu principal de la partie
+├── menu.html / menu.js /     3 slots + assistant de création
+├── home.html / home.js /     menu principal de la partie
 ├── game.html         redirection vers home.html (aucune fonctionnalité en V1)
-├── css/base.css      styles communs (thème sombre, boutons, dialogues, jauges)
+├── css/base.css / menu.css / home.css / qualifying.css     styles communs (thème sombre, boutons, dialogues, jauges)
 ├── js/
 │   ├── data/teams-2026.js, drivers-2026.js   données de référence (gelées, jamais modifiées)
 │   ├── core/constants.js    règles et libellés (limites, niveaux de difficulté, palette)

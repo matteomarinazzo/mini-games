@@ -260,6 +260,11 @@ function generateAiRaceStrategy(saveId, roundId, driver, team, weekend, circuit)
  * @returns {{ events: string[], completed: boolean }}
  */
 export function simulateLap(state) {
+  // Snapshot taken before any lap computation: this is the only baseline used
+  // to identify a position change in the standings rendered after this lap.
+  const oldPositions = new Map(state.entries.map((e) => [e.driverId, e.position]));
+  for (const entry of state.entries) entry._posDiff = 0;
+
   state.currentLap++;
   const lap = state.currentLap;
   const circuit = state._circuit;
@@ -443,7 +448,6 @@ export function simulateLap(state) {
   }
 
   // ── Mise à jour des positions ──
-  const oldPositions = new Map(state.entries.map(e => [e.driverId, e.position]));
   const allSorted = [...state.entries].sort((a, b) => {
     if (a.status === 'dnf' && b.status !== 'dnf') return 1;
     if (b.status === 'dnf' && a.status !== 'dnf') return -1;

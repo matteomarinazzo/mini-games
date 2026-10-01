@@ -1,0 +1,493 @@
+/* Vue « menu des sauvegardes » et assistant de création. */
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.section-head h2 {
+    margin: 0;
+}
+
+.slots {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
+.slot {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.slot--filled {
+    border-top: 6px solid var(--team);
+}
+
+.slot--empty {
+    border-style: dashed;
+}
+
+.slot--invalid {
+    border: 2px solid var(--danger);
+}
+
+.slot__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.slot__head h3 {
+    margin: 0;
+}
+
+.slot__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: auto;
+    padding-top: .5rem;
+}
+
+/* Indicateur de progression : numéro + titre, étape courante soulignée */
+.progress {
+    display: flex;
+    gap: .4rem;
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+}
+
+.progress__item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .4rem .5rem;
+    border-bottom: 4px solid var(--line);
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.progress__item.is-done {
+    border-color: var(--ok);
+    color: var(--text);
+}
+
+.progress__item.is-current {
+    border-color: var(--accent);
+    color: var(--text);
+    font-weight: 700;
+}
+
+.progress__n {
+    display: inline-grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    font-weight: 800;
+    flex: none;
+}
+
+@media (max-width: 34rem) {
+    .progress__item:not(.is-current) .progress__t {
+        display: none;
+    }
+}
+
+.wiz__title {
+    margin: .25rem 0 1rem;
+}
+
+.wiz__title:focus {
+    outline: none;
+}
+
+.wiz__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-top: 1.25rem;
+    position: sticky;
+    bottom: 0;
+    padding: .75rem 0 calc(.75rem + env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, var(--bg) 35%);
+}
+
+.wiz__nav .btn {
+    flex: 1;
+    max-width: 14rem;
+}
+
+.wiz__nav .btn--primary {
+    margin-left: auto;
+}
+
+/* Étape 1 */
+.swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.swatches legend {
+    width: 100%;
+}
+
+.swatch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .6rem;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.swatch input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.swatch__dot {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background: var(--c);
+    border: 2px solid #fff;
+}
+
+.swatch:has(input:checked) {
+    border-color: #fff;
+    background: var(--surface-2);
+}
+
+.swatch:has(input:checked) .swatch__dot::after {
+    content: "✓";
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: .8rem;
+    font-weight: 900;
+    color: #000;
+}
+
+.swatch:has(input:focus-visible) {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+.swatches .field--inline {
+    width: 100%;
+    margin: .5rem 0 0;
+}
+
+.team-preview {
+    --team: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+
+.team-preview__stripe {
+    width: 8px;
+    align-self: stretch;
+    border-radius: 4px;
+    background: var(--team);
+}
+
+.team-preview__name {
+    flex: 1;
+    font-size: 1.3rem;
+    overflow-wrap: anywhere;
+}
+
+/* Étape 2 */
+.budget-big {
+    font-size: 2.6rem;
+    font-weight: 800;
+    margin: .5rem 0;
+    color: var(--accent);
+}
+
+/* Étape 3 */
+.filters {
+    display: grid;
+    gap: .5rem .75rem;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    margin: 1rem 0 .5rem;
+}
+
+.filters .field {
+    margin-bottom: 0;
+}
+
+.pick-summary {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: .5rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.pick-slots {
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    margin-bottom: .5rem;
+}
+
+.pick-slot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem .6rem;
+    padding: .5rem .75rem;
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+}
+
+.pick-slot.is-filled {
+    border-style: solid;
+    border-color: var(--accent);
+}
+
+.pick-slot__label {
+    color: var(--muted);
+    font-size: .85rem;
+    width: 100%;
+}
+
+.drivers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: .6rem;
+}
+
+.driver {
+    padding: .75rem;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+}
+
+.driver.is-selected {
+    border-color: var(--accent);
+    background: var(--surface-2);
+}
+
+.driver__main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    align-items: center;
+}
+
+.driver__meta {
+    margin: .25rem 0;
+    color: var(--muted);
+}
+
+.driver__warn {
+    margin: 0 0 .4rem;
+    font-size: .9rem;
+    color: var(--accent);
+}
+
+.driver__actions {
+    display: flex;
+    gap: .5rem;
+}
+
+.tag {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0 .4rem;
+    font-size: .8rem;
+}
+
+.tag--sel {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* Étape 4 */
+.choices {
+    display: grid;
+    gap: .5rem;
+}
+
+.choice {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    padding: .6rem .75rem;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.choice:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--surface-2);
+}
+
+.choice input {
+    margin-top: .35rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--accent);
+}
+
+.choice small {
+    display: block;
+    color: var(--muted);
+}
+
+.dept-preview {
+    margin-top: 1rem;
+}
+
+/* Étape 3 — variantes de loyauté */
+.driver__warn--hard {
+    color: #ef4444;
+}
+
+/* très fidèle → rouge */
+.driver__warn--cascade {
+    color: #a78bfa;
+}
+
+/* cascade → violet */
+
+/* Étape 5 */
+.recap section {
+    margin-bottom: 1.25rem;
+}
+
+/* Bloc cascade de transferts dans le récap */
+.transfers {
+    margin-top: .5rem;
+}
+
+.transfers__list {
+    display: grid;
+    gap: .35rem;
+}
+
+.transfers__list li {
+    padding: .4rem .6rem;
+    border-left: 3px solid var(--line);
+    border-radius: 0 6px 6px 0;
+    font-size: .9rem;
+}
+
+.transfer-item--poach {
+    border-left-color: #a78bfa;
+    background: color-mix(in srgb, #a78bfa 8%, transparent);
+}
+
+/* Responsive menu/wizard refinements. */
+.slots,
+.pick-slots {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
+.slot__actions,
+.wiz__nav,
+.qualifying-actions {
+    align-items: stretch;
+}
+
+.progress {
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.progress__item {
+    min-width: 8rem;
+}
+
+.driver__actions .btn,
+.slot__actions .btn {
+    flex: 1 1 auto;
+}
+
+@media (max-width: 36rem) {
+    .section-head {
+        align-items: stretch;
+    }
+
+    .section-head>.btn {
+        width: 100%;
+    }
+
+    .progress__item {
+        min-width: 3.1rem;
+        justify-content: center;
+    }
+
+    .wiz__nav {
+        margin-inline: calc(var(--gutter, .875rem) * -1);
+        padding-inline: var(--gutter, .875rem);
+    }
+
+    .wiz__nav .btn {
+        max-width: none;
+    }
+
+    .budget-big {
+        font-size: clamp(2rem, 12vw, 2.6rem);
+    }
+
+    .pick-summary {
+        margin-inline: -.1rem;
+    }
+
+    .pick-slot {
+        min-width: 0;
+    }
+
+    .driver__actions {
+        flex-wrap: wrap;
+    }
+
+    .driver__actions .btn {
+        width: 100%;
+    }
+}
+
+@media (min-width: 48rem) {
+    .drivers {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+/* Le panneau de navigation de l'assistant reste lisible au-dessus du contenu. */
+.wiz__nav { z-index: 2; }

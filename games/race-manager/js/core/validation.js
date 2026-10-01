@@ -149,6 +149,7 @@ export function validateSave(s) {
     err('Activités de saison invalides.');
   }
   if (!isObj(s.weekends)) err('Week-ends de Grand Prix invalides.');
+  if (!isObj(s.transfers) || !Array.isArray(s.transfers.scouting) || !Array.isArray(s.transfers.offers)) err('Marché des transferts invalide.');
   if (!isObj(s.standings) || !Array.isArray(s.standings.drivers) || !Array.isArray(s.standings.teams)) err('Classements invalides.');
 
   // Écuries
@@ -181,14 +182,12 @@ export function validateSave(s) {
       if (!isObj(d) || typeof d.id !== 'string' || !d.id) return err(`Pilote n°${i + 1} invalide.`);
       if (driverIds.has(d.id)) err(`Pilote en double : ${d.id}.`);
       driverIds.add(d.id);
+      if (d.teamId === null) { /* agent libre autorisé */ }
       if (typeof d.name !== 'string' || !d.name) err(`Nom manquant pour le pilote ${d.id}.`);
       if (typeof d.abbr !== 'string' || d.abbr.length !== 3) err(`Abréviation invalide pour le pilote ${d.id}.`);
       if (!(d.category in CATEGORIES)) err(`Catégorie invalide pour le pilote ${d.id}.`);
-      if (!teamIds.has(d.teamId)) err(`Le pilote ${d.id} n’appartient à aucune écurie connue.`);
+      if (d.teamId !== null && !teamIds.has(d.teamId)) err(`Le pilote ${d.id} n’appartient à aucune écurie connue.`);
       perTeam[d.teamId] = (perTeam[d.teamId] || 0) + 1;
-      if (d.contract !== null && (!isObj(d.contract) || d.contract.teamId !== d.teamId || !Number.isFinite(d.contract.salary) || !Number.isInteger(d.contract.startSeason) || !Number.isInteger(d.contract.endSeason) || d.contract.endSeason < d.contract.startSeason || (d.contract.loyalty !== null && !Number.isFinite(d.contract.loyalty)))) {
-        err(`Contrat invalide pour le pilote ${d.id}.`);
-      }
       if (!isObj(d.stats) || !STAT_KEYS.every((k) => isRating(d.stats[k]))) {
         err(`Statistiques invalides (entre ${RATING_MIN} et ${RATING_MAX}) pour le pilote ${d.id}.`);
       }

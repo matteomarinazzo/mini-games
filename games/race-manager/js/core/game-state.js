@@ -11,7 +11,6 @@ import {
 } from './constants.js';
 import { clampRating, teamOverall, driverOverall, normalizeName, validateTeamName, validateColor, validateBudget, validateDriverSelection, validateSave } from './validation.js';
 import { clone, round2, hashString, newId } from './utils.js';
-import { migrateContracts } from './contracts.js';
 import { TEAMS_2026, REFERENCE_VERSION } from '../data/teams-2026.js';
 import { DRIVERS_2026 } from '../data/drivers-2026.js';
 
@@ -41,15 +40,9 @@ function toStateDriver(ref, teamId, signingCost = 0) {
     stats: clone(ref.stats),
     potential: ref.potential,
     experience: ref.experience,
+    loyalty: ref.loyalty ?? null,
     available: false,
-    contract: teamId ? {
-      teamId,
-      salary: ref.salary,
-      signingCost,
-      startSeason: SEASON,
-      endSeason: SEASON + 1 + ((Number(ref.loyalty ?? 50) + Number(ref.age ?? 25)) % 3),
-      loyalty: Number.isFinite(ref.loyalty) ? ref.loyalty : null,
-    } : null,
+    contract: { salary: ref.salary, signingCost, startSeason: SEASON, endSeason: SEASON },
   };
 }
 
@@ -355,6 +348,7 @@ export function createNewGame(input, slotId, now = new Date(), refs = { teams: T
     weekends: {},
     eventLog: [],
     standings: { drivers: [], teams: [] },
+    transfers: { scouting: [], offers: [] },
   };
   const check = validateSave(save);
   if (!check.ok) return { ok: false, errors: ['Erreur interne de génération de la partie.', ...check.errors] };
@@ -390,9 +384,8 @@ export function migrateSave(save) {
     }
     s = { ...s, schemaVersion: 5 };
   }
-  if (s.schemaVersion === 5) {
-    s = { ...migrateContracts(s), schemaVersion: 6 };
-  }
+  s.transfers ||= { scouting: [], offers: [] };
+  s.transfers.scouting ||= []; s.transfers.offers ||= [];
   return s;
 }
 

@@ -1,22 +1,20 @@
 /**
- * Vue « menu principal » V1 : affichage de la partie, onglets, sauvegarde manuelle/automatique,
- * export/import JSON, profil de l'écurie. Aucune fonctionnalité des versions ultérieures.
+ * Vue « menu principal » : accueil, calendrier dynamique (toutes saisons), classements,
+ * pilotes / mercato, paramètres (sauvegarde, import/export JSON, profil de l'écurie)
+ * et modales de fin / début de saison.
  *
  * Le slot arrive par l'URL (home.html?slot=N) ; il est validé (entier 1–3) puis relu depuis
  * localStorage : l'URL ne transporte jamais de données de partie.
  */
-import { SLOT_COUNT, SEASON, STAT_KEYS, STAT_LABELS, DEPT_KEYS, DEPT_LABELS, CATEGORIES, START_LEVELS, UPGRADE_LEVELS, TEAM_NAME_MAX } from './core/constants.js';
+import { SLOT_COUNT, STAT_KEYS, STAT_LABELS, DEPT_KEYS, DEPT_LABELS, UPGRADE_LEVELS, TEAM_NAME_MAX } from './core/constants.js';
 import { readSlot, writeSlot, downloadSave, setLastSlot } from './core/storage.js';
 import { driverOverall, teamOverall, validateTeamName, validateColor } from './core/validation.js';
 import { TEAMS_2026 } from './data/teams-2026.js';
 import { formatMoney, formatPlayTime, formatGameDate } from './core/utils.js';
-import { h, kv, ratingBar, toast, confirmDialog } from './ui.js';
+import { h, kv, ratingBar, toast, confirmDialog, showModal, checkAndShowSeasonModals } from './ui.js';
 import { runImportFlow } from './import-flow.js';
-import { CALENDAR_2026 } from './data/calendar-2026.js';
-import { advanceOneDay, advanceToNextEvent, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost } from './core/progression.js';
-import { weekendFor } from './core/weekend.js';
+import { advanceOneDay, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost, getDynamicCalendar } from './core/progression.js';
 import { ensureTransferState, prospectDriver, offerDriver, driverConfidential } from './core/transfers.js';
-import { showModal } from './ui.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);
@@ -44,6 +42,30 @@ function run(save) {
   let visibleSince = document.hidden ? null : Date.now();
   let statusEl;
 
+  // ---- Saison et calendrier : toujours dérivés de la saison en cours (jamais figés sur 2026)
+  const currentSeason = () => Number(save.season || String(save.gameDate).slice(0, 4));
+  const calendarOf = () => getDynamicCalendar(currentSeason());
+
+  /**
+   * Modales de cycle annuel. checkAndShowSeasonModals() supprime l'entrée qu'il affiche ; or
+   * initNewSeasonStart() relit seasonEnd.oldGrid le 1er janvier pour lister les transferts rivaux.
+   * La modale de fin est donc affichée sur une copie et seulement marquée « vue ».
+   */
+  function flushSeasonModals() {
+    const pm = save.pendingModals;
+    if (!pm) return;
+    if (pm.seasonEnd && !pm.seasonEnd.shown) {
+      checkAndShowSeasonModals({ pendingModals: { seasonEnd: pm.seasonEnd } });
+      pm.seasonEnd.shown = true;
+      persist();
+    } else if (pm.seasonStart) {
+      checkAndShowSeasonModals({ pendingModals: { seasonStart: pm.seasonStart } });
+      delete pm.seasonStart;
+      delete pm.seasonEnd;
+      persist();
+    }
+  }
+
   // ---- Temps de jeu et sauvegarde
   const accrue = () => {
     if (visibleSince === null) return;
@@ -51,9 +73,19 @@ function run(save) {
     save.playTimeSeconds = Math.round(save.playTimeSeconds + (now - visibleSince) / 1000);
     visibleSince = now;
   };
+  // Garantit la structure attendue du calendrier avant toute écriture (sauvegardes anciennes, reset de saison).
+  function normalizeCalendar() {
+    const cal = save.calendar && typeof save.calendar === 'object' ? save.calendar : (save.calendar = {});
+    const done = new Set(Array.isArray(cal.completedRounds) ? cal.completedRounds : []);
+    for (const [id, weekend] of Object.entries(save.weekends || {})) if (weekend?.race?.results?.length) done.add(id);
+    cal.completedRounds = [...done];
+    if (!Number.isInteger(cal.currentRound) || cal.currentRound < 1) cal.currentRound = 1;
+    if (!Array.isArray(cal.trainingCompletedEvents)) cal.trainingCompletedEvents = [];
+  }
   function persist() {
     if (suspended) return { ok: true };
     accrue();
+    normalizeCalendar();
     save.lastPlayedAt = new Date().toISOString();
     const r = writeSlot(slotId, save);
     if (statusEl) {
@@ -90,12 +122,18 @@ function run(save) {
         h('div', {}, h('h3', { text: d.name }), h('p', { class: 'muted', text: `${d.abbr} · ${d.nationality}${d.age != null ? ` · ${d.age} ans` : ''}` })),
         h('div', { class: 'ovr', 'aria-label': `Note globale ${driverOverall(d)}` }, h('span', { text: String(driverOverall(d)) }), h('small', { text: 'Note' }))),
       h('div', { class: 'stats' }, STAT_KEYS.map((k) => ratingBar(STAT_LABELS[k], d.stats[k]))),
-      kv([['Salaire annuel', formatMoney(d.contract.salary)], ['Contrat', `jusqu’à la fin de la saison ${d.contract.endSeason}`]]));
+      kv([['Salaire annuel', formatMoney(d.contract?.salary || 0)], ['Contrat', `jusqu’à la fin de la saison ${d.contract?.endSeason ?? currentSeason()}`]]));
+  }
+
+  function playerDriver(id) {
+    return (save.drivers || []).find((driver) => driver.id === id);
   }
 
   const eventTitle = (event) => {
     if (!event) return 'Saison terminée';
-    if (event.type === 'upgrade') return `Amélioration terminée · ${DEPT_LABELS[event.upgrade.dept]}`;
+    if (event.type === 'season-end') return event.title || `Clôture de la saison ${currentSeason()}`;
+    if (event.type === 'season-start') return event.title || `Début de la saison ${currentSeason() + 1}`;
+    if (event.type === 'upgrade') return `Amélioration terminée · ${DEPT_LABELS[event.upgrade?.dept] || ''}`;
 
     const labels = {
       training: 'Entraînement pilotes',
@@ -129,7 +167,6 @@ function run(save) {
     return `${label} · R${event.round.round} · ${event.round.name}`;
   };
 
-  const playerDriver = (id) => save.drivers.find((driver) => driver.id === id);
   const lapTime = (milliseconds) => {
     const minutes = Math.floor(milliseconds / 60_000);
     const seconds = ((milliseconds % 60_000) / 1000).toFixed(3).padStart(6, '0');
@@ -140,6 +177,7 @@ function run(save) {
     return h('section', { class: 'session-results' }, h('h3', { text: title }),
       h('ol', { class: 'result-list' }, results.map((row) => {
         const driver = playerDriver(row.driverId);
+        if (!driver) return null;
         return h('li', { class: driver.teamId === save.playerTeamId ? 'is-player' : '' }, h('span', { class: 'result-list__position', text: String(row.rank || row.position) }), h('strong', { text: driver.name }), h('span', { text: row.timeMs ? lapTime(row.timeMs) : `${row.points} pts` }));
       })));
   }
@@ -150,12 +188,15 @@ function run(save) {
       qualifying: ['M5 4h10l-2 5 2 5H5z', 'M5 4v16'],
       race: ['M4 16h16', 'M6 16l2-7h8l2 7', 'M9 9V6h6v3', 'M7 19h.01', 'M17 19h.01'],
       upgrade: ['M14 4a4 4 0 0 0-4 5l-6 6 5 5 6-6a4 4 0 0 0 5-4l-4 1z'],
+      season: ['M8 7V3', 'M16 7V3', 'M5 11h14', 'M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z'],
+      generic: ['M12 7v5l3 2', 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z'],
     };
+    const key = String(type).startsWith('season') ? 'season' : (paths[type] ? type : 'generic');
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', `event-icon event-icon--${type}`);
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('aria-hidden', 'true');
-    for (const d of paths[type] || []) {
+    for (const d of paths[key]) {
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('d', d);
       path.setAttribute('fill', 'none');
@@ -176,15 +217,16 @@ function run(save) {
       return date.toISOString().slice(0, 10);
     });
     const formatDay = new Intl.DateTimeFormat('fr-CH', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
-    const qualifyingRound = CALENDAR_2026.find((round) => round.qualifyingDate === save.gameDate);
-    const pendingQualifying = qualifyingRound && !save.weekends[qualifyingRound.id]?.qualifying?.grid?.length;
-    const raceRound = CALENDAR_2026.find((round) => round.raceDate === save.gameDate && !save.weekends[round.id]?.race);
+    const calendar = calendarOf();
+    const qualifyingRound = calendar.find((round) => round.qualifyingDate === save.gameDate);
+    const pendingQualifying = !!qualifyingRound && !save.weekends?.[qualifyingRound.id]?.qualifying?.grid?.length;
+    const raceRound = calendar.find((round) => round.raceDate === save.gameDate && !save.weekends?.[round.id]?.race);
     const pendingRace = !!raceRound;
     const enterQualifying = () => { location.href = `qualifying.html?slot=${slotId}&round=${encodeURIComponent(qualifyingRound.id)}`; };
     const enterRace = () => { location.href = `race.html?slot=${slotId}&round=${encodeURIComponent(raceRound.id)}`; };
     return h('section', { class: 'weekly-calendar', 'aria-labelledby': 'weekTitle' },
       h('div', { class: 'weekly-calendar__head' },
-        h('div', {}, h('h2', { id: 'weekTitle', text: 'Les 7 prochains jours' }), h('p', { class: 'muted', text: `Du ${formatGameDate(weekDates[0])} au ${formatGameDate(weekDates.at(-1))}.` })),
+        h('div', {}, h('h2', { id: 'weekTitle', text: 'Les 7 prochains jours' }), h('p', { class: 'muted', text: `Du ${formatGameDate(weekDates[0])} au ${formatGameDate(weekDates[weekDates.length - 1])}.` })),
         h('div', { class: 'weekly-calendar__actions' },
           h('button', { type: 'button', class: 'btn', text: 'Avancer d’un jour', onClick: advanceDay, disabled: !nextProgression(save) || pendingQualifying || pendingRace }),
           h('button', { type: 'button', class: 'btn btn--primary', text: pendingQualifying ? 'Passer aux qualifications' : pendingRace ? 'Passer à la course' : 'Aller au prochain événement', onClick: pendingQualifying ? enterQualifying : pendingRace ? enterRace : advanceCalendar, disabled: !nextProgression(save) && !pendingQualifying && !pendingRace }))),
@@ -211,48 +253,45 @@ function run(save) {
     }
   }
 
+  function refreshHome() {
+    paintHeader();
+    main.replaceChildren(panels.home.build());
+  }
+
   async function advanceCalendar() {
-    const next = nextProgression(save);
-    if (!next) return toast('La saison 2026 est terminée.', { error: true });
+    if (!nextProgression(save)) return toast(`La saison ${currentSeason()} est terminée.`, { error: true });
+    document.querySelectorAll('.weekly-calendar__actions button').forEach((b) => { b.disabled = true; });
 
-    const btns = document.querySelectorAll('.weekly-calendar__actions button');
-    btns.forEach(b => b.disabled = true);
-
-    while (true) {
-      const result = advanceOneDay(save);
-      persist();
-      paintHeader();
-
-      // Update UI without triggering scroll/focus of show()
-      main.replaceChildren(panels['home'].build());
-
-      if (!result.ok || result.events?.length > 0) {
-        if (result.events?.length > 0) {
-          await showTransferEvents(result.events);
-          toast(`Événement exécuté : ${eventTitle(result.event)}.`);
-        } else if (!result.ok) {
-          toast(result.error, { error: true });
-        }
-        break;
+    let last = null;
+    try {
+      for (let guard = 0; guard < 400; guard++) {
+        const result = advanceOneDay(save);
+        persist();
+        refreshHome();
+        last = result;
+        if (!result.ok || result.events?.length > 0) break;
+        await new Promise((resolve) => setTimeout(resolve, 150));
       }
-      await new Promise(resolve => setTimeout(resolve, 150));
+    } finally {
+      refreshHome();
     }
+
+    if (last && !last.ok) toast(last.error, { error: true });
+    else if (last?.events?.length) {
+      await showTransferEvents(last.events);
+      toast(`Événement exécuté : ${eventTitle(last.event)}.`);
+    }
+    flushSeasonModals();
   }
 
   async function advanceDay() {
     const result = advanceOneDay(save);
-    if (!result.ok) {
-      const written = result.events?.length ? persist() : { ok: true };
-      paintHeader();
-      show('home');
-      toast(written.ok ? result.error : written.error, { error: true });
-      return;
-    }
-    const written = persist();
-    paintHeader();
-    show('home');
+    const written = result.ok || result.events?.length ? persist() : { ok: true };
+    refreshHome();
+    if (!result.ok) return toast(written.ok ? result.error : written.error, { error: true });
     await showTransferEvents(result.events);
     toast(written.ok ? (result.event ? `Événement exécuté : ${eventTitle(result.event)}.` : `Calendrier avancé au ${formatGameDate(save.gameDate)}.`) : written.error, { error: !written.ok });
+    flushSeasonModals();
   }
 
   async function orderUpgrade(dept) {
@@ -277,7 +316,7 @@ function run(save) {
     if (!last) return h('p', { class: 'muted', text: 'Aucun entraînement terminé. Le premier est prévu le mercredi précédant le Grand Prix d’Australie.' });
     return h('div', { class: 'history-list' }, save.activities.trainingHistory.slice(0, 3).map((entry) =>
       h('article', { class: 'history-entry' },
-        h('strong', { text: `R${CALENDAR_2026.find((round) => round.id === entry.roundId)?.round} · ${formatGameDate(entry.date)}` }),
+        h('strong', { text: `R${calendarOf().find((round) => round.id === entry.roundId)?.round ?? '?'} · ${formatGameDate(entry.date)}` }),
         entry.gains.map((gain) => h('p', { text: `${gain.name} : note ${gain.before} → ${gain.after} · +${(gain.statsAfter.start - gain.statsBefore.start).toFixed(2)} par statistique` }))
       )));
   }
@@ -291,7 +330,7 @@ function run(save) {
       h('section', { class: 'card hero dashboard-head' },
         h('h1', { text: t.name }),
         h('div', { class: 'dashboard-head__grid' },
-          kv([['Date simulée', formatGameDate(save.gameDate)], ['Saison', `${SEASON} · R${save.calendar.currentRound || 1}/24`], ['Solde actuel', formatMoney(t.balance)], ['Temps de jeu', formatPlayTime(save.playTimeSeconds)]]),
+          kv([['Date simulée', formatGameDate(save.gameDate)], ['Saison', `${currentSeason()} · R${save.calendar?.currentRound || 1}/${calendarOf().length}`], ['Solde actuel', formatMoney(t.balance)], ['Temps de jeu', formatPlayTime(save.playTimeSeconds)]]),
           h('div', { class: 'next-event' },
             h('span', { class: 'eyebrow', text: 'Prochain événement' }),
             h('strong', { text: eventTitle(next) }),
@@ -320,33 +359,41 @@ function run(save) {
   }
 
   function roundCalendarCard(round) {
-    const passed = round.raceDate < save.gameDate;
-    const weekend = save.weekends[round.id];
-    return h('article', { class: `card season-round${passed ? ' is-past' : ''}` },
-      h('div', { class: 'season-round__head' }, h('div', {}, h('h3', { text: `R${round.round} · ${round.name}` }), h('p', { class: 'muted', text: round.circuit })), h('span', { class: 'badge', text: roundStatus(round, save.gameDate) })),
+    const status = roundStatus(round, save.gameDate);
+    const weekend = save.weekends?.[round.id];
+    const grid = weekend?.qualifying?.grid;
+    const results = weekend?.race?.results;
+    const nameOf = (id) => playerDriver(id)?.name || '—';
+    return h('article', { class: `card season-round${status === 'Terminé' ? ' is-past' : ''}` },
+      h('div', { class: 'season-round__head' }, h('div', {}, h('h3', { text: `R${round.round} · ${round.name}` }), h('p', { class: 'muted', text: round.circuit })), h('span', { class: 'badge', text: status })),
       h('ol', { class: 'round-events' },
         ...round.trainingDates.map((date) => h('li', {}, eventIcon('training'), h('span', { text: `Entraînement pilotes · ${formatGameDate(date)}` }))),
         h('li', {}, eventIcon('qualifying'), h('span', { text: `Qualifications · ${formatGameDate(round.qualifyingDate)}` })),
         h('li', {}, eventIcon('race'), h('span', { text: `Course · ${formatGameDate(round.raceDate)}` }))),
-      weekend?.qualifying.grid?.length ? h('p', { class: 'weekend-summary', text: `Qualifications terminées · pole : ${playerDriver(weekend.qualifying.grid[0].driverId).name}` }) : null,
-      weekend?.race ? h('p', { class: 'weekend-summary', text: `Course terminée · vainqueur : ${playerDriver(weekend.race.results[0].driverId).name}` }) : null,
-      weekend?.qualifying.grid?.length ? h('details', { class: 'saved-results' }, h('summary', { text: 'Voir la grille complète' }), resultsTable(weekend.qualifying.grid, 'Grille de départ')) : null,
-      weekend?.race ? h('details', { class: 'saved-results' }, h('summary', { text: 'Voir le résultat de course' }), resultsTable(weekend.race.results, 'Classement final')) : null,
+      grid?.length ? h('p', { class: 'weekend-summary', text: `Qualifications terminées · pole : ${nameOf(grid[0].driverId)}` }) : null,
+      results?.length ? h('p', { class: 'weekend-summary', text: `Course terminée · vainqueur : ${nameOf(results[0].driverId)}` }) : null,
+      grid?.length ? h('details', { class: 'saved-results' }, h('summary', { text: 'Voir la grille complète' }), resultsTable(grid, 'Grille de départ')) : null,
+      results?.length ? h('details', { class: 'saved-results' }, h('summary', { text: 'Voir le résultat de course' }), resultsTable(results, 'Classement final')) : null,
     );
   }
 
   function calendarPanel() {
-    const passed = CALENDAR_2026.filter((round) => round.raceDate < save.gameDate);
-    const upcoming = CALENDAR_2026.filter((round) => round.raceDate >= save.gameDate);
-    const playerUpgrades = save.activities.upgrades.filter((upgrade) => upgrade.teamId === save.playerTeamId);
+    const calendar = calendarOf();
+    // « passée » = course déjà courue ; une manche reste « à venir » tant que sa date n'est pas dépassée
+    const passed = calendar.filter((round) => round.raceDate < save.gameDate);
+    const upcoming = calendar.filter((round) => round.raceDate >= save.gameDate);
+    const playerUpgrades = (save.activities?.upgrades || []).filter((upgrade) => upgrade.teamId === save.playerTeamId);
     return h('div', { class: 'stack' },
-      h('section', { class: 'card' }, h('h1', { text: `Calendrier ${SEASON}` }), h('p', { class: 'muted', text: 'Chaque week-end comprend trois journées d’entraînement, les qualifications du samedi et la course du dimanche.' })),
+      h('section', { class: 'card' }, h('h1', { text: `Calendrier ${currentSeason()}` }), h('p', { class: 'muted', text: 'Chaque week-end comprend trois journées d’entraînement, les qualifications du samedi et la course du dimanche.' })),
       playerUpgrades.length ? h('section', { class: 'card' }, h('h2', { text: 'Améliorations planifiées' }), h('ul', { class: 'round-events' }, playerUpgrades.map((upgrade) => {
         const team = save.teams.find((entry) => entry.id === upgrade.teamId);
-        return h('li', {}, eventIcon('upgrade'), h('span', { text: `${team.name} · ${DEPT_LABELS[upgrade.dept]} · fin le ${formatGameDate(upgrade.completesOn)}` }));
+        return h('li', {}, eventIcon('upgrade'), h('span', { text: `${team?.name || ''} · ${DEPT_LABELS[upgrade.dept]} · fin le ${formatGameDate(upgrade.completesOn)}` }));
       }))) : null,
       passed.length ? h('section', { class: 'season-section' }, h('h2', { text: 'Manches passées' }), h('div', { class: 'season-rounds' }, passed.map(roundCalendarCard))) : null,
-      h('section', { class: 'season-section' }, h('h2', { text: 'Manches à venir' }), h('div', { class: 'season-rounds' }, upcoming.map(roundCalendarCard))));
+      h('section', { class: 'season-section' }, h('h2', { text: 'Manches à venir' }),
+        upcoming.length
+          ? h('div', { class: 'season-rounds' }, upcoming.map(roundCalendarCard))
+          : h('p', { class: 'muted', text: `Toutes les manches de la saison ${currentSeason()} sont terminées. La nouvelle saison commence le 1er janvier.` })));
   }
 
   function settingsPanel() {
@@ -512,6 +559,7 @@ function run(save) {
         const status = (d) => save.transfers.scouting.find((x) => x.driverId === d.id);
         const openOffer = async (d) => {
           const slot = h('select', { class: 'input' }, h('option', { value: '1', text: 'Pilote n°1' }), h('option', { value: '2', text: 'Pilote n°2' }));
+          slot.value = String(d.contract?.slot) === '2' ? '2' : '1';
           const salary = h('input', { class: 'input', type: 'number', min: '0.1', step: '0.1', value: String(d.contract?.salary || 1) });
           const years = h('input', { class: 'input', type: 'number', min: '1', max: '5', step: '1', value: '2' });
           const body = h('div', { class: 'stack' }, h('p', { text: 'Configurez votre proposition. La réponse arrivera dans 3 jours simulés.' }), h('label', { text: 'Poste proposé' }, slot), h('label', { text: 'Salaire annuel (M€)' }, salary), h('label', { text: 'Durée (années)' }, years));
@@ -569,9 +617,11 @@ function run(save) {
   }
   navButtons.forEach((b) => b.addEventListener('click', () => show(b.dataset.panel)));
 
+  ensureTransferState(save);
   paintHeader();
   persist();          // met à jour lastPlayedAt à l'ouverture
   show('home');
+  flushSeasonModals(); // modale de fin / début de saison restée en attente (rechargement de page)
 }
 
 init();

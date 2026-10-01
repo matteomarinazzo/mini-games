@@ -2,7 +2,7 @@ import { SLOT_COUNT } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
 import { formatGameDate, formatMoney } from './core/utils.js';
 import { h, showModal, toast } from './ui.js';
-import { CALENDAR_2026 } from './data/calendar-2026.js';
+import { getDynamicCalendar } from './core/progression.js';
 import { nextQualifyingSession, playerQualifyingDrivers, runQualifyingSession, simulateRemainingQualifications, weekendFor } from './core/weekend.js';
 
 const main = document.getElementById('content');
@@ -24,8 +24,8 @@ function init() {
   if (!Number.isInteger(slotId) || slotId < 1 || slotId > SLOT_COUNT) return fatal('Emplacement de sauvegarde invalide.');
   const loaded = readSlot(slotId);
   if (loaded.status !== 'ok') return fatal(loaded.errors?.[0] || 'Sauvegarde indisponible.');
-  const round = CALENDAR_2026.find((entry) => entry.id === roundId);
-  if (!round) return fatal('Grand Prix introuvable.');
+  const season = Number(loaded.save.season || String(loaded.save.gameDate).slice(0, 4));
+  const round = getDynamicCalendar(season).find((r) => r.id === roundId); if (!round) return fatal('Grand Prix introuvable.');
   if (loaded.save.gameDate !== round.qualifyingDate && !loaded.save.weekends[round.id]?.qualifying?.grid?.length) return fatal('Les qualifications ne sont pas accessibles à cette date.');
   run(loaded.save, round);
 }

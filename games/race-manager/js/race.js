@@ -2,7 +2,7 @@ import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
 import { formatGameDate, formatMoney, round2 } from './core/utils.js';
 import { h, showModal, toast } from './ui.js';
-import { CALENDAR_2026 } from './data/calendar-2026.js';
+import { getDynamicCalendar } from './core/progression.js';
 import { weekendFor } from './core/weekend.js';
 import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap } from './core/race-engine.js';
 
@@ -19,7 +19,8 @@ function init() {
   if (!Number.isInteger(slotId) || slotId < 1 || slotId > SLOT_COUNT) return fatal('Emplacement de sauvegarde invalide.');
   const loaded = readSlot(slotId);
   if (loaded.status !== 'ok') return fatal(loaded.errors?.[0] || 'Sauvegarde indisponible.');
-  const round = CALENDAR_2026.find((entry) => entry.id === roundId);
+  const season = Number(loaded.save.season || String(loaded.save.gameDate).slice(0, 4));
+  const round = getDynamicCalendar(season).find((r) => r.id === roundId);
   if (!round) return fatal('Grand Prix introuvable.');
 
   if (loaded.save.schemaVersion < 5) return fatal('Veuillez retourner au menu principal pour migrer votre sauvegarde vers la V4.');

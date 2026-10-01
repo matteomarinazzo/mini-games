@@ -1,7 +1,7 @@
-/** Moteur V2 sans DOM : calendrier, entraînements, améliorations, IA, et cycles saisonniers (V6). */
+/** Moteur V2 sans DOM : calendrier, entraînements, améliorations, IA et cycle de saison V6 complet. */
 import { CALENDAR_2026 } from '../data/calendar-2026.js';
-import { DEPT_KEYS, STAT_KEYS, TRAINING_GAIN, UPGRADE_DURATION_DAYS, UPGRADE_LEVELS } from './constants.js';
-import { clampRating, driverOverall } from './validation.js';
+import { DEPT_KEYS, STAT_KEYS, TRAINING_GAIN, UPGRADE_DURATION_DAYS, UPGRADE_LEVELS, RATING_MIN, RATING_MAX } from './constants.js';
+import { clampRating, driverOverall, teamOverall } from './validation.js';
 import { round2 } from './utils.js';
 import { processTransferEvents, transferEvents, replacementCascade } from './transfers.js';
 import { applyRegulationChanges } from './regulations.js';
@@ -9,51 +9,62 @@ import { applyRegulationChanges } from './regulations.js';
 const dateMs = (date) => Date.parse(`${date}T12:00:00Z`);
 const addDays = (date, days) => new Date(dateMs(date) + days * 86400000).toISOString().slice(0, 10);
 const log = (save, date, message, type = 'info') => {
+  if (!save.eventLog) save.eventLog = [];
   save.eventLog.unshift({ id: `${date}-${save.eventLog.length}-${type}`, date, message, type });
   save.eventLog = save.eventLog.slice(0, 60);
 };
 
-// V6 : Permet de décaler les dates selon l'année en cours
-function getDynamicCalendar(season) {
-  const diffYears = season - 2026;
-  if (diffYears === 0) return CALENDAR_2026;
-  return CALENDAR_2026.map(round => ({
+export function shiftYear(dateStr, years) {
+  if (!dateStr || typeof dateStr !== 'string') return dateStr;
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  return `${parseInt(parts[0], 10) + years}-${parts[1]}-${parts[2]}`;
+}
+
+export function getDynamicCalendar(season = 2026) {
+  const diffYears = Number(season) - 2026;
+  return CALENDAR_2026.map((round) => ({
     ...round,
-    trainingDates: round.trainingDates.map(d => shiftYear(d, diffYears)),
+    trainingDates: round.trainingDates.map((d) => shiftYear(d, diffYears)),
     qualifyingDate: shiftYear(round.qualifyingDate, diffYears),
     raceDate: shiftYear(round.raceDate, diffYears),
   }));
 }
-function shiftYear(dateStr, years) {
-  const parts = dateStr.split('-');
-  return `${parseInt(parts[0]) + years}-${parts[1]}-${parts[2]}`;
-}
 
 export function calendarEvents(save = { season: 2026 }) {
-  const cal = getDynamicCalendar(save.season || 2026);
-  return cal.flatMap((round) => [
+  const currentSeason = Number(save.season || (save.gameDate ? save.gameDate.slice(0, 4) : 2026));
+  const cal = getDynamicCalendar(currentSeason);
+  const raceEvents = cal.flatMap((round) => [
     ...round.trainingDates.map((date, dayIndex) => ({ date, type: 'training', dayIndex, round })),
     { date: round.qualifyingDate, type: 'qualifying', round },
     { date: round.raceDate, type: 'race', round },
-  ]).sort(sortEvents);
+  ]);
+
+  const seasonEndEvent = {
+    date: `${currentSeason}-12-31`,
+    type: 'season-end',
+    title: `Clôture de la saison ${currentSeason}`,
+  };
+
+  const nextSeasonYear = currentSeason + 1;
+  const seasonStartEvent = {
+    date: `${nextSeasonYear}-01-01`,
+    type: 'season-start',
+    title: `Début de la saison ${nextSeasonYear}`,
+  };
+
+  return [...raceEvents, seasonEndEvent, seasonStartEvent].sort(sortEvents);
 }
 
 export function timelineEvents(save) {
-  const upgrades = save.activities.upgrades.map((upgrade) => ({
-    date: upgrade.completesOn, type: 'upgrade', upgrade,
+  const upgrades = (save.activities?.upgrades || []).map((upgrade) => ({
+    date: upgrade.completesOn,
+    type: 'upgrade',
+    upgrade,
     team: save.teams.find((entry) => entry.id === upgrade.teamId),
   }));
   const marketEvents = transferEvents(save);
-  const events = [...calendarEvents(save), ...upgrades, ...marketEvents];
-
-  // V6 : Événement spécial de début de saison au 1er janvier s'il est à venir
-  const nextYear = (save.season || 2026) + 1;
-  const newYearDate = `${nextYear}-01-01`;
-  if (save.needsSeasonStart && dateMs(newYearDate) >= dateMs(save.gameDate)) {
-    events.push({ date: newYearDate, type: 'season-start' });
-  }
-
-  return events.sort(sortEvents);
+  return [...calendarEvents(save), ...upgrades, ...marketEvents].sort(sortEvents);
 }
 
 export function eventsForWeek(save, startDate) {
@@ -64,18 +75,12 @@ export function eventsForWeek(save, startDate) {
 export function roundStatus(round, gameDate) {
   if (dateMs(gameDate) < dateMs(round.trainingDates[0])) return 'À venir';
   if (dateMs(gameDate) < dateMs(round.qualifyingDate)) return 'En cours';
-  if (dateMs(gameDate) <= dateMs(round.raceDate)) return 'Disponible en V3';
+  if (dateMs(gameDate) <= dateMs(round.raceDate)) return 'Disponible';
   return 'Terminé';
 }
 
 export function nextProgression(save) {
-  const next = timelineEvents(save).find((event) => dateMs(event.date) > dateMs(save.gameDate));
-  if (!next && !save.needsSeasonStart) {
-    // Si la saison est finie et plus aucun event, on lance closeSeason
-    closeSeason(save);
-    return timelineEvents(save).find((event) => dateMs(event.date) > dateMs(save.gameDate));
-  }
-  return next;
+  return timelineEvents(save).find((event) => dateMs(event.date) > dateMs(save.gameDate)) || null;
 }
 
 export function upgradeCost(team, dept, difficulty) {
@@ -103,6 +108,7 @@ function finishUpgrades(save, date) {
   const complete = save.activities.upgrades.filter((item) => item.completesOn === date);
   for (const upgrade of complete) {
     const team = save.teams.find((entry) => entry.id === upgrade.teamId);
+    if (!team) continue;
     const before = team.departmentRatings[upgrade.dept];
     team.departmentRatings[upgrade.dept] = clampRating(before + 1);
     if (upgrade.teamId === save.playerTeamId) {
@@ -145,30 +151,66 @@ function planAiUpgrades(save, date) {
   }
 }
 
-// V6 : Clôture de la saison
+/** 31 Décembre : Clôture de la saison, primes, réglementation, libération et IA */
 export function closeSeason(save) {
-  const currentSeason = save.season || 2026;
+  const currentSeason = Number(save.season || 2026);
   const nextSeason = currentSeason + 1;
+  if (!save.pendingModals) save.pendingModals = {};
 
-  // 1. Primes (logique simplifiée pour l'instant)
-  save.teams.forEach(t => t.balance = round2(t.balance + 5)); // Bonus fixe de fin d'année 
+  // 1. Classements finaux
+  const finalTeamStandings = [...(save.standings?.teams || [])].sort((a, b) => (b.points || 0) - (a.points || 0));
+  const playerTeamStanding = finalTeamStandings.find((t) => t.teamId === save.playerTeamId);
+  const playerPosition = playerTeamStanding ? finalTeamStandings.indexOf(playerTeamStanding) + 1 : finalTeamStandings.length;
+  const playerPoints = playerTeamStanding ? playerTeamStanding.points : 0;
 
-  // 2. Réglementation
-  const regResults = applyRegulationChanges(save);
-  save.seasonResults = { regulationLogs: regResults.logs }; // Stocké pour l'UI
+  // Calcul des attentes constructeurs
+  const sortedByPerf = [...save.teams].sort((a, b) => teamOverall(b) - teamOverall(a));
+  const expectedPosition = sortedByPerf.findIndex((t) => t.id === save.playerTeamId) + 1;
 
-  // 3. Stats pilotes (variation aléatoire bornée)
-  save.drivers.forEach(driver => {
-    const varPace = (Math.random() * 0.2) - 0.1;
-    const varCons = (Math.random() * 0.2) - 0.1;
-    driver.stats.pace = Math.max(1, Math.min(100, Math.floor(driver.stats.pace * (1 + varPace))));
-    driver.stats.consistency = Math.max(1, Math.min(100, Math.floor(driver.stats.consistency * (1 + varCons))));
+  // Calcul de la prime selon position vs attentes
+  let bonusAmount = 5.0; // Prime de base
+  let perfVerdict = 'conforme aux attentes';
+
+  if (playerPosition < expectedPosition) {
+    const diff = expectedPosition - playerPosition;
+    bonusAmount += diff * 2.5;
+    perfVerdict = `au-dessus des attentes (+${diff} place${diff > 1 ? 's' : ''})`;
+  } else if (playerPosition > expectedPosition) {
+    const diff = playerPosition - expectedPosition;
+    bonusAmount = Math.max(1.0, bonusAmount - diff * 0.8);
+    perfVerdict = `en-dessous des attentes (-${diff} place${diff > 1 ? 's' : ''})`;
+  }
+
+  bonusAmount = round2(bonusAmount);
+  const playerTeam = save.teams.find((t) => t.id === save.playerTeamId);
+  if (playerTeam) {
+    playerTeam.balance = round2(playerTeam.balance + bonusAmount);
+  }
+
+  // Autres équipes reçoivent leur part
+  save.teams.filter((t) => t.id !== save.playerTeamId).forEach((t, i) => {
+    t.balance = round2(t.balance + Math.max(2.0, 10 - i * 0.8));
   });
 
-  // 4. Libération des agents libres sans contrats
-  save.drivers.forEach(driver => {
-    if (driver.contract && driver.contract.endSeason <= currentSeason) {
-      if (!driver.futureContract || driver.futureContract.startSeason > nextSeason) {
+  // 2. Changements de réglementation
+  const regResults = applyRegulationChanges(save);
+  save.lastRegulationChanges = regResults;
+
+  // 3. Évolution des stats pilotes (-10% à +10%) sur les vraies statistiques, bornées à [RATING_MIN, RATING_MAX]
+  save.drivers.forEach((driver) => {
+    STAT_KEYS.forEach((key) => {
+      const variation = (Math.random() * 0.20) - 0.10;
+      driver.stats[key] = Math.max(RATING_MIN, Math.min(RATING_MAX, round2(driver.stats[key] * (1 + variation))));
+    });
+  });
+
+  // 4. Capture des pilotes avant libération pour historique/modal
+  const oldGrid = save.drivers.map((d) => ({ id: d.id, teamId: d.teamId, name: d.name || d.displayName }));
+
+  // Libération des pilotes en fin de contrat sans futureContract
+  save.drivers.forEach((driver) => {
+    if (driver.contract && Number(driver.contract.endSeason) <= currentSeason) {
+      if (!driver.futureContract || Number(driver.futureContract.startSeason) !== nextSeason) {
         driver.contract = null;
         driver.teamId = null;
         driver.loyalty = null;
@@ -176,36 +218,131 @@ export function closeSeason(save) {
     }
   });
 
-  // 5. Exécution marché IA (compléter les baquets vides)
-  save.teams.forEach(team => {
-    const slotsFilled = save.drivers.filter(d => (d.contract?.teamId === team.id && d.contract?.endSeason >= nextSeason) || (d.futureContract?.teamId === team.id)).length;
-    for (let i = slotsFilled; i < 2; i++) {
-      replacementCascade(save, team.id, i + 1, save.gameDate);
+  // 5. Remplissage des baquets IA restants (cascade)
+  save.teams.forEach((team) => {
+    const engaged = save.drivers.filter((d) =>
+      (d.contract && d.contract.teamId === team.id && Number(d.contract.endSeason) >= nextSeason) ||
+      (d.futureContract && d.futureContract.teamId === team.id && Number(d.futureContract.startSeason) === nextSeason)
+    ).length;
+
+    for (let slot = engaged + 1; slot <= 2; slot++) {
+      replacementCascade(save, team.id, slot, `${currentSeason}-12-31`);
     }
   });
 
-  // 6. Reset calendrier
-  save.season = nextSeason;
-  save.needsSeasonStart = true;
-  save.calendar = { ...save.calendar, trainingCompletedEvents: [] };
-  log(save, save.gameDate, `Fin de la saison ${currentSeason}. Préparation de ${nextSeason}...`, 'info');
+  // 6. Nettoyage des prospections et offres expirées du mercato en cours
+  if (save.transfers) {
+    save.transfers.scouting = [];
+    save.transfers.offers = [];
+  }
+
+  // Stocker les données pour la modale de fin de saison
+  save.pendingModals.seasonEnd = {
+    season: currentSeason,
+    teamPoints: playerPoints,
+    teamPosition: playerPosition,
+    expectedPosition,
+    perfVerdict,
+    bonusAmount,
+    regulations: regResults,
+    oldGrid,
+  };
+
+  log(save, `${currentSeason}-12-31`, `Fin de la saison ${currentSeason}. Bilan : ${playerPoints} pts (${perfVerdict}). Prime : ${bonusAmount} M€.`, 'season-end');
 }
 
+/** 1er Janvier : Début de la nouvelle saison, application définitive des transferts, remise à zéro */
 export function initNewSeasonStart(save) {
-  // Paiement des salaires et activation
-  save.drivers.forEach(d => {
+  const prevSeason = Number(save.season || 2026);
+  const nextSeason = prevSeason + 1;
+  save.season = nextSeason;
+  if (!save.pendingModals) save.pendingModals = {};
+
+  // 1. Débit des salaires annuels
+  save.drivers.forEach((d) => {
     if (d.contract && d.contract.teamId) {
-      const team = save.teams.find(t => t.id === d.contract.teamId);
-      if (team) team.balance = round2(team.balance - (d.contract.salary || 0));
+      const team = save.teams.find((t) => t.id === d.contract.teamId);
+      if (team) {
+        team.balance = round2(team.balance - (Number(d.contract.salary) || 0));
+      }
     }
   });
-  save.needsSeasonStart = false;
-  log(save, save.gameDate, `Début de la saison ${save.season} ! Les salaires ont été versés.`, 'info');
+
+  // 2. Remise à zéro du calendrier et des week-ends
+  save.calendar = {
+    currentRound: 1,
+    completedRounds: [],
+    trainingCompletedEvents: [],
+  };
+  save.weekends = {};
+
+  // 3. Remise à zéro des classements (Ordre alphabétique des écuries, puis de leurs pilotes)
+  const sortedTeams = [...save.teams].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+
+  save.standings = {
+    teams: sortedTeams.map((t) => ({ teamId: t.id, points: 0 })),
+    drivers: [],
+  };
+
+  sortedTeams.forEach((t) => {
+    const teamDrivers = save.drivers
+      .filter((d) => d.teamId === t.id)
+      .sort((a, b) => (a.name || a.displayName || '').localeCompare(b.name || b.displayName || '', 'fr', { sensitivity: 'base' }));
+
+    teamDrivers.forEach((d) => {
+      save.standings.drivers.push({ driverId: d.id, points: 0 });
+    });
+  });
+
+  // Ajouter les pilotes sans baquet à la fin
+  save.drivers
+    .filter((d) => !d.teamId)
+    .sort((a, b) => (a.name || a.displayName || '').localeCompare(b.name || b.displayName || '', 'fr', { sensitivity: 'base' }))
+    .forEach((d) => {
+      save.standings.drivers.push({ driverId: d.id, points: 0 });
+    });
+
+  // 4. Nettoyage absolu des transferts
+  if (save.transfers) {
+    save.transfers.scouting = [];
+    save.transfers.offers = [];
+    save.transfers.signed = [];
+  }
+
+  // 5. Données pour la modale de début de saison
+  const myDrivers = save.drivers.filter((d) => d.teamId === save.playerTeamId);
+  const rivalChanges = [];
+  const endModalData = save.pendingModals?.seasonEnd;
+
+  if (endModalData?.oldGrid) {
+    save.drivers.forEach((d) => {
+      if (d.teamId && d.teamId !== save.playerTeamId) {
+        const oldEntry = endModalData.oldGrid.find((o) => o.id === d.id);
+        if (oldEntry && oldEntry.teamId !== d.teamId) {
+          const newTeam = save.teams.find((t) => t.id === d.teamId);
+          rivalChanges.push({
+            driverName: d.name || d.displayName,
+            fromTeamId: oldEntry.teamId,
+            toTeamId: d.teamId,
+            toTeamName: newTeam?.name || d.teamId,
+          });
+        }
+      }
+    });
+  }
+
+  save.pendingModals.seasonStart = {
+    season: nextSeason,
+    myDrivers: myDrivers.map((d) => ({ id: d.id, name: d.name || d.displayName, salary: d.contract?.salary || 0, slot: d.contract?.slot || '1' })),
+    rivalChanges,
+  };
+
+  log(save, `${nextSeason}-01-01`, `Bienvenue dans la saison ${nextSeason} ! Salaires annuels débités, classements réinitialisés.`, 'season-start');
 }
 
 export function advanceToNextEvent(save) {
   const next = nextProgression(save);
-  if (!next && !save.needsSeasonStart) return { ok: false, error: `La saison ${save.season} est terminée.` };
+  if (!next) return { ok: false, error: `Aucun événement futur trouvé pour la saison ${save.season}.` };
   while (true) {
     const result = advanceOneDay(save);
     if (!result.ok || result.events.length > 0) return result;
@@ -235,22 +372,40 @@ export function advanceOneDay(save) {
   const marketEvents = processTransferEvents(save, targetDate) || [];
 
   for (const event of events) {
-    if (event.type === 'season-start') {
-      initNewSeasonStart(save); // V6 : Exécution 1er janvier
-    }
-    if (event.type === 'training') {
+    if (event.type === 'season-end') {
+      closeSeason(save);
+    } else if (event.type === 'season-start') {
+      initNewSeasonStart(save);
+    } else if (event.type === 'training') {
       trainAllDrivers(save, event);
       planAiUpgrades(save, event.date);
     }
-    if (event.round) save.calendar.currentRound = event.round.round;
+    if (event.round) {
+      save.calendar.currentRound = event.round.round;
+    }
   }
 
-  const allEvents = [...events.filter((event) => event.type !== 'scouting-complete' && event.type !== 'transfer-response'), ...marketEvents];
+  const allEvents = [
+    ...events.filter((event) => event.type !== 'scouting-complete' && event.type !== 'transfer-response'),
+    ...marketEvents,
+  ];
+
   return { ok: true, event: allEvents[0] || null, events: allEvents };
 }
 
 function sortEvents(a, b) {
-  const priority = { 'season-start': -1, upgrade: 0, training: 1, qualifying: 2, race: 3, 'scouting-complete': 4, 'transfer-response': 5, prospecting: 4, offer: 5 };
+  const priority = {
+    'season-start': -1,
+    upgrade: 0,
+    training: 1,
+    qualifying: 2,
+    race: 3,
+    'season-end': 4,
+    'scouting-complete': 5,
+    'transfer-response': 6,
+    prospecting: 5,
+    offer: 6,
+  };
   return dateMs(a.date) - dateMs(b.date) || (priority[a.type] ?? 9) - (priority[b.type] ?? 9);
 }
 

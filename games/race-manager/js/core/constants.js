@@ -67,11 +67,11 @@ export const START_LEVELS = {
 
 };
 
-/** Difficulté d'amélioration : enregistrée dès la V1, appliquée à partir de la V2. */
+/** Difficulté d'amélioration : enregistrée dès la V1 */
 export const UPGRADE_LEVELS = {
-  easy: { label: 'Facile', costMultiplier: 0.8, description: 'Améliorations 20 % moins chères (effet appliqué à partir de la V2).' },
-  normal: { label: 'Normale', costMultiplier: 1, description: 'Coût des améliorations standard (effet appliqué à partir de la V2).' },
-  hard: { label: 'Difficile', costMultiplier: 1.3, description: 'Améliorations 30 % plus chères (effet appliqué à partir de la V2).' },
+  easy: { label: 'Facile', costMultiplier: 0.8, description: 'Améliorations 20 % moins chères.' },
+  normal: { label: 'Normale', costMultiplier: 1, description: 'Coût des améliorations standard.' },
+  hard: { label: 'Difficile', costMultiplier: 1.3, description: 'Améliorations 30 % plus chères.' },
 };
 
 /** Règles V2 de progression : les notes pilotes restent décimales en sauvegarde. */

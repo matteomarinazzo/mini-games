@@ -37,6 +37,19 @@ function init() {
 }
 
 function run(save) {
+  // --- INITIALISATION / SÉCURITÉ STANDINGS S1 ---
+  if (!save.standings) {
+    save.standings = {
+      drivers: Object.fromEntries((save.drivers || []).map(d => [d.id, 0])),
+      teams: Object.fromEntries((save.teams || []).map(t => [t.id, 0]))
+    };
+  } else {
+    save.standings.drivers = save.standings.drivers || {};
+    save.standings.teams = save.standings.teams || {};
+  }
+  // ----------------------------------------------
+
+  let activeTab = 'home';
   const teamOf = () => save.teams.find((t) => t.id === save.playerTeamId);
   let suspended = false;            // vrai quand la page va être rechargée après un import (ne plus écrire)
   let visibleSince = document.hidden ? null : Date.now();
@@ -447,105 +460,304 @@ function run(save) {
 
   function standingsPanel() {
     const playerTeamId = save.playerTeamId;
-    const driversById = new Map(save.drivers.map((driver) => [driver.id, driver]));
-    const teamsById = new Map(save.teams.map((team) => [team.id, team]));
+    const driversById = new Map((save.drivers || []).map((driver) => [String(driver.id), driver]));
+    const teamsById = new Map((save.teams || []).map((team) => [String(team.id), team]));
     const driverStats = new Map();
     const teamStats = new Map();
 
-    // Les statistiques de course sont lues dans les résultats enregistrés ; aucun point
-    // n'est recalculé ici et l'écurie est celle stockée sur chaque résultat.
+    // Statistiques de victoires / podiums issues des week-ends
     for (const weekend of Object.values(save.weekends || {})) {
       for (const result of weekend?.race?.results || []) {
-        const driver = driversById.get(result.driverId);
-        if (!driver) continue;
-        const driverEntry = driverStats.get(result.driverId) || { wins: 0, podiums: 0 };
+        if (!result) continue;
+        const driverIdKey = String(result.driverId);
+        const teamIdKey = String(result.teamId);
+
+        const driverEntry = driverStats.get(driverIdKey) || { wins: 0, podiums: 0 };
         if (result.position === 1) driverEntry.wins += 1;
         if (result.position <= 3) driverEntry.podiums += 1;
-        driverStats.set(result.driverId, driverEntry);
+        driverStats.set(driverIdKey, driverEntry);
 
-        const teamEntry = teamStats.get(result.teamId) || { wins: 0, podiums: 0 };
+        const teamEntry = teamStats.get(teamIdKey) || { wins: 0, podiums: 0 };
         if (result.position === 1) teamEntry.wins += 1;
         if (result.position <= 3) teamEntry.podiums += 1;
-        teamStats.set(result.teamId, teamEntry);
+        teamStats.set(teamIdKey, teamEntry);
       }
     }
 
-    const driverRows = (save.standings?.drivers || []).map((standing, index) => {
-      const driver = driversById.get(standing.driverId);
-      if (!driver) return null;
-      const stats = driverStats.get(driver.id) || { wins: 0, podiums: 0 };
-      return { ...standing, driver, stats, rank: index + 1 };
-    }).filter(Boolean);
-    const teamRows = (save.standings?.teams || []).map((standing, index) => {
-      const team = teamsById.get(standing.teamId);
-      if (!team) return null;
-      const stats = teamStats.get(team.id) || { wins: 0, podiums: 0 };
-      return { ...standing, team, stats, rank: index + 1 };
-    }).filter(Boolean);
-    const leaderPoints = (rows) => rows[0]?.points ?? 0;
-    const gapText = (points, leader) => points === leader ? '—' : `−${leader - points}`;
+    // Récupération des points pilotes (format Array ou format Object clé-valeur)
+    const rawDriverStandings = save.standings?.drivers;
+    const driverPointsMap = new Map();
+    if (Array.isArray(rawDriverStandings)) {
+      rawDriverStandings.forEach((entry) => {
+        const id = entry?.driverId ?? entry?.id;
+        if (id !== undefined && id !== null) {
+          driverPointsMap.set(String(id), Number(entry.points) || 0);
+        }
+      });
+    } else if (rawDriverStandings && typeof rawDriverStandings === 'object') {
+      Object.entries(rawDriverStandings).forEach(([id, points]) => {
+        driverPointsMap.set(String(id), Number(points) || 0);
+      });
+    }
 
-    const teamCell = (team) => h('span', { class: 'team-cell' },
-      h('span', { class: 'team-swatch', style: { '--team-color': team.color, background: team.color }, 'aria-hidden': 'true' }),
-      h('span', { text: team.name }));
-    const playerMark = h('span', { class: 'standings-player-mark', 'aria-label': 'Écurie du joueur', text: '' });
+    // Récupération des points constructeurs (format Array ou format Object clé-valeur)
+    const rawTeamStandings = save.standings?.teams;
+    const teamPointsMap = new Map();
+    if (Array.isArray(rawTeamStandings)) {
+      rawTeamStandings.forEach((entry) => {
+        const id = entry?.teamId ?? entry?.id;
+        if (id !== undefined && id !== null) {
+          teamPointsMap.set(String(id), Number(entry.points) || 0);
+        }
+      });
+    } else if (rawTeamStandings && typeof rawTeamStandings === 'object') {
+      Object.entries(rawTeamStandings).forEach(([id, points]) => {
+        teamPointsMap.set(String(id), Number(points) || 0);
+      });
+    }
+
+    // Construction et tri du classement pilotes (tous les pilotes sont listés même à 0 pt)
+    const driverRows = (save.drivers || [])
+      .map((driver) => {
+        const idKey = String(driver.id);
+        const stats = driverStats.get(idKey) || { wins: 0, podiums: 0 };
+        const points = driverPointsMap.get(idKey) || 0;
+        const team = teamsById.get(String(driver.teamId));
+        return { driverId: driver.id, points, driver, stats, team };
+      })
+      .sort((a, b) => {
+        // 1. Points décroissants
+        if (b.points !== a.points) return b.points - a.points;
+
+        // 2. Victoires / Podiums si des courses ont eu lieu
+        if (b.stats.wins !== a.stats.wins) return b.stats.wins - a.stats.wins;
+        if (b.stats.podiums !== a.stats.podiums) return b.stats.podiums - a.stats.podiums;
+
+        // 3. Ordre alphabétique de l'écurie
+        const teamNameA = a.team?.name || 'ZZZ';
+        const teamNameB = b.team?.name || 'ZZZ';
+        const teamComp = teamNameA.localeCompare(teamNameB, 'fr');
+        if (teamComp !== 0) return teamComp;
+
+        // 4. Ordre alphabétique des coéquipiers
+        const nameA = a.driver.name || `${a.driver.firstName || ''} ${a.driver.lastName || ''}`;
+        const nameB = b.driver.name || `${b.driver.firstName || ''} ${b.driver.lastName || ''}`;
+        return nameA.localeCompare(nameB, 'fr');
+      })
+      .map((row, index) => ({ ...row, rank: index + 1 }));
+
+    // Construction et tri du classement constructeurs
+    const teamRows = (save.teams || [])
+      .map((team) => {
+        const idKey = String(team.id);
+        const stats = teamStats.get(idKey) || { wins: 0, podiums: 0 };
+        const points = teamPointsMap.get(idKey) || 0;
+        return { teamId: team.id, points, team, stats };
+      })
+      .sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        if (b.stats.wins !== a.stats.wins) return b.stats.wins - a.stats.wins;
+        if (b.stats.podiums !== a.stats.podiums) return b.stats.podiums - a.stats.podiums;
+        return (a.team.name || '').localeCompare(b.team.name || '', 'fr');
+      })
+      .map((row, index) => ({ ...row, rank: index + 1 }));
+
+    const leaderPoints = (rows) => rows[0]?.points ?? 0;
+    const gapText = (points, leader) => (points === leader ? '—' : `−${leader - points}`);
+
+    const teamCell = (team) =>
+      h(
+        'span',
+        { class: 'team-cell' },
+        h('span', {
+          class: 'team-swatch',
+          style: { '--team-color': team.color, background: team.color },
+          'aria-hidden': 'true',
+        }),
+        h('span', { text: team.name })
+      );
+
+    const playerMark = h('span', {
+      class: 'standings-player-mark',
+      'aria-label': 'Écurie du joueur',
+      text: '',
+    });
 
     const driverTable = () => {
       const leader = leaderPoints(driverRows);
-      return h('div', { class: 'table-scroll' }, h('table', {},
-        h('caption', { class: 'sr-only', text: 'Classement des pilotes' }),
-        h('thead', {}, h('tr', {}, ['#', 'Pilote', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) => h('th', { scope: 'col', text: label })))),
-        h('tbody', {}, driverRows.length ? driverRows.map((row) => {
-          const isPlayer = row.driver.teamId === playerTeamId;
-          const team = teamsById.get(row.driver.teamId);
-          return h('tr', { class: isPlayer ? 'is-player-team' : '', 'data-team-color': team?.color || '' },
-            h('td', { class: 'standings-rank', text: String(row.rank) }),
-            h('th', { scope: 'row', class: 'standings-name' }, isPlayer ? playerMark.cloneNode(true) : null, h('strong', { text: row.driver.name })),
-            h('td', {}, team ? teamCell(team) : h('span', { class: 'muted', text: '—' })),
-            h('td', { class: 'standings-points', text: String(row.points) }),
-            h('td', { text: gapText(row.points, leader) }),
-            h('td', { text: String(row.stats.wins) }),
-            h('td', { text: String(row.stats.podiums) }));
-        }) : h('tr', {}, h('td', { colspan: '7', class: 'muted', text: 'Aucune course enregistrée.' })))));
+      return h(
+        'div',
+        { class: 'table-scroll' },
+        h(
+          'table',
+          {},
+          h('caption', { class: 'sr-only', text: 'Classement des pilotes' }),
+          h(
+            'thead',
+            {},
+            h(
+              'tr',
+              {},
+              ['#', 'Pilote', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) =>
+                h('th', { scope: 'col', text: label })
+              )
+            )
+          ),
+          h(
+            'tbody',
+            {},
+            driverRows.length
+              ? driverRows.map((row) => {
+                const isPlayer = String(row.driver.teamId) === String(playerTeamId);
+                const team = teamsById.get(String(row.driver.teamId));
+                return h(
+                  'tr',
+                  { class: isPlayer ? 'is-player-team' : '', 'data-team-color': team?.color || '' },
+                  h('td', { class: 'standings-rank', text: String(row.rank) }),
+                  h(
+                    'th',
+                    { scope: 'row', class: 'standings-name' },
+                    isPlayer ? playerMark.cloneNode(true) : null,
+                    h('strong', { text: row.driver.name })
+                  ),
+                  h('td', {}, team ? teamCell(team) : h('span', { class: 'muted', text: '—' })),
+                  h('td', { class: 'standings-points', text: String(row.points) }),
+                  h('td', { text: gapText(row.points, leader) }),
+                  h('td', { text: String(row.stats.wins) }),
+                  h('td', { text: String(row.stats.podiums) })
+                );
+              })
+              : h('tr', {}, h('td', { colspan: '7', class: 'muted', text: 'Aucun pilote enregistré.' }))
+          )
+        )
+      );
     };
 
     const teamTable = () => {
       const leader = leaderPoints(teamRows);
-      return h('div', { class: 'table-scroll' }, h('table', {},
-        h('caption', { class: 'sr-only', text: 'Classement des constructeurs' }),
-        h('thead', {}, h('tr', {}, ['#', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) => h('th', { scope: 'col', text: label })))),
-        h('tbody', {}, teamRows.length ? teamRows.map((row) => {
-          const isPlayer = row.team.id === playerTeamId;
-          return h('tr', { class: isPlayer ? 'is-player-team' : '' },
-            h('td', { class: 'standings-rank', text: String(row.rank) }),
-            h('th', { scope: 'row', class: 'standings-name' }, isPlayer ? playerMark.cloneNode(true) : null, teamCell(row.team)),
-            h('td', { class: 'standings-points', text: String(row.points) }),
-            h('td', { text: gapText(row.points, leader) }),
-            h('td', { text: String(row.stats.wins) }),
-            h('td', { text: String(row.stats.podiums) }));
-        }) : h('tr', {}, h('td', { colspan: '6', class: 'muted', text: 'Aucune course enregistrée.' })))));
+      return h(
+        'div',
+        { class: 'table-scroll' },
+        h(
+          'table',
+          {},
+          h('caption', { class: 'sr-only', text: 'Classement des constructeurs' }),
+          h(
+            'thead',
+            {},
+            h(
+              'tr',
+              {},
+              ['#', 'Écurie', 'Points', 'Écart', 'Victoires', 'Podiums'].map((label) =>
+                h('th', { scope: 'col', text: label })
+              )
+            )
+          ),
+          h(
+            'tbody',
+            {},
+            teamRows.length
+              ? teamRows.map((row) => {
+                const isPlayer = String(row.team.id) === String(playerTeamId);
+                return h(
+                  'tr',
+                  { class: isPlayer ? 'is-player-team' : '' },
+                  h('td', { class: 'standings-rank', text: String(row.rank) }),
+                  h(
+                    'th',
+                    { scope: 'row', class: 'standings-name' },
+                    isPlayer ? playerMark.cloneNode(true) : null,
+                    teamCell(row.team)
+                  ),
+                  h('td', { class: 'standings-points', text: String(row.points) }),
+                  h('td', { text: gapText(row.points, leader) }),
+                  h('td', { text: String(row.stats.wins) }),
+                  h('td', { text: String(row.stats.podiums) })
+                );
+              })
+              : h('tr', {}, h('td', { colspan: '6', class: 'muted', text: 'Aucune écurie enregistrée.' }))
+          )
+        )
+      );
     };
 
-    const driversTab = h('button', { type: 'button', class: 'standings-subtab is-active', role: 'tab', id: 'standings-tab-drivers', 'aria-controls': 'standings-panel-drivers', 'aria-selected': 'true', tabindex: '0', text: 'Pilotes' });
-    const teamsTab = h('button', { type: 'button', class: 'standings-subtab', role: 'tab', id: 'standings-tab-teams', 'aria-controls': 'standings-panel-teams', 'aria-selected': 'false', tabindex: '-1', text: 'Constructeurs' });
-    const driversPanel = h('div', { id: 'standings-panel-drivers', class: 'standings-table-panel', role: 'tabpanel', 'aria-labelledby': 'standings-tab-drivers' }, driverTable());
-    const teamsPanel = h('div', { id: 'standings-panel-teams', class: 'standings-table-panel', role: 'tabpanel', 'aria-labelledby': 'standings-tab-teams', hidden: true }, teamTable());
+    const driversTab = h('button', {
+      type: 'button',
+      class: 'standings-subtab is-active',
+      role: 'tab',
+      id: 'standings-tab-drivers',
+      'aria-controls': 'standings-panel-drivers',
+      'aria-selected': 'true',
+      tabindex: '0',
+      text: 'Pilotes',
+    });
+    const teamsTab = h('button', {
+      type: 'button',
+      class: 'standings-subtab',
+      role: 'tab',
+      id: 'standings-tab-teams',
+      'aria-controls': 'standings-panel-teams',
+      'aria-selected': 'false',
+      tabindex: '-1',
+      text: 'Constructeurs',
+    });
+    const driversPanel = h(
+      'div',
+      {
+        id: 'standings-panel-drivers',
+        class: 'standings-table-panel',
+        role: 'tabpanel',
+        'aria-labelledby': 'standings-tab-drivers',
+      },
+      driverTable()
+    );
+    const teamsPanel = h(
+      'div',
+      {
+        id: 'standings-panel-teams',
+        class: 'standings-table-panel',
+        role: 'tabpanel',
+        'aria-labelledby': 'standings-tab-teams',
+        hidden: true,
+      },
+      teamTable()
+    );
+
     const selectTab = (tab, panel, otherTab, otherPanel) => {
-      tab.classList.add('is-active'); otherTab.classList.remove('is-active');
-      tab.setAttribute('aria-selected', 'true'); otherTab.setAttribute('aria-selected', 'false');
-      tab.tabIndex = 0; otherTab.tabIndex = -1; panel.hidden = false; otherPanel.hidden = true; tab.focus();
+      tab.classList.add('is-active');
+      otherTab.classList.remove('is-active');
+      tab.setAttribute('aria-selected', 'true');
+      otherTab.setAttribute('aria-selected', 'false');
+      tab.tabIndex = 0;
+      otherTab.tabIndex = -1;
+      panel.hidden = false;
+      otherPanel.hidden = true;
+      tab.focus();
     };
+
     driversTab.addEventListener('click', () => selectTab(driversTab, driversPanel, teamsTab, teamsPanel));
     teamsTab.addEventListener('click', () => selectTab(teamsTab, teamsPanel, driversTab, driversPanel));
-    [driversTab, teamsTab].forEach((tab) => tab.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); (tab === driversTab ? teamsTab : driversTab).click(); }
-    }));
+    [driversTab, teamsTab].forEach((tab) =>
+      tab.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+          event.preventDefault();
+          (tab === driversTab ? teamsTab : driversTab).click();
+        }
+      })
+    );
 
-    return h('section', { class: 'card standings-card', 'aria-labelledby': 'standings-title' },
+    return h(
+      'section',
+      { class: 'card standings-card', 'aria-labelledby': 'standings-title' },
       h('h1', { id: 'standings-title', text: 'Classements' }),
-      h('p', { class: 'muted', text: 'Points issus du classement officiel de la sauvegarde. Les statistiques sont dérivées des résultats enregistrés.' }),
+      h('p', {
+        class: 'muted',
+        text: 'Points issus du classement officiel de la sauvegarde. Les statistiques sont dérivées des résultats enregistrés.',
+      }),
       h('div', { class: 'standings-subtabs', role: 'tablist', 'aria-label': 'Type de classement' }, driversTab, teamsTab),
-      driversPanel, teamsPanel);
+      driversPanel,
+      teamsPanel
+    );
   }
 
   const panels = {

@@ -15,6 +15,8 @@ import { runImportFlow } from './import-flow.js';
 import { CALENDAR_2026 } from './data/calendar-2026.js';
 import { advanceOneDay, advanceToNextEvent, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost } from './core/progression.js';
 import { weekendFor } from './core/weekend.js';
+import { ensureTransferState, prospectDriver, offerDriver, driverConfidential } from './core/transfers.js';
+import { showModal } from './ui.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);
@@ -94,8 +96,37 @@ function run(save) {
   const eventTitle = (event) => {
     if (!event) return 'Saison terminée';
     if (event.type === 'upgrade') return `Amélioration terminée · ${DEPT_LABELS[event.upgrade.dept]}`;
-    const labels = { training: 'Entraînement pilotes', qualifying: 'Qualifications', race: 'Course' };
-    return `${labels[event.type]} · R${event.round.round} · ${event.round.name}`;
+
+    const labels = {
+      training: 'Entraînement pilotes',
+      qualifying: 'Qualifications',
+      race: 'Course',
+      prospecting: 'Prospection terminée',
+      prospection: 'Prospection terminée',
+      'prospection-complete': 'Prospection terminée',
+      'scouting-complete': 'Prospection terminée',
+      offer: 'Réponse du pilote',
+      'offer-response': 'Réponse du pilote',
+      'driver-response': 'Réponse du pilote',
+      'transfer-response': 'Réponse du pilote',
+    };
+    const label = labels[event.type] || event.title || 'Événement';
+    const isOfferResponse = ['offer', 'offer-response', 'driver-response', 'transfer-response'].includes(event.type);
+    if (isOfferResponse) {
+      const offer = event.offer || event.transfer?.offer;
+      const decision = event.decision || event.transfer?.decision;
+      const driverId = event.driverId || offer?.driverId;
+      const driver = driverId ? playerDriver(driverId) : null;
+      const name = driver?.name || offer?.driverName || event.driverName || 'pilote';
+      if (!decision) return `Réponse de ${name}`;
+      const result = decision.accepted ? 'offre acceptée' : 'offre refusée';
+      const reasonText = decision.reason || (Array.isArray(decision.reasons) && decision.reasons.length ? decision.reasons.join(', ') : '');
+      const reason = reasonText ? `, raison : ${reasonText}` : '';
+      const probability = decision.probability != null ? ` (probabilité : ${Math.round(Number(decision.probability) <= 1 ? Number(decision.probability) * 100 : Number(decision.probability))} %)` : '';
+      return `Réponse de ${name} : ${result}${reason}${probability}`;
+    }
+    if (!event.round) return label;
+    return `${label} · R${event.round.round} · ${event.round.name}`;
   };
 
   const playerDriver = (id) => save.drivers.find((driver) => driver.id === id);
@@ -144,7 +175,6 @@ function run(save) {
       date.setUTCDate(date.getUTCDate() + index);
       return date.toISOString().slice(0, 10);
     });
-    const labels = { training: 'Entraînement', qualifying: 'Qualifications', race: 'Course', upgrade: 'Amélioration terminée' };
     const formatDay = new Intl.DateTimeFormat('fr-CH', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
     const qualifyingRound = CALENDAR_2026.find((round) => round.qualifyingDate === save.gameDate);
     const pendingQualifying = qualifyingRound && !save.weekends[qualifyingRound.id]?.qualifying?.grid?.length;
@@ -163,9 +193,22 @@ function run(save) {
         return h('article', { class: `week-day${date === save.gameDate ? ' is-today' : ''}` },
           h('h3', { text: formatDay.format(new Date(`${date}T12:00:00Z`)) }),
           daysEvents.length
-            ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', { text: labels[event.type] }), event.round ? h('small', { text: `R${event.round.round}` }) : null)))
+            ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', { text: eventTitle(event) }))))
             : h('p', { class: 'week-empty', text: 'Aucun événement' }));
       })));
+  }
+
+  async function showTransferEvents(events) {
+    const transferEvents = (events || []).filter((event) => event.transfer || event.transferType || event.type === 'prospecting' || event.type === 'offer' || event.type === 'prospection' || event.type === 'offer-response' || event.type === 'driver-response' || event.type === 'scouting-complete' || event.type === 'transfer-response');
+    for (const event of transferEvents) {
+      const title = eventTitle(event);
+      const isOfferResponse = ['offer', 'offer-response', 'driver-response', 'transfer-response'].includes(event.type);
+      const detail = isOfferResponse ? title : (event.message || event.description || (event.driverId ? playerDriver(event.driverId)?.name : ''));
+      await showModal({
+        title,
+        body: h('p', { text: detail || 'Un événement du marché des transferts est arrivé à échéance.' }),
+      });
+    }
   }
 
   async function advanceCalendar() {
@@ -185,6 +228,7 @@ function run(save) {
 
       if (!result.ok || result.events?.length > 0) {
         if (result.events?.length > 0) {
+          await showTransferEvents(result.events);
           toast(`Événement exécuté : ${eventTitle(result.event)}.`);
         } else if (!result.ok) {
           toast(result.error, { error: true });
@@ -207,6 +251,7 @@ function run(save) {
     const written = persist();
     paintHeader();
     show('home');
+    await showTransferEvents(result.events);
     toast(written.ok ? (result.event ? `Événement exécuté : ${eventTitle(result.event)}.` : `Calendrier avancé au ${formatGameDate(save.gameDate)}.`) : written.error, { error: !written.ok });
   }
 
@@ -460,7 +505,55 @@ function run(save) {
     home: { title: 'Accueil', build: homePanel },
     calendar: { title: 'Calendrier', build: calendarPanel },
     standings: { title: 'Classements', build: standingsPanel },
-    drivers: { title: 'Pilotes / mercato', build: () => placeholder('Pilotes / mercato', 'La gestion des contrats et des transferts de pilotes sera ajoutée plus tard.') },
+    drivers: {
+      title: 'Pilotes / mercato', build: () => {
+        ensureTransferState(save);
+        const mine = save.drivers.filter((d) => d.teamId === save.playerTeamId);
+        const status = (d) => save.transfers.scouting.find((x) => x.driverId === d.id);
+        const openOffer = async (d) => {
+          const slot = h('select', { class: 'input' }, h('option', { value: '1', text: 'Pilote n°1' }), h('option', { value: '2', text: 'Pilote n°2' }));
+          const salary = h('input', { class: 'input', type: 'number', min: '0.1', step: '0.1', value: String(d.contract?.salary || 1) });
+          const years = h('input', { class: 'input', type: 'number', min: '1', max: '5', step: '1', value: '2' });
+          const body = h('div', { class: 'stack' }, h('p', { text: 'Configurez votre proposition. La réponse arrivera dans 3 jours simulés.' }), h('label', { text: 'Poste proposé' }, slot), h('label', { text: 'Salaire annuel (M€)' }, salary), h('label', { text: 'Durée (années)' }, years));
+          const ok = await showModal({ title: `Offre pour ${d.name}`, body, wide: true, actions: [{ label: 'Annuler', value: false, variant: 'btn--ghost', autofocus: true }, { label: 'Envoyer l’offre', value: true, variant: 'btn--primary' }] });
+          if (!ok) return; const r = offerDriver(save, d.id, slot.value, salary.value, years.value); if (!r.ok) return toast(r.error, { error: true }); persist(); show('drivers'); toast('Offre planifiée : réponse dans 3 jours.');
+        };
+        const prospect = (d) => {
+          const activeProspections = save.transfers.scouting.filter((entry) => !entry.completed).length;
+          if (activeProspections >= 3) return toast('Limite atteinte : 3 prospections simultanées maximum.', { error: true });
+          const r = prospectDriver(save, d.id);
+          if (!r.ok) return toast(r.error, { error: true });
+          persist(); show('drivers'); toast(`Prospection planifiée pour ${d.name}, réponse dans 7 jours.`);
+        };
+        const line = (d) => {
+          const info = driverConfidential(save, d.id);
+          const sc = status(d);
+          const current = save.teams.find((t) => t.id === d.teamId);
+          const isMine = d.teamId === save.playerTeamId;
+          const acceptedOffer = save.transfers.offers.find((o) => o.driverId === d.id && (o.accepted === true || o.decision?.accepted === true));
+          const signed = save.transfers.signed.find((o) => o.driverId === d.id);
+          const deferred = d.contract?.deferred === true || !!d.futureContract || !!signed || !!acceptedOffer;
+          const pendingTeamId = d.futureContract?.teamId || signed?.targetTeamId || acceptedOffer?.targetTeamId;
+          const pendingTeam = save.teams.find((t) => t.id === pendingTeamId);
+          const pendingSeason = d.futureContract?.startSeason || signed?.startSeason || (acceptedOffer ? Number(save.season ?? String(save.gameDate).slice(0, 4)) + 1 : null);
+          const pendingSlot = d.futureContract?.slot || signed?.slot || acceptedOffer?.slot;
+          const confirmation = deferred && pendingTeam
+            ? `Rejoindra ${pendingTeam.name} en ${pendingSeason} en tant que pilote n°${pendingSlot}.`
+            : null;
+          const confidential = sc?.completed || isMine;
+          let action = null;
+          if (confirmation) {
+            action = h('p', { class: 'transfer-private', text: confirmation });
+          } else if (confidential) {
+            action = h('button', { type: 'button', class: 'btn btn--small btn--primary', text: isMine ? 'Renouveler le contrat' : 'Faire une offre', onClick: () => openOffer(d), disabled: save.transfers.offers.some((o) => o.driverId === d.id && !o.resolved) });
+          } else {
+            action = h('button', { type: 'button', class: 'btn btn--small', text: sc ? `Prospection prévue le ${formatGameDate(sc.dueOn)}` : 'Prospecter le pilote', onClick: () => prospect(d), disabled: !!sc && !sc.completed });
+          }
+          return h('article', { class: 'transfer-row card' }, h('div', {}, h('strong', { text: d.name }), h('p', { class: 'muted', text: `${current?.name || 'Agent libre'} · ${d.category} · ${d.age ?? '—'} ans · Note ${driverOverall(d)}` }), confidential && !confirmation ? h('p', { class: 'transfer-private', text: `Loyalty : ${info.loyalty ?? '—'} · Salaire : ${formatMoney(info.contract?.salary || 0)} · Fin : saison ${info.contract?.endSeason ?? '—'}` }) : null), h('div', { class: 'row' }, action));
+        };
+        return h('div', { class: 'stack' }, h('section', { class: 'card' }, h('h1', { text: 'Pilotes / marché des transferts' }), h('p', { class: 'muted', text: 'Vos pilotes restent affichés ci-dessus ; la prospection révèle les informations confidentielles après 7 jours.' }), h('div', { class: 'grid2' }, mine.map(driverCard))), h('section', { class: 'card' }, h('h2', { text: 'Prospection' }), h('div', { class: 'transfer-list' }, save.drivers.map(line))));
+      }
+    },
     settings: { title: 'Paramètres et sauvegarde', build: settingsPanel },
   };
 

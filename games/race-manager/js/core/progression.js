@@ -3,6 +3,7 @@ import { CALENDAR_2026 } from '../data/calendar-2026.js';
 import { DEPT_KEYS, STAT_KEYS, TRAINING_GAIN, UPGRADE_DURATION_DAYS, UPGRADE_LEVELS } from './constants.js';
 import { clampRating, driverOverall } from './validation.js';
 import { round2 } from './utils.js';
+import { processTransferEvents, transferEvents } from './transfers.js';
 
 const dateMs = (date) => Date.parse(`${date}T12:00:00Z`);
 const addDays = (date, days) => new Date(dateMs(date) + days * 86400000).toISOString().slice(0, 10);
@@ -24,7 +25,8 @@ export function timelineEvents(save) {
     date: upgrade.completesOn, type: 'upgrade', upgrade,
     team: save.teams.find((entry) => entry.id === upgrade.teamId),
   }));
-  return [...calendarEvents(), ...upgrades].sort(sortEvents);
+  const marketEvents = transferEvents(save);
+  return [...calendarEvents(), ...upgrades, ...marketEvents].sort(sortEvents);
 }
 
 export function eventsForWeek(save, startDate) {
@@ -136,11 +138,14 @@ export function advanceOneDay(save) {
     return { ok: false, blocked: true, event: race, events: [], error: 'Terminez les qualifications avant de passer à la course.' };
   }
   const completedUpgrades = events.filter((event) => event.type === 'upgrade');
-
   // Une amélioration qui finit le jour des qualifications est bien traitée avant l'accès à la session.
   completedUpgrades.forEach(() => finishUpgrades(save, targetDate));
 
   save.gameDate = targetDate;
+  // Le mercato est traité après le changement de date, indépendamment des
+  // événements de course présents le même jour. processTransferEvents doit
+  // résoudre toutes les échéances de `date` et retourner un résultat par événement.
+  const marketEvents = processTransferEvents(save, targetDate) || [];
   for (const event of events) {
     if (event.type === 'training') {
       trainAllDrivers(save, event);
@@ -148,11 +153,13 @@ export function advanceOneDay(save) {
     }
     if (event.round) save.calendar.currentRound = event.round.round;
   }
-  return { ok: true, event: events[0] || null, events };
+  const allEvents = [...events.filter((event) => event.type !== 'scouting-complete' && event.type !== 'transfer-response'), ...marketEvents];
+  return { ok: true, event: allEvents[0] || null, events: allEvents };
 }
 
+
 function sortEvents(a, b) {
-  const priority = { upgrade: 0, training: 1, qualifying: 2, race: 3 };
+  const priority = { upgrade: 0, training: 1, qualifying: 2, race: 3, 'scouting-complete': 4, 'transfer-response': 5, prospecting: 4, offer: 5 };
   return dateMs(a.date) - dateMs(b.date) || (priority[a.type] ?? 9) - (priority[b.type] ?? 9);
 }
 

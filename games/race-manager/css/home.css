@@ -798,3 +798,32 @@ body.page-home {
         padding-inline: .7rem;
     }
 }
+
+/* Marché des transferts */
+.transfer-list {
+    display: grid;
+    gap: var(--space-3, 1rem)
+}
+
+.transfer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem
+}
+
+.transfer-private {
+    color: var(--team, #e63946);
+    font-weight: 600
+}
+
+@media(max-width:700px) {
+    .transfer-row {
+        align-items: stretch;
+        flex-direction: column
+    }
+
+    .transfer-row .row {
+        flex-wrap: wrap
+    }
+}

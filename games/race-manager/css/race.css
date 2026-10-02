@@ -114,12 +114,12 @@
 }
 
 .tyre-soft {
-    background: #e63946;
+    background: #ff4d4d;
     color: #fff !important;
 }
 
 .tyre-medium {
-    background: #ffc21a;
+    background: #ffd633;
 }
 
 .tyre-hard {
@@ -133,7 +133,7 @@
 }
 
 .tyre-wet {
-    background: #3b82f6;
+    background: #0059b3;
     color: #fff !important;
 }
 
@@ -281,21 +281,66 @@
         grid-template-columns: minmax(15rem, .8fr) minmax(0, 1.6fr);
     }
 }
+
 /* Correctifs de composition course : stratégies équilibrées, classement lisible. */
-.race-page { width: min(100%, 86rem); }
-.race-layout:has(> .driver-strategy) { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-.race-layout:has(> .driver-strategy) > .driver-strategy { min-width: 0; margin-bottom: 0; }
-.race-layout:not(:has(> .driver-strategy)) { grid-template-columns: minmax(0, 1.7fr) minmax(19rem, .9fr); align-items: start; }
-.race-layout:not(:has(> .driver-strategy)) > .card { min-width: 0; }
-.race-layout:not(:has(> .driver-strategy)) .standings-table { min-width: 48rem; }
-.standings-table th, .standings-table td { padding: .7rem .65rem; white-space: nowrap; }
-.standings-table th:nth-child(2), .standings-table td:nth-child(2) { min-width: 7rem; }
-@media (max-width: 63.99rem) {
-  .race-layout:has(> .driver-strategy) { grid-template-columns: 1fr; }
-  .race-layout:not(:has(> .driver-strategy)) { grid-template-columns: minmax(0, 1.45fr) minmax(16rem, .9fr); }
+.race-page {
+    width: min(100%, 86rem);
 }
+
+.race-layout:has(> .driver-strategy) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+.race-layout:has(> .driver-strategy)>.driver-strategy {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.race-layout:not(:has(> .driver-strategy)) {
+    grid-template-columns: minmax(0, 1.7fr) minmax(19rem, .9fr);
+    align-items: start;
+}
+
+.race-layout:not(:has(> .driver-strategy))>.card {
+    min-width: 0;
+}
+
+.race-layout:not(:has(> .driver-strategy)) .standings-table {
+    min-width: 48rem;
+}
+
+.standings-table th,
+.standings-table td {
+    padding: .7rem .65rem;
+    white-space: nowrap;
+}
+
+.standings-table th:nth-child(2),
+.standings-table td:nth-child(2) {
+    min-width: 7rem;
+}
+
+@media (max-width: 63.99rem) {
+    .race-layout:has(> .driver-strategy) {
+        grid-template-columns: 1fr;
+    }
+
+    .race-layout:not(:has(> .driver-strategy)) {
+        grid-template-columns: minmax(0, 1.45fr) minmax(16rem, .9fr);
+    }
+}
+
 @media (max-width: 47.99rem) {
-  .race-layout:not(:has(> .driver-strategy)) { grid-template-columns: 1fr; }
-  .race-layout:not(:has(> .driver-strategy)) .standings-table { min-width: 44rem; }
-  .race-layout:has(> .driver-strategy) .driver-strategy { padding: .85rem; }
+    .race-layout:not(:has(> .driver-strategy)) {
+        grid-template-columns: 1fr;
+    }
+
+    .race-layout:not(:has(> .driver-strategy)) .standings-table {
+        min-width: 44rem;
+    }
+
+    .race-layout:has(> .driver-strategy) .driver-strategy {
+        padding: .85rem;
+    }
 }

@@ -1,6 +1,6 @@
 import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
-import { formatGameDate, formatMoney, round2 } from './core/utils.js';
+import { formatGameDate, formatMoney, round2, weatherCategory, weatherLabel, recommendedCompound } from './core/utils.js';
 import { h, showModal, toast } from './ui.js';
 import { getDynamicCalendar } from './core/progression.js';
 import { weekendFor } from './core/weekend.js';
@@ -75,7 +75,7 @@ function run(save, round) {
   function initDriverStrats() {
     for (const d of playerDrivers) {
       driverStrats[d.id] = {
-        startCompound: 'medium',
+        startCompound: recommendedCompound(weekend.startMm),
         pace: 'balanced',
         riskLevel: 'normal',
         stops: [{ lap: Math.floor(circuitData(round.id).laps * 0.45), compound: 'hard' }]
@@ -120,7 +120,7 @@ function run(save, round) {
   function renderPreviewSvg(strat) {
     const totalLaps = circuitData(round.id).laps;
     const stints = estimateStints(strat, totalLaps);
-    const colors = { soft: '#ff4d4d', medium: '#ffd633', hard: '#ffffff', intermediate: '#4da6ff', wet: '#0059b3' };
+    const colors = { soft: '#ff4d4d', medium: '#ffd633', hard: '#ffffff', intermediate: '#2ecc71', wet: '#0059b3' };
 
     const mapX = (lap) => (lap / totalLaps) * 1000;
     const mapY = (state) => 200 - (state / 100) * 200;
@@ -215,7 +215,7 @@ function run(save, round) {
       h('div', { class: 'stack' },
         h('section', { class: 'card race-hero' },
           h('h1', { text: `Stratégie de Course · R${round.round}` }),
-          h('p', { class: 'muted', text: `${round.name} · ${weekend.weather === 'rain' ? '🌧️ Pluie' : weekend.weather === 'mixed' ? '⛅ Mixte' : '☀️ Sec'} · ${totalLaps} tours` })
+          h('p', { class: 'muted', text: `${round.name} · Départ : ${weatherLabel(weatherCategory(weekend.startMm))} (${weekend.startMm.toFixed(1)} mm) · ${totalLaps} tours` })
         ),
         h('section', { class: 'card' },
           h('div', { class: 'race-layout stack' },
@@ -329,6 +329,8 @@ function run(save, round) {
     weekend.race.log = raceState.log.slice(0, 100);
     persist();
 
+    if (res.events.some(e => e.startsWith('Météo :'))) { toast(res.events.find(e => e.startsWith('Météo :'))); needsPause = true; }
+
     if (needsPause) {
       setPlaySpeed(0);
     } else {
@@ -363,6 +365,7 @@ function run(save, round) {
 
   function updateLiveRaceUI() {
     document.getElementById('liveLapInfo').textContent = `Tour ${raceState.currentLap}/${raceState.laps}`;
+    document.getElementById('liveWeatherInfo').textContent = `${weatherLabel(raceState.weather)} · ${raceState.currentMm.toFixed(1)} mm`;
 
     const sortedEntries = [...raceState.entries].sort((a, b) => {
       if (a.status === 'dnf' && b.status !== 'dnf') return 1;
@@ -419,7 +422,8 @@ function run(save, round) {
         h('section', { class: 'card race-hero', style: 'margin-bottom: 1rem;' },
           h('div', { style: 'display: flex; justify-content: space-between; align-items: center;' },
             h('h1', { text: `Grand Prix · R${round.round}` }),
-            h('h2', { id: 'liveLapInfo', style: 'color: var(--accent);' }, `Tour ${raceState.currentLap}/${raceState.laps}`)
+            h('h2', { id: 'liveLapInfo', style: 'color: var(--accent);' }, `Tour ${raceState.currentLap}/${raceState.laps}`),
+            h('p', { id: 'liveWeatherInfo', class: 'muted', text: `${weatherLabel(raceState.weather)} · ${raceState.currentMm.toFixed(1)} mm` })
           )
         ),
         h('div', { class: 'race-controls' },
@@ -475,7 +479,7 @@ function run(save, round) {
         h('section', { class: 'card race-hero' },
           h('h1', { text: `Résultats de la Course · R${round.round}` }),
           h('p', { text: round.name }),
-          h('p', { class: 'muted', text: `${weekend.weather === 'rain' ? '🌧️ Pluie' : weekend.weather === 'mixed' ? '⛅ Mixte' : '☀️ Sec'} · ${weekend.race.rewards?.money > 0 ? `Gains : +${weekend.race.rewards.money} M€` : ''}` })
+          h('p', { class: 'muted', text: `${weatherLabel(weatherCategory(raceState?.currentMm ?? weekend.startMm))} · ${raceState?.currentMm?.toFixed(1) ?? weekend.startMm.toFixed(1)} mm · ${weekend.race.rewards?.money > 0 ? `Gains : +${weekend.race.rewards.money} M€` : ''}` })
         ),
         h('section', { class: 'card' },
           h('h2', { text: 'Classement Final' }),

@@ -149,6 +149,9 @@ export function validateSave(s) {
     err('Activités de saison invalides.');
   }
   if (!isObj(s.weekends)) err('Week-ends de Grand Prix invalides.');
+  if (isObj(s.weekends)) Object.entries(s.weekends).forEach(([id, w]) => {
+    if (!isObj(w) || !Number.isFinite(w.startMm) || w.startMm < 0 || w.startMm > 10 || !Number.isFinite(w.currentMm) || w.currentMm < 0 || w.currentMm > 10 || !['dry', 'damp', 'wet'].includes(w.weather)) err(`Météo invalide pour le week-end ${id}.`);
+  });
   if (!isObj(s.transfers) || !Array.isArray(s.transfers.scouting) || !Array.isArray(s.transfers.offers)) err('Marché des transferts invalide.');
   if (!isObj(s.standings) || !Array.isArray(s.standings.drivers) || !Array.isArray(s.standings.teams)) err('Classements invalides.');
 

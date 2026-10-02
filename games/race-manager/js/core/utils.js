@@ -52,3 +52,20 @@ export function formatGameDate(str) {
   const d = new Date(`${str}T00:00:00Z`);
   return Number.isNaN(d.getTime()) ? String(str) : d.toLocaleDateString('fr-CH', { dateStyle: 'long', timeZone: 'UTC' });
 }
+
+/** Météo de course : catégories et pneus recommandés à partir de l'eau présente. */
+export function weatherCategory(mm) {
+  const amount = Number(mm) || 0;
+  return amount <= 1 ? 'dry' : amount <= 4 ? 'damp' : 'wet';
+}
+export function weatherLabel(category) {
+  return { dry: 'Sec', damp: 'Humide', wet: 'Mouillée' }[category] || 'Sec';
+}
+export function recommendedCompound(mm) {
+  return { dry: 'hard', damp: 'intermediate', wet: 'wet' }[weatherCategory(mm)];
+}
+export function shiftSundayToMonday(date) {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+  const d = new Date(`${date}T12:00:00Z`);
+  return d.getUTCDay() === 0 ? new Date(d.getTime() + 86400000).toISOString().slice(0, 10) : date;
+}

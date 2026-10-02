@@ -10,7 +10,7 @@ import {
   START_LEVELS, UPGRADE_LEVELS, DEPT_KEYS,
 } from './constants.js';
 import { clampRating, teamOverall, driverOverall, normalizeName, validateTeamName, validateColor, validateBudget, validateDriverSelection, validateSave } from './validation.js';
-import { clone, round2, hashString, newId } from './utils.js';
+import { clone, round2, hashString, newId, shiftSundayToMonday, weatherCategory } from './utils.js';
 import { TEAMS_2026, REFERENCE_VERSION } from '../data/teams-2026.js';
 import { DRIVERS_2026 } from '../data/drivers-2026.js';
 
@@ -384,6 +384,17 @@ export function migrateSave(save) {
     }
     s = { ...s, schemaVersion: 5 };
   }
+  for (const w of Object.values(s.weekends || {})) {
+    if (w && w.startMm == null) { w.startMm = w.weather === 'rain' ? 5 : w.weather === 'mixed' ? 2 : 0; }
+    if (w) { w.currentMm = Number.isFinite(w.currentMm) ? w.currentMm : w.startMm; w.weather = weatherCategory(w.currentMm); }
+  }
+  const migratePendingDate = (date) => {
+    const shifted = shiftSundayToMonday(date);
+    return shifted < s.gameDate ? s.gameDate : shifted;
+  };
+  for (const u of s.activities?.upgrades || []) u.completesOn = migratePendingDate(u.completesOn);
+  for (const x of s.transfers?.scouting || []) x.dueOn = migratePendingDate(x.dueOn);
+  for (const x of s.transfers?.offers || []) x.dueOn = migratePendingDate(x.dueOn);
   s.transfers ||= { scouting: [], offers: [] };
   s.transfers.scouting ||= []; s.transfers.offers ||= [];
   return s;

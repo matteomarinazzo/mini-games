@@ -1,6 +1,7 @@
 /** Moteur V3 du week-end : qualifications, stratégies et course rapide. */
 import { RACE_POINTS, TYRE_COMPOUNDS } from './constants.js';
-import { hashString, round2 } from './utils.js';
+import { hashString, round2, weatherCategory } from './utils.js';
+import { circuitFor } from '../data/circuits-2026.js';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const random = (seed) => (hashString(seed) % 10_000) / 10_000;
@@ -9,11 +10,15 @@ const teamRating = (team) => (team.departmentRatings.aero + team.departmentRatin
 
 export function weekendFor(save, roundId) {
   if (!save.weekends[roundId]) {
+    const circuit = circuitFor(roundId);
     const weatherRoll = random(`${save.saveId}-${roundId}-weather`);
+    const startMm = Math.round(Math.min(10, weatherRoll * (1.5 + circuit.rainProbability * 24)) * 10) / 10;
     save.weekends[roundId] = {
       roundId,
-      weather: weatherRoll > .82 ? 'rain' : weatherRoll > .58 ? 'mixed' : 'dry',
-      rainRisk: Math.round(weatherRoll * 100),
+      weather: weatherCategory(startMm),
+      startMm,
+      currentMm: startMm,
+      rainRisk: Math.round(circuit.rainProbability * 100),
       qualifying: { sessions: {}, grid: [] },
       strategies: {},
       race: null,

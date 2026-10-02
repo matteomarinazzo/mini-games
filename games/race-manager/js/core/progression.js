@@ -2,12 +2,13 @@
 import { CALENDAR_2026 } from '../data/calendar-2026.js';
 import { DEPT_KEYS, STAT_KEYS, TRAINING_GAIN, UPGRADE_DURATION_DAYS, UPGRADE_LEVELS, RATING_MIN, RATING_MAX } from './constants.js';
 import { clampRating, driverOverall, teamOverall } from './validation.js';
-import { round2 } from './utils.js';
+import { round2, shiftSundayToMonday } from './utils.js';
 import { processTransferEvents, transferEvents, replacementCascade } from './transfers.js';
 import { applyRegulationChanges } from './regulations.js';
 
 const dateMs = (date) => Date.parse(`${date}T12:00:00Z`);
 const addDays = (date, days) => new Date(dateMs(date) + days * 86400000).toISOString().slice(0, 10);
+const eventDate = (date, type) => type === 'race' ? date : shiftSundayToMonday(date);
 const log = (save, date, message, type = 'info') => {
   if (!save.eventLog) save.eventLog = [];
   save.eventLog.unshift({ id: `${date}-${save.eventLog.length}-${type}`, date, message, type });
@@ -29,6 +30,15 @@ export function getDynamicCalendar(season = 2026) {
     qualifyingDate: shiftYear(round.qualifyingDate, diffYears),
     raceDate: shiftYear(round.raceDate, diffYears),
   }));
+}
+
+
+export function migrateScheduledEventDates(save) {
+  if (!save || typeof save !== 'object') return save;
+  for (const upgrade of save.activities?.upgrades || []) upgrade.completesOn = shiftSundayToMonday(upgrade.completesOn);
+  for (const item of save.transfers?.scouting || []) item.dueOn = shiftSundayToMonday(item.dueOn);
+  for (const item of save.transfers?.offers || []) item.dueOn = shiftSundayToMonday(item.dueOn);
+  return save;
 }
 
 export function calendarEvents(save = { season: 2026 }) {
@@ -53,17 +63,21 @@ export function calendarEvents(save = { season: 2026 }) {
     title: `Début de la saison ${nextSeasonYear}`,
   };
 
-  return [...raceEvents, seasonEndEvent, seasonStartEvent].sort(sortEvents);
+  const shifted = [...raceEvents, seasonEndEvent, seasonStartEvent].map((event) => ({
+    ...event,
+    date: eventDate(event.date, event.type),
+  }));
+  return shifted.sort(sortEvents);
 }
 
 export function timelineEvents(save) {
   const upgrades = (save.activities?.upgrades || []).map((upgrade) => ({
-    date: upgrade.completesOn,
+    date: eventDate(upgrade.completesOn, 'upgrade'),
     type: 'upgrade',
     upgrade,
     team: save.teams.find((entry) => entry.id === upgrade.teamId),
   }));
-  const marketEvents = transferEvents(save);
+  const marketEvents = transferEvents(save).map((event) => ({ ...event, date: eventDate(event.date, event.type) }));
   return [...calendarEvents(save), ...upgrades, ...marketEvents].sort(sortEvents);
 }
 

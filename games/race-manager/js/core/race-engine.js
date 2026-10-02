@@ -17,7 +17,8 @@ import {
   PUNCTURE_THRESHOLD, CLIFF_PENALTY_MAX_MS,
 } from './constants.js';
 import { circuitFor } from '../data/circuits-2026.js';
-import { hashString, round2, weatherCategory, weatherLabel } from './utils.js';
+import { hashString, round2, weatherLabel } from './utils.js';
+import { createWeatherState, advanceWeather, weatherCategory, recommendedCompound, normalizeRainProbability } from './weather.js';
 import { weekendFor } from './weekend.js';
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -55,9 +56,11 @@ export function initRaceState(save, roundId, startReactions = {}, playerOptions 
   const driversMap = new Map(save.drivers.map((d) => [d.id, d]));
   const teamsMap = new Map(save.teams.map((t) => [t.id, t]));
 
-  // Pré-calculer les changements de météo
+  // La météo de départ est calculée une seule fois par weekendFor et persistée.
+  // Ne jamais refaire un tirage ici : la stratégie et le moteur lisent la même valeur.
   const weatherChanges = [];
   const startMm = Number.isFinite(weekend.startMm) ? weekend.startMm : 0;
+  const startCategory = weatherCategory(startMm);
 
   // Construire les entrées de course
   const entries = grid.map((row) => {
@@ -65,7 +68,7 @@ export function initRaceState(save, roundId, startReactions = {}, playerOptions 
     const team = teamsMap.get(driver.teamId);
     const isPlayer = driver.teamId === save.playerTeamId;
     const opts = playerOptions[driver.id];
-    const aiStrat = isPlayer ? null : generateAiRaceStrategy(save.saveId, roundId, driver, team, weekend, circuit);
+    const aiStrat = isPlayer ? null : generateAiRaceStrategy(save.saveId, roundId, driver, team, weekend, circuit, { mm: startMm, category: startCategory });
 
     const startCompound = opts?.compound || aiStrat?.compound || 'medium';
     const pace = opts?.pace || aiStrat?.pace || 'balanced';
@@ -102,10 +105,11 @@ export function initRaceState(save, roundId, startReactions = {}, playerOptions 
     circuitId: circuit.id,
     laps: circuit.laps,
     currentLap: 0,
-    weather: weekend.weather,
+    weather: startCategory,
     startMm,
-    currentMm: Number.isFinite(weekend.currentMm) ? weekend.currentMm : startMm,
-    rainProbability: circuit.rainProbability,
+    currentMm: startMm,
+    rainProbability: normalizeRainProbability(circuit.rainProbability),
+    weatherState: createWeatherState(startMm, circuit.rainProbability),
     weatherChanges,
     entries,
     log: [],
@@ -149,7 +153,10 @@ export function deserializeRaceState(data, save, roundId) {
   return {
     ...data,
     startMm: Number.isFinite(data.startMm) ? data.startMm : (save.weekends?.[roundId]?.startMm ?? 0),
-    currentMm: Number.isFinite(data.currentMm) ? data.currentMm : (save.weekends?.[roundId]?.currentMm ?? data.startMm ?? 0),
+    currentMm: Math.min(6, Math.max(0, Number.isFinite(data.currentMm) ? data.currentMm : (save.weekends?.[roundId]?.currentMm ?? data.startMm ?? 0))),
+    weatherState: data.weatherState && typeof data.weatherState === 'object'
+      ? { ...data.weatherState, mm: Math.min(6, Math.max(0, Number(data.weatherState.mm ?? data.currentMm ?? 0))) }
+      : createWeatherState(Number.isFinite(data.currentMm) ? data.currentMm : (save.weekends?.[roundId]?.currentMm ?? data.startMm ?? 0), circuit.rainProbability),
     weather: weatherCategory(Number.isFinite(data.currentMm) ? data.currentMm : (save.weekends?.[roundId]?.currentMm ?? data.startMm ?? 0)),
     entries: data.entries.map((e) => ({
       ...e,
@@ -167,30 +174,15 @@ export function deserializeRaceState(data, save, roundId) {
 // Météo
 // ────────────────────────────────────────────────────────
 
-function generateWeatherChanges(saveId, roundId, circuit, startWeather) {
-  const changes = [];
-  const roll = seededRandom(`${saveId}-${roundId}-weather-change`);
-  if (startWeather === 'dry' && roll < circuit.rainProbability * 0.6) {
-    const changeLap = Math.floor(circuit.laps * (0.25 + roll * 0.5));
-    changes.push({ lap: changeLap, to: 'rain' });
-    const clearRoll = seededRandom(`${saveId}-${roundId}-weather-clear`);
-    if (clearRoll > 0.5) {
-      changes.push({ lap: Math.min(changeLap + Math.floor(circuit.laps * 0.2), circuit.laps - 3), to: 'dry' });
-    }
-  } else if (startWeather === 'rain' && roll > 0.6) {
-    const changeLap = Math.floor(circuit.laps * (0.3 + roll * 0.3));
-    changes.push({ lap: changeLap, to: 'dry' });
-  }
-  return changes;
-}
-
-function getCurrentWeather(state) { return weatherCategory(state.currentMm); }
+function getCurrentWeather(state) { return weatherCategory(state.currentMm, state.weather); }
 function updateTrackWater(state, lap) {
-  const roll = seededRandom(`${state._saveId}-${state.roundId}-water-${lap}`) - 0.5;
-  const trend = (state.rainProbability * 0.9) - 0.2;
   const old = state.currentMm;
-  state.currentMm = clamp(Math.round((old + roll * 1.2 + trend) * 10) / 10, 0, 10);
-  state.weather = weatherCategory(state.currentMm);
+  let randomIndex = 0;
+  const rng = () => seededRandom(`${state._saveId}-${state.roundId}-weather-${lap}-${randomIndex++}-${Math.floor(state.weatherState?.remaining || 0)}-${state.weatherState?.state || 'stable'}`);
+  // Seed distinct par tour : la météo reste déterministe, mais sa machine est sérialisable.
+  state.weatherState = advanceWeather(state.weatherState || createWeatherState(old, state.rainProbability), state.rainProbability, rng);
+  state.currentMm = clamp(state.weatherState.mm, 0, 6);
+  state.weather = weatherCategory(state.currentMm, state.weather);
   return old;
 }
 
@@ -232,9 +224,9 @@ function applyRaceStart(entries, driversMap, reactions, saveId, roundId) {
 // Stratégie IA
 // ────────────────────────────────────────────────────────
 
-function generateAiRaceStrategy(saveId, roundId, driver, team, weekend, circuit) {
+function generateAiRaceStrategy(saveId, roundId, driver, team, weekend, circuit, startingWeather) {
   const roll = seededRandom(`${saveId}-${roundId}-racestrat-${driver.id}`);
-  const weather = weekend.weather;
+  const weather = startingWeather?.category || weatherCategory(Number(weekend.currentMm ?? weekend.startMm ?? 0));
 
   if (weather === 'wet') {
     return { compound: 'wet', pace: 'balanced', riskLevel: 'normal', plannedStops: [{ lap: Math.floor(circuit.laps * 0.5), compound: 'intermediate' }] };
@@ -284,7 +276,7 @@ export function simulateLap(state) {
 
   // Annoncer un changement de météo
   if (weather !== previousWeather) {
-    events.push(`Météo : la piste passe de ${weatherLabel(previousWeather).toLowerCase()} à ${weatherLabel(weather).toLowerCase()} (${state.currentMm.toFixed(1)} mm).`);
+    events.push(`Météo : la piste passe à ${weatherLabel(weather).toLowerCase()} (${state.currentMm.toFixed(1)} mm).`);
   }
   state._lastWeather = weather;
 
@@ -323,18 +315,16 @@ export function simulateLap(state) {
     // ── IA : arrêt d'urgence si usure critique ──
     if (!entry.isPlayer && !entry.pitThisLap && entry.tyres.wear <= 8) {
       entry.pitThisLap = true;
-      entry._pitCompound = weather === 'wet' ? 'wet' : weather === 'damp' ? 'intermediate' : 'hard';
+      entry._pitCompound = recommendedCompound(state.currentMm);
     }
 
     // ── IA : changement de pneus si météo change ──
     if (!entry.isPlayer && !entry.pitThisLap && weather !== previousWeather) {
       const currentIsWet = entry.tyres.compound === 'wet' || entry.tyres.compound === 'intermediate';
-      if (weather === 'wet' && entry.tyres.compound !== 'wet') {
+      const recommended = recommendedCompound(state.currentMm);
+      if (entry.tyres.compound !== recommended && ((weather === 'wet' && recommended === 'wet') || (weather === 'damp' && recommended === 'intermediate') || (weather === 'dry' && currentIsWet))) {
         entry.pitThisLap = true;
-        entry._pitCompound = 'wet';
-      } else if (weather === 'dry' && currentIsWet) {
-        entry.pitThisLap = true;
-        entry._pitCompound = 'medium';
+        entry._pitCompound = recommended;
       }
     }
 
@@ -554,7 +544,7 @@ function checkIncident(state, entry, driver, weather, lap, paceM) {
   if (typeRoll < 0.80) {
     // Crevaison → pit stop forcé
     entry.pitThisLap = true;
-    entry._pitCompound = weather === 'wet' ? 'wet' : weather === 'damp' ? 'intermediate' : 'hard';
+    entry._pitCompound = recommendedCompound(state.currentMm);
     entry.totalTime += 15_000;
     return { message: `Tour ${lap} : 💨 Crevaison pour ${driverName} ! Arrêt forcé.`, reason: null, dnf: false };
   }
@@ -616,7 +606,7 @@ export function finishRace(state, save) {
   if (weekend.race?.results) return { ok: false, error: 'Cette course est déjà terminée.' };
 
   const weather = getCurrentWeather(state);
-  const wasDry = weatherCategory(state.currentMm) === 'dry';
+  const wasDry = weatherCategory(state.currentMm, state.weather) === 'dry';
 
   // Appliquer la pénalité des composés si course sèche
   for (const entry of state.entries) {
@@ -754,3 +744,5 @@ export function estimateWearPerLap(circuitId, compound, pace) {
   if (!circuit) return 2.0;
   return tyreD.wearRate * circuit.tyreWear * paceM.wear;
 }
+
+export { recommendedCompound };

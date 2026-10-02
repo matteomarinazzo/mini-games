@@ -1,10 +1,11 @@
 import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
-import { formatGameDate, formatMoney, round2, weatherCategory, weatherLabel, recommendedCompound } from './core/utils.js';
+import { formatGameDate, formatMoney, round2, weatherCategory, weatherLabel } from './core/utils.js';
 import { h, showModal, toast } from './ui.js';
 import { getDynamicCalendar } from './core/progression.js';
+import { circuitFor } from './data/circuits-2026.js';
 import { weekendFor } from './core/weekend.js';
-import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap } from './core/race-engine.js';
+import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap, recommendedCompound } from './core/race-engine.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);
@@ -35,7 +36,6 @@ function run(save, round) {
   document.documentElement.style.setProperty('--team', playerTeam.color);
   document.getElementById('hdrTeam').textContent = playerTeam.name;
   document.getElementById('hdrBalance').textContent = `Solde : ${formatMoney(playerTeam.balance)}`;
-  document.getElementById('backLink').href = `home.html?slot=${slotId}`;
 
   const weekend = weekendFor(save, round.id);
   const playerDrivers = save.drivers.filter(d => d.teamId === save.playerTeamId);
@@ -279,30 +279,55 @@ function run(save, round) {
     );
   }
 
+  // Use the same circuit definition as initRaceState, even before raceState exists.
+  // The strategy screen must never fall back to a generic lap count.
   function circuitData(id) {
-    return { laps: raceState ? raceState.laps : 58 };
+    return circuitFor(id);
   }
 
   let playSpeed = 0;
+  let pendingSpeed = 0;
   let simTimer = null;
   let gapMode = 'leader'; // 'leader' or 'ahead'
 
   function setPlaySpeed(speed) {
-    playSpeed = speed;
-    if (simTimer) clearTimeout(simTimer);
+    // Ignore repeated clicks on the currently selected speed.
+    if (speed === pendingSpeed) return;
 
+    pendingSpeed = speed;
     document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('btn--primary'));
     const activeBtn = document.getElementById(`btn-speed-${speed}`);
     if (activeBtn) activeBtn.classList.add('btn--primary');
 
-    if (speed > 0 && !raceState.completed) {
+    if (speed <= 0) {
+      playSpeed = 0;
+      if (simTimer) {
+        clearTimeout(simTimer);
+        simTimer = null;
+      }
+      return;
+    }
+
+    if (raceState.completed) return;
+
+    // A running lap keeps its original speed; a paused race starts a fresh,
+    // full-length delay instead of advancing immediately.
+    if (playSpeed <= 0) {
+      playSpeed = speed;
       scheduleNextLap();
     }
   }
 
   function scheduleNextLap() {
+    if (simTimer || playSpeed <= 0 || raceState.completed) return;
+    simTimer = setTimeout(runNextLap, 5000 / playSpeed);
+  }
+
+  function runNextLap() {
+    simTimer = null;
     if (playSpeed <= 0 || raceState.completed) return;
 
+    const lapSpeed = playSpeed;
     const res = simulateLap(raceState);
     if (res.events.length) raceState.log.unshift(...res.events.reverse());
 
@@ -334,7 +359,9 @@ function run(save, round) {
     if (needsPause) {
       setPlaySpeed(0);
     } else {
-      simTimer = setTimeout(scheduleNextLap, 5000 / playSpeed);
+      // Apply a speed change only after this lap has completed.
+      playSpeed = pendingSpeed || lapSpeed;
+      scheduleNextLap();
     }
   }
 

@@ -1,4 +1,4 @@
-# The Race Manager — V3 (dossier `games/race-manager/`)
+# Race Manager — V3 (dossier `games/race-manager/`)
 
 Jeu de management d'écurie de sport automobile pour mini-games.ch. HTML, CSS et JavaScript vanilla (modules ES), sans framework, sans build, sans backend. Poids total : ~110 Ko de texte, aucune image.
 

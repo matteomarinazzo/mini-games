@@ -111,6 +111,10 @@
             "pancake": {
                 "name": "Pancake",
                 "description": "Flip a pancake from a pan and land it on unlikely objects!"
+            },
+            "race-manager": {
+                "name": "Race Manager",
+                "description": "Manage your own racing team. Hire drivers, develop your car and win the championships!"
             }
         },
         "badges": {

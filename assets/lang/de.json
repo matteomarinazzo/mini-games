@@ -111,6 +111,10 @@
             "pancake": {
                 "name": "Pancake",
                 "description": "Wirf einen Pfannkuchen aus einer Pfanne und lasse ihn auf unwahrscheinlichen Objekten landen!"
+            },
+            "race-manager": {
+                "name": "Race Manager",
+                "description": "Leite dein eigenes Rennteam. Stelle Fahrer ein, entwickle dein Auto und gewinne die Meisterschaften!"
             }
         },
         "badges": {

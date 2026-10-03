@@ -489,8 +489,11 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
 /* Le panneau de navigation de l'assistant reste lisible au-dessus du contenu. */
-.wiz__nav { z-index: 2; }
+.wiz__nav {
+    z-index: 2;
+}
 
 /* Étape 3 : une ligne horizontale par catégorie */
 .drivers {
@@ -522,7 +525,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.driver-row > .driver {
+.driver-row>.driver {
     flex: 0 0 min(19rem, 82vw);
     scroll-snap-align: start;
 }
@@ -587,7 +590,7 @@
     overflow-y: hidden;
 }
 
-.driver-row > .driver {
+.driver-row>.driver {
     min-width: 0;
 }
 
@@ -595,4 +598,27 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+}
+
+.modal {
+    width: min(92vw, 30rem);
+    max-width: min(92vw, 30rem);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    /* + padding et border-radius identiques aux autres modales */
+}
+
+.modal--wide {
+    width: min(94vw, 40rem);
+    max-width: min(94vw, 40rem);
+}
+
+@media (max-width: 32rem) {
+
+    .modal,
+    .modal--wide {
+        max-width: calc(100vw - 2rem);
+        padding: 1rem;
+    }
 }

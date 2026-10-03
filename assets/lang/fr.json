@@ -113,6 +113,10 @@
             "pancake": {
                 "name": "Pancake",
                 "description": "Lance une crêpe depuis une poêle et fais-la atterrir sur des objets improbables !"
+            },
+            "race-manager": {
+                "name": "Race Manager",
+                "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !"
             }
         },
         "badges": {

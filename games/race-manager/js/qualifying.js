@@ -1,8 +1,9 @@
 import { SLOT_COUNT } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
 import { formatGameDate, formatMoney } from './core/utils.js';
-import { h, showModal, toast } from './ui.js';
+import { h, showModal, teamDot, toast } from './ui.js';
 import { getDynamicCalendar } from './core/progression.js';
+import { trackSvg } from './data/circuit-tracks-2026.js';
 import { nextQualifyingSession, playerQualifyingDrivers, runQualifyingSession, simulateRemainingQualifications, weekendFor } from './core/weekend.js';
 
 const main = document.getElementById('content');
@@ -33,6 +34,7 @@ function init() {
 function run(save, round) {
   const playerTeam = save.teams.find((team) => team.id === save.playerTeamId);
   const driverById = (id) => save.drivers.find((driver) => driver.id === id);
+  const teamOf = (id) => save.teams.find((team) => team.id === id);
   const persist = () => writeSlot(slotId, save);
   document.documentElement.style.setProperty('--team', playerTeam.color);
   document.getElementById('hdrTeam').textContent = playerTeam.name;
@@ -42,7 +44,7 @@ function run(save, round) {
   function resultList(results) {
     return h('ol', { class: 'result-list' }, results.map((row) => {
       const driver = driverById(row.driverId);
-      return h('li', { class: driver.teamId === save.playerTeamId ? 'is-player' : '' }, h('span', { class: 'result-list__position', text: String(row.rank || row.position) }), h('strong', { text: driver.name }), h('span', { text: lapTime(row.timeMs) }));
+      return h('li', { class: driver.teamId === save.playerTeamId ? 'is-player' : '' }, h('span', { class: 'result-list__position', text: String(row.rank || row.position) }), h('strong', {}, teamDot(teamOf(driver.teamId)), driver.name), h('span', { text: lapTime(row.timeMs) }));
     }));
   }
 
@@ -126,7 +128,7 @@ function run(save, round) {
     const weekend = weekendFor(save, round.id);
     const session = nextQualifyingSession(save, round.id);
     main.replaceChildren(h('div', { class: 'stack' },
-      h('section', { class: 'card qualifying-hero' }, h('h1', { text: `Qualifications · R${round.round}` }), h('p', { text: round.name }), h('p', { class: 'muted', text: `${round.circuit} · ${formatGameDate(round.qualifyingDate)} · format 24 → 17 → 10.` }),
+      h('section', { class: 'card qualifying-hero' }, h('h1', { text: `Qualifications · R${round.round}` }), h('p', {}, round.name, trackSvg(round.id, { className: 'track-svg--inline' })), h('p', { class: 'muted', text: `${round.circuit} · ${formatGameDate(round.qualifyingDate)} · format 24 → 17 → 10.` }),
         h('div', { class: 'qualifying-actions' }, weekend.qualifying.grid.length
           ? h('button', { type: 'button', class: 'btn btn--primary', text: 'Voir la grille de départ', onClick: showGrid })
           : h('button', { type: 'button', class: 'btn btn--primary', text: `Démarrer ${session}`, onClick: startSession }))),

@@ -4,11 +4,11 @@
       "path": "./games/race-manager/index.html",
       "name": "The Race Manager",
       "emoji": "🏎️",
-      "description": "Dirige ta propre écurie de course. Achète tes pilotes, développe ta voiture et gagne les championnats !",
+      "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !",
       "tags": [
         "real-time",
         "strategy",
-        "single-player"
+        "solo"
       ],
       "badge": "strategy",
       "badgeText": "Stratégie",

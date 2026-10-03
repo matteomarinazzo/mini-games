@@ -4,7 +4,7 @@
  * afin de n'être définie qu'à un seul endroit.
  */
 export const GAME_ID = 'mon-jeu';
-export const GAME_TITLE = 'The Race Manager';
+export const GAME_TITLE = 'Race Manager';
 export const SCHEMA_VERSION = 6;
 export const SEASON = 2026;
 export const START_DATE = '2026-01-01';

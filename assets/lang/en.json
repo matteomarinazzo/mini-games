@@ -115,6 +115,10 @@
             "race-manager": {
                 "name": "Race Manager",
                 "description": "Manage your own racing team. Hire drivers, develop your car and win the championships!"
+            },
+            "sudoku": {
+                "name": "Sudoku",
+                "description": "Fill in the grid without repeating numbers in a line, column or block. Four difficulty levels await you!"
             }
         },
         "badges": {

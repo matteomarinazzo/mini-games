@@ -1,9 +1,10 @@
-const CACHE_NAME = "mini-games-cache-v1.20.2026-10-03";
+const CACHE_NAME = "mini-games-cache-v1.21.2026-10-04";
 
 const ASSETS_TO_CACHE = [
     '',
     'index.html',
     'style.css',
+    'profile-panel.css',
     'rating-modal.css',
     'manifest.json',
     'fonts.css',
@@ -76,6 +77,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/punch-reflex.webp',
     'assets/logos/rocketeer.webp',
     'assets/logos/race-manager.webp',
+    'assets/logos/sudoku.webp',
 
     // About
     'about/about.html',
@@ -325,6 +327,15 @@ const ASSETS_TO_CACHE = [
     'games/race-manager/js/data/circuits-2026.js',
     'games/race-manager/js/data/drivers-2026.js',
     'games/race-manager/js/data/teams-2026.js',
+
+    // Game: Sudoku
+    'games/sudoku/index.html',
+    'games/sudoku/game.html',
+    'games/sudoku/css/menu.css',
+    'games/sudoku/css/game.css',
+    'games/sudoku/js/menu.js',
+    'games/sudoku/js/game.js',
+    'games/sudoku/js/store.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

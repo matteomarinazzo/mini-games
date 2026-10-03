@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sudoku – Grilles classiques 4 niveaux | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Joue au Sudoku en ligne gratuitement : 4 niveaux de difficulté, notes, détection des erreurs et chronomètre. Jouable sur mobile et ordinateur.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/sudoku/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sudoku – Grilles classiques 4 niveaux | Mini‑Games">
+    <meta property="og:description"
+        content="Joue au Sudoku en ligne gratuitement : 4 niveaux de difficulté, notes, détection des erreurs et chronomètre.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/sudoku/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/sudoku.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sudoku – Grilles classiques 4 niveaux | Mini‑Games">
+    <meta name="twitter:description"
+        content="Joue au Sudoku en ligne gratuitement : 4 niveaux de difficulté, notes, détection des erreurs et chronomètre.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/sudoku.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Sudoku",
+      "url": "https://mini-games.ch/games/sudoku/",
+      "description": "Sudoku classique 9×9 avec grilles à solution unique, quatre niveaux de difficulté, notes et vérification des erreurs.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Logic Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="menu-body">
+
+    <!-- Back Button -->
+    <a href="../../index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu"
+        aria-label="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <div class="menu-container">
+        <div class="menu-header">
+            <div class="menu-icon">🔢</div>
+            <h1 class="menu-title">SU<span class="menu-title-pro">DO</span>KU</h1>
+            <p class="menu-subtitle">Choisis ta difficulté.</p>
+        </div>
+
+        <div class="diff-list" id="diffList">
+            <button class="diff-card" data-difficulty="easy">
+                <span class="diff-name">FACILE</span>
+                <span class="diff-desc">≈ 40 cases données</span>
+                <span class="diff-best" data-best="easy">—</span>
+            </button>
+            <button class="diff-card" data-difficulty="medium">
+                <span class="diff-name">INTERMÉDIAIRE</span>
+                <span class="diff-desc">≈ 32 cases données</span>
+                <span class="diff-best" data-best="medium">—</span>
+            </button>
+            <button class="diff-card" data-difficulty="hard">
+                <span class="diff-name">DIFFICILE</span>
+                <span class="diff-desc">≈ 28 cases données</span>
+                <span class="diff-best" data-best="hard">—</span>
+            </button>
+            <button class="diff-card" data-difficulty="expert">
+                <span class="diff-name">EXPERT</span>
+                <span class="diff-desc">≈ 24 cases données</span>
+                <span class="diff-best" data-best="expert">—</span>
+            </button>
+        </div>
+        <label class="setting-row" for="noteHelp">
+            <span class="setting-text">
+                <span class="setting-title">Aide dans les notes</span>
+                <span class="setting-sub">Une note impossible s'affiche en rouge</span>
+            </span>
+            <input type="checkbox" id="noteHelp" class="switch" checked>
+        </label>
+
+        <p class="menu-note">Meilleur temps à droite de chaque niveau. Ta partie en cours est conservée par niveau.</p>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

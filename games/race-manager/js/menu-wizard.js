@@ -19,6 +19,18 @@ const TEAM_NAME_BY_ID = new Map(TEAMS_2026.map((t) => [t.id, t.name]));
 const driverById = (id) => DRIVERS_2026.find((d) => d.id === id);
 const field = (text, control) => h('div', { class: 'field' }, h('label', { for: control.id, text }), control);
 
+// Les catégories sont déduites des données : une nouvelle catégorie s'intègre
+// automatiquement au regroupement et au filtre.
+const DRIVER_CATEGORIES = [...new Set(DRIVERS_2026.map((d) => d.category))];
+const categoryLabel = (category) => CATEGORIES[category] || category;
+const categoryOrder = (a, b) => {
+  const preferred = ['F1', 'F2', 'F3'];
+  const ai = preferred.indexOf(a);
+  const bi = preferred.indexOf(b);
+  if (ai !== -1 || bi !== -1) return (ai === -1 ? preferred.length : ai) - (bi === -1 ? preferred.length : bi);
+  return a.localeCompare(b, 'fr');
+};
+
 /** Groupe de boutons radio avec description (fieldset + legend natifs). */
 function radioGroup(legend, name, options, current, onChange) {
   return h('fieldset', { class: 'choices' },
@@ -157,14 +169,14 @@ export function startWizard({ slotId, mount, onExit }) {
 
   function buildDriversStep() {
     const f = state.filters;
-    const cat = h('select', { id: 'fCat', class: 'input' }, h('option', { value: 'all', text: 'Toutes' }), Object.entries(CATEGORIES).map(([k, v]) => h('option', { value: k, text: v })));
+    const cat = h('select', { id: 'fCat', class: 'input' }, h('option', { value: 'all', text: 'Toutes' }), DRIVER_CATEGORIES.slice().sort(categoryOrder).map((k) => h('option', { value: k, text: categoryLabel(k) })));
     cat.value = f.category;
     const minR = h('input', { id: 'fMin', class: 'input', type: 'number', min: '50', max: '100', step: '1', inputmode: 'numeric', value: String(f.minRating) });
     const maxC = h('input', { id: 'fMax', class: 'input', type: 'number', min: '0', step: '0.5', inputmode: 'decimal', placeholder: 'Sans limite', value: String(f.maxCost) });
     const sort = h('select', { id: 'fSort', class: 'input' }, [['rating', 'Note (décroissante)'], ['costAsc', 'Prix (croissant)'], ['costDesc', 'Prix (décroissant)'], ['name', 'Nom']].map(([v, t]) => h('option', { value: v, text: t })));
     sort.value = f.sort;
     const summary = h('div', { class: 'pick-summary' });
-    const list = h('ul', { class: 'drivers' });
+    const list = h('div', { class: 'drivers' });
     const count = h('p', { class: 'muted', role: 'status' });
     hint = h('p', { class: 'muted', role: 'status' });
 
@@ -215,20 +227,31 @@ export function startWizard({ slotId, mount, onExit }) {
       };
       items = items.sort(sorters[f.sort]);
       count.textContent = `${items.length} pilote${items.length > 1 ? 's' : ''} affiché${items.length > 1 ? 's' : ''}`;
-      list.replaceChildren(...items.map((d) => {
-        const selected = state.driverIds.includes(d.id);
-        return h('li', { class: `driver${selected ? ' is-selected' : ''}` },
-          h('div', { class: 'driver__main' },
-            h('strong', { text: d.displayName }), h('span', { class: 'tag', text: d.abbr }), h('span', { class: 'tag', text: CATEGORIES[d.category] }),
-            selected ? h('span', { class: 'tag tag--sel', text: '✓ Sélectionné' }) : null),
-          h('p', { class: 'driver__meta', text: `Note ${driverOverall(d)} · ${formatMoney(d.cost)} · ${d.teamId ? `Actuellement chez ${TEAM_NAME_BY_ID.get(d.teamId)}` : 'Sans écurie'}` }),
-          d.teamId ? h('p', { class: 'driver__warn', text: 'Son équipe devra lui trouver un remplaçant.' }) : null,
-          h('div', { class: 'driver__actions' },
-            h('button', { type: 'button', class: 'btn btn--small', 'aria-label': `Détails de ${d.displayName}`, text: 'Détails', onClick: () => showDetails(d) }),
-            selected
-              ? h('button', { type: 'button', class: 'btn btn--small btn--ghost', 'aria-label': `Retirer ${d.displayName}`, text: 'Retirer', onClick: () => remove(d.id) })
-              : h('button', { type: 'button', class: 'btn btn--small btn--primary', 'aria-label': `Choisir ${d.displayName}`, text: 'Choisir', onClick: () => pick(d.id) })));
-      }));
+
+      const grouped = new Map();
+      items.forEach((d) => {
+        if (!grouped.has(d.category)) grouped.set(d.category, []);
+        grouped.get(d.category).push(d);
+      });
+      const categorySections = [...grouped.keys()].sort(categoryOrder).map((category) => {
+        const row = h('ul', { class: 'driver-row' }, grouped.get(category).map((d) => {
+          const selected = state.driverIds.includes(d.id);
+          return h('li', { class: `driver${selected ? ' is-selected' : ''}` },
+            h('div', { class: 'driver__main' },
+              h('strong', { text: d.displayName }), h('span', { class: 'tag', text: d.abbr }), h('span', { class: 'tag', text: categoryLabel(d.category) }),
+              selected ? h('span', { class: 'tag tag--sel', text: '✓ Sélectionné' }) : null),
+            h('p', { class: 'driver__meta', text: `Note ${driverOverall(d)} · ${formatMoney(d.cost)} · ${d.teamId ? `Actuellement chez ${TEAM_NAME_BY_ID.get(d.teamId)}` : 'Sans écurie'}` }),
+            d.teamId ? h('p', { class: 'driver__warn', text: 'Son équipe devra lui trouver un remplaçant.' }) : null,
+            h('div', { class: 'driver__actions' },
+              h('button', { type: 'button', class: 'btn btn--small', 'aria-label': `Détails de ${d.displayName}`, text: 'Détails', onClick: () => showDetails(d) }),
+              selected
+                ? h('button', { type: 'button', class: 'btn btn--small btn--ghost', 'aria-label': `Retirer ${d.displayName}`, text: 'Retirer', onClick: () => remove(d.id) })
+                : h('button', { type: 'button', class: 'btn btn--small btn--primary', 'aria-label': `Choisir ${d.displayName}`, text: 'Choisir', onClick: () => pick(d.id) })));
+        }));
+        return h('section', { class: 'driver-category-section' },
+          h('h3', { class: 'driver-category-title', text: categoryLabel(category) }), row);
+      });
+      list.replaceChildren(...categorySections);
     }
 
     cat.addEventListener('input', () => { f.category = cat.value; renderList(); });
@@ -251,8 +274,10 @@ export function startWizard({ slotId, mount, onExit }) {
       const r = computeDepartmentRatings(state.teamName, state.startLevel);
       preview.replaceChildren(
         h('h3', { text: 'Notes de départ de vos départements' }),
-        DEPT_KEYS.map((k) => ratingBar(DEPT_LABELS[k], r[k])),
-        h('p', { class: 'muted', text: `Note globale de l’écurie : ${teamOverall({ departmentRatings: r })}. Un département est un peu plus fort (+4) et un autre un peu plus faible (−4), selon le nom de l’écurie, pour lui donner une identité.` }));
+        ...DEPT_KEYS.map((k) => ratingBar(DEPT_LABELS[k], r[k])),
+        h('br'),
+        h('p', { class: 'muted', text: `Note globale de l’écurie : ${teamOverall({ departmentRatings: r })}.` }),
+        h('span', { class: 'muted', text: 'Un département est un peu plus fort (+4) et un autre un peu plus faible (−4).' }));
     };
     paint();
     return h('div', {},
@@ -282,8 +307,7 @@ export function startWizard({ slotId, mount, onExit }) {
       h('section', {}, h('h3', { text: 'Départements' }), DEPT_KEYS.map((k) => ratingBar(DEPT_LABELS[k], team.departmentRatings[k])),
         h('p', { class: 'muted', text: `Note globale de l’écurie : ${teamOverall(team)}` })),
       h('section', {}, h('h3', { text: 'Difficulté' }), kv([['Note de départ des départements', START_LEVELS[state.startLevel].label], ['Difficulté d’amélioration', UPGRADE_LEVELS[state.upgradeLevel].label]])),
-      h('section', {}, h('h3', { text: `Grille ${SEASON}` }), kv([['Écuries', String(save.teams.length)], ['Pilotes', String(save.drivers.length)]]),
-        h('p', { class: 'muted', text: 'Les transferts éventuels des écuries adverses seront annoncés après la création de la partie.' })));
+      h('p', { class: 'muted', text: 'Les transferts éventuels des écuries adverses seront annoncés après la création de la partie.' }));
   }
   const validateRecapStep = () => (createNewGame(payload(), slotId).ok ? null : 'Une condition n’est plus remplie : revenez aux étapes précédentes.');
 

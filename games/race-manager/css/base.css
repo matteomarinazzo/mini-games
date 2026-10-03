@@ -540,8 +540,97 @@ textarea.input {
     padding-block: 1.5rem;
   }
 }
+
 /* Correctifs responsive finaux — contenu fluide sans débordement horizontal. */
-:root { --content-max: 86rem; }
-body.am-page { overflow-x: hidden; }
-.container, .card, .stack, .grid2 { min-width: 0; }
-.container { width: min(100%, var(--content-max)); }
+:root {
+  --content-max: 86rem;
+}
+
+body.am-page {
+  overflow-x: hidden;
+}
+
+.container,
+.card,
+.stack,
+.grid2 {
+  min-width: 0;
+}
+
+.container {
+  width: min(100%, var(--content-max));
+}
+
+
+/* Garde-fous finaux mobile : aucun débordement global ou de modale. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.am-page,
+body.am-page>* {
+  max-width: 100%;
+}
+
+.container,
+.topbar,
+.card,
+.stack,
+.grid2,
+.modal,
+.modal__body,
+.modal__actions {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.modal,
+.modal--wide {
+  width: calc(100vw - 1rem);
+  max-width: calc(100vw - 1rem);
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.modal__body>*,
+.modal__body p,
+.modal__body li,
+.modal__title {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.modal__actions .btn {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+fieldset,
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+.field,
+.field>*,
+.choice>*,
+.team-preview>*,
+.kv>*,
+.rating>*,
+.topbar>* {
+  min-width: 0;
+}
+
+.kv dd,
+.choice span,
+.team-preview__name,
+.form-error {
+  overflow-wrap: anywhere;
+}

@@ -827,3 +827,123 @@ body.page-home {
         flex-wrap: wrap
     }
 }
+
+/* ---- Modales sur grand écran : base.css les force à toute la largeur, on les recentre en largeur raisonnable */
+@media (min-width: 48rem) {
+    .modal {
+        width: min(90vw, 32rem);
+        max-width: min(90vw, 32rem);
+    }
+
+    .modal--wide {
+        width: min(90vw, 42rem);
+        max-width: min(90vw, 42rem);
+    }
+}
+
+/* Réponse d'un pilote : verdict, raison et probabilité dans le corps de la modale */
+.event-detail {
+    display: grid;
+    gap: .5rem;
+}
+
+.event-detail p {
+    margin: 0;
+}
+
+.event-detail__verdict {
+    display: inline-block;
+    justify-self: start;
+    padding: .2rem .75rem;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.event-detail__verdict.is-accepted {
+    border-color: var(--ok);
+    color: var(--ok);
+}
+
+.event-detail__verdict.is-refused {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+/* Tracés des circuits */
+.track-svg {
+    flex: none;
+    width: 1.5em;
+    height: 1.5em;
+    color: var(--muted);
+    vertical-align: middle;
+}
+
+.track-svg--inline {
+    margin-left: .4rem;
+}
+
+.track-svg--card {
+    width: 4.5rem;
+    height: 4.5rem;
+    color: var(--text);
+}
+
+.track-svg__start {
+    fill: var(--team);
+}
+
+.season-round__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .4rem;
+    flex: none;
+}
+
+/* Onglet Pilotes : filtres et liste */
+.driver-filters {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+}
+
+.driver-filters .field {
+    margin-bottom: 0;
+}
+
+.driver-filters__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin: .75rem 0;
+}
+
+.driver-filters__bar p {
+    margin: 0;
+}
+
+.transfer-row>div:first-child {
+    min-width: 0;
+}
+
+.transfer-list__more {
+    display: flex;
+    justify-content: center;
+    margin-top: .75rem;
+}
+
+@media (min-width: 60rem) {
+    .transfer-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .transfer-row .row .btn {
+        width: 100%;
+    }
+}
+

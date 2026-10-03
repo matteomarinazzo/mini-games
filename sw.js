@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.17.2026-05-13";
+const CACHE_NAME = "mini-games-cache-v1.20.2026-10-03";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -75,6 +75,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/where-am-i.webp',
     'assets/logos/punch-reflex.webp',
     'assets/logos/rocketeer.webp',
+    'assets/logos/race-manager.webp',
 
     // About
     'about/about.html',
@@ -278,7 +279,52 @@ const ASSETS_TO_CACHE = [
     'games/rocketeer/js/rocket.js',
     'games/rocketeer/js/renderer.js',
 
+    // Game: Race Manager
+    'games/race-manager/index.html',
+    'games/race-manager/game.html',
+    'games/race-manager/home.html',
+    'games/race-manager/menu.html',
+    'games/race-manager/qualifying.html',
+    'games/race-manager/race.html',
 
+    // Race Manager — CSS
+    'games/race-manager/css/base.css',
+    'games/race-manager/css/home.css',
+    'games/race-manager/css/menu.css',
+    'games/race-manager/css/qualifying.css',
+    'games/race-manager/css/race.css',
+
+    // Race Manager — JS racine
+    'games/race-manager/js/home.js',
+    'games/race-manager/js/import-flow.js',
+    'games/race-manager/js/menu-wizard.js',
+    'games/race-manager/js/menu.js',
+    'games/race-manager/js/qualifying.js',
+    'games/race-manager/js/race.js',
+    'games/race-manager/js/summary-view.js',
+    'games/race-manager/js/tyre-art.js',
+    'games/race-manager/js/ui.js',
+
+    // Race Manager — JS core
+    'games/race-manager/js/core/constants.js',
+    'games/race-manager/js/core/contracts.js',
+    'games/race-manager/js/core/game-state.js',
+    'games/race-manager/js/core/progression.js',
+    'games/race-manager/js/core/race-engine.js',
+    'games/race-manager/js/core/regulations.js',
+    'games/race-manager/js/core/storage.js',
+    'games/race-manager/js/core/transfers.js',
+    'games/race-manager/js/core/utils.js',
+    'games/race-manager/js/core/validation.js',
+    'games/race-manager/js/core/weather.js',
+    'games/race-manager/js/core/weekend.js',
+
+    // Race Manager — Data
+    'games/race-manager/js/data/calendar-2026.js',
+    'games/race-manager/js/data/circuit-tracks-2026.js',
+    'games/race-manager/js/data/circuits-2026.js',
+    'games/race-manager/js/data/drivers-2026.js',
+    'games/race-manager/js/data/teams-2026.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

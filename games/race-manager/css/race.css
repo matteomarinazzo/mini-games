@@ -344,3 +344,573 @@
         padding: .85rem;
     }
 }
+
+/* ---- Modale Lights Out : compacte et centrée (base.css force les modales à toute la largeur) ---- */
+.modal.lights-out {
+    width: min(92vw, 26rem);
+    max-width: min(92vw, 26rem);
+    padding: 1.75rem 1.5rem 1.5rem;
+    border-color: var(--team);
+    text-align: center;
+}
+
+.modal.lights-out[open] {
+    display: grid;
+    justify-items: center;
+    gap: .75rem;
+}
+
+.modal.lights-out h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.modal.lights-out p {
+    margin: 0;
+}
+
+.modal.lights-out .lights-out__status {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 4rem;
+    padding: .5rem;
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #0d131c;
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+.modal.lights-out .lights-out__button {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.5rem;
+    font-size: 1.15rem;
+}
+
+/* Quand les feux s'éteignent le bouton devient actif : on le met en évidence */
+.modal.lights-out .lights-out__button:not(:disabled) {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #06210f;
+    animation: lights-out-pulse .5s ease-in-out infinite alternate;
+}
+
+@keyframes lights-out-pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.03);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal.lights-out .lights-out__button:not(:disabled) {
+        animation: none;
+    }
+}
+
+/* ---- Tracé du circuit après le nom de la course ---- */
+.track-svg {
+    flex: none;
+    width: 1.5em;
+    height: 1.5em;
+    color: var(--muted);
+    vertical-align: middle;
+}
+
+.track-svg--inline {
+    margin-left: .5rem;
+}
+
+.track-svg__start {
+    fill: var(--team);
+}
+
+/* ---- Course en direct : tracé et ronds des pilotes ---- */
+.race-side {
+    display: grid;
+    gap: 1rem;
+    align-self: start;
+    min-width: 0;
+}
+
+.race-track .track-svg--live {
+    display: block;
+    width: 100%;
+    max-width: 26rem;
+    height: auto;
+    margin-inline: auto;
+    overflow: visible;
+    color: #5b6a82;
+}
+
+.race-track .track-svg--live path {
+    stroke-width: 5px;
+}
+
+.race-track .track-svg--live .track-svg__start {
+    fill: var(--muted);
+}
+
+.track-label {
+    fill: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    paint-order: stroke;
+    stroke: #0b0f16;
+    stroke-width: 2.5px;
+    pointer-events: none;
+}
+
+.race-track__note {
+    margin: .75rem 0 0;
+    font-size: .85rem;
+}
+
+/* ---- Classement final : une ligne lisible par pilote ---- */
+.result-list {
+    display: grid;
+    gap: .4rem;
+    border-top: 0;
+}
+
+.result-list li {
+    grid-template-columns: 2.5rem minmax(0, 1fr) minmax(6rem, max-content) max-content;
+    gap: .75rem;
+    padding: .65rem .85rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+
+.result-list__position {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text);
+    font-size: .95rem;
+}
+
+.result-list li:nth-child(1) .result-list__position {
+    background: #ffc21a;
+    border-color: #ffc21a;
+    color: #0b0f16;
+}
+
+.result-list li:nth-child(2) .result-list__position {
+    background: #c9d1dc;
+    border-color: #c9d1dc;
+    color: #0b0f16;
+}
+
+.result-list li:nth-child(3) .result-list__position {
+    background: #d08b52;
+    border-color: #d08b52;
+    color: #0b0f16;
+}
+
+.result-list li>strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.result-list li>span:nth-child(3) {
+    text-align: right;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.result-list li>span:nth-child(4) {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.result-list li.is-player {
+    border-color: var(--team);
+    background: color-mix(in srgb, var(--team) 16%, var(--surface-2));
+    box-shadow: inset 4px 0 0 var(--team);
+}
+
+.result-list li.is-dnf {
+    opacity: .7;
+}
+
+.result-list li.is-dnf>span:nth-child(3) {
+    color: var(--danger);
+    white-space: normal;
+}
+
+@media (max-width: 36rem) {
+    .result-list li {
+        grid-template-columns: 2rem minmax(0, 1fr) max-content;
+        gap: .35rem .6rem;
+        padding: .6rem;
+    }
+
+    .result-list li>span:nth-child(4) {
+        grid-column: 2 / -1;
+        text-align: left;
+    }
+
+    .result-list li.is-dnf>span:nth-child(3) {
+        grid-column: 2 / -1;
+        grid-row: 2;
+        text-align: left;
+    }
+
+    .result-list li.is-dnf>span:nth-child(4) {
+        grid-row: 3;
+    }
+}
+
+/* ---- Modale d'arrêt aux stands : pneus, rythme, risque et aperçu d'usure (base.css force les modales à toute la largeur) ---- */
+.modal.pit-dialog {
+    width: min(94vw, 60rem);
+    max-width: min(94vw, 60rem);
+    padding: 0;
+    border-color: var(--team);
+}
+
+.pit__head {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--team) 22%, var(--surface)), var(--surface) 70%);
+}
+
+.pit__head .dot {
+    flex: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin: 0;
+}
+
+.pit__head h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.pit__head p {
+    margin: .2rem 0 0;
+    font-size: .9rem;
+}
+
+.pit__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1.25rem;
+}
+
+@media (min-width: 52rem) {
+    .pit__body {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    }
+}
+
+.pit__col {
+    display: grid;
+    gap: 1.1rem;
+    align-content: start;
+    min-width: 0;
+}
+
+.pit-tyres,
+.pit-seg {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.pit-tyres legend,
+.pit-seg legend {
+    padding: 0;
+    margin-bottom: .5rem;
+    font-weight: 700;
+}
+
+/* Pneus actuels, usés, puis pneus neufs */
+.pit-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: .75rem;
+    padding: 1rem .75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: radial-gradient(circle at 50% 0%, var(--surface-2), #0d131c 75%);
+}
+
+.pit-hero__tyre {
+    display: grid;
+    justify-items: center;
+    gap: .2rem;
+    min-width: 0;
+    text-align: center;
+}
+
+.pit-hero__tyre .tyre-svg {
+    width: clamp(5rem, 16vw, 6.5rem);
+    height: auto;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .55));
+}
+
+.pit-hero__arrow {
+    font-size: 1.8rem;
+    color: var(--muted);
+}
+
+/* Choix du composé */
+.pit-tyres__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.2rem, 1fr));
+    gap: .5rem;
+}
+
+.pit-tyre {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: .15rem;
+    min-width: 0;
+    padding: .7rem .4rem .6rem;
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.pit-tyre input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.pit-tyre:hover {
+    border-color: var(--muted);
+}
+
+.pit-tyre:has(input:checked) {
+    border-color: var(--tyre);
+    background: color-mix(in srgb, var(--tyre) 14%, var(--surface-2));
+    box-shadow: 0 0 0 1px var(--tyre);
+}
+
+.pit-tyre:has(input:focus-visible) {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #000;
+}
+
+.pit-tyre .tyre-svg {
+    width: 4.4rem;
+    height: auto;
+    transition: transform .25s;
+}
+
+.pit-tyre:has(input:checked) .tyre-svg {
+    transform: rotate(24deg) scale(1.06);
+}
+
+.pit-tyre strong {
+    font-size: .95rem;
+}
+
+.pit-tyre__stat {
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.pit-tyre__flag {
+    min-height: 1.1em;
+    font-size: .76rem;
+    font-weight: 700;
+}
+
+.pit-tyre__flag.is-ok {
+    color: var(--ok);
+}
+
+.pit-tyre__flag.is-bad {
+    color: var(--danger);
+}
+
+/* Rythme et risque : pastilles à choix unique */
+.pit-seg__row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    background: #0d131c;
+}
+
+.pit-seg__opt {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: .3rem .6rem;
+    font-size: .95rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+}
+
+.pit-seg__opt input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.pit-seg__opt:has(input:checked) {
+    background: var(--team);
+    color: #0b0f16;
+}
+
+.pit-seg__opt:has(input:focus-visible) {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+}
+
+.pit-seg__hint {
+    margin: .4rem 0 0;
+    font-size: .85rem;
+}
+
+/* Aperçu de l'usure */
+.pit-preview {
+    min-width: 0;
+    padding: .85rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #0d131c;
+}
+
+.pit-preview h3 {
+    margin-bottom: .6rem;
+}
+
+.pit-preview__chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 12rem;
+}
+
+.pit-legend {
+    margin: .5rem 0 0;
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+.pit-stints {
+    display: grid;
+    gap: .35rem;
+    margin: .6rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pit-stints li {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .9rem;
+}
+
+.pit-stints .tyre-svg {
+    flex: none;
+    width: 1.75rem;
+    height: auto;
+}
+
+.pit-verdict {
+    margin: .75rem 0 0;
+    padding: .6rem .8rem;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.pit-verdict.is-ok {
+    border-color: var(--ok);
+    background: color-mix(in srgb, var(--ok) 12%, #0d131c);
+}
+
+.pit-verdict.is-warn {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, #0d131c);
+}
+
+.pit-verdict.is-bad {
+    border-color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 14%, #0d131c);
+}
+
+.pit-notes {
+    margin: .6rem 0 0;
+    padding-left: 1.1rem;
+    color: #ffe7a3;
+    font-size: .88rem;
+}
+
+.pit__actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .6rem;
+    padding: .9rem 1.25rem;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+}
+
+@media (max-width: 32rem) {
+    .pit__head,
+    .pit__body {
+        padding-inline: .9rem;
+    }
+
+    .pit__actions {
+        padding-inline: .9rem;
+    }
+
+    .pit__actions .btn {
+        flex: 1 1 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pit-tyre,
+    .pit-tyre .tyre-svg {
+        transition: none;
+    }
+
+    .pit-tyre:has(input:checked) .tyre-svg {
+        transform: none;
+    }
+}

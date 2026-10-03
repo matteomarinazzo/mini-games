@@ -24,6 +24,17 @@ export function h(tag, props = {}, ...children) {
   return el;
 }
 
+/** Rond de la couleur d'une écurie (le nom de l'écurie sert d'infobulle et de texte alternatif). */
+export function teamDot(team) {
+  return h('span', {
+    class: 'dot',
+    style: { '--c': team?.color || '#cccccc' },
+    title: team?.name,
+    role: 'img',
+    'aria-label': team?.name ? `Écurie ${team.name}` : null,
+  });
+}
+
 /** Liste de définitions ; les valeurs peuvent être du texte ou des noeuds. */
 export const kv = (pairs) => h('dl', { class: 'kv' }, pairs.flatMap(([k, v]) => [h('dt', { text: k }), h('dd', {}, v)]));
 

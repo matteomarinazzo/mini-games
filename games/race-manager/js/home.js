@@ -123,7 +123,7 @@ function run(save) {
     document.documentElement.style.setProperty('--team', t.color);
     document.getElementById('hdrTeam').textContent = t.name;
     document.getElementById('hdrBalance').textContent = `Solde : ${formatMoney(t.balance)}`;
-    document.title = `${t.name} · The Race Manager | Mini‑Games`;
+    document.title = `${t.name} · Race Manager | Mini‑Games`;
   }
   // Enregistre avant de quitter vers le menu des slots (la navigation se poursuit normalement)
   document.getElementById('backLink').addEventListener('click', () => { persist(); });
@@ -489,10 +489,7 @@ function run(save) {
         h('div', { class: 'field field--inline' }, h('label', { for: 'profColor', text: 'Couleur' }), colorIn),
         profErr,
         h('button', { type: 'button', class: 'btn btn--primary', text: 'Appliquer', onClick: applyProfile })),
-      h('section', { class: 'card' },
-        h('h2', { text: 'Menu des sauvegardes' }),
-        h('p', { class: 'muted', text: 'Votre partie est enregistrée avant le retour au menu.' }),
-        h('a', { class: 'btn', href: 'menu.html', text: 'Retour au menu des sauvegardes', onClick: () => { persist(); } })));
+    );
   }
 
 
@@ -879,11 +876,13 @@ function run(save) {
         const countEl = h('p', { class: 'muted', role: 'status' });
         const listEl = h('div', { class: 'transfer-list' });
         const moreBtn = h('button', { type: 'button', class: 'btn', text: 'Afficher plus', onClick: () => { f.limit += DRIVERS_PAGE_SIZE; renderList(); } });
-        const resetBtn = h('button', { type: 'button', class: 'btn btn--ghost btn--small', text: 'Réinitialiser les filtres', onClick: () => {
-          Object.assign(f, { q: '', team: '', category: '', status: '', sort: 'ovr', limit: DRIVERS_PAGE_SIZE });
-          searchIn.value = ''; teamSel.value = ''; catSel.value = ''; statusSel.value = ''; sortSel.value = 'ovr';
-          renderList();
-        } });
+        const resetBtn = h('button', {
+          type: 'button', class: 'btn btn--ghost btn--small', text: 'Réinitialiser les filtres', onClick: () => {
+            Object.assign(f, { q: '', team: '', category: '', status: '', sort: 'ovr', limit: DRIVERS_PAGE_SIZE });
+            searchIn.value = ''; teamSel.value = ''; catSel.value = ''; statusSel.value = ''; sortSel.value = 'ovr';
+            renderList();
+          }
+        });
 
         const matches = (d) => {
           const st = state(d);

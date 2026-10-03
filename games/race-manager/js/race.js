@@ -1,9 +1,11 @@
-import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS } from './core/constants.js';
+import { SLOT_COUNT, TYRE_COMPOUNDS, TYRE_LABELS, TYRE_DATA, PACE_MULTIPLIERS, PUNCTURE_THRESHOLD, MIN_DRY_COMPOUNDS, COMPOUND_RULE_PENALTY_SECONDS, PIT_STOP_BASE, DOUBLE_STACK_PENALTY } from './core/constants.js';
 import { readSlot, writeSlot } from './core/storage.js';
 import { formatGameDate, formatMoney, round2, weatherCategory, weatherLabel } from './core/utils.js';
-import { h, showModal, toast } from './ui.js';
+import { h, teamDot, toast } from './ui.js';
+import { tyreSvg, TYRE_COLORS } from './tyre-art.js';
 import { getDynamicCalendar } from './core/progression.js';
 import { circuitFor } from './data/circuits-2026.js';
+import { trackSvg, trackPointAt } from './data/circuit-tracks-2026.js';
 import { weekendFor } from './core/weekend.js';
 import { initRaceState, serializeRaceState, deserializeRaceState, simulateLap, finishRace, orderPitStop, changePace, canPitThisLap, estimateWearPerLap, recommendedCompound } from './core/race-engine.js';
 
@@ -32,6 +34,7 @@ function init() {
 function run(save, round) {
   const playerTeam = save.teams.find((team) => team.id === save.playerTeamId);
   const driverById = (id) => save.drivers.find((driver) => driver.id === id);
+  const teamOf = (id) => save.teams.find((team) => team.id === id);
   const persist = () => writeSlot(slotId, save);
   document.documentElement.style.setProperty('--team', playerTeam.color);
   document.getElementById('hdrTeam').textContent = playerTeam.name;
@@ -83,11 +86,11 @@ function run(save, round) {
     }
   }
 
-  function estimateStints(strat, totalLaps) {
+  function estimateStints(strat, totalLaps, startLap = 0, startState = 100) {
     const stints = [];
-    let currentLap = 0;
+    let currentLap = startLap;
     let currentCompound = strat.startCompound;
-    let currentState = 100;
+    let currentState = startState;
 
     const sortedStops = [...strat.stops].sort((a, b) => a.lap - b.lap);
 
@@ -102,7 +105,7 @@ function run(save, round) {
       for (let l = 0; l <= lapsInStint; l++) {
         const lapNum = currentLap + l;
         points.push({ lap: lapNum, state: Math.max(0, currentState) });
-        currentState -= estimateWearPerLap(round.id, currentCompound, strat.pace);
+        currentState -= estimateWearPerLap(round.id, currentCompound, strat.pace) * (1 + (strat.damage || 0) * 0.003);
       }
 
       stints.push({ compound: currentCompound, startLap: currentLap, endLap: endLap, points });
@@ -119,8 +122,12 @@ function run(save, round) {
 
   function renderPreviewSvg(strat) {
     const totalLaps = circuitData(round.id).laps;
-    const stints = estimateStints(strat, totalLaps);
-    const colors = { soft: '#ff4d4d', medium: '#ffd633', hard: '#ffffff', intermediate: '#2ecc71', wet: '#0059b3' };
+    return drawStintsSvg(estimateStints(strat, totalLaps), totalLaps);
+  }
+
+  /** Courbe d'usure par relais. `nowLap` trace le tour actuel ; `ghost` trace en pointillés l'usure si l'on ne s'arrête pas. */
+  function drawStintsSvg(stints, totalLaps, { nowLap = null, ghost = null } = {}) {
+    const colors = TYRE_COLORS;
 
     const mapX = (lap) => (lap / totalLaps) * 1000;
     const mapY = (state) => 200 - (state / 100) * 200;
@@ -131,6 +138,11 @@ function run(save, round) {
     // Threshold line
     html += `<line x1="0" y1="${y30}" x2="1000" y2="${y30}" stroke="rgba(255,0,0,0.5)" stroke-width="2" stroke-dasharray="5,5" />`;
     html += `<text x="5" y="${y30 - 5}" fill="rgba(255,0,0,0.7)" font-size="12">30% (Risque crevaison)</text>`;
+
+    if (ghost && ghost.points.length > 1) {
+      const gp = ghost.points.map(p => `${mapX(p.lap)},${mapY(p.state)}`).join(' ');
+      html += `<polyline points="${gp}" fill="none" stroke="${colors[ghost.compound] || '#ccc'}" stroke-width="2" stroke-dasharray="3,5" opacity="0.6" />`;
+    }
 
     for (const s of stints) {
       if (s.startLap === s.endLap) continue;
@@ -145,6 +157,12 @@ function run(save, round) {
         html += `<line x1="${mapX(s.endLap)}" y1="0" x2="${mapX(s.endLap)}" y2="200" stroke="#fff" stroke-width="1" stroke-dasharray="4,4" />`;
         html += `<text x="${mapX(s.endLap) + 5}" y="20" fill="#fff" font-size="12">Lap ${s.endLap}</text>`;
       }
+    }
+
+    if (nowLap != null) {
+      const nx = mapX(nowLap);
+      html += `<line x1="${nx}" y1="0" x2="${nx}" y2="200" stroke="#ffc21a" stroke-width="2" />`;
+      html += `<text x="${nx + (nx > 800 ? -6 : 6)}" y="36" fill="#ffc21a" font-size="12" text-anchor="${nx > 800 ? 'end' : 'start'}">Maintenant</text>`;
     }
 
     // Axis markers
@@ -215,7 +233,7 @@ function run(save, round) {
       h('div', { class: 'stack' },
         h('section', { class: 'card race-hero' },
           h('h1', { text: `Stratégie de Course · R${round.round}` }),
-          h('p', { class: 'muted', text: `${round.name} · Départ : ${weatherLabel(weatherCategory(weekend.startMm))} (${weekend.startMm.toFixed(1)} mm) · ${totalLaps} tours` })
+          h('p', { class: 'muted' }, `${round.name} · Départ : ${weatherLabel(weatherCategory(weekend.startMm))} (${weekend.startMm.toFixed(1)} mm) · ${totalLaps} tours`, trackSvg(round.id, { className: 'track-svg--inline' }))
         ),
         h('section', { class: 'card' },
           h('div', { class: 'race-layout stack' },
@@ -289,6 +307,8 @@ function run(save, round) {
   let pendingSpeed = 0;
   let simTimer = null;
   let gapMode = 'leader'; // 'leader' or 'ahead'
+  let trackDots = new Map(); // driverId → { entry, driver, circle, label, title, placed, cur, from, to }
+  let dotFrame = null;
 
   function setPlaySpeed(speed) {
     // Ignore repeated clicks on the currently selected speed.
@@ -339,11 +359,18 @@ function run(save, round) {
         needsPause = true;
         delete entry._needsPitWarning;
       }
+      // Abandon d'un de vos pilotes ce tour : on prévient et on met la course en pause
+      if (entry.isPlayer && entry.status === 'dnf' && entry.dnfLap === raceState.currentLap) {
+        const d = driverById(entry.driverId);
+        toast(`${d.name} abandonne : ${entry.dnfReason}.`, { error: true });
+        needsPause = true;
+      }
     }
 
     // Le classement et les couleurs sont rendus à partir du même état final du tour.
     // Aucune interpolation DOM ne peut donc afficher une couleur sur une mauvaise ligne.
     updateLiveRaceUI();
+    updateTrackDots(5000 / lapSpeed);
 
     if (raceState.completed) {
       finishRaceAndShowResults();
@@ -367,27 +394,327 @@ function run(save, round) {
 
   function finishRaceAndShowResults() {
     if (simTimer) clearTimeout(simTimer);
+    if (dotFrame) { cancelAnimationFrame(dotFrame); dotFrame = null; }
     const res = finishRace(raceState, save);
     if (!res.ok) { toast(res.error, { error: true }); return; }
     persist();
     renderResults();
   }
 
+  // ---- Tracé en direct : un rond de la couleur de l'écurie par pilote.
+  // Position estimée : au passage du leader sur la ligne, un pilote est « écart / temps au tour du leader » de tour derrière lui.
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag, attrs = {}) => {
+    const el = document.createElementNS(SVG_NS, tag);
+    for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, String(value));
+    return el;
+  };
+
+  function buildTrackView() {
+    trackDots = new Map();
+    const svg = trackSvg(round.id, { className: 'track-svg--live' });
+    if (!svg) return null;
+    svg.removeAttribute('aria-hidden');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', `Tracé du circuit : ${round.circuit}`);
+    const layer = svgEl('g', { class: 'track-dots' });
+    for (const entry of raceState.entries) {
+      const team = save.teams.find((t) => t.id === entry.teamId);
+      const driver = driverById(entry.driverId);
+      const circle = svgEl('circle', {
+        r: entry.isPlayer ? 6 : 4.5,
+        fill: team?.color || '#cccccc',
+        stroke: entry.isPlayer ? '#ffffff' : '#0b0f16',
+        'stroke-width': entry.isPlayer ? 2 : 1.5,
+      });
+      const title = svgEl('title');
+      circle.append(title);
+      const label = entry.isPlayer ? svgEl('text', { class: 'track-label' }) : null;
+      if (label) label.textContent = driver?.abbr || '';
+      trackDots.set(entry.driverId, { entry, driver, circle, label, title, placed: false, cur: 0, from: 0, to: 0 });
+      layer.append(circle);
+      if (label) layer.append(label);
+    }
+    svg.append(layer);
+    return svg;
+  }
+
+  /** Distance parcourue (en tours, continue) de chaque pilote encore en course, au passage du leader sur la ligne. */
+  function dotTargets() {
+    const racing = raceState.entries.filter((e) => e.status === 'racing');
+    const leader = racing.reduce((best, e) => (!best || e.totalTime < best.totalTime ? e : best), null);
+    const targets = new Map();
+    if (!leader) return targets;
+    const lapRef = leader.lapTime || raceState._circuit?.lapTimeBase || 90000;
+    for (const e of racing) {
+      targets.set(e.driverId, raceState.currentLap === 0
+        ? -(e.position - 1) * 0.0035 // avant le départ : pilotes alignés sur la grille, derrière la ligne
+        : raceState.currentLap - (e.totalTime - leader.totalTime) / lapRef);
+    }
+    return targets;
+  }
+
+  function placeDot(dot, distance) {
+    const point = trackPointAt(round.id, distance);
+    if (!point) return;
+    dot.circle.setAttribute('cx', point.x.toFixed(1));
+    dot.circle.setAttribute('cy', point.y.toFixed(1));
+    if (dot.label) {
+      dot.label.setAttribute('x', (point.x + 8).toFixed(1));
+      dot.label.setAttribute('y', (point.y - 7).toFixed(1));
+    }
+  }
+
+  /** Déplace les ronds vers leurs nouvelles positions, de façon fluide sur `durationMs` (0 = immédiat). */
+  function updateTrackDots(durationMs) {
+    if (!trackDots.size) return;
+    const targets = dotTargets();
+    const ordered = [...trackDots.values()].sort((a, b) => b.entry.position - a.entry.position);
+    for (const dot of ordered) {
+      const out = dot.entry.status !== 'racing';
+      dot.circle.style.display = out ? 'none' : '';
+      if (dot.label) dot.label.style.display = out ? 'none' : '';
+      dot.title.textContent = `${dot.driver?.abbr || ''} · P${dot.entry.position}`;
+      if (out) continue;
+      dot.to = targets.get(dot.entry.driverId) ?? dot.cur;
+      if (!dot.placed) { dot.cur = dot.to; dot.placed = true; }
+      dot.from = dot.cur;
+      // le leader (P1) est dessiné en dernier, donc au-dessus des autres
+      const layer = dot.circle.parentNode;
+      layer.append(dot.circle);
+      if (dot.label) layer.append(dot.label);
+    }
+    if (dotFrame) cancelAnimationFrame(dotFrame);
+    const start = performance.now();
+    const tick = (now) => {
+      const t = durationMs > 0 ? Math.min(1, (now - start) / durationMs) : 1;
+      for (const dot of trackDots.values()) {
+        if (dot.entry.status !== 'racing') continue;
+        dot.cur = dot.from + (dot.to - dot.from) * t;
+        placeDot(dot, dot.cur);
+      }
+      dotFrame = t < 1 ? requestAnimationFrame(tick) : null;
+    };
+    tick(start);
+  }
+
+  // ---- Modale d'arrêt aux stands : pneus, rythme et risque pour le relais suivant, avec aperçu de l'usure.
+  const PACE_CHOICES = [['cautious', 'Prudent'], ['balanced', 'Équilibré'], ['aggressive', 'Agressif']];
+  const RISK_CHOICES = [['low', 'Faible'], ['normal', 'Normale'], ['high', 'Élevée']];
+  const paceLabel = (pace) => PACE_CHOICES.find(([value]) => value === pace)?.[1] || pace;
+
+  function paceHint(pace) {
+    const m = PACE_MULTIPLIERS[pace];
+    if (!m) return '';
+    const signed = (n, digits = 0) => `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n).toFixed(digits)}`;
+    return `Usure des pneus ${signed(Math.round((m.wear - 1) * 100))} %, temps au tour ${signed((m.lapTimeFactor - 1) * 100, 1)} %.`;
+  }
+
+  /** Groupe de boutons radio présenté en pastilles (même logique que les listes de la stratégie d'avant-course). */
+  function segmented(name, legend, choices, value, onChange) {
+    return h('fieldset', { class: 'pit-seg' },
+      h('legend', { text: legend }),
+      h('div', { class: 'pit-seg__row' }, choices.map(([val, text]) => h('label', { class: 'pit-seg__opt' },
+        h('input', { type: 'radio', name, value: val, checked: val === value, onChange: () => onChange(val) }),
+        h('span', { text })
+      )))
+    );
+  }
+
+  /** Juge un plan de relais : usure minimale, seuil de crevaison (30 %) et falaise de performance du composé. */
+  function assessPlan(stints, totalLaps) {
+    let minState = 100;
+    let minLap = null;
+    let firstRisk = null;
+    let firstCliff = null;
+    for (const s of stints) {
+      // Un relais qui se termine par un arrêt est remplacé pendant son dernier tour : on ne juge pas l'usure de ce tour-là.
+      const pts = s.endLap < totalLaps ? s.points.slice(0, -1) : s.points;
+      const cliff = TYRE_DATA[s.compound]?.cliff ?? 20;
+      for (const p of pts) {
+        if (p.state < minState) { minState = p.state; minLap = p.lap; }
+        if (!firstCliff && p.state < cliff) firstCliff = { lap: p.lap, compound: s.compound };
+        if (!firstRisk && p.state < PUNCTURE_THRESHOLD) firstRisk = { lap: p.lap, compound: s.compound };
+      }
+    }
+    if (firstCliff) return { level: 'bad', text: `Chute de performance dès le tour ${firstCliff.lap} (${TYRE_LABELS[firstCliff.compound]}). Ajoutez un arrêt ou choisissez un rythme prudent.` };
+    if (firstRisk) return { level: 'warn', text: `Zone de risque de crevaison (moins de ${PUNCTURE_THRESHOLD} %) dès le tour ${firstRisk.lap}.` };
+    return { level: 'ok', text: `Les pneus tiennent jusqu’à l’arrivée : usure minimale de ${Math.round(minState)} % au tour ${minLap}.` };
+  }
+
   async function openPitMenu(driverId) {
-    const choice = await showModal({
-      title: 'Arrêt aux stands',
-      body: h('p', { text: 'Choisissez le composé de pneus à monter pour le prochain tour :' }),
-      actions: [
-        ...TYRE_COMPOUNDS.map(c => ({ label: TYRE_LABELS[c], value: c, variant: 'btn--primary' })),
-        { label: 'Annuler', value: null }
-      ]
+    const entry = raceState.entries.find((e) => e.driverId === driverId);
+    if (!entry || entry.status !== 'racing') return;
+    const driver = driverById(driverId);
+    const circuit = circuitData(round.id);
+    const totalLaps = circuit.laps;
+    const pitLap = raceState.currentLap + 1; // l'arrêt a lieu au prochain tour simulé
+
+    // La course est mise en pause pendant le choix, puis reprend à la même vitesse.
+    const resumeSpeed = pendingSpeed;
+    setPlaySpeed(0);
+
+    // Pénalité de pneus inadaptés à la piste : mêmes valeurs que le moteur (race-engine.js, simulateLap).
+    const weatherPenaltyMs = (compound) => {
+      const wetCompound = compound === 'wet' || compound === 'intermediate';
+      if (raceState.weather === 'wet' && compound !== 'wet') return 6000;
+      if (raceState.weather === 'damp' && compound !== 'intermediate') return 2000;
+      if (raceState.weather === 'dry' && wetCompound) return 4000;
+      return 0;
+    };
+    const suggestedCompound = () => {
+      const recommended = recommendedCompound(raceState.currentMm);
+      if (recommended !== 'hard') return recommended;
+      return ['hard', 'medium', 'soft'].find((c) => !entry.compoundsUsed.has(c)) || recommended;
+    };
+
+    const plan = {
+      compound: entry._orderedPitCompound || suggestedCompound(),
+      pace: entry._orderedPitPace || entry.pace,
+      riskLevel: entry._orderedPitRisk || entry.riskLevel,
+    };
+    // Un arrêt manuel remplace le prochain arrêt planifié (sauf si un arrêt est déjà ordonné).
+    const remaining = entry.plannedStops.slice(entry._orderedPitCompound ? 0 : 1).filter((s) => s.lap > pitLap);
+    const pitLoss = circuit.pitLossSeconds + PIT_STOP_BASE;
+    const teammatePits = raceState.entries.some((e) => e.isPlayer && e.driverId !== driverId && e._orderedPitCompound);
+    const wearFactor = 1 + entry.damage * 0.003;
+
+    // ── En-tête
+    const sub = h('p', { class: 'muted', text: `Tour ${raceState.currentLap}/${totalLaps}, arrêt au tour ${pitLap} (environ ${Math.round(pitLoss)} s perdues). La course est en pause pendant votre choix.` });
+
+    // ── Pneus actuels → pneus neufs
+    const heroNew = h('div', { class: 'pit-hero__tyre' });
+    const hero = h('div', { class: 'pit-hero' },
+      h('div', { class: 'pit-hero__tyre' },
+        tyreSvg(entry.tyres.compound, { size: 104, wear: entry.tyres.wear }),
+        h('strong', { text: `${TYRE_LABELS[entry.tyres.compound]} actuels` }),
+        h('span', { class: 'muted', text: `${Math.round(entry.tyres.wear)} % d’état, ${entry.tyres.lapsOn} tours` })
+      ),
+      h('div', { class: 'pit-hero__arrow', 'aria-hidden': 'true', text: '→' }),
+      heroNew
+    );
+
+    // ── Choix du composé
+    const cardUi = new Map();
+    const cards = TYRE_COMPOUNDS.map((compound) => {
+      const wear = h('span', { class: 'pit-tyre__stat' });
+      const penalty = weatherPenaltyMs(compound);
+      const grip = TYRE_DATA[compound].gripPenaltyMs;
+      const flag = h('span', { class: `pit-tyre__flag ${penalty > 0 ? 'is-bad' : raceState.weather !== 'dry' ? 'is-ok' : ''}`,
+        text: penalty > 0 ? `Inadapté : +${(penalty / 1000).toFixed(0)} s/tour` : raceState.weather !== 'dry' ? 'Adapté à la piste' : '' });
+      cardUi.set(compound, { wear });
+      return h('label', { class: 'pit-tyre', style: { '--tyre': TYRE_COLORS[compound] } },
+        h('input', { type: 'radio', name: 'pit-compound', value: compound, checked: compound === plan.compound, onChange: () => { plan.compound = compound; update(); } }),
+        tyreSvg(compound, { size: 72 }),
+        h('strong', { text: TYRE_LABELS[compound] }),
+        wear,
+        h('span', { class: 'pit-tyre__stat', text: grip === 0 ? 'Grip maximal' : `Grip +${(grip / 1000).toFixed(2)} s/tour` }),
+        flag
+      );
     });
-    if (choice) {
-      const ok = orderPitStop(raceState, driverId, choice);
-      if (ok.ok) toast(`Arrêt programmé pour le prochain tour (${TYRE_LABELS[choice]}).`);
-      else toast(ok.error, { error: true });
+
+    // ── Rythme et risque après l'arrêt
+    const paceHintEl = h('p', { class: 'pit-seg__hint muted' });
+    const paceGroup = h('div', {}, segmented('pit-pace', 'Rythme après l’arrêt', PACE_CHOICES, plan.pace, (v) => { plan.pace = v; update(); }), paceHintEl);
+    const riskGroup = segmented('pit-risk', 'Risque après l’arrêt (dépassements)', RISK_CHOICES, plan.riskLevel, (v) => { plan.riskLevel = v; update(); });
+
+    // ── Aperçu de l'usure
+    const chartSlot = h('div', { class: 'pit-preview__chart' });
+    const stintList = h('ul', { class: 'pit-stints' });
+    const verdictEl = h('p', { class: 'pit-verdict', 'aria-live': 'polite' });
+    const notesEl = h('ul', { class: 'pit-notes' });
+    const preview = h('section', { class: 'pit-preview', 'aria-labelledby': 'pitPreviewTitle' },
+      h('h3', { id: 'pitPreviewTitle', text: 'Aperçu de l’usure jusqu’à l’arrivée' }),
+      chartSlot,
+      h('p', { class: 'pit-legend', text: 'Trait plein : avec cet arrêt. Pointillés : si vous gardez vos pneus actuels. Ligne rouge : seuil de crevaison.' }),
+      stintList,
+      verdictEl,
+      notesEl
+    );
+
+    function update() {
+      for (const compound of TYRE_COMPOUNDS) {
+        cardUi.get(compound).wear.textContent = `Usure ${(estimateWearPerLap(round.id, compound, plan.pace) * wearFactor).toFixed(1)} %/tour`;
+      }
+      heroNew.replaceChildren(
+        tyreSvg(plan.compound, { size: 104, wear: 100 }),
+        h('strong', { text: `${TYRE_LABELS[plan.compound]} neufs` }),
+        h('span', { class: 'muted', text: `Rythme ${paceLabel(plan.pace).toLowerCase()}` })
+      );
+      paceHintEl.textContent = paceHint(plan.pace);
+
+      const stints = estimateStints({ startCompound: plan.compound, pace: plan.pace, stops: remaining, damage: entry.damage }, totalLaps, pitLap, 100);
+      const ghostStints = estimateStints({ startCompound: entry.tyres.compound, pace: entry.pace, stops: [], damage: entry.damage }, totalLaps, raceState.currentLap, entry.tyres.wear);
+      const ghost = ghostStints[0] ? { compound: entry.tyres.compound, points: ghostStints[0].points } : null;
+      chartSlot.replaceChildren(drawStintsSvg(stints, totalLaps, { nowLap: raceState.currentLap, ghost }));
+
+      stintList.replaceChildren(...stints.filter((s) => s.endLap > s.startLap).map((s) => {
+        const pts = s.endLap < totalLaps ? s.points.slice(0, -1) : s.points;
+        const end = Math.round(pts[pts.length - 1].state);
+        return h('li', {}, tyreSvg(s.compound, { size: 28 }),
+          h('span', { text: `${TYRE_LABELS[s.compound]}, tours ${s.startLap} à ${s.endLap} (${s.endLap - s.startLap} tours), état final ${end} %` }));
+      }));
+
+      const verdict = assessPlan(stints, totalLaps);
+      verdictEl.className = `pit-verdict is-${verdict.level}`;
+      verdictEl.textContent = verdict.text;
+
+      const notes = [];
+      if (teammatePits) notes.push(`Votre coéquipier s’arrête aussi à ce tour : +${DOUBLE_STACK_PENALTY} s d’immobilisation (double arrêt).`);
+      const used = new Set([...entry.compoundsUsed, plan.compound, ...remaining.map((s) => s.compound)]);
+      const dryUsed = [...used].filter((c) => c !== 'wet' && c !== 'intermediate').length;
+      if (raceState.weather === 'dry' && dryUsed < MIN_DRY_COMPOUNDS) {
+        notes.push(`Règle des 2 composés : une seule gomme sèche prévue, pénalité de ${COMPOUND_RULE_PENALTY_SECONDS} s si la piste reste sèche.`);
+      }
+      notesEl.replaceChildren(...notes.map((text) => h('li', { text })));
+      notesEl.hidden = notes.length === 0;
+    }
+
+    // ── Fenêtre
+    const cancelBtn = h('button', { type: 'button', class: 'btn btn--ghost', text: 'Annuler', onClick: () => dlg.close('cancel') });
+    const confirmBtn = h('button', { type: 'button', class: 'btn btn--primary', autofocus: true, text: 'Confirmer l’arrêt', onClick: () => dlg.close('confirm') });
+    const dlg = h('dialog', { class: 'modal pit-dialog', 'aria-labelledby': 'pitTitle' },
+      h('div', { class: 'pit' },
+        h('header', { class: 'pit__head' },
+          teamDot(teamOf(entry.teamId)),
+          h('div', {}, h('h2', { id: 'pitTitle', text: `Arrêt aux stands : ${driver.name}` }), sub)
+        ),
+        h('div', { class: 'pit__body' },
+          h('div', { class: 'pit__col' },
+            hero,
+            h('fieldset', { class: 'pit-tyres' }, h('legend', { text: 'Pneus à monter' }), h('div', { class: 'pit-tyres__grid' }, cards))
+          ),
+          h('div', { class: 'pit__col' }, paceGroup, riskGroup, preview)
+        ),
+        h('div', { class: 'pit__actions' }, cancelBtn, confirmBtn)
+      )
+    );
+
+    const outcome = await new Promise((resolve) => {
+      const previous = document.activeElement;
+      dlg.addEventListener('close', () => {
+        dlg.remove();
+        if (previous && previous.isConnected && typeof previous.focus === 'function') previous.focus();
+        resolve(dlg.returnValue); // « confirm », « cancel », ou vide (Échap)
+      });
+      document.body.append(dlg);
+      update();
+      dlg.showModal();
+    });
+
+    if (outcome === 'confirm') {
+      const ok = orderPitStop(raceState, driverId, plan.compound, { pace: plan.pace, riskLevel: plan.riskLevel });
+      if (ok.ok) {
+        toast(`Arrêt programmé pour ${driver.name} au tour ${pitLap} (${TYRE_LABELS[plan.compound]}, rythme ${paceLabel(plan.pace).toLowerCase()}).`);
+        // L'ordre est sauvegardé tout de suite : un rechargement avant le prochain tour ne l'annule pas.
+        weekend.race.state = serializeRaceState(raceState);
+        persist();
+      } else {
+        toast(ok.error, { error: true });
+      }
       updateLiveRaceUI();
     }
+    if (resumeSpeed > 0 && !raceState.completed) setPlaySpeed(resumeSpeed);
   }
 
   function updateLiveRaceUI() {
@@ -428,14 +755,14 @@ function run(save, round) {
       const positionClass = !isDnf && entry._posDiff ? (entry._posDiff > 0 ? 'pos-up' : 'pos-down') : '';
       return h('tr', { class: `${entry.isPlayer ? 'is-player' : ''} ${isDnf ? 'is-dnf' : ''} ${positionClass}` },
         h('td', { text: p }),
-        h('td', { text: d.abbr, title: d.name }),
+        h('td', { title: d.name }, teamDot(teamOf(entry.teamId)), d.abbr),
         h('td', { class: 'gap', text: gapText }),
         h('td', { class: 'tyre' },
           isDnf ? null : h('span', { class: `tyre-${entry.tyres.compound}`, text: entry.tyres.compound.charAt(0).toUpperCase() }),
           isDnf ? null : h('span', { class: `tyre-wear ${entry.tyres.wear < 20 ? 'wear-danger' : ''}`, text: `${Math.round(entry.tyres.wear)}%` })
         ),
         h('td', { text: entry.pitStops.length > 0 ? entry.pitStops.length : '-' }),
-        h('td', {}, entry.isPlayer && !isDnf && canPitThisLap(raceState, entry.driverId) ? h('button', { class: 'btn', style: 'padding: 0.2rem 0.5rem; font-size: 0.8rem;', text: 'Pit', onClick: () => openPitMenu(entry.driverId) }) : null)
+        h('td', {}, entry.isPlayer && !isDnf && canPitThisLap(raceState, entry.driverId) ? h('button', { class: 'btn', style: 'padding: 0.2rem 0.5rem; font-size: 0.8rem;', text: entry._orderedPitCompound ? 'Pit prévu' : 'Pit', onClick: () => openPitMenu(entry.driverId) }) : null)
       );
     }));
 
@@ -444,6 +771,7 @@ function run(save, round) {
   }
 
   function renderLiveRace() {
+    const trackView = buildTrackView();
     main.replaceChildren(
       h('div', { class: 'stack' },
         h('section', { class: 'card race-hero', style: 'margin-bottom: 1rem;' },
@@ -475,14 +803,22 @@ function run(save, round) {
             )
           ),
 
-          h('section', { class: 'card', style: 'align-self: start;' },
-            h('h2', { text: 'Événements', style: 'margin-top: 0;' }),
-            h('div', { id: 'liveLog', class: 'race-log' })
+          h('div', { class: 'race-side' },
+            trackView ? h('section', { class: 'card race-track' },
+              h('h2', { text: 'Circuit', style: 'margin-top: 0;' }),
+              trackView,
+              h('p', { class: 'muted race-track__note', text: 'Positions estimées d’après les écarts de temps. Cercle blanc : vos pilotes.' })
+            ) : null,
+            h('section', { class: 'card', style: 'align-self: start;' },
+              h('h2', { text: 'Événements', style: 'margin-top: 0;' }),
+              h('div', { id: 'liveLog', class: 'race-log' })
+            )
           )
         )
       )
     );
     updateLiveRaceUI();
+    updateTrackDots(0);
   }
 
   function renderResults() {
@@ -492,10 +828,10 @@ function run(save, round) {
       return h('ol', { class: 'result-list' }, res.map((row) => {
         const driver = driverById(row.driverId);
         const isDnf = row.status === 'dnf';
-        return h('li', { class: driver.teamId === save.playerTeamId ? 'is-player' : '' },
+        return h('li', { class: `${driver.teamId === save.playerTeamId ? 'is-player' : ''}${isDnf ? ' is-dnf' : ''}`.trim() },
           h('span', { class: 'result-list__position', text: String(row.position) }),
-          h('strong', { text: driver.name }),
-          h('span', { text: isDnf ? `DNF (${row.dnfReason})` : row.position === 1 ? 'Vainqueur' : `+${row.gap}s` }),
+          h('strong', {}, teamDot(teamOf(driver.teamId)), driver.name),
+          h('span', { text: isDnf ? `DNF (${row.dnfReason}${row.dnfLap ? `, tour ${row.dnfLap}` : ''})` : row.position === 1 ? 'Vainqueur' : `+${row.gap}s` }),
           h('span', { class: 'muted', style: 'font-size: 0.9rem;' }, `(${row.points} pts, ${row.pitStops} arrêts)`)
         );
       }));
@@ -505,7 +841,7 @@ function run(save, round) {
       h('div', { class: 'stack' },
         h('section', { class: 'card race-hero' },
           h('h1', { text: `Résultats de la Course · R${round.round}` }),
-          h('p', { text: round.name }),
+          h('p', {}, round.name, trackSvg(round.id, { className: 'track-svg--inline' })),
           h('p', { class: 'muted', text: `${weatherLabel(weatherCategory(raceState?.currentMm ?? weekend.startMm))} · ${raceState?.currentMm?.toFixed(1) ?? weekend.startMm.toFixed(1)} mm · ${weekend.race.rewards?.money > 0 ? `Gains : +${weekend.race.rewards.money} M€` : ''}` })
         ),
         h('section', { class: 'card' },

@@ -22,14 +22,30 @@ export function shiftYear(dateStr, years) {
   return `${parseInt(parts[0], 10) + years}-${parts[1]}-${parts[2]}`;
 }
 
+/** Date la plus proche tombant le même jour de semaine que `weekday` (0 = dimanche) : décalage de -3 à +3 jours. */
+const nearestWeekday = (date, weekday) => {
+  const current = new Date(`${date}T12:00:00Z`).getUTCDay();
+  return addDays(date, ((weekday - current + 10) % 7) - 3);
+};
+
+/**
+ * Calendrier d'une saison. Chaque Grand Prix garde sa place dans l'année et son jour de semaine de 2026
+ * (dimanche, ou samedi pour Bakou et Las Vegas) : la date de 2026 est reportée sur l'année voulue puis
+ * ramenée au jour de semaine d'origine le plus proche. Entraînements et qualifications en découlent comme en 2026.
+ */
 export function getDynamicCalendar(season = 2026) {
   const diffYears = Number(season) - 2026;
-  return CALENDAR_2026.map((round) => ({
-    ...round,
-    trainingDates: round.trainingDates.map((d) => shiftYear(d, diffYears)),
-    qualifyingDate: shiftYear(round.qualifyingDate, diffYears),
-    raceDate: shiftYear(round.raceDate, diffYears),
-  }));
+  return CALENDAR_2026.map((round) => {
+    const raceDate = diffYears === 0
+      ? round.raceDate
+      : nearestWeekday(shiftYear(round.raceDate, diffYears), new Date(`${round.raceDate}T12:00:00Z`).getUTCDay());
+    return {
+      ...round,
+      trainingDates: [-4, -3, -2].map((days) => addDays(raceDate, days)),
+      qualifyingDate: addDays(raceDate, -1),
+      raceDate,
+    };
+  });
 }
 
 

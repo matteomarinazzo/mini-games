@@ -6,7 +6,7 @@
  *   initRaceState(save, roundId, startReactions, playerOptions)
  *   simulateLap(state)
  *   canPitThisLap(state, driverId)
- *   orderPitStop(state, driverId, compound)
+ *   orderPitStop(state, driverId, compound, { pace, riskLevel })
  *   changePace(state, driverId, pace)
  *   finishRace(state, save)
  */
@@ -29,6 +29,18 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
  */
 function seededRandom(seed) {
   return (hashString(String(seed)) % 10_000) / 10_000;
+}
+
+/**
+ * Ordre de classement : les pilotes en course d'abord (temps total croissant), puis les abandons,
+ * celui qui a tenu le plus de tours en premier (égalité : position sur la grille).
+ */
+function compareClassification(a, b) {
+  const aOut = a.status === 'dnf';
+  const bOut = b.status === 'dnf';
+  if (aOut !== bOut) return aOut ? 1 : -1;
+  if (aOut) return (b.dnfLap || 0) - (a.dnfLap || 0) || a.gridPosition - b.gridPosition;
+  return a.totalTime - b.totalTime;
 }
 
 /** Moyenne des 3 départements d'une équipe. */
@@ -293,7 +305,11 @@ export function simulateLap(state) {
     if (entry._orderedPitCompound) {
       entry.pitThisLap = true;
       entry._pitCompound = entry._orderedPitCompound;
+      entry._pitPace = entry._orderedPitPace;
+      entry._pitRisk = entry._orderedPitRisk;
       delete entry._orderedPitCompound;
+      delete entry._orderedPitPace;
+      delete entry._orderedPitRisk;
     }
 
     // ── Arrêt aux stands planifié ──
@@ -387,6 +403,12 @@ export function simulateLap(state) {
       entry.totalTime += Math.round(pitTime);
       delete entry._pitCompound;
 
+      // Rythme et risque choisis pour le relais suivant (arrêt ordonné par le joueur) : effectifs dès le tour d'après.
+      if (entry._pitPace && PACE_MULTIPLIERS[entry._pitPace]) entry.pace = entry._pitPace;
+      if (entry._pitRisk) entry.riskLevel = entry._pitRisk;
+      delete entry._pitPace;
+      delete entry._pitRisk;
+
       events.push(`Tour ${lap} : 🔧 ${driver.name} s'arrête aux stands → ${TYRE_DATA[newCompound] ? newCompound.charAt(0).toUpperCase() + newCompound.slice(1) : newCompound}.${stackPenalty > 0 ? ' (double arrêt !)' : ''}`);
     }
 
@@ -401,6 +423,8 @@ export function simulateLap(state) {
       if (incidentResult.dnf) {
         entry.status = 'dnf';
         entry.dnfReason = incidentResult.reason;
+        entry.dnfKind = incidentResult.kind || 'mechanical';
+        entry.dnfLap = lap;
         entry.totalTime = Infinity;
       }
     }
@@ -448,11 +472,7 @@ export function simulateLap(state) {
   }
 
   // ── Mise à jour des positions ──
-  const allSorted = [...state.entries].sort((a, b) => {
-    if (a.status === 'dnf' && b.status !== 'dnf') return 1;
-    if (b.status === 'dnf' && a.status !== 'dnf') return -1;
-    return a.totalTime - b.totalTime;
-  });
+  const allSorted = [...state.entries].sort(compareClassification);
 
   const playerOvertakes = [];
 
@@ -548,9 +568,56 @@ function checkIncident(state, entry, driver, weather, lap, paceM) {
     entry.totalTime += 15_000;
     return { message: `Tour ${lap} : 💨 Crevaison pour ${driverName} ! Arrêt forcé.`, reason: null, dnf: false };
   }
-  const reasons = ['Problème moteur', 'Sortie de piste', 'Collision', 'Problème de boîte de vitesses'];
-  const reason = reasons[Math.floor(typeRoll * reasons.length) % reasons.length];
-  return { message: `Tour ${lap} : ❌ ${driverName} abandonne (${reason}).`, reason, dnf: true };
+  const cause = pickDnfCause(entry, driver, weather, lap, seed);
+  const message = cause.kind === 'accident'
+    ? `Tour ${lap} : 💥 ${driverName} est victime d'un accident et abandonne (${cause.reason}).`
+    : `Tour ${lap} : ❌ ${driverName} abandonne (${cause.reason}).`;
+  return { message, reason: cause.reason, kind: cause.kind, dnf: true };
+}
+
+/** Causes d'abandon : `weight` = poids de base, ajusté par le contexte dans pickDnfCause. */
+const DNF_CAUSES = Object.freeze([
+  { reason: 'Problème moteur', kind: 'mechanical', weight: 10 },
+  { reason: 'Problème de boîte de vitesses', kind: 'mechanical', weight: 8 },
+  { reason: 'Panne hydraulique', kind: 'mechanical', weight: 6 },
+  { reason: 'Surchauffe', kind: 'mechanical', weight: 6 },
+  { reason: 'Problème de freins', kind: 'mechanical', weight: 6 },
+  { reason: 'Panne électrique', kind: 'mechanical', weight: 5 },
+  { reason: 'Fuite d’huile', kind: 'mechanical', weight: 4 },
+  { reason: 'Sortie de piste', kind: 'accident', weight: 12 },
+  { reason: 'Tête-à-queue', kind: 'accident', weight: 6 },
+  { reason: 'Contact avec le mur', kind: 'accident', weight: 6 },
+  { reason: 'Collision', kind: 'accident', weight: 8 },
+  { reason: 'Suspension cassée', kind: 'damage', weight: 0 },
+  { reason: 'Dommages accumulés', kind: 'damage', weight: 0 },
+]);
+
+/**
+ * Choisit la cause d'un abandon, de façon déterministe (seed) mais selon le contexte :
+ * pluie, pneus usés et pilote peu fiable favorisent les accidents ; les dégâts favorisent la casse mécanique.
+ */
+function pickDnfCause(entry, driver, weather, lap, seed) {
+  const skill = 1.6 - driver.stats.raceManagement / 100;
+  const wetFactor = weather === 'wet' ? 2 : weather === 'damp' ? 1.4 : 1;
+  const wornTyres = entry.tyres.wear < PUNCTURE_THRESHOLD ? 1.4 : 1;
+  const weights = DNF_CAUSES.map((cause) => {
+    if (cause.kind === 'accident') {
+      let w = cause.weight * skill * wetFactor * wornTyres;
+      if (cause.reason === 'Collision' && lap === 1) w *= 3;
+      if (cause.reason === 'Tête-à-queue') w *= wetFactor;
+      return w;
+    }
+    if (cause.kind === 'mechanical') return cause.weight * (1 + entry.damage / 100);
+    if (cause.reason === 'Suspension cassée') return entry.damage >= 25 ? 10 : 0;
+    return entry.damage >= 40 ? 14 : 0; // Dommages accumulés
+  });
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let pick = seededRandom(`${seed}-cause`) * total;
+  for (let i = 0; i < DNF_CAUSES.length; i++) {
+    pick -= weights[i];
+    if (pick <= 0 && weights[i] > 0) return DNF_CAUSES[i];
+  }
+  return DNF_CAUSES[0];
 }
 
 // ────────────────────────────────────────────────────────
@@ -565,18 +632,26 @@ export function canPitThisLap(state, driverId) {
   return true;
 }
 
-/** Programme un arrêt aux stands pour le prochain tour simulé. */
-export function orderPitStop(state, driverId, compound) {
+/**
+ * Programme un arrêt aux stands pour le prochain tour simulé.
+ * `options.pace` et `options.riskLevel` (facultatifs) s'appliquent au relais qui suit l'arrêt.
+ */
+export function orderPitStop(state, driverId, compound, options = {}) {
   if (!TYRE_COMPOUNDS.includes(compound)) return { ok: false, error: 'Composé invalide.' };
+  const { pace, riskLevel } = options;
+  if (pace != null && !PACE_MULTIPLIERS[pace]) return { ok: false, error: 'Rythme invalide.' };
+  if (riskLevel != null && !['low', 'normal', 'high'].includes(riskLevel)) return { ok: false, error: 'Niveau de risque invalide.' };
   const entry = state.entries.find((e) => e.driverId === driverId);
   if (!entry) return { ok: false, error: 'Pilote introuvable.' };
   if (entry.status !== 'racing') return { ok: false, error: 'Ce pilote a abandonné.' };
 
+  // Un arrêt manuel remplace le prochain arrêt planifié (une seule fois, même si l'ordre est modifié ensuite).
+  const alreadyOrdered = Boolean(entry._orderedPitCompound);
   entry._orderedPitCompound = compound;
+  if (pace != null) entry._orderedPitPace = pace; else delete entry._orderedPitPace;
+  if (riskLevel != null) entry._orderedPitRisk = riskLevel; else delete entry._orderedPitRisk;
 
-  // Si on ordonne un arrêt manuel, on retire le prochain arrêt planifié 
-  // pour éviter qu'il ne re-déclenche une alerte plus tard
-  if (entry.plannedStops.length > 0) {
+  if (!alreadyOrdered && entry.plannedStops.length > 0) {
     entry.plannedStops.shift();
   }
 
@@ -621,12 +696,7 @@ export function finishRace(state, save) {
   }
 
   // Tri final
-  const sorted = [...state.entries].sort((a, b) => {
-    if (a.status === 'dnf' && b.status !== 'dnf') return 1;
-    if (b.status === 'dnf' && a.status !== 'dnf') return -1;
-    if (a.status === 'dnf' && b.status === 'dnf') return a.totalTime - b.totalTime;
-    return a.totalTime - b.totalTime;
-  });
+  const sorted = [...state.entries].sort(compareClassification);
 
   const results = sorted.map((entry, i) => {
     const points = entry.status === 'racing' ? (RACE_POINTS[i] || 0) : 0;
@@ -638,6 +708,8 @@ export function finishRace(state, save) {
       points,
       status: entry.status,
       dnfReason: entry.dnfReason,
+      dnfLap: entry.dnfLap ?? null,
+      dnfKind: entry.dnfKind ?? null,
       totalTimeMs: entry.status === 'racing' ? entry.totalTime : null,
       gap: entry.status === 'racing' && i > 0 ? round2((entry.totalTime - sorted[0].totalTime) / 1000) : 0,
       tyresUsed: [...entry.compoundsUsed],

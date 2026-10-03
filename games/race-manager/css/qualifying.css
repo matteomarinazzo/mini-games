@@ -89,3 +89,91 @@
 }
 /* Largeur de lecture cohérente avec le classement de course. */
 .qualifying-page { width: min(100%, 60rem); }
+
+/* ---- Modale Lights Out : compacte et centrée (base.css force les modales à toute la largeur) ---- */
+.modal.lights-out {
+    width: min(92vw, 26rem);
+    max-width: min(92vw, 26rem);
+    padding: 1.75rem 1.5rem 1.5rem;
+    border-color: var(--team);
+    text-align: center;
+}
+
+.modal.lights-out[open] {
+    display: grid;
+    justify-items: center;
+    gap: .75rem;
+}
+
+.modal.lights-out h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.modal.lights-out p {
+    margin: 0;
+}
+
+.modal.lights-out .lights-out__status {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 4rem;
+    padding: .5rem;
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #0d131c;
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+.modal.lights-out .lights-out__button {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.5rem;
+    font-size: 1.15rem;
+}
+
+/* Quand les feux s'éteignent le bouton devient actif : on le met en évidence */
+.modal.lights-out .lights-out__button:not(:disabled) {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #06210f;
+    animation: lights-out-pulse .5s ease-in-out infinite alternate;
+}
+
+@keyframes lights-out-pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.03);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal.lights-out .lights-out__button:not(:disabled) {
+        animation: none;
+    }
+}
+
+/* ---- Tracé du circuit après le nom de la course ---- */
+.track-svg {
+    flex: none;
+    width: 1.5em;
+    height: 1.5em;
+    color: var(--muted);
+    vertical-align: middle;
+}
+
+.track-svg--inline {
+    margin-left: .5rem;
+}
+
+.track-svg__start {
+    fill: var(--team);
+}
+

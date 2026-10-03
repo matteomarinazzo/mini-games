@@ -61,3 +61,41 @@ export function trackSvg(roundId, { className = '' } = {}) {
   svg.append(line, start);
   return svg;
 }
+
+const GEOMETRY_CACHE = new Map();
+
+/** Points du tracé + longueurs cumulées (boucle fermée : le dernier segment ramène à la ligne de départ). */
+function trackGeometry(roundId) {
+  if (GEOMETRY_CACHE.has(roundId)) return GEOMETRY_CACHE.get(roundId);
+  const track = CIRCUIT_TRACKS[roundId];
+  let geometry = null;
+  if (track) {
+    const numbers = track.d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+    const points = [];
+    for (let i = 0; i + 1 < numbers.length; i += 2) points.push([numbers[i], numbers[i + 1]]);
+    points.push(points[0]);
+    const cumulative = [0];
+    for (let i = 1; i < points.length; i++) {
+      cumulative.push(cumulative[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
+    }
+    geometry = { points, cumulative, length: cumulative[cumulative.length - 1] };
+  }
+  GEOMETRY_CACHE.set(roundId, geometry);
+  return geometry;
+}
+
+/**
+ * Position {x, y} (viewBox 0 0 200 200) à `progress` ∈ [0, 1[ d'un tour : 0 = ligne de départ, le sens est celui du circuit.
+ * Retourne null si l'id est inconnu.
+ */
+export function trackPointAt(roundId, progress) {
+  const geometry = trackGeometry(roundId);
+  if (!geometry) return null;
+  const target = (((progress % 1) + 1) % 1) * geometry.length;
+  const { points, cumulative } = geometry;
+  let i = 1;
+  while (i < cumulative.length - 1 && cumulative[i] < target) i++;
+  const span = cumulative[i] - cumulative[i - 1] || 1;
+  const t = (target - cumulative[i - 1]) / span;
+  return { x: points[i - 1][0] + (points[i][0] - points[i - 1][0]) * t, y: points[i - 1][1] + (points[i][1] - points[i - 1][1]) * t };
+}

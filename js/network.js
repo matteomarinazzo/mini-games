@@ -1,8 +1,8 @@
 export async function checkRealConnection() {
     if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
 
-    //const pingUrl = `/index.html?ping=${Date.now()}`;
-    const pingUrl = `/perso/mini-games-plateform/index.html?ping=${Date.now()}`;
+    const pingUrl = `/index.html?ping=${Date.now()}`;
+    //const pingUrl = `/perso/mini-games-plateform/index.html?ping=${Date.now()}`;
 
     try {
         const controller = new AbortController();

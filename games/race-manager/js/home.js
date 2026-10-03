@@ -15,6 +15,7 @@ import { h, kv, ratingBar, toast, confirmDialog, showModal, checkAndShowSeasonMo
 import { runImportFlow } from './import-flow.js';
 import { advanceOneDay, eventsForWeek, nextProgression, roundStatus, startUpgrade, upgradeCost, getDynamicCalendar } from './core/progression.js';
 import { ensureTransferState, prospectDriver, offerDriver, driverConfidential } from './core/transfers.js';
+import { trackSvg } from './data/circuit-tracks-2026.js';
 
 const main = document.getElementById('content');
 const params = new URLSearchParams(location.search);
@@ -50,6 +51,8 @@ function run(save) {
   // ----------------------------------------------
 
   let activeTab = 'home';
+  const DRIVERS_PAGE_SIZE = 20;
+  const driverFilters = { q: '', team: '', category: '', status: '', sort: 'ovr', limit: DRIVERS_PAGE_SIZE };
   const teamOf = () => save.teams.find((t) => t.id === save.playerTeamId);
   let suspended = false;            // vrai quand la page va être rechargée après un import (ne plus écrire)
   let visibleSince = document.hidden ? null : Date.now();
@@ -142,6 +145,20 @@ function run(save) {
     return (save.drivers || []).find((driver) => driver.id === id);
   }
 
+  const OFFER_RESPONSE_TYPES = ['offer', 'offer-response', 'driver-response', 'transfer-response'];
+
+  /** Données d'une réponse de pilote à une offre (utilisées par le titre d'événement, la modale et le journal). */
+  function offerResponseInfo(event) {
+    const offer = event.offer || event.transfer?.offer;
+    const decision = event.decision || event.transfer?.decision;
+    const driverId = event.driverId || offer?.driverId;
+    const driver = driverId ? playerDriver(driverId) : null;
+    const name = driver?.name || offer?.driverName || event.driverName || 'pilote';
+    const reasonText = decision ? (decision.reason || (Array.isArray(decision.reasons) && decision.reasons.length ? decision.reasons.join(', ') : '')) : '';
+    const probabilityPct = decision?.probability != null ? Math.round(Number(decision.probability) <= 1 ? Number(decision.probability) * 100 : Number(decision.probability)) : null;
+    return { name, decision, accepted: !!decision?.accepted, reasonText, probabilityPct };
+  }
+
   const eventTitle = (event) => {
     if (!event) return 'Saison terminée';
     if (event.type === 'season-end') return event.title || `Clôture de la saison ${currentSeason()}`;
@@ -162,19 +179,12 @@ function run(save) {
       'transfer-response': 'Réponse du pilote',
     };
     const label = labels[event.type] || event.title || 'Événement';
-    const isOfferResponse = ['offer', 'offer-response', 'driver-response', 'transfer-response'].includes(event.type);
-    if (isOfferResponse) {
-      const offer = event.offer || event.transfer?.offer;
-      const decision = event.decision || event.transfer?.decision;
-      const driverId = event.driverId || offer?.driverId;
-      const driver = driverId ? playerDriver(driverId) : null;
-      const name = driver?.name || offer?.driverName || event.driverName || 'pilote';
-      if (!decision) return `Réponse de ${name}`;
-      const result = decision.accepted ? 'offre acceptée' : 'offre refusée';
-      const reasonText = decision.reason || (Array.isArray(decision.reasons) && decision.reasons.length ? decision.reasons.join(', ') : '');
-      const reason = reasonText ? `, raison : ${reasonText}` : '';
-      const probability = decision.probability != null ? ` (probabilité : ${Math.round(Number(decision.probability) <= 1 ? Number(decision.probability) * 100 : Number(decision.probability))} %)` : '';
-      return `Réponse de ${name} : ${result}${reason}${probability}`;
+    if (OFFER_RESPONSE_TYPES.includes(event.type)) {
+      const info = offerResponseInfo(event);
+      if (!info.decision) return `Réponse de ${info.name}`;
+      const reason = info.reasonText ? `, raison : ${info.reasonText}` : '';
+      const probability = info.probabilityPct != null ? ` (probabilité : ${info.probabilityPct} %)` : '';
+      return `Réponse de ${info.name} : ${info.accepted ? 'offre acceptée' : 'offre refusée'}${reason}${probability}`;
     }
     if (!event.round) return label;
     return `${label} · R${event.round.round} · ${event.round.name}`;
@@ -222,6 +232,12 @@ function run(save) {
     return svg;
   }
 
+  /** Petit tracé du circuit d'un événement (course, qualifs, entraînement) ; rien si l'événement n'a pas de manche. */
+  const trackOfEvent = (event) => {
+    const id = event?.round?.id || event?.roundId;
+    return id ? trackSvg(id, { className: 'track-svg--inline' }) : null;
+  };
+
   function weekCalendarNode() {
     const events = eventsForWeek(save, save.gameDate);
     const weekDates = Array.from({ length: 7 }, (_, index) => {
@@ -248,22 +264,45 @@ function run(save) {
         return h('article', { class: `week-day${date === save.gameDate ? ' is-today' : ''}` },
           h('h3', { text: formatDay.format(new Date(`${date}T12:00:00Z`)) }),
           daysEvents.length
-            ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', { text: eventTitle(event) }))))
+            ? h('ul', { class: 'week-events' }, daysEvents.map((event) => h('li', { class: `week-event week-event--${event.type}` }, eventIcon(event.type), h('span', {}, eventTitle(event), trackOfEvent(event)))))
             : h('p', { class: 'week-empty', text: 'Aucun événement' }));
       })));
   }
 
+  /** Journal d'écurie : ajoute prospections et réponses de pilotes (sans doublon date + message). */
+  function logTransferEvent(event, message) {
+    if (!Array.isArray(save.eventLog)) save.eventLog = [];
+    const date = event.date || save.gameDate;
+    if (save.eventLog.some((entry) => entry.date === date && entry.message === message)) return false;
+    save.eventLog.unshift({ date, message });
+    return true;
+  }
+
   async function showTransferEvents(events) {
     const transferEvents = (events || []).filter((event) => event.transfer || event.transferType || event.type === 'prospecting' || event.type === 'offer' || event.type === 'prospection' || event.type === 'offer-response' || event.type === 'driver-response' || event.type === 'scouting-complete' || event.type === 'transfer-response');
+    const modals = [];
+    let logged = false;
     for (const event of transferEvents) {
       const title = eventTitle(event);
-      const isOfferResponse = ['offer', 'offer-response', 'driver-response', 'transfer-response'].includes(event.type);
-      const detail = isOfferResponse ? title : (event.message || event.description || (event.driverId ? playerDriver(event.driverId)?.name : ''));
-      await showModal({
-        title,
-        body: h('p', { text: detail || 'Un événement du marché des transferts est arrivé à échéance.' }),
-      });
+      if (OFFER_RESPONSE_TYPES.includes(event.type)) {
+        const info = offerResponseInfo(event);
+        // Titre = « Réponse de … » ; verdict, raison et probabilité dans le corps
+        const body = info.decision
+          ? h('div', { class: 'event-detail' },
+            h('p', { class: `event-detail__verdict ${info.accepted ? 'is-accepted' : 'is-refused'}`, text: info.accepted ? 'Offre acceptée' : 'Offre refusée' }),
+            info.reasonText ? h('p', { class: 'event-detail__reason' }, h('strong', { text: 'Raison : ' }), info.reasonText) : null,
+            info.probabilityPct != null ? h('p', { class: 'muted event-detail__proba', text: `Probabilité d’acceptation : ${info.probabilityPct} %` }) : null)
+          : h('p', { text: 'Un événement du marché des transferts est arrivé à échéance.' });
+        modals.push({ title: `Réponse de ${info.name}`, body });
+        if (logTransferEvent(event, title)) logged = true;
+      } else {
+        const detail = event.message || event.description || (event.driverId ? playerDriver(event.driverId)?.name : '');
+        modals.push({ title, body: h('p', { text: detail || 'Un événement du marché des transferts est arrivé à échéance.' }) });
+        if (logTransferEvent(event, detail && detail !== title ? `${title} : ${detail}` : title)) logged = true;
+      }
     }
+    if (logged) { persist(); refreshHome(); }
+    for (const modal of modals) await showModal(modal);
   }
 
   function refreshHome() {
@@ -346,7 +385,7 @@ function run(save) {
           kv([['Date simulée', formatGameDate(save.gameDate)], ['Saison', `${currentSeason()} · R${save.calendar?.currentRound || 1}/${calendarOf().length}`], ['Solde actuel', formatMoney(t.balance)], ['Temps de jeu', formatPlayTime(save.playTimeSeconds)]]),
           h('div', { class: 'next-event' },
             h('span', { class: 'eyebrow', text: 'Prochain événement' }),
-            h('strong', { text: eventTitle(next) }),
+            h('strong', {}, eventTitle(next), trackOfEvent(next)),
             h('p', { class: 'muted', text: next ? formatGameDate(next.date) : 'La saison est terminée.' }))
         ),
         h('p', { class: 'muted', text: `Difficulté des améliorations : ${UPGRADE_LEVELS[save.difficulty.upgradeDifficulty].label}.` })
@@ -358,7 +397,6 @@ function run(save) {
           activeUpgrades.length
             ? h('div', { class: 'active-upgrades' }, activeUpgrades.map((upgrade) => h('p', {}, h('strong', { text: DEPT_LABELS[upgrade.dept] }), ` · fin prévue le ${formatGameDate(upgrade.completesOn)} · ${formatMoney(upgrade.cost)} payé.`)))
             : h('p', { class: 'muted', text: 'Aucune amélioration en cours.' }))),
-      h('section', { 'aria-labelledby': 'drvTitle' }, h('h2', { id: 'drvTitle', text: 'Vos pilotes' }), h('div', { class: 'grid2' }, mine.map(driverCard))),
       h('section', { class: 'card', 'aria-labelledby': 'depTitle' },
         h('h2', { id: 'depTitle', text: 'Départements' }),
         h('div', { class: 'upgrade-grid' }, DEPT_KEYS.map((k) => {
@@ -378,7 +416,7 @@ function run(save) {
     const results = weekend?.race?.results;
     const nameOf = (id) => playerDriver(id)?.name || '—';
     return h('article', { class: `card season-round${status === 'Terminé' ? ' is-past' : ''}` },
-      h('div', { class: 'season-round__head' }, h('div', {}, h('h3', { text: `R${round.round} · ${round.name}` }), h('p', { class: 'muted', text: round.circuit })), h('span', { class: 'badge', text: status })),
+      h('div', { class: 'season-round__head' }, h('div', {}, h('h3', { text: `R${round.round} · ${round.name}` }), h('p', { class: 'muted', text: round.circuit })), h('div', { class: 'season-round__side' }, trackSvg(round.id, { className: 'track-svg--card' }), h('span', { class: 'badge', text: status }))),
       h('ol', { class: 'round-events' },
         ...round.trainingDates.map((date) => h('li', {}, eventIcon('training'), h('span', { text: `Entraînement pilotes · ${formatGameDate(date)}` }))),
         h('li', {}, eventIcon('qualifying'), h('span', { text: `Qualifications · ${formatGameDate(round.qualifyingDate)}` })),
@@ -768,7 +806,9 @@ function run(save) {
       title: 'Pilotes / mercato', build: () => {
         ensureTransferState(save);
         const mine = save.drivers.filter((d) => d.teamId === save.playerTeamId);
+        const f = driverFilters;
         const status = (d) => save.transfers.scouting.find((x) => x.driverId === d.id);
+        const norm = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const openOffer = async (d) => {
           const slot = h('select', { class: 'input' }, h('option', { value: '1', text: 'Pilote n°1' }), h('option', { value: '2', text: 'Pilote n°2' }));
           slot.value = String(d.contract?.slot) === '2' ? '2' : '1';
@@ -776,16 +816,25 @@ function run(save) {
           const years = h('input', { class: 'input', type: 'number', min: '1', max: '5', step: '1', value: '2' });
           const body = h('div', { class: 'stack' }, h('p', { text: 'Configurez votre proposition. La réponse arrivera dans 3 jours simulés.' }), h('label', { text: 'Poste proposé' }, slot), h('label', { text: 'Salaire annuel (M€)' }, salary), h('label', { text: 'Durée (années)' }, years));
           const ok = await showModal({ title: `Offre pour ${d.name}`, body, wide: true, actions: [{ label: 'Annuler', value: false, variant: 'btn--ghost', autofocus: true }, { label: 'Envoyer l’offre', value: true, variant: 'btn--primary' }] });
-          if (!ok) return; const r = offerDriver(save, d.id, slot.value, salary.value, years.value); if (!r.ok) return toast(r.error, { error: true }); persist(); show('drivers'); toast('Offre planifiée : réponse dans 3 jours.');
+          if (!ok) return; const r = offerDriver(save, d.id, slot.value, salary.value, years.value); if (!r.ok) return toast(r.error, { error: true }); persist(); renderList(); toast('Offre planifiée : réponse dans 3 jours.');
         };
-        const prospect = (d) => {
+        // Clic sur « Prospecter » : une modale résume le pilote et demande confirmation avant de planifier la prospection
+        const prospect = async (d) => {
           const activeProspections = save.transfers.scouting.filter((entry) => !entry.completed).length;
           if (activeProspections >= 3) return toast('Limite atteinte : 3 prospections simultanées maximum.', { error: true });
+          const current = save.teams.find((t) => t.id === d.teamId);
+          const body = h('div', { class: 'stack' },
+            kv([['Écurie', current?.name || 'Agent libre'], ['Catégorie', String(d.category ?? '—')], ['Âge', d.age != null ? `${d.age} ans` : '—'], ['Note globale', String(driverOverall(d))]]),
+            h('p', { text: 'La prospection révèle les informations confidentielles du pilote (loyauté, salaire, fin de contrat) après 7 jours simulés. Vous pourrez ensuite lui faire une offre.' }),
+            h('p', { class: 'muted', text: `Prospections en cours : ${activeProspections} / 3.` }));
+          const ok = await showModal({ title: `Prospecter ${d.name}`, body, actions: [{ label: 'Annuler', value: false, variant: 'btn--ghost', autofocus: true }, { label: 'Lancer la prospection', value: true, variant: 'btn--primary' }] });
+          if (!ok) return;
           const r = prospectDriver(save, d.id);
           if (!r.ok) return toast(r.error, { error: true });
-          persist(); show('drivers'); toast(`Prospection planifiée pour ${d.name}, réponse dans 7 jours.`);
+          persist(); renderList(); toast(`Prospection planifiée pour ${d.name}, réponse dans 7 jours.`);
         };
-        const line = (d) => {
+        // État d'un pilote vis-à-vis du marché (mêmes règles qu'avant, calculées une seule fois par pilote)
+        const state = (d) => {
           const info = driverConfidential(save, d.id);
           const sc = status(d);
           const current = save.teams.find((t) => t.id === d.teamId);
@@ -800,7 +849,10 @@ function run(save) {
           const confirmation = deferred && pendingTeam
             ? `Rejoindra ${pendingTeam.name} en ${pendingSeason} en tant que pilote n°${pendingSlot}.`
             : null;
-          const confidential = sc?.completed || isMine;
+          return { info, sc, current, isMine, confirmation, confidential: !!(sc?.completed || isMine) };
+        };
+        const line = (d) => {
+          const { info, sc, current, isMine, confirmation, confidential } = state(d);
           let action = null;
           if (confirmation) {
             action = h('p', { class: 'transfer-private', text: confirmation });
@@ -811,7 +863,71 @@ function run(save) {
           }
           return h('article', { class: 'transfer-row card' }, h('div', {}, h('strong', { text: d.name }), h('p', { class: 'muted', text: `${current?.name || 'Agent libre'} · ${d.category} · ${d.age ?? '—'} ans · Note ${driverOverall(d)}` }), confidential && !confirmation ? h('p', { class: 'transfer-private', text: `Loyalty : ${info.loyalty ?? '—'} · Salaire : ${formatMoney(info.contract?.salary || 0)} · Fin : saison ${info.contract?.endSeason ?? '—'}` }) : null), h('div', { class: 'row' }, action));
         };
-        return h('div', { class: 'stack' }, h('section', { class: 'card' }, h('h1', { text: 'Pilotes / marché des transferts' }), h('p', { class: 'muted', text: 'Vos pilotes restent affichés ci-dessus ; la prospection révèle les informations confidentielles après 7 jours.' }), h('div', { class: 'grid2' }, mine.map(driverCard))), h('section', { class: 'card' }, h('h2', { text: 'Prospection' }), h('div', { class: 'transfer-list' }, save.drivers.map(line))));
+
+        // ---- Filtres, tri et pagination de la liste
+        const teamsSorted = [...save.teams].sort((a, b) => String(a.name).localeCompare(String(b.name), 'fr'));
+        const categories = [...new Set(save.drivers.map((d) => d.category).filter((c) => c != null && c !== ''))].sort((a, b) => String(a).localeCompare(String(b), 'fr'));
+        const option = (value, text) => h('option', { value, text });
+        const searchIn = h('input', { id: 'drvSearch', class: 'input', type: 'search', placeholder: 'Nom, abréviation ou écurie', autocomplete: 'off', value: f.q });
+        const teamSel = h('select', { id: 'drvTeam', class: 'input' }, option('', 'Toutes les écuries'), option('__free', 'Agents libres'), teamsSorted.map((t) => option(String(t.id), t.name)));
+        const catSel = h('select', { id: 'drvCat', class: 'input' }, option('', 'Toutes les catégories'), categories.map((c) => option(String(c), String(c))));
+        const statusSel = h('select', { id: 'drvStatus', class: 'input' },
+          option('', 'Tous les pilotes'), option('todo', 'À prospecter'), option('scouting', 'Prospection en cours'), option('scouted', 'Prospectés'), option('signed', 'Contrat signé (saison suivante)'), option('mine', 'Mes pilotes'));
+        const sortSel = h('select', { id: 'drvSort', class: 'input' },
+          option('ovr', 'Note (meilleure d’abord)'), option('name', 'Nom (A → Z)'), option('age', 'Âge (plus jeune d’abord)'), option('team', 'Écurie (A → Z)'));
+        teamSel.value = f.team; catSel.value = f.category; statusSel.value = f.status; sortSel.value = f.sort;
+        const countEl = h('p', { class: 'muted', role: 'status' });
+        const listEl = h('div', { class: 'transfer-list' });
+        const moreBtn = h('button', { type: 'button', class: 'btn', text: 'Afficher plus', onClick: () => { f.limit += DRIVERS_PAGE_SIZE; renderList(); } });
+        const resetBtn = h('button', { type: 'button', class: 'btn btn--ghost btn--small', text: 'Réinitialiser les filtres', onClick: () => {
+          Object.assign(f, { q: '', team: '', category: '', status: '', sort: 'ovr', limit: DRIVERS_PAGE_SIZE });
+          searchIn.value = ''; teamSel.value = ''; catSel.value = ''; statusSel.value = ''; sortSel.value = 'ovr';
+          renderList();
+        } });
+
+        const matches = (d) => {
+          const st = state(d);
+          if (f.q) {
+            const hay = norm(`${d.name} ${d.abbr || ''} ${st.current?.name || ''}`);
+            if (!norm(f.q).trim().split(/\s+/).every((word) => hay.includes(word))) return false;
+          }
+          if (f.team === '__free' ? !!st.current : (f.team && String(d.teamId) !== f.team)) return false;
+          if (f.category && String(d.category) !== f.category) return false;
+          if (f.status === 'mine' && !st.isMine) return false;
+          if (f.status === 'signed' && !st.confirmation) return false;
+          if (f.status === 'scouted' && !(st.sc?.completed && !st.isMine)) return false;
+          if (f.status === 'scouting' && !(st.sc && !st.sc.completed)) return false;
+          if (f.status === 'todo' && (st.sc || st.isMine || st.confirmation)) return false;
+          return true;
+        };
+        const byName = (a, b) => String(a.name).localeCompare(String(b.name), 'fr');
+        const compare = {
+          ovr: (a, b) => driverOverall(b) - driverOverall(a) || byName(a, b),
+          name: byName,
+          age: (a, b) => (a.age ?? 99) - (b.age ?? 99) || byName(a, b),
+          team: (a, b) => String(save.teams.find((t) => t.id === a.teamId)?.name || 'ZZZ').localeCompare(String(save.teams.find((t) => t.id === b.teamId)?.name || 'ZZZ'), 'fr') || byName(a, b),
+        };
+        function renderList() {
+          const rows = save.drivers.filter(matches).sort(compare[f.sort] || compare.ovr);
+          const shown = rows.slice(0, f.limit);
+          countEl.textContent = `${rows.length} pilote${rows.length > 1 ? 's' : ''} sur ${save.drivers.length}${rows.length > shown.length ? ` · ${shown.length} affichés` : ''}`;
+          listEl.replaceChildren(...(shown.length ? shown.map(line) : [h('p', { class: 'muted', text: 'Aucun pilote ne correspond aux filtres.' })]));
+          moreBtn.hidden = rows.length <= shown.length;
+          moreBtn.textContent = `Afficher plus (${rows.length - shown.length} restants)`;
+        }
+        const bind = (el, key, evt = 'change') => el.addEventListener(evt, () => { f[key] = el.value; f.limit = DRIVERS_PAGE_SIZE; renderList(); });
+        bind(searchIn, 'q', 'input'); bind(teamSel, 'team'); bind(catSel, 'category'); bind(statusSel, 'status'); bind(sortSel, 'sort');
+        renderList();
+
+        const field = (id, label, control) => h('div', { class: 'field' }, h('label', { for: id, text: label }), control);
+        return h('div', { class: 'stack' },
+          h('section', { class: 'card' }, h('h1', { text: 'Pilotes / marché des transferts' }), h('p', { class: 'muted', text: 'Vos pilotes restent affichés ci-dessus ; la prospection révèle les informations confidentielles après 7 jours.' }), h('div', { class: 'grid2' }, mine.map(driverCard))),
+          h('section', { class: 'card' }, h('h2', { text: 'Prospection' }),
+            h('div', { class: 'driver-filters' },
+              field('drvSearch', 'Rechercher', searchIn), field('drvTeam', 'Écurie', teamSel), field('drvCat', 'Catégorie', catSel), field('drvStatus', 'Statut', statusSel), field('drvSort', 'Trier par', sortSel)),
+            h('div', { class: 'driver-filters__bar' }, countEl, resetBtn),
+            listEl,
+            h('div', { class: 'transfer-list__more' }, moreBtn)));
       }
     },
     settings: { title: 'Paramètres et sauvegarde', build: settingsPanel },

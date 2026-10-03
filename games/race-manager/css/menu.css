@@ -427,8 +427,8 @@
 }
 
 .progress {
-    overflow-x: auto;
-    scrollbar-width: thin;
+    overflow: visible;
+    min-width: 0;
 }
 
 .progress__item {
@@ -491,3 +491,108 @@
 }
 /* Le panneau de navigation de l'assistant reste lisible au-dessus du contenu. */
 .wiz__nav { z-index: 2; }
+
+/* Étape 3 : une ligne horizontale par catégorie */
+.drivers {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.driver-category-section {
+    min-width: 0;
+}
+
+.driver-category-title {
+    margin: 0 0 .45rem;
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+.driver-row {
+    display: flex;
+    gap: .6rem;
+    list-style: none;
+    margin: 0;
+    padding: .15rem .1rem .65rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.driver-row > .driver {
+    flex: 0 0 min(19rem, 82vw);
+    scroll-snap-align: start;
+}
+
+
+/* Garde-fous finaux du wizard : le seul défilement horizontal autorisé
+   reste local aux lignes de cartes pilotes (.driver-row). */
+.progress {
+    overflow: visible;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.progress__item {
+    min-width: 0;
+}
+
+.filters {
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.pick-slots {
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.driver-category-section,
+.drivers,
+.driver,
+.driver__main,
+.driver__actions,
+.pick-slot,
+.choice,
+.swatch,
+.team-preview,
+.recap,
+.transfers {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.driver__meta,
+.driver__warn,
+.driver__main,
+.tag,
+.pick-slot strong,
+.choice span,
+.swatch__name,
+.recap li,
+.transfers__list li {
+    overflow-wrap: anywhere;
+}
+
+.driver-row {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.driver-row > .driver {
+    min-width: 0;
+}
+
+.wiz__nav {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}

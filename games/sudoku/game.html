@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sudoku – Partie en cours | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex">
+
+    <meta name="description"
+        content="Joue au Sudoku en ligne gratuitement : 4 niveaux de difficulté, notes, détection des erreurs et chronomètre.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="game-body">
+
+    <!-- Back to menu -->
+    <a href="index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu"
+        aria-label="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-item">
+            <div class="label">NIVEAU</div>
+            <div class="value" id="hudDiff">—</div>
+        </div>
+        <div class="hud-item hud-center">
+            <div class="label">TEMPS</div>
+            <div class="value hud-timer" id="hudTimer">00:00</div>
+        </div>
+        <div class="hud-item">
+            <div class="label">ERREURS</div>
+            <div class="value" id="hudErrors">0</div>
+        </div>
+    </div>
+
+    <div class="game-area">
+        <div class="board" id="board" role="grid" aria-label="Grille de Sudoku"></div>
+
+        <div class="modes" id="modes" role="group" aria-label="Mode de saisie">
+            <button class="mode-btn active" data-mode="digit" aria-pressed="true">✏️ Chiffre</button>
+            <button class="mode-btn" data-mode="erase" aria-pressed="false">⌫ Gomme</button>
+            <button class="mode-btn" data-mode="note" aria-pressed="false">📝 Note</button>
+        </div>
+
+        <div class="pad" id="pad" role="group" aria-label="Pavé de chiffres"></div>
+
+        <div class="actions">
+            <button class="btn-action btn-new" id="newBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10" />
+                </svg>
+                Nouvelle partie
+            </button>
+            <button class="btn-action btn-solution" id="solutionBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 18h6" />
+                    <path d="M10 22h4" />
+                    <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z" />
+                </svg>
+                Solution
+            </button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Confirmation ══ -->
+    <div class="game-overlay" id="confirmOverlay" style="display:none;">
+        <div class="overlay-content">
+            <h2 id="confirmTitle">Confirmer</h2>
+            <p class="overlay-text" id="confirmText"></p>
+            <button class="btn-primary" id="confirmYes">Confirmer</button>
+            <button class="btn-secondary" id="confirmNo" style="margin-top:8px;">Annuler</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Victoire ══ -->
+    <div class="game-overlay" id="winOverlay" style="display:none;">
+        <div class="overlay-content">
+            <div class="win-trophy">🏆</div>
+            <h2>Grille terminée !</h2>
+            <div class="win-stats">
+                <div class="win-stat"><span class="es-label">Niveau</span><span class="es-value" id="winDiff">—</span>
+                </div>
+                <div class="win-stat"><span class="es-label">Temps</span><span class="es-value highlight"
+                        id="winTime">—</span></div>
+            </div>
+            <p class="overlay-text" id="winRecord"></p>
+            <button class="btn-primary" id="replayBtn">REJOUER</button>
+            <a class="btn-secondary btn-link" href="index.html" style="margin-top:8px;">Changer de niveau</a>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+
+</body>
+
+</html>

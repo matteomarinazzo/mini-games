@@ -584,15 +584,11 @@ function filterGames() {
 
       if (match) {
         card.classList.remove("is-hidden", "is-hidden-desktop");
+        card.style.removeProperty("display");
         currentCategoryHasVisibleCards = true;
       } else {
-        if (isMobile) {
-          card.classList.add("is-hidden");
-          card.classList.remove("is-hidden-desktop");
-        } else {
-          card.classList.add("is-hidden-desktop");
-          card.classList.remove("is-hidden");
-        }
+        card.classList.add("is-hidden", "is-hidden-desktop");
+        card.style.setProperty("display", "none", "important");
       }
     } else if (el.classList.contains('hidden-spacer')) {
       el.style.display = (query === "") ? '' : 'none';
@@ -910,3 +906,11 @@ function changeCategoryWithAnim(newFilter, direction) {
     grid.style.transform = 'translateX(0)';
   }, 200);
 }
+
+window.addEventListener("pageshow", (event) => {
+  // La page a été restaurée par le bouton Retour/Avancer
+  if (event.persisted) {
+    document.body.style.opacity = "1";
+    document.body.style.transition = "";
+  }
+});

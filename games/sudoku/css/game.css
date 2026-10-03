@@ -1,0 +1,381 @@
+/* ─── GAME LAYOUT ─── */
+.game-body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ─── HUD ─── */
+.hud {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(16px, 4vw, 48px);
+    padding: 10px 60px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    min-height: 58px;
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hud-center {
+    min-width: 80px;
+}
+
+.hud-item .label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    font-family: var(--font-mono);
+}
+
+.hud-item .value {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.hud-timer {
+    font-size: 22px !important;
+    color: var(--success);
+}
+
+.hud-item .value.has-errors {
+    color: var(--accent);
+}
+
+/* ─── GAME AREA ─── */
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 10px 8px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ─── BOARD ─── */
+.board {
+    --size: min(94vw, calc(100dvh - 312px), 460px);
+    width: var(--size);
+    height: var(--size);
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface2);
+    flex-shrink: 0;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    color: var(--success);
+    font-family: var(--font-display);
+    cursor: pointer;
+    min-width: 0;
+    min-height: 0;
+}
+
+.cell.bR {
+    border-right: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.cell.bB {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.cell:last-child,
+.cell.col8 {
+    border-right: 0;
+}
+
+.cell.row8 {
+    border-bottom: 0;
+}
+
+.cell .val {
+    font-size: clamp(16px, 5.4vw, 28px);
+    font-weight: 600;
+    line-height: 1;
+}
+
+.cell.given {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.cell.given .val {
+    font-weight: 700;
+}
+
+/* Surbrillance : ligne/colonne/bloc, même chiffre, sélection */
+.cell.peer {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cell.same {
+    background: rgba(0, 212, 170, 0.22);
+}
+
+.cell.selected {
+    background: rgba(0, 212, 170, 0.32);
+    box-shadow: inset 0 0 0 2px var(--success);
+    z-index: 1;
+}
+
+.cell.error {
+    color: var(--accent);
+    background: rgba(255, 30, 0, 0.16);
+}
+
+.cell:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+    z-index: 2;
+}
+
+/* Notes */
+.notes {
+    position: absolute;
+    inset: 1px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
+}
+
+.notes span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: clamp(7px, 2.4vw, 11px);
+    line-height: 1;
+    color: #9a9aae;
+}
+
+.notes span.bad {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* ─── MODES ─── */
+.modes {
+    display: flex;
+    gap: 8px;
+    width: min(94vw, 460px);
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--dim);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mode-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* ─── PAD ─── */
+.pad {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    width: min(94vw, 460px);
+}
+
+.pad-btn {
+    height: clamp(42px, 7.5vh, 52px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: clamp(16px, 5vw, 22px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.pad-btn:active {
+    background: var(--accent);
+}
+
+.pad-btn:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    width: min(94vw, 460px);
+}
+
+.btn-action {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.btn-action svg {
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.btn-action:active {
+    transform: scale(0.97);
+}
+
+.btn-action:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.btn-action:disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Nouvelle partie : action principale */
+.btn-new {
+    border-color: rgba(255, 30, 0, 0.45);
+    box-shadow: 0 4px 14px rgba(255, 30, 0, 0.12);
+}
+
+.btn-new svg {
+    color: var(--accent);
+}
+
+.btn-new:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn-new:hover svg {
+    color: #fff;
+}
+
+/* Solution : action discrète */
+.btn-solution svg {
+    color: var(--gold);
+}
+
+.btn-solution:hover {
+    background: rgba(255, 215, 0, 0.08);
+    border-color: rgba(255, 215, 0, 0.5);
+    color: var(--gold);
+}
+
+@media (max-width: 360px) {
+    .btn-action {
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+}
+
+/* ─── WIN POPUP ─── */
+.win-trophy {
+    font-size: 52px;
+    margin-bottom: 8px;
+}
+
+.win-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.win-stat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+}
+
+.es-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.es-value {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.es-value.highlight {
+    color: var(--success);
+}
+
+@media (max-height: 640px) {
+    .board {
+        --size: min(94vw, calc(100dvh - 262px), 460px);
+    }
+
+    .game-area {
+        justify-content: space-between;
+    }
+}

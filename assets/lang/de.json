@@ -115,6 +115,10 @@
             "race-manager": {
                 "name": "Race Manager",
                 "description": "Leite dein eigenes Rennteam. Stelle Fahrer ein, entwickle dein Auto und gewinne die Meisterschaften!"
+            },
+            "sudoku": {
+                "name": "Sudoku",
+                "description": "Fülle das Gitter, ohne Zahlen in einer Zeile, Spalte oder einem Block zu wiederholen. Vier Schwierigkeitsstufen erwarten dich!"
             }
         },
         "badges": {

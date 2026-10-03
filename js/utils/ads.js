@@ -3,8 +3,8 @@
  * Évite les popups intrusives et gère la répétition.
  */
 
-const SOCIAL_BAR_SCRIPT = "https://pl29320862.profitablecpmratenetwork.com/89/6a/dd/896add25a788dcbea38a6fc5dbb07a44.js";
-const SMART_LINK_URL = "https://www.profitablecpmratenetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d";
+const SOCIAL_BAR_SCRIPT = "https://pl29320862.profitableratecpmnetwork.com/89/6a/dd/896add25a788dcbea38a6fc5dbb07a44.js";
+const SMART_LINK_URL = "https://www.profitableratecpmnetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d";
 
 /**
  * Initialise la Social Bar avec un contrôle de fréquence (max 1 fois par minute)
@@ -16,36 +16,26 @@ let isAuthorized = false;
  * Si la pub tente de réapparaître trop vite, elle est supprimée.
  */
 export function initAds() {
-    const lastShow = sessionStorage.getItem('mg_socialbar_last');
+    const lastShow = Number(sessionStorage.getItem('mg_socialbar_last') || 0);
     const now = Date.now();
-    const canShow = !lastShow || (now - parseInt(lastShow)) >= 60000;
-    /*
-        if (canShow) {
-            isAuthorized = true;
-    
-            // Injection du script
-            const script = document.createElement('script');
-            script.src = SOCIAL_BAR_SCRIPT;
-            script.id = 'mg-socialbar-script';
-            document.body.appendChild(script);
-    
-            sessionStorage.setItem('mg_socialbar_last', now.toString());
-    
-            // On laisse la pub s'afficher pendant 20 secondes, puis on la "tue"
-            setTimeout(() => {
-                isAuthorized = false;
-                const s = document.getElementById('mg-socialbar-script');
-                if (s) s.remove();
-                killAdElements();
-            }, 20000);
-        } else {
-            isAuthorized = false;
-            killAdElements();
-        }
-    
-        // Lancer la surveillance des injections sauvages
-        startAdPolicer();
-        */
+    const canShow = !lastShow || (now - lastShow) >= 60000;
+
+    if (!canShow) {
+        console.log('Social Bar ignorée : délai de fréquence non écoulé');
+        return;
+    }
+
+    isAuthorized = true;
+    console.log('Social Bar autorisée');
+
+    const script = document.createElement('script');
+    script.src = SOCIAL_BAR_SCRIPT;
+    script.id = 'mg-socialbar-script';
+    script.async = true;
+    script.onerror = () => console.error('Échec du chargement de la Social Bar');
+    document.body.appendChild(script);
+
+    sessionStorage.setItem('mg_socialbar_last', String(now));
 }
 
 /**

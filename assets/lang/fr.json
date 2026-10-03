@@ -117,6 +117,10 @@
             "race-manager": {
                 "name": "Race Manager",
                 "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !"
+            },
+            "sudoku": {
+                "name": "Sudoku",
+                "description": "Remplis la grille sans répéter de chiffres dans une ligne, une colonne ou un bloc. Quatre niveaux de difficulté t’attendent !"
             }
         },
         "badges": {

@@ -176,6 +176,22 @@
     }
   },
   "puzzle": {
+    "sudoku": {
+      "path": "./games/sudoku/index.html",
+      "name": "Sudoku",
+      "emoji": "🔢",
+      "description": "Remplis la grille sans répéter de chiffres dans une ligne, une colonne ou un bloc. Quatre niveaux de difficulté t’attendent !",
+      "tags": [
+        "logic",
+        "puzzle",
+        "reflexion",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "ball-sort": {
       "path": "./games/ball-sort/index.html",
       "name": "Ball Sort",

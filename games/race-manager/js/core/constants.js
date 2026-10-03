@@ -3,7 +3,7 @@
  * Toute valeur de règle (limites, libellés, niveaux de difficulté) vit ici
  * afin de n'être définie qu'à un seul endroit.
  */
-export const GAME_ID = 'mon-jeu';
+export const GAME_ID = 'race-manager';
 export const GAME_TITLE = 'Race Manager';
 export const SCHEMA_VERSION = 6;
 export const SEASON = 2026;

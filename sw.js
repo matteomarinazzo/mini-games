@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.23.2026-10-04";
+const CACHE_NAME = "mini-games-cache-v1.24.2026-10-04";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -80,6 +80,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/sudoku.webp',
     'assets/logos/rush-highway.webp',
     'assets/logos/wiki-challenge.webp',
+    'assets/logos/minesweeper.webp',
 
     // About
     'about/about.html',
@@ -356,6 +357,14 @@ const ASSETS_TO_CACHE = [
     'games/wiki-challenge/css/game.css',
     'games/wiki-challenge/js/menu.js',
     'games/wiki-challenge/js/game.js',
+
+    // Game: Minesweeper
+    'games/minesweeper/index.html',
+    'games/minesweeper/game.html',
+    'games/minesweeper/css/menu.css',
+    'games/minesweeper/css/game.css',
+    'games/minesweeper/js/menu.js',
+    'games/minesweeper/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

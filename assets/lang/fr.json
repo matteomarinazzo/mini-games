@@ -129,6 +129,10 @@
             "wiki-challenge": {
                 "name": "Wiki Challenge",
                 "description": "Pars d'un article Wikipédia et atteins l'article cible en ne cliquant que sur des liens. Seul ou entre amis !"
+            },
+            "minesweeper": {
+                "name": "Démineur",
+                "description": "Révélez les cases, évitez les mines et affrontez un adversaire en temps réel sur la même grille."
             }
         },
         "badges": {
@@ -601,18 +605,24 @@
             "error_code": "Entrez un code de salle valide (6 caractères).",
             "error_room_full": "Cette salle est déjà pleine.",
             "error_room_not_found": "Salle introuvable. Vérifiez le code.",
+            "error_started": "La partie a déjà commencé.",
+            "error_offline": "Multijoueur indisponible : pas de connexion.",
+            "error_firebase": "Multijoueur indisponible (Firebase).",
+            "connecting": "Connexion en cours, réessayez dans un instant.",
             "creating_room": "Création de la salle…",
             "joining_room": "Connexion à la salle…",
             "create_error": "Erreur lors de la création de la salle.",
             "join_error": "Erreur lors de la connexion à la salle.",
+            "launch_error": "Impossible de lancer la partie, réessayez.",
+            "need_two": "Il faut 2 soldats pour lancer.",
+            "left_room": "Vous avez quitté la salle.",
+            "offline_tag": "DÉCONNECTÉ",
+            "waiting_leader": "En attente du lancement par le créateur…",
             "waiting_room": "En attente",
             "create_room": "Créer la salle",
             "join_room": "Rejoindre la salle"
         },
         "room": {
-            "meta_title": "Démineur – Salle d'attente | Mini‑Games",
-            "meta_description": "Salle d'attente démineur multijoueur. Attendez votre adversaire et lancez la partie !",
-            "header_title": "DÉMINEUR",
             "title": "SALLE D'ATTENTE",
             "code_label": "CODE DE LA SALLE",
             "copy_btn": "Copier",
@@ -622,14 +632,9 @@
             "you": "Vous",
             "waiting_player": "En attente du deuxième soldat…",
             "waiting_a_player": "En attente d'un soldat…",
-            "player_ready": "PRÊT",
-            "player_not_ready": "Attente",
             "player_leader": "LEADER",
-            "ready_btn": "JE SUIS PRÊT",
-            "unready_btn": "ANNULER",
             "start_btn": "LANCER LE DUEL",
             "leave_btn": "Quitter",
-            "waiting_ready": "En attente que tous les joueurs soient prêts…",
             "not_found": "Salle introuvable.",
             "closed": "La salle a été fermée."
         },
@@ -638,9 +643,7 @@
             "status_waiting": "ATTENTE",
             "status_countdown": "PRÊT",
             "hud_mines": "Bombes",
-            "hud_time": "Temps",
             "hud_score": "Cases",
-            "hud_lives": "Vies",
             "flag_btn": "Drapeau",
             "reveal_btn": "Révéler",
             "countdown_go": "FEU !",
@@ -649,22 +652,23 @@
             "result_draw": "ÉGALITÉ",
             "result_cleared": "GRILLE NETTOYÉE !",
             "result_exploded": "EXPLOSION !",
-            "result_no_lives": "Plus de vies",
+            "opp_exploded": "L'adversaire a sauté sur une mine !",
+            "opp_left": "L'adversaire a quitté la partie.",
             "revealedCells": "Cases révélées",
             "opponentCells": "Cases adversaire",
-            "bombsTriggered": "Bombes touchées",
-            "lives_label": "Vies restantes",
             "time_label": "Temps",
-            "mine_remaining": "mines restantes",
+            "best_time": "Meilleur temps",
             "pause_title": "Pause",
             "resume_btn": "Reprendre",
             "rematch_btn": "Revanche",
+            "rematch_wait": "En attente du créateur pour la revanche…",
+            "rematch_error": "Impossible de lancer la revanche.",
             "restart_btn": "Recommencer",
             "menu_btn": "Menu",
             "sound": "SON",
-            "music": "MUSIQUE",
             "waiting_label": "Connexion…",
-            "waiting_sub": "En attente de l'adversaire"
+            "waiting_sub": "En attente de l'adversaire",
+            "connection_lost": "Connexion instable, réessayez."
         }
     }
 }

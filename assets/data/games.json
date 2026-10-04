@@ -180,10 +180,10 @@
       "path": "./games/minesweeper/index.html",
       "name": "Démineur",
       "emoji": "💣",
-      "description": "Le classique revisité : solo ou multijoueur en temps réel. Pose les drapeaux au bon endroit et fais exploser les mines adverses.",
+      "description": "Révélez les cases, évitez les mines et affrontez un adversaire en temps réel sur la même grille.",
       "tags": [
-        "reflexes",
         "strategy",
+        "solo",
         "multiplayer",
         "fast"
       ],

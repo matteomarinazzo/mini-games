@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.22.2026-10-04",
+    "currentVersion": "1.23.2026-10-04",
     "lastUpdate": "2026-10-04",
     "history": [
+        {
+            "version": "1.23.2026-10-04",
+            "date": "2026-10-04",
+            "changes": [
+                "Ajout du jeu Wiki Challenge"
+            ]
+        },
         {
             "version": "1.22.2026-10-04",
             "date": "2026-10-04",

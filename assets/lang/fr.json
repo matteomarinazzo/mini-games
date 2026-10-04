@@ -125,6 +125,10 @@
             "rush-highway": {
                 "name": "Rush Highway",
                 "description": "Évite les véhicules et les obstacles sur une autoroute sans fin, ramasse des bonus et gagne des pièces pour débloquer de nouvelles voitures !"
+            },
+            "wiki-challenge": {
+                "name": "Wiki Challenge",
+                "description": "Pars d'un article Wikipédia et atteins l'article cible en ne cliquant que sur des liens. Seul ou entre amis !"
             }
         },
         "badges": {

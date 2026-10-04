@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.21.2026-10-04";
+const CACHE_NAME = "mini-games-cache-v1.22.2026-10-05";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -78,6 +78,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/rocketeer.webp',
     'assets/logos/race-manager.webp',
     'assets/logos/sudoku.webp',
+    'assets/logos/rush-highway.webp',
 
     // About
     'about/about.html',
@@ -336,6 +337,16 @@ const ASSETS_TO_CACHE = [
     'games/sudoku/js/menu.js',
     'games/sudoku/js/game.js',
     'games/sudoku/js/store.js',
+
+    // Game: Rush Highway
+    'games/rush-highway/index.html',
+    'games/rush-highway/game.html',
+    'games/rush-highway/css/menu.css',
+    'games/rush-highway/css/game.css',
+    'games/rush-highway/js/menu.js',
+    'games/rush-highway/js/game.js',
+    'games/rush-highway/js/store.js',
+    'games/rush-highway/js/vehicles.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

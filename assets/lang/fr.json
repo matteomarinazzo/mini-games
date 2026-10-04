@@ -121,6 +121,10 @@
             "sudoku": {
                 "name": "Sudoku",
                 "description": "Remplis la grille sans répéter de chiffres dans une ligne, une colonne ou un bloc. Quatre niveaux de difficulté t’attendent !"
+            },
+            "rush-highway": {
+                "name": "Rush Highway",
+                "description": "Évite les véhicules et les obstacles sur une autoroute sans fin, ramasse des bonus et gagne des pièces pour débloquer de nouvelles voitures !"
             }
         },
         "badges": {
@@ -176,7 +180,8 @@
             "clicker": "🎮 Clicker",
             "digger": "🪏 Pelle",
             "snow": "❄️ Neige",
-            "flipping": "🥞 Lancer"
+            "flipping": "🥞 Lancer",
+            "racing": "🚗 Course"
         }
     },
     "about": {

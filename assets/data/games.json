@@ -6,6 +6,7 @@
       "emoji": "🏎️",
       "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !",
       "tags": [
+        "racing",
         "real-time",
         "strategy",
         "solo"
@@ -97,6 +98,23 @@
     }
   },
   "arcade": {
+    "rush-highway": {
+      "path": "./games/rush-highway/index.html",
+      "name": "Rush Highway",
+      "emoji": "🚗",
+      "description": "Évite les véhicules et les obstacles sur une autoroute sans fin, ramasse des bonus et gagne des pièces pour débloquer de nouvelles voitures !",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "racing",
+        "survival",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "falling-blocks": {
       "path": "./games/falling-blocks/index.html",
       "name": "Falling Blocks",

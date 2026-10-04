@@ -119,6 +119,10 @@
             "sudoku": {
                 "name": "Sudoku",
                 "description": "Fill in the grid without repeating numbers in a line, column or block. Four difficulty levels await you!"
+            },
+            "rush-highway": {
+                "name": "Rush Highway",
+                "description": "Evade vehicles and obstacles on an endless highway, collect bonuses and earn coins to unlock new cars!"
             }
         },
         "badges": {
@@ -174,7 +178,8 @@
             "clicker": "🎮 Clicker",
             "digger": "🪏 Digger",
             "snow": "❄️ Snow",
-            "flipping": "🥞 Flipping"
+            "flipping": "🥞 Flipping",
+            "racing": "🚗 Racing"
         }
     },
     "about": {

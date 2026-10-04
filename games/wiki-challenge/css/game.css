@@ -1,0 +1,85 @@
+/* Wiki Challenge — game.css (base : menu.css) */
+.wc-body { height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* HUD */
+.wc-hud {
+    position: relative; z-index: 5; flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
+    padding: calc(8px + env(safe-area-inset-top)) 14px 8px; background: var(--surface-1);
+    border-bottom: 1px solid var(--ink-muted);
+}
+.wc-words { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 220px; }
+.wc-w {
+    font-family: 'DM Serif Display', serif; font-size: 1.05rem; color: var(--neon-guess);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.wc-w.target { color: var(--neon-draw); }
+.wc-arrow { color: var(--chalk-ghost); }
+.wc-timer { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--chalk-dim); }
+.wc-timer.warn { color: var(--neon-warn); }
+.wc-actions { display: flex; gap: 8px; }
+.wc-sm { padding: 7px 14px; font-size: 12px; }
+.wc-danger, .wc-leave { color: var(--rose); border-color: var(--rose); }
+[hidden] { display: none !important; }
+
+/* Zone principale */
+.wc-main { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; }
+.wc-reader {
+    flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    background: #fbfaf7; color: #202122; padding: 16px 16px calc(32px + env(safe-area-inset-bottom));
+}
+body.rank-only .wc-reader { display: none; }
+
+.wc-loader {
+    position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 14px; background: rgba(11, 13, 18, 0.78); color: var(--chalk); text-align: center; padding: 24px;
+}
+
+/* Contenu Wikipédia */
+.wc-article { max-width: 760px; margin: 0 auto; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.65; }
+.wc-article h1 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-bottom: 12px; }
+.wc-article h2, .wc-article h3 { font-family: 'DM Serif Display', serif; margin: 22px 0 8px; border-bottom: 1px solid #d8d6cf; }
+.wc-article p, .wc-article ul, .wc-article ol { margin: 0 0 12px; }
+.wc-article ul, .wc-article ol { padding-left: 1.4em; }
+.wc-article img { max-width: 100%; height: auto; }
+.wc-article table { display: block; max-width: 100%; overflow-x: auto; font-size: 14px; border-collapse: collapse; }
+.wc-article td, .wc-article th { padding: 3px 6px; }
+.wc-article .infobox, .wc-article .thumb, .wc-article figure { float: right; clear: right; max-width: 45%; margin: 0 0 10px 14px; font-size: 13px; }
+.wc-article a[data-t], .wc-article a[data-a] { color: #0645ad; cursor: pointer; }
+.wc-article a[data-t]:hover, .wc-article a[data-a]:hover { text-decoration: underline; }
+.wc-article a.wc-dead { color: inherit; cursor: default; pointer-events: none; }
+
+/* Classement : plein écran (joueur hors navigation) ou panneau superposé (🏆) */
+.wc-rank {
+    display: none; flex: 1; overflow-y: auto; padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+    max-width: 640px; margin: 0 auto; width: 100%; flex-direction: column; gap: 14px;
+}
+body.rank-only .wc-rank { display: flex; }
+body.rank-open .wc-rank {
+    display: flex; position: absolute; inset: 0; z-index: 6; max-width: none; background: rgba(11, 13, 18, 0.97);
+}
+.wc-note { color: var(--chalk-dim); font-size: 14px; }
+.wc-rank-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.wc-rank-list li {
+    display: grid; grid-template-columns: 2em 1fr; gap: 2px 10px; align-items: baseline;
+    padding: 10px 14px; background: var(--ink-soft); border: 1px solid var(--ink-muted); border-radius: var(--r-sm);
+}
+.wc-rank-list li.me { border-color: var(--neon-guess); }
+.wc-rank-list li.found { border-color: var(--neon-win); }
+.wc-rank-list li.off { opacity: 0.55; }
+.wc-rank-list .nm { font-weight: 700; overflow-wrap: anywhere; }
+.wc-rank-list .dt { grid-column: 2; color: var(--chalk-dim); font-size: 13px; overflow-wrap: anywhere; }
+.wc-rank-list .pt { grid-column: 2; color: var(--neon-guess); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.wc-rank-actions { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+
+/* Toasts */
+.wc-toasts { position: fixed; z-index: 300; left: 0; right: 0; top: calc(70px + env(safe-area-inset-top)); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.wc-toast {
+    background: var(--ink-mid); border: 1px solid var(--neon-win); color: var(--chalk); padding: 10px 18px;
+    border-radius: 100px; font-size: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); animation: popIn 0.3s var(--ease-spring);
+}
+
+@media (max-width: 640px) {
+    .wc-article .infobox, .wc-article .thumb, .wc-article figure { float: none; max-width: 100%; margin: 0 0 12px; }
+    .wc-timer { order: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .wc-toast { animation: none; } }

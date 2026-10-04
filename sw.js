@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.22.2026-10-05";
+const CACHE_NAME = "mini-games-cache-v1.23.2026-10-04";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -79,6 +79,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/race-manager.webp',
     'assets/logos/sudoku.webp',
     'assets/logos/rush-highway.webp',
+    'assets/logos/wiki-challenge.webp',
 
     // About
     'about/about.html',
@@ -347,6 +348,14 @@ const ASSETS_TO_CACHE = [
     'games/rush-highway/js/game.js',
     'games/rush-highway/js/store.js',
     'games/rush-highway/js/vehicles.js',
+
+    // Game: Wiki Challenge
+    'games/wiki-challenge/index.html',
+    'games/wiki-challenge/game.html',
+    'games/wiki-challenge/css/menu.css',
+    'games/wiki-challenge/css/game.css',
+    'games/wiki-challenge/js/menu.js',
+    'games/wiki-challenge/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

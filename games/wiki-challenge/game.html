@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Partie en cours – Wiki Challenge | Mini‑Games</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="wc-body rank-only">
+    <header class="wc-hud">
+        <div class="wc-words">
+            <span class="wc-w" id="wStart">…</span>
+            <span class="wc-arrow">→</span>
+            <span class="wc-w target" id="wTarget">…</span>
+        </div>
+        <div class="wc-timer" id="wTimer">--:--</div>
+        <div class="wc-actions">
+            <button class="btn btn-outline wc-sm" id="backBtn" hidden>← Retour</button>
+            <button class="btn btn-outline wc-sm" id="rankBtn" hidden>🏆</button>
+            <button class="btn btn-outline wc-sm wc-danger" id="giveUpBtn" hidden>Abandonner</button>
+        </div>
+    </header>
+
+    <main class="wc-main">
+        <section class="wc-reader" id="reader" aria-live="polite"></section>
+
+        <div class="wc-loader" id="loader" hidden>
+            <span id="loaderText">Chargement…</span>
+            <button class="btn btn-secondary wc-sm" id="loaderRetry" hidden>Réessayer</button>
+        </div>
+
+        <section class="wc-rank" id="rankPanel">
+            <h2>Classement</h2>
+            <p class="wc-note" id="rankNote"></p>
+            <ol class="wc-rank-list" id="rankList"></ol>
+            <div class="wc-rank-actions">
+                <button class="btn btn-secondary" id="genRetryBtn" hidden>Relancer le tirage</button>
+                <button class="btn btn-primary" id="replayBtn" hidden>Rejouer</button>
+                <p class="wc-note" id="waitLeader" hidden>En attente du créateur pour la prochaine manche…</p>
+                <button class="btn btn-outline" id="closeRankBtn" hidden>Retour à la page</button>
+                <button class="btn btn-outline wc-leave" id="quitBtn">Quitter</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="wc-toasts" id="toast"></div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

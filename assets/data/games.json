@@ -210,6 +210,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "wiki-challenge": {
+      "path": "./games/wiki-challenge/index.html",
+      "name": "Wiki Challenge",
+      "emoji": "📖",
+      "description": "Pars d'un article Wikipédia et atteins l'article cible en ne cliquant que sur des liens. Seul ou entre amis !",
+      "tags": [
+        "culture",
+        "reflexion",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "ball-sort": {
       "path": "./games/ball-sort/index.html",
       "name": "Ball Sort",

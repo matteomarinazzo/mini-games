@@ -123,6 +123,10 @@
             "rush-highway": {
                 "name": "Rush Highway",
                 "description": "Weiche Fahrzeugen und Hindernissen auf einer endlosen Autobahn aus, sammle Bonusse und verdiene Münzen, um neue Autos freizuschalten!"
+            },
+            "wiki-challenge": {
+                "name": "Wiki Challenge",
+                "description": "Starte bei einem Wikipedia-Artikel und erreiche den Zielartikel, indem du nur auf Links klickst. Alleine oder mit Freunden!"
             }
         },
         "badges": {

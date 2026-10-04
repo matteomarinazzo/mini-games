@@ -1,0 +1,630 @@
+/* Socle commun (variables, boutons, overlays) + styles du menu.
+   Chargé par index.html ET game.html. Aucune police distante : piles système. */
+
+:root {
+    --bg: #0a0a0b;
+    --bg2: #111113;
+    --surface: #18181c;
+    --surface2: #1e1e24;
+    --border: rgba(255, 255, 255, 0.07);
+
+    --text: #e8e8f0;
+    --dim: #8a8aa0;
+    --accent: #ff1e00;
+    --gold: #ffd700;
+    --success: #00d4aa;
+    --bad: #b06bff;
+
+    --font-display: 'Rajdhani', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'Share Tech Mono', ui-monospace, Consolas, 'Courier New', monospace;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+html,
+body {
+    overscroll-behavior: none;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    font-family: var(--font-display);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+/* ─── BACK / PAUSE BUTTON ─── */
+.pause-btn {
+    position: fixed;
+    top: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.pause-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+
+/* ─── BUTTONS ─── */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(255, 30, 0, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+    color: var(--dim);
+    flex-shrink: 0;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-link {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+:is(button, a):focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* ─── OVERLAYS ─── */
+.game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 6, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(8px);
+}
+
+.game-overlay[style*="flex"] {
+    display: flex !important;
+}
+
+.overlay-content {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    max-width: 360px;
+    width: 92%;
+    max-height: 94dvh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.overlay-content h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+}
+
+.overlay-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+/* ─── MENU PAGE ─── */
+.menu-body {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.menu-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 56px 16px 12px;
+    gap: 12px;
+    max-width: 460px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.menu-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+    margin: 0 -16px;
+    padding: 10px 16px max(10px, env(safe-area-inset-bottom));
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-header {
+    text-align: center;
+}
+
+.menu-icon {
+    font-size: 40px;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.menu-title {
+    font-size: clamp(28px, 8vw, 44px);
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.menu-title-pro {
+    color: var(--accent);
+}
+
+.menu-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.menu-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    text-align: center;
+}
+
+.coins-badge {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    background: var(--surface);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 999px;
+    padding: 6px 18px;
+    transition: transform 0.2s;
+}
+
+.coins-badge.bump {
+    transform: scale(1.15);
+}
+
+/* ─── RECORD EN ÉVIDENCE ─── */
+.best-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin: 10px auto 4px;
+    padding: 8px 26px;
+    border-radius: 16px;
+    border: 2px solid var(--gold);
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.04));
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.25);
+}
+
+.best-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+}
+
+.best-value {
+    font-family: var(--font-mono);
+    font-size: clamp(28px, 9vw, 40px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: #fff;
+}
+
+/* ─── GARAGE ─── */
+.garage {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.garage-stage {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    border-radius: 14px;
+    padding: 10px 6px;
+    background:
+        repeating-linear-gradient(180deg, transparent 0 18px, rgba(255, 255, 255, 0.35) 18px 34px) center / 4px 100% no-repeat,
+        linear-gradient(180deg, #2a2d36, #3a3d46);
+}
+
+.garage-car svg {
+    display: block;
+    height: min(26dvh, 180px);
+    width: auto;
+    filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.6));
+    transition: filter 0.2s;
+}
+
+.garage-car.is-locked svg {
+    filter: grayscale(1) brightness(0.5) drop-shadow(0 10px 12px rgba(0, 0, 0, 0.6));
+}
+
+.nav-btn {
+    width: 48px;
+    height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--text);
+    font-size: 30px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.nav-btn:active {
+    background: var(--accent);
+}
+
+.veh-name {
+    font-size: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.veh-status {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    min-height: 16px;
+    text-align: center;
+    color: var(--dim);
+}
+
+.veh-status.ok {
+    color: var(--success);
+}
+
+.veh-status.locked {
+    color: var(--gold);
+}
+
+.stats {
+    width: 100%;
+    display: grid;
+    gap: 6px;
+}
+
+.stat {
+    display: grid;
+    grid-template-columns: 96px 1fr 76px;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+}
+
+.stat-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.stat-bar i {
+    display: block;
+    height: 100%;
+    background: var(--success);
+    border-radius: 4px;
+}
+
+.stat b {
+    color: var(--text);
+    text-align: right;
+    font-weight: 400;
+}
+
+.thumbs {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+}
+
+.thumb {
+    position: relative;
+    flex: 1;
+    max-width: 64px;
+    height: 64px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.thumb svg {
+    height: 100%;
+    width: auto;
+}
+
+.thumb.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(255, 30, 0, 0.35);
+}
+
+.thumb.off svg {
+    filter: grayscale(1) brightness(0.5);
+}
+
+.thumb .tag {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    font-size: 11px;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 0 3px;
+    font-family: var(--font-mono);
+    color: var(--gold);
+}
+
+.msg {
+    min-height: 18px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: center;
+}
+
+.msg.good {
+    color: var(--success);
+}
+
+.msg.bad {
+    color: #ff6b5a;
+}
+
+.btn-buy {
+    background: var(--gold);
+    color: #1a1a1a;
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.25);
+}
+
+/* ─── MINIATURES : rangée défilante (14 véhicules) ─── */
+.thumbs {
+    position: relative;
+    min-width: 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 6px 6px 8px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+}
+
+.thumb {
+    flex: 0 0 58px;
+    max-width: none;
+    height: 62px;
+    scroll-snap-align: center;
+}
+
+/* ─── ÉCRANS LARGES (PC) : deux colonnes, tout visible sans défiler ─── */
+@media (min-width: 820px) {
+    .menu-body {
+        display: block;
+        overflow-y: visible;
+        height: auto;
+        min-height: 100dvh;
+    }
+
+    .menu-container {
+        flex: none;
+        overflow: visible;
+        max-width: 900px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        column-gap: 32px;
+        row-gap: 10px;
+        align-content: start;
+        padding: 48px 16px 24px;
+        margin: 0 auto;
+    }
+
+    .menu-header,
+    .coins-badge {
+        grid-column: 1 / -1;
+    }
+
+    .coins-badge {
+        justify-self: center;
+    }
+
+    .garage {
+        display: contents;
+    }
+
+    .garage-stage {
+        grid-column: 1;
+        grid-row: 3 / span 7;
+        align-self: stretch;
+    }
+
+    .garage-car svg {
+        height: min(48dvh, 340px);
+    }
+
+    .veh-name,
+    .veh-status,
+    .stats,
+    .thumbs {
+        grid-column: 2;
+    }
+
+    .veh-name,
+    .veh-status {
+        text-align: left;
+    }
+
+    .thumbs {
+        justify-content: flex-start;
+    }
+
+    .msg {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    /* Les boutons : colonne 2, juste sous la liste de véhicules / message */
+    .menu-actions {
+        position: static;
+        grid-column: 2;
+        width: 100%;
+        max-width: 320px;
+        margin: 0;
+        background: none;
+        border-top: none;
+        padding: 0;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .menu-actions .btn-primary {
+        width: auto;
+        flex: 1;
+    }
+
+    /* La note passe en pleine largeur, après tout le reste */
+    .menu-note {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-icon,
+    .overlay-content {
+        animation: none;
+    }
+
+    * {
+        transition: none !important;
+    }
+}

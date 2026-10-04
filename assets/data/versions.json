@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.21.2026-10-03",
-    "lastUpdate": "2026-10-03",
+    "currentVersion": "1.22.2026-10-04",
+    "lastUpdate": "2026-10-04",
     "history": [
+        {
+            "version": "1.22.2026-10-04",
+            "date": "2026-10-04",
+            "changes": [
+                "Ajout du jeu Rush Highway"
+            ]
+        },
         {
             "version": "1.21.2026-10-03",
             "date": "2026-10-03",

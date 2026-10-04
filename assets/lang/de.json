@@ -119,6 +119,10 @@
             "sudoku": {
                 "name": "Sudoku",
                 "description": "Fülle das Gitter, ohne Zahlen in einer Zeile, Spalte oder einem Block zu wiederholen. Vier Schwierigkeitsstufen erwarten dich!"
+            },
+            "rush-highway": {
+                "name": "Rush Highway",
+                "description": "Weiche Fahrzeugen und Hindernissen auf einer endlosen Autobahn aus, sammle Bonusse und verdiene Münzen, um neue Autos freizuschalten!"
             }
         },
         "badges": {
@@ -174,7 +178,8 @@
             "clicker": "🎮 Clicker",
             "digger": "🪏 Gräber",
             "snow": "❄️ Schnee",
-            "flipping": "🥞 Wurf"
+            "flipping": "🥞 Wurf",
+            "racing": "🚗 Rennen"
         }
     },
     "about": {

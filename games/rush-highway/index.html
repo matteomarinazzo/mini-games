@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rush Highway – Course de voitures 2D en ligne | Mini‑Games</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Joue à Rush Highway gratuitement : esquive la circulation sur 5 voies, ramasse bonus et pièces, débloque de nouveaux véhicules. Jouable sur mobile et ordinateur.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/rush-highway/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Rush Highway – Course de voitures 2D en ligne | Mini‑Games">
+    <meta property="og:description"
+        content="Esquive la circulation sur 5 voies, ramasse bonus et pièces, débloque de nouveaux véhicules.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/rush-highway/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/rush-highway.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Rush Highway – Course de voitures 2D en ligne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Esquive la circulation sur 5 voies, ramasse bonus et pièces, débloque de nouveaux véhicules.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/rush-highway.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Rush Highway",
+      "url": "https://mini-games.ch/games/rush-highway/",
+      "description": "Jeu de voiture 2D en vue de dessus : évite les véhicules et obstacles sur une autoroute à 5 voies, ramasse des bonus et débloque de nouveaux véhicules.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Racing Game", "Arcade Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="menu-body">
+
+    <!-- Back Button -->
+    <a href="../../index.html" class="pause-btn" style="left: 12px; right: auto;" title="Retour au menu"
+        aria-label="Retour au menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <main class="menu-container">
+        <div class="menu-header">
+            <div class="menu-icon">🏁</div>
+            <h1 class="menu-title">RUSH <span class="menu-title-pro">HIGHWAY</span></h1>
+            <div class="best-badge" aria-label="Record de distance">
+                <span class="best-label">🏆 RECORD DE DISTANCE</span>
+                <span class="best-value"><span id="best">0</span> m</span>
+            </div>
+            <p class="menu-subtitle">Choisis ton bolide</p>
+        </div>
+
+        <div class="coins-badge" aria-live="polite">🪙 <span id="coins">0</span></div>
+
+        <section class="garage" aria-label="Sélection du véhicule">
+            <div class="garage-stage">
+                <button class="nav-btn" id="prevBtn" aria-label="Véhicule précédent">‹</button>
+                <div class="garage-car" id="carView"></div>
+                <button class="nav-btn" id="nextBtn" aria-label="Véhicule suivant">›</button>
+            </div>
+            <h2 class="veh-name" id="vehName">—</h2>
+            <p class="veh-status" id="vehStatus"></p>
+            <div class="stats" id="stats"></div>
+            <div class="thumbs" id="thumbs" role="group" aria-label="Liste des véhicules"></div>
+        </section>
+
+        <p class="msg" id="msg" role="status" aria-live="polite"></p>
+
+        <div class="menu-actions">
+            <button class="btn-primary btn-buy" id="buyBtn" hidden>ACHETER</button>
+            <button class="btn-primary btn-play" id="playBtn">JOUER</button>
+        </div>
+
+        <p class="menu-note">Évite la circulation, ramasse les bonus, gagne des pièces.</p>
+    </main>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

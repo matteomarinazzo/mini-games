@@ -634,3 +634,51 @@ button {
 .form-error {
   overflow-wrap: anywhere;
 }
+/* Scoped ranking tables: shared visual language without changing other modals. */
+.ranking-table-wrap {
+  max-height: min(52vh, 34rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface);
+}
+.ranking-table {
+  width: 100%;
+  min-width: 31rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-table th, .ranking-table td {
+  padding: .7rem .75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+.ranking-table thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg-alt, var(--surface));
+  color: var(--muted);
+  font-size: .74rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.ranking-table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--bg-alt, #101722) 55%, transparent); }
+.ranking-table tbody tr:last-child > * { border-bottom: 0; }
+.ranking-table tbody tr.is-player { background: color-mix(in srgb, var(--team) 20%, var(--surface)); }
+.ranking-table tbody tr.is-dnf { opacity: .58; }
+.ranking-table__pos { width: 3.5rem; text-align: center !important; }
+.ranking-table__badge { display: inline-grid; place-items: center; min-width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--bg-alt, #101722); color: var(--muted); font-weight: 800; }
+.ranking-table .podium-1 .ranking-table__badge { background: #d8ad45; color: #16120a; }
+.ranking-table .podium-2 .ranking-table__badge { background: #aeb8c5; color: #111820; }
+.ranking-table .podium-3 .ranking-table__badge { background: #b97852; color: #fff; }
+.ranking-table__driver { display: inline-flex; align-items: center; min-width: 10rem; font-weight: 700; }
+.ranking-table__num { text-align: right !important; }
+@media (max-width: 36rem) {
+  .ranking-table-wrap { max-height: 48vh; }
+  .ranking-table th, .ranking-table td { padding: .55rem .5rem; }
+  .ranking-table { min-width: 28rem; }
+  .ranking-table__driver { min-width: 8.5rem; }
+  .ranking-table--results { min-width: 35rem; }
+}

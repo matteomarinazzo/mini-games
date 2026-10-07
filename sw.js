@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.24.2026-10-04";
+const CACHE_NAME = "mini-games-cache-v1.25.2026-10-07";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -81,6 +81,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/rush-highway.webp',
     'assets/logos/wiki-challenge.webp',
     'assets/logos/minesweeper.webp',
+    'assets/logos/at-your-own-risk.webp',
 
     // About
     'about/about.html',
@@ -365,6 +366,46 @@ const ASSETS_TO_CACHE = [
     'games/minesweeper/css/game.css',
     'games/minesweeper/js/menu.js',
     'games/minesweeper/js/game.js',
+
+    // Game: At your own risk
+    'games/at-your-own-risk/index.html',
+    'games/at-your-own-risk/game.html',
+    'games/at-your-own-risk/css/menu.css',
+    'games/at-your-own-risk/css/menu1.css',
+    'games/at-your-own-risk/css/game.css',
+    'games/at-your-own-risk/js/menu.js',
+    'games/at-your-own-risk/js/game.js',
+    'games/at-your-own-risk/js/progress.js',
+    'games/at-your-own-risk/js/levels/manifest.js',
+    'games/at-your-own-risk/js/levels/world1/level1.js',
+    'games/at-your-own-risk/js/levels/world1/level2.js',
+    'games/at-your-own-risk/js/levels/world1/level3.js',
+    'games/at-your-own-risk/js/levels/world1/level4.js',
+    'games/at-your-own-risk/js/levels/world1/level5.js',
+    'games/at-your-own-risk/js/levels/world1/level6.js',
+    'games/at-your-own-risk/js/levels/world1/level7.js',
+    'games/at-your-own-risk/js/levels/world1/level8.js',
+    'games/at-your-own-risk/js/levels/world1/level9.js',
+    'games/at-your-own-risk/js/levels/world1/level10.js',
+    'games/at-your-own-risk/js/levels/world1/level11.js',
+    'games/at-your-own-risk/js/levels/world1/level12.js',
+    'games/at-your-own-risk/js/levels/world1/level13.js',
+    'games/at-your-own-risk/js/levels/world1/level14.js',
+    'games/at-your-own-risk/js/levels/world1/level15.js',
+    'games/at-your-own-risk/js/levels/world1/level16.js',
+    'games/at-your-own-risk/js/levels/world1/level17.js',
+    'games/at-your-own-risk/js/levels/world1/level18.js',
+    'games/at-your-own-risk/js/levels/world1/level19.js',
+    'games/at-your-own-risk/js/levels/world1/level20.js',
+    'games/at-your-own-risk/images/buttons/jump.svg',
+    'games/at-your-own-risk/images/buttons/left.svg',
+    'games/at-your-own-risk/images/buttons/right.svg',
+    'games/at-your-own-risk/images/character/run1.svg',
+    'games/at-your-own-risk/images/character/run2.svg',
+    'games/at-your-own-risk/images/character/run3.svg',
+    'games/at-your-own-risk/images/hazards/spike.svg',
+    'games/at-your-own-risk/images/hazards/spike_dark.svg',
+    'games/at-your-own-risk/images/portal/portal.svg',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

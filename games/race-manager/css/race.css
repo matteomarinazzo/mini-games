@@ -914,3 +914,7 @@
         transform: none;
     }
 }
+
+/* Responsive circuit artwork in strategy and result heroes. */
+.race-hero .track-svg--inline { display: block; width: min(100%, 30rem); height: auto; max-height: 46vmin; aspect-ratio: 1; margin: .75rem auto .25rem; }
+.race-track .track-svg--live { max-height: 50vh; aspect-ratio: 1; object-fit: contain; }

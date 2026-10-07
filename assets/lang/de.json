@@ -131,6 +131,10 @@
             "minesweeper": {
                 "name": "Minensuchboot",
                 "description": "Entdecke die Felder, weiche den Minen aus und tritt in Echtzeit auf demselben Spielfeld gegen einen Gegner an."
+            },
+            "at-your-own-risk": {
+                "name": "At your own risk",
+                "description": "Ein einfaches und zugängliches Plattformspiel: Durchquere jedes Level und erreiche das Portal, um das Abenteuer fortzusetzen."
             }
         },
         "badges": {
@@ -187,7 +191,9 @@
             "digger": "🪏 Gräber",
             "snow": "❄️ Schnee",
             "flipping": "🥞 Wurf",
-            "racing": "🚗 Rennen"
+            "racing": "🚗 Rennen",
+            "platformer": "🏃 Plattform",
+            "traps": "🎯 Fallen"
         }
     },
     "about": {

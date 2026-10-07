@@ -133,6 +133,10 @@
             "minesweeper": {
                 "name": "Démineur",
                 "description": "Révélez les cases, évitez les mines et affrontez un adversaire en temps réel sur la même grille."
+            },
+            "at-your-own-risk": {
+                "name": "At your own risk",
+                "description": "Un jeu de plateforme simple et accessible : traverse chaque niveau et atteins le portail pour continuer l’aventure."
             }
         },
         "badges": {
@@ -189,7 +193,9 @@
             "digger": "🪏 Pelle",
             "snow": "❄️ Neige",
             "flipping": "🥞 Lancer",
-            "racing": "🚗 Course"
+            "racing": "🚗 Course",
+            "platformer": "🏃 Plateforme",
+            "traps": "🎯 Pièges"
         }
     },
     "about": {

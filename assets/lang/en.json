@@ -131,6 +131,10 @@
             "minesweeper": {
                 "name": "Minesweeper",
                 "description": "Reveal cells, avoid mines and challenge an opponent in real time on the same grid."
+            },
+            "at-your-own-risk": {
+                "name": "At your own risk",
+                "description": "A simple and accessible platform game: cross each level and reach the portal to continue the adventure."
             }
         },
         "badges": {
@@ -187,7 +191,9 @@
             "digger": "🪏 Digger",
             "snow": "❄️ Snow",
             "flipping": "🥞 Flipping",
-            "racing": "🚗 Racing"
+            "racing": "🚗 Racing",
+            "platformer": "🏃 Platform",
+            "traps": "🎯 Traps"
         }
     },
     "about": {

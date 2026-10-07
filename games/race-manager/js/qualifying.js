@@ -42,10 +42,16 @@ function run(save, round) {
   document.getElementById('backLink').href = `home.html?slot=${slotId}`;
 
   function resultList(results) {
-    return h('ol', { class: 'result-list' }, results.map((row) => {
-      const driver = driverById(row.driverId);
-      return h('li', { class: driver.teamId === save.playerTeamId ? 'is-player' : '' }, h('span', { class: 'result-list__position', text: String(row.rank || row.position) }), h('strong', {}, teamDot(teamOf(driver.teamId)), driver.name), h('span', { text: lapTime(row.timeMs) }));
-    }));
+    return h('div', { class: 'ranking-table-wrap', role: 'region', 'aria-label': 'Classement des qualifications', tabindex: '0' },
+      h('table', { class: 'ranking-table' },
+        h('thead', {}, h('tr', {}, h('th', { scope: 'col', text: 'P' }), h('th', { scope: 'col', text: 'Pilote' }), h('th', { scope: 'col', text: 'Temps' }))),
+        h('tbody', {}, results.map((row) => {
+          const driver = driverById(row.driverId), position = row.rank || row.position;
+          return h('tr', { class: `${driver.teamId === save.playerTeamId ? 'is-player' : ''}${position <= 3 ? ` podium-${position}` : ''}`.trim() },
+            h('td', { class: 'ranking-table__pos', 'data-label': 'Position' }, h('span', { class: 'ranking-table__badge', text: String(position) })),
+            h('th', { scope: 'row', 'data-label': 'Pilote' }, h('span', { class: 'ranking-table__driver' }, teamDot(teamOf(driver.teamId)), driver.name)),
+            h('td', { class: 'ranking-table__num', 'data-label': 'Temps', text: lapTime(row.timeMs) }));
+        }))));
   }
 
   function lightsOut(driver) {

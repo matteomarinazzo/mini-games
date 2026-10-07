@@ -103,15 +103,15 @@ body {
 }
 
 #btnL {
-    left: 14px
+    left: 64px
 }
 
 #btnR {
-    left: 96px
+    left: 146px
 }
 
 #btnJ {
-    right: 14px;
+    right: 64px;
     width: 84px;
     height: 84px
 }
@@ -119,5 +119,22 @@ body {
 @media (hover:hover) and (pointer:fine) {
     .ctl {
         display: none
+    }
+}
+
+@media (orientation: portrait) and (pointer: coarse) and (hover: none) {
+    html.force-land body.gs-game-body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: var(--rh);
+        height: var(--rw);
+        transform-origin: top left;
+        transform: translateX(var(--rw)) rotate(90deg);
+    }
+
+    html.force-land #cv {
+        width: min(var(--rh), calc(var(--rw) * 4 / 3));
+        height: min(var(--rw), calc(var(--rh) * 3 / 4));
     }
 }

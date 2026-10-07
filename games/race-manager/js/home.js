@@ -25,7 +25,7 @@ function fatal(messages) {
   main.replaceChildren(h('section', { class: 'card' },
     h('h1', { text: 'Impossible d’ouvrir cette partie' }),
     h('ul', {}, messages.map((m) => h('li', { text: m }))),
-    h('p', {}, h('a', { class: 'btn btn--primary', href: 'menu.html', text: 'Retour au menu des sauvegardes' }))));
+    h('p', {}, h('a', { class: 'btn btn--primary', href: 'index.html', text: 'Retour au menu des sauvegardes' }))));
   document.getElementById('gameNav').hidden = true;
 }
 

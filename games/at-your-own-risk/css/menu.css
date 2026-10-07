@@ -1,14 +1,165 @@
-*{box-sizing:border-box}
-body.menu-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#996b07;color:#fff;font-family:system-ui,sans-serif}
-.home-button{position:fixed;top:12px;left:12px;color:#fff;text-decoration:none;display:flex;gap:6px;align-items:center;background:#0004;padding:8px 12px;border-radius:10px}
-.container{text-align:center;padding:24px;max-width:560px}
-h1{font-size:clamp(28px,6vw,44px);margin:0 0 6px}.subtitle{opacity:.85;margin:0 0 24px}
-#levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px;margin-bottom:24px}
-.lv{display:block;padding:16px 0;border-radius:12px;background:#feb854;color:#222;font-weight:700;text-decoration:none;font-size:18px}
-.lv.done{background:#8fd18f}.lv.locked{background:#0004;color:#fff8}
-.btn{display:inline-block;padding:14px 32px;border-radius:12px;background:#fff;color:#222;font-weight:700;text-decoration:none;font-size:18px}
-.worlds{display:flex;align-items:center;justify-content:center;gap:16px;margin:0 0 16px}.worlds[hidden]{display:none}
-.worlds h2{margin:0;min-width:140px;font-size:22px}
-.arrow{width:44px;height:44px;padding:0;border:0;border-radius:12px;background:#feb854;color:#222;font-size:30px;font-weight:700;line-height:1;cursor:pointer}
-.arrow:disabled{opacity:.35;cursor:default}
-.world-note{margin:0 0 16px;padding:10px 14px;border-radius:12px;background:#0004;font-weight:600}.world-note[hidden]{display:none}
+* {
+    box-sizing: border-box
+}
+
+body.menu-body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    /* on garde flex */
+    background: #996b07;
+    color: #fff;
+    font-family: system-ui, sans-serif;
+    /* ❌ supprimer align-items:center et justify-content:center */
+}
+
+.home-button {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: #0004;
+    padding: 8px 12px;
+    border-radius: 10px
+}
+
+.container {
+    margin: auto;
+    /* ← centre si petit, scrolle si grand */
+    text-align: center;
+    padding: 24px;
+    max-width: 560px;
+    width: 100%;
+}
+
+h1 {
+    font-size: clamp(28px, 6vw, 44px);
+    margin: 0 0 6px
+}
+
+.subtitle {
+    opacity: .85;
+    margin: 0 0 24px
+}
+
+#levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px
+}
+
+.lv {
+    display: block;
+    padding: 16px 0;
+    border-radius: 12px;
+    background: #feb854;
+    color: #222;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 18px
+}
+
+.lv.done {
+    background: #8fd18f
+}
+
+.lv.locked {
+    background: #0004;
+    color: #fff8
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 12px;
+    background: #fff;
+    color: #222;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 18px
+}
+
+.worlds {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 0 0 16px
+}
+
+.worlds[hidden] {
+    display: none
+}
+
+.worlds h2 {
+    margin: 0;
+    min-width: 140px;
+    font-size: 22px
+}
+
+.arrow {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: #feb854;
+    color: #222;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer
+}
+
+.arrow:disabled {
+    opacity: .35;
+    cursor: default
+}
+
+.world-note {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #0004;
+    font-weight: 600
+}
+
+.world-note[hidden] {
+    display: none
+}
+
+@media (orientation: portrait) and (pointer: coarse) and (hover: none) {
+    html.force-land {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--rw);
+        height: var(--rh);
+        overflow: hidden;
+        background: #996b07;
+        /* même couleur que le fond, plus de beige */
+    }
+
+    html.force-land body.menu-body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: var(--rh);
+        /* largeur "paysage" = hauteur réelle */
+        height: var(--rw);
+        /* hauteur "paysage" = largeur réelle */
+        min-height: 0;
+        margin: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        transform-origin: top left;
+        transform: translateX(var(--rw)) rotate(90deg);
+    }
+}

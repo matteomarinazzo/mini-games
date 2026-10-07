@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="fr">
 
 <head>
@@ -46,19 +46,52 @@
   }
   </script>
 
-  <!-- Redirection vers le menu des sauvegardes (chemin relatif) -->
-  <meta http-equiv="refresh" content="0; url=menu.html">
-  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/menu.css" />
   <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+  <!-- Script Google Adsense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+    crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-QYX3ZK4KB2');
+  </script>
 </head>
 
-<body class="am-page">
-  <main class="container">
+<body class="am-page page-menu">
+  <header class="topbar">
+    <a class="btn btn--ghost" href="../../index.html">← Retour</a>
     <h1>Race Manager</h1>
-    <p>Jeu de management d'écurie de sport automobile.</p>
-    <p><a class="btn btn--primary" href="menu.html">Ouvrir le menu des sauvegardes</a></p>
+  </header>
+
+  <main class="container" id="main">
+    <div id="storageBanner" class="banner" role="alert" hidden></div>
+
+    <section id="slotsView" aria-labelledby="slotsTitle">
+      <div class="section-head">
+        <h2 id="slotsTitle" tabindex="-1">Vos sauvegardes</h2>
+      </div>
+      <div id="slots" class="slots"></div>
+      <p class="muted">Les parties sont enregistrées dans ce navigateur. Exportez-les en JSON depuis le menu principal
+        pour les conserver ou les transférer.</p>
+    </section>
+
+    <section id="wizardView" aria-label="Création d'une nouvelle partie" hidden></section>
   </main>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>
+    <p class="container">Ce jeu nécessite JavaScript.</p>
+  </noscript>
+
+  <script type="module" src="js/menu.js"></script>
   <script type="module" src="../../js/countPlayedTime.js"></script>
   <script type="module"
     src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495"

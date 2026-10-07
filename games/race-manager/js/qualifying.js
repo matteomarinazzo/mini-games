@@ -18,7 +18,7 @@ function lapTime(milliseconds) {
 }
 
 function fatal(message) {
-  main.replaceChildren(h('section', { class: 'card' }, h('h1', { text: 'Qualifications indisponibles' }), h('p', { text: message }), h('a', { class: 'btn btn--primary', href: 'menu.html', text: 'Retour aux sauvegardes' })));
+  main.replaceChildren(h('section', { class: 'card' }, h('h1', { text: 'Qualifications indisponibles' }), h('p', { text: message }), h('a', { class: 'btn btn--primary', href: 'index.html', text: 'Retour aux sauvegardes' })));
 }
 
 function init() {

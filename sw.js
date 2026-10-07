@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.25.2026-10-07";
+const CACHE_NAME = "mini-games-cache-v1.25.2026-10-07.6";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -289,7 +289,6 @@ const ASSETS_TO_CACHE = [
     'games/race-manager/index.html',
     'games/race-manager/game.html',
     'games/race-manager/home.html',
-    'games/race-manager/menu.html',
     'games/race-manager/qualifying.html',
     'games/race-manager/race.html',
 
@@ -371,7 +370,6 @@ const ASSETS_TO_CACHE = [
     'games/at-your-own-risk/index.html',
     'games/at-your-own-risk/game.html',
     'games/at-your-own-risk/css/menu.css',
-    'games/at-your-own-risk/css/menu1.css',
     'games/at-your-own-risk/css/game.css',
     'games/at-your-own-risk/js/menu.js',
     'games/at-your-own-risk/js/game.js',

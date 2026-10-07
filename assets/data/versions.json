@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.24.2026-10-04",
-    "lastUpdate": "2026-10-04",
+    "currentVersion": "1.25.2026-10-07",
+    "lastUpdate": "2026-10-07",
     "history": [
+        {
+            "version": "1.25.2026-10-07",
+            "date": "2026-10-07",
+            "changes": [
+                "Ajout du jeu At your own risk",
+                "Correction du css des classements de Race Manager",
+                "Ajout de nouveaux pilotes dans les données de Race Manager"
+            ]
+        },
         {
             "version": "1.24.2026-10-04",
             "date": "2026-10-04",

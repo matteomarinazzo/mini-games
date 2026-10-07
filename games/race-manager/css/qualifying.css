@@ -177,3 +177,6 @@
     fill: var(--team);
 }
 
+
+/* Responsive circuit artwork in qualifying hero. */
+.qualifying-hero .track-svg--inline { display: block; width: min(100%, 30rem); height: auto; max-height: 46vmin; aspect-ratio: 1; margin: .75rem auto .25rem; }

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>At Your Own Risk | Mini‑Games</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="studio-body gs-game-body">
+    <div id="stage"><canvas id="cv" width="800" height="600"></canvas></div>
+    <div class="hud">
+        <a href="./index.html" title="Menu">☰ Menu</a>
+        <b id="hudLevel">Niveau 1</b><span id="hudFails">Échec N°0</span>
+        <span class="sp"></span><button id="again" title="Recommencer">↻</button>
+    </div>
+    <div id="dead" hidden><b style="font-size:24px">Raté !</b><button id="retry">↻ Recommencer</button></div>
+    <button class="ctl" id="btnL" aria-label="Gauche"><img src="images/buttons/left.svg" alt=""></button>
+    <button class="ctl" id="btnR" aria-label="Droite"><img src="images/buttons/right.svg" alt=""></button>
+    <button class="ctl" id="btnJ" aria-label="Saut"><img src="images/buttons/jump.svg" alt=""></button>
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

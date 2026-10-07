@@ -1,0 +1,123 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    background: #996b07;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    font-family: system-ui, sans-serif;
+}
+
+#stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#cv {
+    width: min(100vw, calc(100vh*4/3));
+    height: min(100vh, calc(100vw*3/4));
+    background: #996b07
+}
+
+.hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 14px;
+    text-shadow: 0 1px 2px #000
+}
+
+.hud .sp {
+    flex: 1
+}
+
+.hud a,
+.hud button {
+    color: #fff;
+    background: #0006;
+    border: 1px solid #fff6;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer
+}
+
+#dead {
+    position: fixed;
+    inset: 0;
+    background: #0007;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center
+}
+
+#dead[hidden] {
+    display: none
+}
+
+#retry {
+    font-size: 20px;
+    padding: 14px 28px;
+    border: 0;
+    border-radius: 12px;
+    background: #feb854;
+    color: #222;
+    font-weight: 700;
+    cursor: pointer
+}
+
+.ctl {
+    position: fixed;
+    bottom: 14px;
+    width: 72px;
+    height: 72px;
+    padding: 0;
+    border: 0;
+    background: none;
+    touch-action: none
+}
+
+.ctl img {
+    width: 100%;
+    height: 100%;
+    pointer-events: none
+}
+
+#btnL {
+    left: 14px
+}
+
+#btnR {
+    left: 96px
+}
+
+#btnJ {
+    right: 14px;
+    width: 84px;
+    height: 84px
+}
+
+@media (hover:hover) and (pointer:fine) {
+    .ctl {
+        display: none
+    }
+}

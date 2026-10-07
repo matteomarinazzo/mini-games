@@ -115,6 +115,23 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "at-your-own-risk": {
+      "path": "./games/at-your-own-risk/index.html",
+      "name": "At Your Own Risk",
+      "emoji": "😈",
+      "description": "Un jeu de plateforme simple et accessible : traverse chaque niveau et atteins le portail pour continuer l’aventure.",
+      "tags": [
+        "arcade",
+        "platformer",
+        "reflexes",
+        "traps",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "falling-blocks": {
       "path": "./games/falling-blocks/index.html",
       "name": "Falling Blocks",

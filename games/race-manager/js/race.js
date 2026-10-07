@@ -795,8 +795,8 @@ function run(save, round) {
               h('h2', { text: 'Classement En Direct', style: 'margin-top: 0;' }),
               h('button', { class: 'btn', style: 'padding: 0.2rem 0.5rem; font-size: 0.8rem;', text: 'Changer mode écart', onClick: () => { gapMode = gapMode === 'leader' ? 'ahead' : 'leader'; updateLiveRaceUI(); } })
             ),
-            h('div', { style: 'overflow-x: auto;' },
-              h('table', { class: 'standings-table' },
+            h('div', { class: 'ranking-table-wrap ranking-table-wrap--live', role: 'region', 'aria-label': 'Classement en direct', tabindex: '0' },
+              h('table', { class: 'ranking-table standings-table' },
                 h('thead', {}, h('tr', {}, h('th', { text: 'P' }), h('th', { text: 'Pilote' }), h('th', { text: 'Écart' }), h('th', { text: 'Pneus' }), h('th', { text: 'Arrêts' }), h('th', { text: 'Actions' }))),
                 h('tbody', { id: 'liveStandingsBody' })
               )
@@ -825,16 +825,17 @@ function run(save, round) {
     const results = weekend.race.results;
 
     function resultList(res) {
-      return h('ol', { class: 'result-list' }, res.map((row) => {
-        const driver = driverById(row.driverId);
-        const isDnf = row.status === 'dnf';
-        return h('li', { class: `${driver.teamId === save.playerTeamId ? 'is-player' : ''}${isDnf ? ' is-dnf' : ''}`.trim() },
-          h('span', { class: 'result-list__position', text: String(row.position) }),
-          h('strong', {}, teamDot(teamOf(driver.teamId)), driver.name),
-          h('span', { text: isDnf ? `DNF (${row.dnfReason}${row.dnfLap ? `, tour ${row.dnfLap}` : ''})` : row.position === 1 ? 'Vainqueur' : `+${row.gap}s` }),
-          h('span', { class: 'muted', style: 'font-size: 0.9rem;' }, `(${row.points} pts, ${row.pitStops} arrêts)`)
-        );
-      }));
+      return h('div', { class: 'ranking-table-wrap', role: 'region', 'aria-label': 'Classement final de la course', tabindex: '0' },
+        h('table', { class: 'ranking-table ranking-table--results' },
+          h('thead', {}, h('tr', {}, h('th', { scope: 'col', text: 'P' }), h('th', { scope: 'col', text: 'Pilote' }), h('th', { scope: 'col', text: 'Résultat' }), h('th', { scope: 'col', text: 'Points' }), h('th', { scope: 'col', text: 'Arrêts' }))),
+          h('tbody', {}, res.map((row) => {
+            const driver = driverById(row.driverId), isDnf = row.status === 'dnf';
+            return h('tr', { class: `${driver.teamId === save.playerTeamId ? 'is-player' : ''}${isDnf ? ' is-dnf' : ''}${row.position <= 3 ? ` podium-${row.position}` : ''}`.trim() },
+              h('td', { class: 'ranking-table__pos', 'data-label': 'Position' }, h('span', { class: 'ranking-table__badge', text: String(row.position) })),
+              h('th', { scope: 'row', 'data-label': 'Pilote' }, h('span', { class: 'ranking-table__driver' }, teamDot(teamOf(driver.teamId)), driver.name)),
+              h('td', { 'data-label': 'Résultat', text: isDnf ? `DNF (${row.dnfReason}${row.dnfLap ? `, tour ${row.dnfLap}` : ''})` : row.position === 1 ? 'Vainqueur' : `+${row.gap}s` }),
+              h('td', { class: 'ranking-table__num', 'data-label': 'Points', text: String(row.points) }), h('td', { class: 'ranking-table__num', 'data-label': 'Arrêts', text: String(row.pitStops) }));
+          }))));
     }
 
     main.replaceChildren(

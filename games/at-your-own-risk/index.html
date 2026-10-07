@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>At Your Own Risk – Jeu de plateforme piégé | Mini‑Games</title>
+    <meta name="description"
+        content="Atteins le portail… si tu oses. Un jeu de plateforme plein de pièges inspiré de Level Devil, sur Mini‑Games.">
+    <link rel="canonical" href="https://mini-games.ch" />
+    <meta property="og:title" content="At Your Own Risk – Jeu de plateforme piégé | Mini‑Games">
+    <meta property="og:description" content="Atteins le portail… si tu oses. Un jeu de plateforme plein de pièges.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch">
+    <meta property="og:image" content="https://mini-games.ch">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="At Your Own Risk – Jeu de plateforme piégé | Mini‑Games">
+    <meta name="twitter:description" content="Atteins le portail… si tu oses.">
+    <meta name="twitter:image" content="https://mini-games.ch">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"VideoGame","name":"At Your Own Risk","url":"https://mini-games.ch","description":"Jeu de plateforme piégé : atteignez le portail en évitant les pièges.","applicationCategory":"Game","operatingSystem":"Any","genre":["Platformer","Puzzle","Singleplayer"],"inLanguage":"fr","publisher":{"@type":"Organization","name":"Mini‑Games"}}
+    </script>
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="container main-menu" id="mainMenu">
+        <header class="header">
+            <h1>At Your Own Risk</h1>
+            <p class="subtitle">Atteins le portail, simplement.</p>
+        </header>
+        <nav class="worlds" id="worlds" hidden>
+            <button class="arrow" id="prevWorld" type="button" aria-label="Monde précédent">&#8249;</button>
+            <h2 id="worldName">Monde 1</h2>
+            <button class="arrow" id="nextWorld" type="button" aria-label="Monde suivant">&#8250;</button>
+        </nav>
+        <p class="world-note" id="worldNote" hidden></p>
+        <div id="levels"></div>
+        <a class="btn" id="playBtn" href="game.html?level=1">Jouer</a>
+    </div>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

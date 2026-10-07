@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.25.2026-10-07",
+    "currentVersion": "1.26.2026-10-07",
     "lastUpdate": "2026-10-07",
     "history": [
+        {
+            "version": "1.26.2026-10-07",
+            "date": "2026-10-07",
+            "changes": [
+                "Correction de la verison mobile du jeu At your own risk",
+                "Mise à jour des head de tous les HTML en prévision de la publicité"
+            ]
+        },
         {
             "version": "1.25.2026-10-07",
             "date": "2026-10-07",

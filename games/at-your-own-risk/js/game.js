@@ -4,24 +4,33 @@ import { COUNT, WORLDS, worldOf } from './levels/manifest.js';
 
 const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d'), W = 800, H = 600, PW = 26, PH = 32;
-const n = Math.max(1, Math.min(COUNT, +new URLSearchParams(location.search).get('level') || 1));
+let n = Math.max(1, Math.min(COUNT, +new URLSearchParams(location.search).get('level') || 1));
 
-if (!unlocked(n)) { // niveau verrouillé ou monde non publié : retour au menu (et on arrête le module)
+if (!unlocked(n)) { // niveau verrouillé ou monde non publié : retour au menu
     location.replace('index.html');
     await new Promise(() => { });
 }
-const wi = worldOf(n), WD = WORLDS[wi]; // monde du niveau
-const L = (await import('./levels/' + WORLDS[wi].id + '/level' + n + '.js')).default; // chargement dynamique
+let wi, WD, L, fails;
+
+// Charge un niveau en mémoire (sans recharger la page => le plein écran / lock paysage restent actifs)
+async function loadLevel(num) {
+    n = num; wi = worldOf(n); WD = WORLDS[wi];
+    L = (await import('./levels/' + WD.id + '/level' + n + '.js')).default;
+    fails = getTries(n);
+    $('hudLevel').textContent = (WORLDS.length > 1 ? WD.name + ' · ' : '') + 'Niveau ' + (n - WD.first + 1);
+    $('hudFails').textContent = 'Échec N°' + fails;
+    history.replaceState(null, '', 'game.html?level=' + n); // l'URL suit le niveau (F5 reste cohérent)
+}
+await loadLevel(n);
+
 const img = s => Object.assign(new Image(), { src: 'images/' + s });
 const IM = { run: ['run1', 'run2', 'run3'].map(f => img('character/' + f + '.svg')), spike: img('hazards/spike.svg'), spikeD: img('hazards/spike_dark.svg'), portal: img('portal/portal.svg') };
 const keys = { l: 0, r: 0, j: 0 };
-let S, fails = getTries(n);
-$('hudLevel').textContent = (WORLDS.length > 1 ? WD.name + ' · ' : '') + 'Niveau ' + (n - WD.first + 1); $('hudFails').textContent = 'Échec N°' + fails;
+let S;
 
 // --- Transition de victoire : la caméra zoome sur le portail (qui reste au sol) jusqu'à le traverser (flash clair, GROW),
 // puis le niveau suivant démarre dans le flash et dézoome : on sort de SON portail (SHRINK).
 const ZOOM = 16, GROW = 50, HOLD = 8, WIN_T = GROW + HOLD, SHRINK = 50, INTRO_T = HOLD + SHRINK, FLASH = '#996b07';
-const ZK = 'ayor-zoom'; // sessionStorage : numéro du niveau qui doit jouer l'intro
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 // Portail visible = dans l'écran et pas marqué hidden (portal.hidden ou L.hidePortal)
 const visible = o => !o.hidden && !L.hidePortal && o.x + o.w > 0 && o.x < W && o.y + o.h > 0 && o.y < H;
@@ -49,12 +58,16 @@ function step() {
     if (s.mode === 'intro') { s.wt++; if (s.wt >= INTRO_T) { s.mode = 'play'; s.t = 0; } return; }
     if (s.mode === 'win') {
         s.wt++;
-        if (s.wt === WIN_T) {
+        if (s.wt === WIN_T && !s.loading) {
+            s.loading = 1;
             markDone(n);
-            const more = n < WD.last; // encore un niveau dans ce monde ?
-            if (more) { try { sessionStorage.setItem(ZK, String(n + 1)); } catch { } }
-            // Fin de monde : retour au menu, sur le monde suivant s'il existe (sinon sur celui-ci)
-            location.replace(more ? 'game.html?level=' + (n + 1) : 'index.html?world=' + (wi + (WORLDS[wi + 1] ? 2 : 1)));
+            if (n < WD.last) {
+                // Niveau suivant en mémoire, SANS recharger la page => landscape conservé
+                loadLevel(n + 1).then(() => { reset(); S.mode = 'intro'; S.wt = 0; });
+            } else {
+                // Fin de monde : retour au menu, sur le monde suivant s'il existe
+                location.replace('index.html?world=' + (wi + (WORLDS[wi + 1] ? 2 : 1)));
+            }
         }
         return;
     }
@@ -153,8 +166,6 @@ function draw() {
     }
 }
 reset(); // état initial AVANT de lancer la boucle
-// Arrivée depuis le niveau précédent : on joue l'intro (dézoom du portail)
-try { if (sessionStorage.getItem(ZK) === String(n)) { S.mode = 'intro'; S.wt = 0; } sessionStorage.removeItem(ZK); } catch { }
 // Boucle unique (jamais recréée au redémarrage)
 let last = performance.now(), acc = 0;
 (function loop(t) { acc += Math.min(100, t - last); last = t; while (acc >= 1000 / 60) { step(); acc -= 1000 / 60; } draw(); requestAnimationFrame(loop); })(last);
@@ -170,3 +181,22 @@ for (const [id, k] of [['btnL', 'l'], ['btnR', 'r'], ['btnJ', 'j']]) {
 addEventListener('blur', () => keys.l = keys.r = keys.j = 0);
 document.addEventListener('contextmenu', e => e.preventDefault());
 $('retry').onclick = $('again').onclick = reset;
+
+// Rotation forcée en paysage : dimensions exactes en pixels
+(() => {
+    const mq = matchMedia('(orientation: portrait) and (pointer: coarse) and (hover: none)');
+    const root = document.documentElement;
+    function fit() {
+        const vv = window.visualViewport;
+        const w = Math.round(vv ? vv.width : innerWidth);
+        const h = Math.round(vv ? vv.height : innerHeight);
+        root.style.setProperty('--rw', w + 'px');  // largeur réelle
+        root.style.setProperty('--rh', h + 'px');  // hauteur réelle
+        root.classList.toggle('force-land', mq.matches);
+    }
+    fit();
+    addEventListener('resize', fit);
+    addEventListener('orientationchange', fit);
+    window.visualViewport?.addEventListener('resize', fit);
+    mq.addEventListener?.('change', fit);
+})();

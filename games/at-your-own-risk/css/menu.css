@@ -10,7 +10,6 @@ body.menu-body {
     background: #996b07;
     color: #fff;
     font-family: system-ui, sans-serif;
-    /* ❌ supprimer align-items:center et justify-content:center */
 }
 
 .home-button {

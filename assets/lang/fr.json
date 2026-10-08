@@ -141,6 +141,14 @@
             "letter-by-letter": {
                 "name": "À la lettre",
                 "description": "Devine le mot caché avant d’épuiser tes essais !"
+            },
+            "ball-rush": {
+                "name": "Ball Rush",
+                "description": "Guide ta bille de plateforme en plateforme, évite les chutes et tiens le plus longtemps possible !"
+            },
+            "crossword": {
+                "name": "Mots croisés",
+                "description": "Retrouve les mots cachés dans la grille, puis découvre le mot mystère avec les lettres restantes."
             }
         },
         "badges": {

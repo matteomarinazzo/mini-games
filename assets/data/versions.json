@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.27.2026-10-08",
+    "currentVersion": "1.28.2026-10-08",
     "lastUpdate": "2026-10-08",
     "history": [
+        {
+            "version": "1.28.2026-10-08",
+            "date": "2026-10-08",
+            "changes": [
+                "Ajout du jeu Ball Rush",
+                "Ajout du jeu Mots croisés"
+            ]
+        },
         {
             "version": "1.27.2026-10-08",
             "date": "2026-10-08",

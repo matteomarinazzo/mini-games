@@ -139,6 +139,14 @@
             "letter-by-letter": {
                 "name": "Buchstabe für Buchstabe",
                 "description": "Errate das versteckte Wort, bevor dir die Versuche ausgehen!"
+            },
+            "ball-rush": {
+                "name": "Ball Rush",
+                "description": "Lenke deine Ball von Plattform zu Plattform, weiche den Stürzen aus und halte dich so lange wie möglich!"
+            },
+            "crossword": {
+                "name": "Kreuzworträtsel",
+                "description": "Finde die versteckten Wörter im Raster und entdecke dann das Geheimniswort mit den restlichen Buchstaben."
             }
         },
         "badges": {

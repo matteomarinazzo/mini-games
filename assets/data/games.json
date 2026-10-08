@@ -243,6 +243,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "letter-by-letter": {
+      "path": "./games/letter-by-letter/index.html",
+      "name": "À la lettre",
+      "emoji": "🔠",
+      "description": "Devine le mot caché avant d’épuiser tes essais.",
+      "tags": [
+        "vocabulary",
+        "logic",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "ball-sort": {
       "path": "./games/ball-sort/index.html",
       "name": "Ball Sort",

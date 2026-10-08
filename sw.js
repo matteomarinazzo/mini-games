@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.25.2026-10-07.6";
+const CACHE_NAME = "mini-games-cache-v1.26.2026-10-08.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -82,6 +82,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/wiki-challenge.webp',
     'assets/logos/minesweeper.webp',
     'assets/logos/at-your-own-risk.webp',
+    'assets/logos/letter-by-letter.webp',
 
     // About
     'about/about.html',
@@ -404,6 +405,17 @@ const ASSETS_TO_CACHE = [
     'games/at-your-own-risk/images/hazards/spike.svg',
     'games/at-your-own-risk/images/hazards/spike_dark.svg',
     'games/at-your-own-risk/images/portal/portal.svg',
+
+    // Game: letter-by-letter
+    'games/letter-by-letter/index.html',
+    'games/letter-by-letter/game.html',
+    'games/letter-by-letter/css/menu.css',
+    'games/letter-by-letter/css/game.css',
+    'games/letter-by-letter/js/menu.js',
+    'games/letter-by-letter/js/game.js',
+    'games/letter-by-letter/js/logic.js',
+    'games/letter-by-letter/js/storage.js',
+    'games/letter-by-letter/js/words.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

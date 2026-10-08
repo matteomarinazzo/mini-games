@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Letter by Letter – Jeu de mots gratuit en ligne | Mini‑Games</title>
+
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mini-games.ch/games/letter-by-letter/" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+  <!-- Script Google Adsense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+    crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-QYX3ZK4KB2');
+  </script>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <button type="button" class="icon-btn" id="pauseBtn" aria-label="Pause (Échap)" title="Pause (Échap)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+          <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+        </svg>
+      </button>
+
+      <div class="title">
+        <h1>À LA LETTRE</h1>
+        <p id="modeLabel">5 lettres · 6 essais</p>
+      </div>
+
+      <div class="attempts" id="attempts">
+        <span class="attempts-label">Essais restants</span>
+        <span class="attempts-count" id="attemptsCount" aria-live="polite">6</span>
+        <span class="pips" id="pips" aria-hidden="true"></span>
+      </div>
+    </header>
+
+    <main class="board-area" id="boardArea">
+      <div class="board" id="board" role="grid" aria-label="Grille de Letter by Letter"></div>
+      <p class="message" id="message" role="status" aria-live="polite"></p>
+    </main>
+
+    <!-- Barre affichée quand la partie est finie et la modale fermée -->
+    <div class="end-bar" id="endBar" hidden>
+      <p class="end-bar-text" id="endBarText"></p>
+      <div class="end-bar-actions">
+        <button type="button" class="btn btn-primary" id="endBarReplay">Rejouer</button>
+        <button type="button" class="btn btn-secondary" id="endBarMenu">Retour au menu</button>
+      </div>
+    </div>
+
+    <section class="keyboard" id="keyboard" aria-label="Clavier virtuel"></section>
+  </div>
+
+  <!-- Modale de pause -->
+  <div class="modal" id="pauseModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+      <h2 id="pauseTitle">Pause</h2>
+      <button type="button" class="btn btn-primary" id="resumeBtn">Reprendre</button>
+      <button type="button" class="btn btn-secondary" id="newGameBtn">Nouvelle partie</button>
+      <button type="button" class="btn btn-secondary" id="menuPauseBtn">Menu</button>
+      <button type="button" class="btn btn-sound" id="soundToggle" aria-pressed="true" aria-label="Son">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-hidden="true">
+          <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+        </svg>
+      </button>
+      <p class="modal-hint">Échap pour reprendre</p>
+    </div>
+  </div>
+
+  <!-- Modale de fin de partie -->
+  <div class="modal" id="endModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endTitle" aria-describedby="endText">
+      <h2 id="endTitle">Victoire !</h2>
+      <p class="end-text" id="endText"></p>
+      <div class="end-word" id="endWord" aria-hidden="true"></div>
+      <button type="button" class="btn btn-primary" id="replayBtn">Rejouer</button>
+      <button type="button" class="btn btn-secondary" id="menuBtn">Retour au menu</button>
+      <p class="modal-hint">Échap pour revoir la grille</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

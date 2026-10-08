@@ -137,6 +137,10 @@
             "at-your-own-risk": {
                 "name": "At your own risk",
                 "description": "Un jeu de plateforme simple et accessible : traverse chaque niveau et atteins le portail pour continuer l’aventure."
+            },
+            "letter-by-letter": {
+                "name": "À la lettre",
+                "description": "Devine le mot caché avant d’épuiser tes essais !"
             }
         },
         "badges": {
@@ -195,7 +199,8 @@
             "flipping": "🥞 Lancer",
             "racing": "🚗 Course",
             "platformer": "🏃 Plateforme",
-            "traps": "🎯 Pièges"
+            "traps": "🎯 Pièges",
+            "vocabulary": "📖 Vocabulaire"
         }
     },
     "about": {

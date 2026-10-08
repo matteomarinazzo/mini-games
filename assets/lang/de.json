@@ -135,6 +135,10 @@
             "at-your-own-risk": {
                 "name": "At your own risk",
                 "description": "Ein einfaches und zugängliches Plattformspiel: Durchquere jedes Level und erreiche das Portal, um das Abenteuer fortzusetzen."
+            },
+            "letter-by-letter": {
+                "name": "Buchstabe für Buchstabe",
+                "description": "Errate das versteckte Wort, bevor dir die Versuche ausgehen!"
             }
         },
         "badges": {
@@ -193,7 +197,8 @@
             "flipping": "🥞 Wurf",
             "racing": "🚗 Rennen",
             "platformer": "🏃 Plattform",
-            "traps": "🎯 Fallen"
+            "traps": "🎯 Fallen",
+            "vocabulary": "📖 Vokabular"
         }
     },
     "about": {

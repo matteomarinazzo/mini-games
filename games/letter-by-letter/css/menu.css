@@ -1,0 +1,376 @@
+/* ========================================
+   LETTER BY LETTER — MENU
+   Palette : nuit bleue + tuiles vert / ambre / ardoise.
+   Les états ne reposent pas que sur la couleur (forme + lettre).
+======================================== */
+:root {
+  --bg: #0a1230;
+  --bg-2: #101a45;
+  --panel: #131d4a;
+  --line: #2c3a6e;
+  --text: #eef2ff;
+  --muted: #b4bddd;
+  --accent: #ffd23f;
+  --accent-ink: #1b1400;
+  --correct: #15803d;
+  --correct-ink: #ffffff;
+  --present: #f59e0b;
+  --present-ink: #1b1300;
+  --absent: #2b3558;
+  --absent-ink: #d3daf2;
+  --focus: #7dd3fc;
+  --radius: 16px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 44px 44px,
+    radial-gradient(ellipse at 50% -10%, #1d2c6d 0%, var(--bg) 60%);
+  background-color: var(--bg);
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ========================================
+   LIEN ACCUEIL
+======================================== */
+.home-link {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ========================================
+   PAGE / HERO
+======================================== */
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 72px 18px 40px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hero-tiles {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.t {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  font-size: 26px;
+  font-weight: 800;
+  position: relative;
+}
+
+.t-correct {
+  background: var(--correct);
+  color: var(--correct-ink);
+}
+
+.t-present {
+  background: var(--present);
+  color: var(--present-ink);
+}
+
+.t-absent {
+  background: var(--absent);
+  color: var(--absent-ink);
+}
+
+/* Forme "mal placée" : rond intérieur, comme dans le Letter by Letter télévisé */
+.t-present::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 3px solid rgba(27, 19, 0, 0.55);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero h1 {
+  font-size: clamp(40px, 11vw, 64px);
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding-left: 0.18em;
+}
+
+.tagline {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+/* ========================================
+   PANNEAU DE CONFIGURATION
+======================================== */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 18px 20px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.group {
+  border: 0;
+  margin-bottom: 22px;
+}
+
+.group legend {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.choices {
+  display: grid;
+  gap: 10px;
+}
+
+.choices-length {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.choices-attempts {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* Les vrais radios restent dans le DOM (clavier + lecteurs d'écran) */
+.choice {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.choice input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.choice-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 64px;
+  padding: 8px 4px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.choice:hover .choice-face {
+  border-color: #4a5c9f;
+}
+
+.choice input:checked+.choice-face {
+  border-color: var(--accent);
+  background: rgba(255, 210, 63, 0.14);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.choice input:focus-visible+.choice-face {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.choice-num {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.choice-unit {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.choice-played {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.choice-played strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.summary {
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  margin: 4px 0 16px;
+  min-height: 1.4em;
+}
+
+.summary strong {
+  color: var(--text);
+}
+
+/* ========================================
+   BOUTON DEMARRER
+======================================== */
+.start-btn {
+  width: 100%;
+  min-height: 56px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.12s, filter 0.12s;
+}
+
+.start-btn:hover {
+  filter: brightness(1.06);
+}
+
+.start-btn:active {
+  transform: scale(0.985);
+}
+
+/* ========================================
+   LEGENDE / FOOTER
+======================================== */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin: 22px 0 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  position: relative;
+}
+
+.swatch.t-present::after {
+  inset: 3px;
+  border-width: 2px;
+}
+
+.about {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.about p+p {
+  margin-top: 8px;
+}
+
+/* ========================================
+   PETITS ECRANS
+======================================== */
+@media (max-width: 520px) {
+  .page {
+    padding-top: 68px;
+  }
+
+  .panel {
+    padding: 18px 12px 16px;
+  }
+
+  .choices {
+    gap: 6px;
+  }
+
+  .choice-face {
+    min-height: 68px;
+  }
+
+  .choice-num {
+    font-size: 24px;
+  }
+
+  .t {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  * {
+    transition: none !important;
+  }
+}

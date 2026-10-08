@@ -139,6 +139,14 @@
             "letter-by-letter": {
                 "name": "Letter by Letter",
                 "description": "Guess the hidden word before you run out of attempts!"
+            },
+            "ball-rush": {
+                "name": "Ball Rush",
+                "description": "Guide your ball from platform to platform, avoid falls and hold on for as long as possible!"
+            },
+            "crossword": {
+                "name": "Crossword",
+                "description": "Find the hidden words in the grid, then discover the mystery word with the remaining letters."
             }
         },
         "badges": {

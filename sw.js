@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.26.2026-10-08.0";
+const CACHE_NAME = "mini-games-cache-v1.28.2026-10-08.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -83,6 +83,8 @@ const ASSETS_TO_CACHE = [
     'assets/logos/minesweeper.webp',
     'assets/logos/at-your-own-risk.webp',
     'assets/logos/letter-by-letter.webp',
+    'assets/logos/ball-rush.webp',
+    'assets/logos/crossword.webp',
 
     // About
     'about/about.html',
@@ -406,7 +408,7 @@ const ASSETS_TO_CACHE = [
     'games/at-your-own-risk/images/hazards/spike_dark.svg',
     'games/at-your-own-risk/images/portal/portal.svg',
 
-    // Game: letter-by-letter
+    // Game: Letter by Letter
     'games/letter-by-letter/index.html',
     'games/letter-by-letter/game.html',
     'games/letter-by-letter/css/menu.css',
@@ -416,6 +418,17 @@ const ASSETS_TO_CACHE = [
     'games/letter-by-letter/js/logic.js',
     'games/letter-by-letter/js/storage.js',
     'games/letter-by-letter/js/words.js',
+
+    // Game: Ball Rush
+    'games/ball-rush/index.html',
+    'games/ball-rush/css/game.css',
+    'games/ball-rush/js/game.js',
+
+    // Game: Crossword
+    'games/crossword/index.html',
+    'games/crossword/css/game.css',
+    'games/crossword/js/game.js',
+    'games/crossword/js/words.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

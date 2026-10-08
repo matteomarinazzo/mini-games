@@ -147,6 +147,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "ball-rush": {
+      "path": "./games/ball-rush/index.html",
+      "name": "Ball Rush",
+      "emoji": "🔮",
+      "description": "Guide ta bille de plateforme en plateforme, évite les chutes et tiens le plus longtemps possible !",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "precision",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "layer-pile": {
       "path": "./games/layer-pile/index.html",
       "name": "Layer Pile",
@@ -252,6 +268,21 @@
         "vocabulary",
         "logic",
         "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "crossword": {
+      "path": "./games/crossword/index.html",
+      "name": "Mots croisés",
+      "emoji": "🔎",
+      "description": "Retrouve les mots cachés dans la grille, puis découvre le mot mystère avec les lettres restantes.",
+      "tags": [
+        "puzzle",
+        "vocabulary",
         "solo"
       ],
       "badge": "brain",

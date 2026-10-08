@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ball Rush – Jeu de réflexes en solo | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Ball Rush sur Mini‑Games. Guidez votre ball de plateforme en plateforme sans tomber dans le vide !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/ball-rush/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Ball Rush – Jeu de réflexes en solo | Mini‑Games">
+    <meta property="og:description" content="Guidez votre bille de plateforme en plateforme sans tomber dans le vide !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/ball-rush/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/ball-rush.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ball Rush – Jeu de réflexes en solo | Mini‑Games">
+    <meta name="twitter:description"
+        content="Guidez votre bille de plateforme en plateforme sans tomber dans le vide !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/ball-rush.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Ball Rush",
+      "url": "https://mini-games.ch/games/ball-rush/",
+      "description": "Jeu d'adresse où une ball avance seule sur des plateformes en perspective : déplacez-la latéralement pour atterrir à chaque saut.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Arcade Game", "Skill Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- SKY BACKGROUND -->
+    <canvas id="skyCanvas"></canvas>
+
+    <!-- GAME CANVAS -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ─── START OVERLAY ─── -->
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🔵</div>
+            <h2 class="start-title">Ball Rush</h2>
+            <p class="start-text">La ball avance et saute toute seule.<br>
+                Déplace-la <strong>à gauche / à droite</strong> pour atterrir sur chaque plateforme.</p>
+            <p class="start-keys">A / D · ← / → · glisser le doigt · jauge en bas</p>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+        </div>
+    </div>
+
+    <!-- ─── RULES OVERLAY ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de Ball Rush</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Enchaîne le plus de <strong>plateformes</strong> possible sans tomber.</li>
+                    <li>Chaque plateforme franchie rapporte <strong>+1</strong>.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🔄 Mécaniques</h3>
+                <ul>
+                    <li>La ball <strong>avance</strong> et <strong>saute</strong> automatiquement.</li>
+                    <li>Tu ne contrôles que le <strong>déplacement latéral</strong>.</li>
+                    <li>La <strong>vitesse augmente</strong> et les plateformes rétrécissent.</li>
+                    <li>Certaines plateformes <strong>bougent</strong>.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>A / D</strong> ou <strong>← / →</strong> – Se déplacer</li>
+                    <li><strong>Glisser</strong> – Mobile</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── GAME OVER OVERLAY ─── -->
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">💀</div>
+            <div class="gameover-title" id="goTitle">Partie terminée</div>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Score</span>
+                    <span class="stat-val" id="goScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Meilleur score</span>
+                    <span class="stat-val" id="goBest">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Distance</span>
+                    <span class="stat-val"><span id="goDist">0</span> m</span>
+                </div>
+            </div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Plateformes</span>
+                        <span class="rc-value" id="recPersonalScore">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global">
+                        <span class="rc-label">Plateformes</span>
+                        <span class="rc-value" id="recGlobalScore">0</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label">Score</span>
+            <span class="score-value" id="scoreValue">0</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- SIDE INDICATORS -->
+    <div id="bestBadge">Meilleur<span id="bestVal">0</span></div>
+    <div id="heightIndicator">
+        <span class="hi-label">Distance</span>
+        <span class="hi-value"><span id="distVal">0</span> m</span>
+    </div>
+
+    <!-- FLOATING SCORE DELTA -->
+    <div class="score-delta" id="scoreDelta"></div>
+
+    <!-- CONTROL HINT -->
+    <div id="tapHint">A / D · ← / → pour te déplacer</div>
+
+    <!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

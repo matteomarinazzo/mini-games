@@ -28,7 +28,8 @@ function render() {
 
   box.replaceChildren();
   for (let i = W.first; i <= W.last; i++) {
-    const ok = unlocked(i), a = document.createElement(ok ? 'a' : 'span'), t = getTries(i), num = i - W.first + 1;
+    const ok = unlocked(i);
+    const a = document.createElement(ok ? 'a' : 'span'), t = getTries(i), num = i - W.first + 1;
     a.className = 'lv' + (ok ? '' : ' locked') + (isDone(i) ? ' done' : '');
     a.textContent = isDone(i) ? '✓ ' + num : ok ? num + (t ? ' (' + t + ' é)' : '') : '🔒' + (t ? ' (' + t + ' é)' : '');
     if (ok) a.href = 'game.html?level=' + i;

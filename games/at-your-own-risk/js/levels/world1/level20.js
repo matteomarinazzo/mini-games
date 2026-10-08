@@ -315,6 +315,9 @@ export default {
                         s.portal.x = -100;
                         s.portal.y = -100;
                     }
+                    if (s.p.x >= 700) {
+                        s.portal.on = false;
+                    }
                 }
             }
         ]

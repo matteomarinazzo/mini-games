@@ -3162,6 +3162,110 @@ export function playRocketeerSound(type) {
 }
 
 // ─────────────────────────────────────────────
+// SONS — Letter by Letter
+// ─────────────────────────────────────────────
+export function playLetterbyLetterSound(type, step = 0) {
+    if (!isSoundEnabled) return;
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Une note : attaque douce, déclin exponentiel, filtre passe-bas optionnel
+    const tone = (freq, t, dur, dest, { type: wave = 'sine', vol = 0.4, attack = 0.006, lp = 0, glideTo = 0, detune = 0 } = {}) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = wave;
+        osc.frequency.setValueAtTime(freq, t);
+        if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+        if (detune) osc.detune.value = detune;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol, t + attack);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        let node = osc;
+        if (lp) {
+            const f = ctx.createBiquadFilter();
+            f.type = 'lowpass';
+            f.frequency.value = lp;
+            osc.connect(f);
+            node = f;
+        }
+        node.connect(g); g.connect(dest);
+        osc.start(t); osc.stop(t + dur + 0.02);
+    };
+
+    // Petit bruit filtré (texture : claquement, scintillement)
+    const burst = (t, dur, dest, { vol = 0.15, freq = 1000, filter = 'bandpass', q = 1 } = {}) => {
+        const n = Math.ceil(ctx.sampleRate * dur);
+        const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const f = ctx.createBiquadFilter();
+        f.type = filter;
+        f.frequency.value = freq;
+        f.Q.value = q;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        src.connect(f); f.connect(g); g.connect(dest);
+        src.start(t); src.stop(t + dur);
+    };
+
+    // Lettre bien placée : petite cloche cristalline, monte d'un cran à chaque lettre
+    if (type === 'correct') {
+        const master = out(ctx, 0.75);
+        const pentatonic = [0, 2, 4, 7, 9, 12, 14, 16];   // gamme pentatonique majeure
+        const semi = pentatonic[Math.min(Math.max(step, 0), pentatonic.length - 1)];
+        const f = 659.25 * Math.pow(2, semi / 12);         // départ : Mi5
+        tone(f, now, 0.24, master, { vol: 0.42 });
+        tone(f * 2, now, 0.16, master, { vol: 0.16 });
+        tone(f * 3.01, now, 0.08, master, { vol: 0.05 }); // harmonique légèrement désaccordée = timbre de cloche
+        burst(now, 0.015, master, { vol: 0.08, freq: 5000, filter: 'highpass' });
+    }
+
+    // Lettre mal placée : note boisée, douce, qui retombe légèrement
+    else if (type === 'present') {
+        const master = out(ctx, 0.65);
+        tone(392, now, 0.22, master, { type: 'triangle', vol: 0.38, lp: 2200, glideTo: 370 });
+        tone(784, now, 0.12, master, { vol: 0.08 });
+    }
+
+    // Lettre absente : "thock" sourd et court, sans agressivité
+    else if (type === 'absent') {
+        const master = out(ctx, 0.55);
+        tone(150, now, 0.11, master, { vol: 0.5, glideTo: 70, attack: 0.002 });
+        burst(now, 0.04, master, { vol: 0.12, freq: 500, q: 0.8 });
+    }
+
+    // Victoire : arpège pentatonique, octave doublée, accord final et scintillement
+    else if (type === 'win') {
+        const master = out(ctx, 0.8);
+        const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+        notes.forEach((f, i) => {
+            const t = now + i * 0.085;
+            tone(f, t, 0.36, master, { type: 'triangle', vol: 0.3 });
+            tone(f * 2, t, 0.2, master, { vol: 0.1 });
+        });
+        const tEnd = now + notes.length * 0.085;
+        [523.25, 659.25, 783.99, 1046.5].forEach((f) => tone(f, tEnd, 0.9, master, { vol: 0.14, attack: 0.02 }));
+        [0, 0.07, 0.14].forEach((d) => burst(tEnd + d, 0.06, master, { vol: 0.07, freq: 6500, filter: 'highpass' }));
+    }
+
+    // Défaite : quatre notes descendantes feutrées, puis un grave qui s'éteint
+    else if (type === 'lose') {
+        const master = out(ctx, 0.7);
+        const notes = [392, 349.23, 311.13, 261.63];
+        notes.forEach((f, i) => {
+            const t = now + i * 0.17;
+            const dur = i === notes.length - 1 ? 0.5 : 0.24;
+            tone(f, t, dur, master, { type: 'sawtooth', vol: 0.16, lp: 900, detune: -8 });
+            tone(f, t, dur, master, { type: 'sawtooth', vol: 0.16, lp: 900, detune: 8 });
+        });
+        tone(98, now + 0.55, 0.65, master, { vol: 0.35, glideTo: 65, attack: 0.02 });
+    }
+}
+
+// ─────────────────────────────────────────────
 // GESTION DE LA VISIBILITÉ DE LA PAGE
 // ─────────────────────────────────────────────
 const musicStates = {

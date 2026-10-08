@@ -135,6 +135,10 @@
             "at-your-own-risk": {
                 "name": "At your own risk",
                 "description": "A simple and accessible platform game: cross each level and reach the portal to continue the adventure."
+            },
+            "letter-by-letter": {
+                "name": "Letter by Letter",
+                "description": "Guess the hidden word before you run out of attempts!"
             }
         },
         "badges": {
@@ -193,7 +197,8 @@
             "flipping": "🥞 Flipping",
             "racing": "🚗 Racing",
             "platformer": "🏃 Platform",
-            "traps": "🎯 Traps"
+            "traps": "🎯 Traps",
+            "vocabulary": "📖 Vocabulary"
         }
     },
     "about": {

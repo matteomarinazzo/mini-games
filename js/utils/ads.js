@@ -3,8 +3,13 @@
  * Évite les popups intrusives et gère la répétition.
  */
 
-const SOCIAL_BAR_SCRIPT = "https://pl29320862.profitableratecpmnetwork.com/89/6a/dd/896add25a788dcbea38a6fc5dbb07a44.js";
-const SMART_LINK_URL = "https://www.profitableratecpmnetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d";
+//const SOCIAL_BAR_SCRIPT = "https://pl29320862.profitableratecpmnetwork.com/89/6a/dd/896add25a788dcbea38a6fc5dbb07a44.js";
+//const SMART_LINK_URL = "https://www.profitableratecpmnetwork.com/iq3k316euf?key=f29b63614f169507fbc2690ce341228d";
+
+// URLs malveillantes désactivées pour sécurité
+const SOCIAL_BAR_SCRIPT = "data:text/javascript,console.log('Social Bar bloquée');";
+const SMART_LINK_URL = "#";
+
 
 /**
  * Initialise la Social Bar avec un contrôle de fréquence (max 1 fois par minute)

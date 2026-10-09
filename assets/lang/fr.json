@@ -149,6 +149,10 @@
             "crossword": {
                 "name": "Mots croisés",
                 "description": "Retrouve les mots cachés dans la grille, puis découvre le mot mystère avec les lettres restantes."
+            },
+            "snake": {
+                "name": "Snake",
+                "description": "Fais grandir ton serpent en mangeant des fruits, mais attention à ne pas te mordre la queue !"
             }
         },
         "badges": {

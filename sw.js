@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.28.2026-10-08.0";
+const CACHE_NAME = "mini-games-cache-v1.29.2026-10-09.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -85,6 +85,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/letter-by-letter.webp',
     'assets/logos/ball-rush.webp',
     'assets/logos/crossword.webp',
+    'assets/logos/snake.webp',
 
     // About
     'about/about.html',
@@ -429,6 +430,11 @@ const ASSETS_TO_CACHE = [
     'games/crossword/css/game.css',
     'games/crossword/js/game.js',
     'games/crossword/js/words.js',
+
+    // Game: Snake
+    'games/snake/index.html',
+    'games/snake/css/game.css',
+    'games/snake/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

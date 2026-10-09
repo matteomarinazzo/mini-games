@@ -147,6 +147,10 @@
             "crossword": {
                 "name": "Kreuzworträtsel",
                 "description": "Finde die versteckten Wörter im Raster und entdecke dann das Geheimniswort mit den restlichen Buchstaben."
+            },
+            "snake": {
+                "name": "Snake",
+                "description": "Lass deine Schlange wachsen, indem du Früchte isst, aber pass auf, dass du dich nicht in den Schwanz beißt!"
             }
         },
         "badges": {

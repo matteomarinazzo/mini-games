@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.29.2026-10-09.0";
+const CACHE_NAME = "mini-games-cache-v1.30.2026-10-09.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -86,6 +86,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/ball-rush.webp',
     'assets/logos/crossword.webp',
     'assets/logos/snake.webp',
+    'assets/logos/maze.webp',
 
     // About
     'about/about.html',
@@ -435,6 +436,18 @@ const ASSETS_TO_CACHE = [
     'games/snake/index.html',
     'games/snake/css/game.css',
     'games/snake/js/game.js',
+
+    // Game: Maze
+    'games/maze/index.html',
+    'games/maze/css/game.css',
+    'games/maze/js/game.js',
+    'games/maze/js/core/maze-engine.js',
+    'games/maze/js/core/maze-generator.js',
+    'games/maze/js/core/maze-map.js',
+    'games/maze/js/core/maze-render.js',
+    'games/maze/js/core/maze-size.js',
+    'games/maze/js/core/maze-storage.js',
+    'games/maze/js/core/maze-world.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

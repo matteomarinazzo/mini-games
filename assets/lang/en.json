@@ -151,6 +151,10 @@
             "snake": {
                 "name": "Snake",
                 "description": "Grow your snake by eating fruits, but be careful not to bite your own tail!"
+            },
+            "maze": {
+                "name": "Maze 3D",
+                "description": "Explore a 3D maze and find the exit before you get lost!"
             }
         },
         "badges": {

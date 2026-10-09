@@ -1,119 +1,5 @@
 {
-  "strategy": {
-    "race-manager": {
-      "path": "./games/race-manager/index.html",
-      "name": "The Race Manager",
-      "emoji": "🏎️",
-      "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !",
-      "tags": [
-        "racing",
-        "real-time",
-        "strategy",
-        "solo"
-      ],
-      "badge": "strategy",
-      "badgeText": "Stratégie",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "battleship": {
-      "path": "./games/battleship/index.html",
-      "name": "Bataille navale",
-      "emoji": "🚢",
-      "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
-      "tags": [
-        "real-time",
-        "strategy",
-        "multiplayer"
-      ],
-      "badge": "strategy",
-      "badgeText": "Stratégie",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "lostBelow": {
-      "path": "./games/lostBelow/index.html",
-      "name": "Lost Below",
-      "emoji": "🔦",
-      "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
-      "tags": [
-        "survival",
-        "exploration",
-        "strategy",
-        "multiplayer"
-      ],
-      "badge": "adventure",
-      "badgeText": "Aventure",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "maze": {
-      "path": "./games/maze/index.html",
-      "name": "Labyrinthe 3D",
-      "emoji": "🌀",
-      "description": "Explore un labyrinthe en 3D et trouve la sortie avant de te perdre !",
-      "tags": [
-        "survival",
-        "exploration",
-        "reflexion",
-        "solo"
-      ],
-      "badge": "adventure",
-      "badgeText": "Aventure",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "rocketeer": {
-      "path": "./games/rocketeer/index.html",
-      "name": "Rocketeer",
-      "emoji": "🚀",
-      "description": "Construis ta fusée pièce par pièce et propulse-la le plus loin possible dans l'espace !",
-      "tags": [
-        "space",
-        "construction",
-        "physics"
-      ],
-      "badge": "simulation",
-      "badgeText": "Simulation",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    }
-  },
-  "random": {
-    "casino": {
-      "path": "./games/casino/index.html",
-      "name": "Casino",
-      "emoji": "🎰",
-      "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
-      "tags": [
-        "money",
-        "random",
-        "games",
-        "solo"
-      ],
-      "badge": "fun",
-      "badgeText": "Fun !",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "funfair": {
-      "path": "./games/funfair/index.html",
-      "name": "Funfair Frenzy",
-      "emoji": "🎡",
-      "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
-      "tags": [
-        "tickets",
-        "skill",
-        "games",
-        "solo"
-      ],
-      "badge": "fun",
-      "badgeText": "Fun !",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    }
-  },
-  "arcade": {
+  "action": {
     "rush-highway": {
       "path": "./games/rush-highway/index.html",
       "name": "Rush Highway",
@@ -124,6 +10,22 @@
         "reflexes",
         "racing",
         "survival",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "ball-rush": {
+      "path": "./games/ball-rush/index.html",
+      "name": "Ball Rush",
+      "emoji": "🔮",
+      "description": "Guide ta bille de plateforme en plateforme, évite les chutes et tiens le plus longtemps possible !",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "precision",
         "solo"
       ],
       "badge": "action",
@@ -148,30 +50,29 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
-    "falling-blocks": {
-      "path": "./games/falling-blocks/index.html",
-      "name": "Falling Blocks",
-      "emoji": "🧱",
-      "description": "Empile les pièces, complète les lignes et explose le score ! ",
+    "punch-reflex": {
+      "path": "./games/punch-reflex/index.html",
+      "name": "Punch Reflex",
+      "emoji": "🥊",
+      "description": "Sois plus rapide que l'éclair : clique sur les cibles dès qu'elles s'allument !",
       "tags": [
-        "arcade",
+        "speed",
         "reflexes",
-        "classic"
+        "solo"
       ],
-      "badge": "classic",
-      "badgeText": "Classique",
+      "badge": "action",
+      "badgeText": "Action",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
-    "ball-rush": {
-      "path": "./games/ball-rush/index.html",
-      "name": "Ball Rush",
-      "emoji": "🔮",
-      "description": "Guide ta bille de plateforme en plateforme, évite les chutes et tiens le plus longtemps possible !",
+    "lights-out-reflex": {
+      "path": "./games/lights-out-reflex/index.html",
+      "name": "Lights Out Reflex",
+      "emoji": "🚦",
+      "description": "Inspiré par les départs de Formule 1 : attendez l'extinction des feux et réagissez le plus vite possible pour battre le record !",
       "tags": [
         "arcade",
         "reflexes",
-        "precision",
         "solo"
       ],
       "badge": "action",
@@ -194,75 +95,63 @@
       "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
-    },
-    "snake": {
-      "path": "./games/snake/index.html",
-      "name": "Snake",
-      "emoji": "🐍",
-      "description": "Fais grandir ton serpent en mangeant des fruits, mais attention à ne pas te mordre la queue !",
+    }
+  },
+  "adventure": {
+    "maze": {
+      "path": "./games/maze/index.html",
+      "name": "Labyrinthe 3D",
+      "emoji": "🌀",
+      "description": "Explore un labyrinthe en 3D et trouve la sortie avant de te perdre !",
       "tags": [
-        "arcade",
-        "reflexes",
-        "classic"
-      ],
-      "badge": "classic",
-      "badgeText": "Classique",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "lights-out-reflex": {
-      "path": "./games/lights-out-reflex/index.html",
-      "name": "Lights Out Reflex",
-      "emoji": "🚦",
-      "description": "Inspiré par les départs de Formule 1 : attendez l'extinction des feux et réagissez le plus vite possible pour battre le record !",
-      "tags": [
-        "arcade",
-        "reflexes",
+        "survival",
+        "exploration",
+        "reflexion",
         "solo"
       ],
-      "badge": "action",
-      "badgeText": "Action",
+      "badge": "adventure",
+      "badgeText": "Aventure",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
-    "punch-reflex": {
-      "path": "./games/punch-reflex/index.html",
-      "name": "Punch Reflex",
-      "emoji": "🥊",
-      "description": "Sois plus rapide que l'éclair : clique sur les cibles dès qu'elles s'allument !",
+    "lostBelow": {
+      "path": "./games/lostBelow/index.html",
+      "name": "Lost Below",
+      "emoji": "🔦",
+      "description": "Survis aux profondeurs : explore la grotte et trouve la sortie avant qu'il ne soit trop tard.",
       "tags": [
-        "speed",
-        "reflexes",
-        "solo"
-      ],
-      "badge": "action",
-      "badgeText": "Action",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "minesweeper": {
-      "path": "./games/minesweeper/index.html",
-      "name": "Démineur",
-      "emoji": "💣",
-      "description": "Révélez les cases, évitez les mines et affrontez un adversaire en temps réel sur la même grille.",
-      "tags": [
+        "survival",
+        "exploration",
         "strategy",
-        "solo",
-        "multiplayer",
-        "fast"
+        "multiplayer"
       ],
-      "badge": "classic",
-      "badgeText": "Classique",
+      "badge": "adventure",
+      "badgeText": "Aventure",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "rocketeer": {
+      "path": "./games/rocketeer/index.html",
+      "name": "Rocketeer",
+      "emoji": "🚀",
+      "description": "Construis ta fusée pièce par pièce et propulse-la le plus loin possible dans l'espace !",
+      "tags": [
+        "space",
+        "construction",
+        "physics"
+      ],
+      "badge": "simulation",
+      "badgeText": "Simulation",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
   "puzzle": {
-    "sudoku": {
-      "path": "./games/sudoku/index.html",
-      "name": "Sudoku",
-      "emoji": "🔢",
-      "description": "Remplis la grille sans répéter de chiffres dans une ligne, une colonne ou un bloc. Quatre niveaux de difficulté t’attendent !",
+    "ball-sort": {
+      "path": "./games/ball-sort/index.html",
+      "name": "Ball Sort",
+      "emoji": "🧪",
+      "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
       "tags": [
         "logic",
         "puzzle",
@@ -274,16 +163,31 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
-    "wiki-challenge": {
-      "path": "./games/wiki-challenge/index.html",
-      "name": "Wiki Challenge",
-      "emoji": "📖",
-      "description": "Pars d'un article Wikipédia et atteins l'article cible en ne cliquant que sur des liens. Seul ou entre amis !",
+    "block-puzzle": {
+      "path": "./games/block-puzzle/index.html",
+      "name": "Block Puzzle",
+      "emoji": "🧱",
+      "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
       "tags": [
-        "culture",
+        "logic",
+        "puzzle",
+        "reflexion"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "sudoku": {
+      "path": "./games/sudoku/index.html",
+      "name": "Sudoku",
+      "emoji": "🔢",
+      "description": "Remplis la grille sans répéter de chiffres dans une ligne, une colonne ou un bloc. Quatre niveaux de difficulté t’attendent !",
+      "tags": [
+        "logic",
+        "puzzle",
         "reflexion",
-        "solo",
-        "multiplayer"
+        "solo"
       ],
       "badge": "brain",
       "badgeText": "Casse-tête",
@@ -320,40 +224,40 @@
       "badgeText": "Casse-tête",
       "rating": "0",
       "stars": "☆☆☆☆☆"
-    },
-    "ball-sort": {
-      "path": "./games/ball-sort/index.html",
-      "name": "Ball Sort",
-      "emoji": "🧪",
-      "description": "Trie les boules colorées dans les flacons. Calme en apparence, mais terriblement addictif.",
-      "tags": [
-        "logic",
-        "puzzle",
-        "reflexion",
-        "solo"
-      ],
-      "badge": "brain",
-      "badgeText": "Casse-tête",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "block-puzzle": {
-      "path": "./games/block-puzzle/index.html",
-      "name": "Block Puzzle",
-      "emoji": "🧱",
-      "description": "Assemblez les blocs pour compléter des lignes et éviter de bloquer la grille. Un puzzle stratégique et addictif !",
-      "tags": [
-        "logic",
-        "puzzle",
-        "reflexion"
-      ],
-      "badge": "brain",
-      "badgeText": "Casse-tête",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
     }
   },
-  "classic": {
+  "multiplayer": {
+    "draw-guess": {
+      "path": "./games/draw-guess/index.html",
+      "name": "Draw and Guess",
+      "emoji": "✏️",
+      "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
+      "tags": [
+        "creativity",
+        "reflexion",
+        "multiplayer",
+        "real-time"
+      ],
+      "badge": "fun",
+      "badgeText": "Fun !",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "battleship": {
+      "path": "./games/battleship/index.html",
+      "name": "Bataille navale",
+      "emoji": "🚢",
+      "description": "Localisez et coulez la flotte adverse avant que la vôtre ne sombre. Stratégie et intuition en multijoueur !",
+      "tags": [
+        "real-time",
+        "strategy",
+        "multiplayer"
+      ],
+      "badge": "strategy",
+      "badgeText": "Stratégie",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "morpion": {
       "path": "./games/morpion/index.html",
       "name": "Morpion",
@@ -363,22 +267,6 @@
         "strategy",
         "multiplayer",
         "fast"
-      ],
-      "badge": "classic",
-      "badgeText": "Classique",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    },
-    "casse-briques": {
-      "path": "./games/casse-briques/index.html",
-      "name": "Casse-Briques",
-      "emoji": "🧱",
-      "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
-      "tags": [
-        "reflexes",
-        "precision",
-        "fast",
-        "solo"
       ],
       "badge": "classic",
       "badgeText": "Classique",
@@ -399,25 +287,59 @@
       "badgeText": "Classique",
       "rating": "0",
       "stars": "☆☆☆☆☆"
-    },
-    "draw-guess": {
-      "path": "./games/draw-guess/index.html",
-      "name": "Draw and Guess",
-      "emoji": "✏️",
-      "description": "Exprimez votre talent artistique (ou pas) et faites deviner des mots en temps réel !",
+    }
+  },
+  "strategy": {
+    "race-manager": {
+      "path": "./games/race-manager/index.html",
+      "name": "The Race Manager",
+      "emoji": "🏎️",
+      "description": "Dirige ta propre écurie de course. Embauche tes pilotes, développe ta voiture et gagne les championnats !",
       "tags": [
-        "creativity",
-        "reflexion",
-        "multiplayer",
-        "real-time"
+        "racing",
+        "real-time",
+        "strategy",
+        "solo"
       ],
-      "badge": "fun",
-      "badgeText": "Fun !",
+      "badge": "strategy",
+      "badgeText": "Stratégie",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "minesweeper": {
+      "path": "./games/minesweeper/index.html",
+      "name": "Démineur",
+      "emoji": "💣",
+      "description": "Révélez les cases, évitez les mines et affrontez un adversaire en temps réel sur la même grille.",
+      "tags": [
+        "strategy",
+        "solo",
+        "multiplayer",
+        "fast"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "snow-digger": {
+      "path": "./games/snow-digger/index.html",
+      "name": "Snow Digger",
+      "emoji": "❄️",
+      "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
+      "tags": [
+        "snow",
+        "digger",
+        "clicker",
+        "solo"
+      ],
+      "badge": "popular",
+      "badgeText": "Populaire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }
   },
-  "geo": {
+  "quiz": {
     "geoquiz": {
       "path": "./games/geoquiz/index.html",
       "name": "GeoQuiz",
@@ -447,22 +369,100 @@
       "badgeText": "Explo",
       "rating": "0",
       "stars": "☆☆☆☆☆"
+    },
+    "wiki-challenge": {
+      "path": "./games/wiki-challenge/index.html",
+      "name": "Wiki Challenge",
+      "emoji": "📖",
+      "description": "Pars d'un article Wikipédia et atteins l'article cible en ne cliquant que sur des liens. Seul ou entre amis !",
+      "tags": [
+        "culture",
+        "reflexion",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
     }
   },
-  "clicker": {
-    "snow-digger": {
-      "path": "./games/snow-digger/index.html",
-      "name": "Snow Digger",
-      "emoji": "❄️",
-      "description": "Déblaye la neige, gagne de l'argent, et déblaye plus vite. Simple, rapide, addictif.",
+  "retro": {
+    "snake": {
+      "path": "./games/snake/index.html",
+      "name": "Snake",
+      "emoji": "🐍",
+      "description": "Fais grandir ton serpent en mangeant des fruits, mais attention à ne pas te mordre la queue !",
       "tags": [
-        "snow",
-        "digger",
-        "clicker",
+        "arcade",
+        "reflexes",
+        "classic"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "falling-blocks": {
+      "path": "./games/falling-blocks/index.html",
+      "name": "Falling Blocks",
+      "emoji": "🧱",
+      "description": "Empile les pièces, complète les lignes et explose le score !",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "classic"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "casse-briques": {
+      "path": "./games/casse-briques/index.html",
+      "name": "Casse-Briques",
+      "emoji": "🧱",
+      "description": "Casse toutes les briques et garde la balle en jeu. Simple et efficace.",
+      "tags": [
+        "reflexes",
+        "precision",
+        "fast",
         "solo"
       ],
-      "badge": "popular",
-      "badgeText": "Populaire",
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "casino": {
+      "path": "./games/casino/index.html",
+      "name": "Casino",
+      "emoji": "🎰",
+      "description": "Joue aux jeux de hasard. Gagne de l'argent, mais attention aux pertes.",
+      "tags": [
+        "money",
+        "random",
+        "games",
+        "solo"
+      ],
+      "badge": "fun",
+      "badgeText": "Fun !",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "funfair": {
+      "path": "./games/funfair/index.html",
+      "name": "Funfair Frenzy",
+      "emoji": "🎡",
+      "description": "Gagne des tickets et remporte tous les prix de la fête foraine ! Choisis ton budget et tente ta chance.",
+      "tags": [
+        "tickets",
+        "skill",
+        "games",
+        "solo"
+      ],
+      "badge": "fun",
+      "badgeText": "Fun !",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }

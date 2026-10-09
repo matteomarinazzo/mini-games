@@ -825,6 +825,20 @@ function initThemeSettingsUI() {
 
   section.dataset.themeUiReady = 'true';
 
+  // Aperçu Live au survol
+  themeGrid.addEventListener('mouseover', (event) => {
+    const swatch = event.target.closest('.theme-swatch');
+    if (!swatch) return;
+    const themeName = swatch.dataset.theme;
+    if (themeName && THEMES[themeName]) {
+      previewTheme(themeName);
+    }
+  });
+
+  themeGrid.addEventListener('mouseleave', () => {
+    _restoreTheme();
+  });
+
   themeGrid.addEventListener('click', (event) => {
     const swatch = event.target.closest('.theme-swatch');
     if (!swatch) return;
@@ -852,9 +866,26 @@ function initThemeSettingsUI() {
   _renderThemeSettings();
 }
 
+export function previewTheme(themeName) {
+  const theme = THEMES[themeName];
+  if (!theme) return;
+  const root = document.documentElement;
+  for (const [prop, val] of Object.entries(theme)) {
+    if (prop.startsWith('--')) {
+      root.style.setProperty(prop, val);
+    }
+  }
+  document.body.dataset.theme = themeName;
+}
+
 function setActiveTheme(themeName) {
   const nextTheme = isThemeUnlocked(themeName) ? themeName : DEFAULT_THEME;
   localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  // Si on choisit manuellement un thème, on désactive le mode auto-thème
+  localStorage.setItem('mg_auto_theme', 'false');
+  const autoToggle = document.getElementById('autoThemeToggle');
+  if (autoToggle) autoToggle.checked = false;
+
   applyTheme(nextTheme);
   _renderThemeSettings();
 }
@@ -914,6 +945,7 @@ export function initProfilePanel(totalGamesCount = 0) {
   initCloudSyncUI();
   initUsername();
   initThemeSettingsUI();
+  initEcoAndAutoThemeUI();
   checkPremiumReturn();
 
   if (panel.dataset.purchaseListenerReady !== 'true') {
@@ -1005,17 +1037,28 @@ function initUsername() {
 let _totalGames = 0;
 
 // ─── OPEN / CLOSE ─────────────────────────────────────────────────────────────
-function openPanel() {
+export function openPanel(initialTab = null) {
   const panel = document.getElementById('profilePanel');
   if (!panel) return;
   panel.classList.remove('hidden');
   requestAnimationFrame(() => panel.classList.add('open'));
   document.body.classList.add('no-scroll');
+
+  if (initialTab) {
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+    const tabBtn = document.querySelector(`.profile-tab[data-tab="${initialTab}"]`);
+    if (tabBtn) tabBtn.classList.add('active');
+    const content = document.getElementById(`tab-${initialTab}`);
+    if (content) content.classList.add('active');
+  }
+
   _renderStats();
   _renderThemeSettings();
   checkAndUnlockBadges(_totalGames);
   _updateProfileBadgeCount();
-  document.getElementById('floating-menu-settings').style.display = 'none';
+  const floatSettings = document.getElementById('floating-menu-settings');
+  if (floatSettings) floatSettings.style.display = 'none';
 
   // Masquer BMC
   hideBMC();
@@ -1311,6 +1354,9 @@ export function applyTheme(name) {
     }
   }
 
+  // Appliquer le dataset theme sur le body pour les effets CSS d'ambiance
+  document.body.dataset.theme = resolvedThemeName;
+
   // meta theme-color = coin haut = --primary
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (metaTheme) metaTheme.setAttribute('content', theme['--meta-color'] || theme['--primary']);
@@ -1319,31 +1365,73 @@ export function applyTheme(name) {
 }
 
 function _restoreTheme() {
-  const saved = getSavedThemeName();
-  localStorage.setItem(THEME_STORAGE_KEY, saved);
-  applyTheme(saved);
+  const isAuto = localStorage.getItem('mg_auto_theme') === 'true';
+  let targetTheme;
+
+  if (isAuto) {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    targetTheme = isDark && isThemeUnlocked('dark') ? 'dark' : DEFAULT_THEME;
+  } else {
+    targetTheme = getSavedThemeName();
+  }
+
+  applyTheme(targetTheme);
+
+  // Restaurer Mode Éco
+  const isEco = localStorage.getItem('mg_eco_mode') === 'true';
+  document.body.classList.toggle('eco-mode', isEco);
+}
+
+export function initEcoAndAutoThemeUI() {
+  const ecoToggle = document.getElementById('ecoModeToggle');
+  const autoToggle = document.getElementById('autoThemeToggle');
+
+  if (ecoToggle) {
+    ecoToggle.checked = localStorage.getItem('mg_eco_mode') === 'true';
+    ecoToggle.addEventListener('change', () => {
+      const active = ecoToggle.checked;
+      localStorage.setItem('mg_eco_mode', active ? 'true' : 'false');
+      document.body.classList.toggle('eco-mode', active);
+    });
+  }
+
+  if (autoToggle) {
+    autoToggle.checked = localStorage.getItem('mg_auto_theme') === 'true';
+    autoToggle.addEventListener('change', () => {
+      const active = autoToggle.checked;
+      localStorage.setItem('mg_auto_theme', active ? 'true' : 'false');
+      _restoreTheme();
+      _renderThemeSettings();
+    });
+  }
+
+  // Écouter les changements système OS si le mode auto est actif
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (localStorage.getItem('mg_auto_theme') === 'true') {
+      _restoreTheme();
+    }
+  });
 }
 
 // ─── MODE D'AFFICHAGE ─────────────────────────────────────────────────────────
 /**
- * Applique le mode d'affichage 'grid' ou 'list' à la grille de jeux.
+ * Applique le mode d'affichage ('grid', 'compact', 'list', 'showcase') à la grille de jeux.
  * @param {string} mode
  */
 export function setDisplayMode(mode) {
   const grid = document.getElementById('mainGamesGrid');
   if (!grid) return;
 
+  const validModes = ['grid', 'compact', 'list', 'showcase'];
+  if (!validModes.includes(mode)) mode = 'grid';
+
   localStorage.setItem('mg_display_mode', mode);
 
-  if (mode === 'list') {
-    grid.classList.add('display-list');
-    grid.classList.remove('display-grid');
-  } else {
-    grid.classList.add('display-grid');
-    grid.classList.remove('display-list');
-  }
+  // Nettoyer tous les modes précédents et appliquer le nouveau
+  validModes.forEach(m => grid.classList.remove(`display-${m}`));
+  grid.classList.add(`display-${mode}`);
 
-  // Mettre à jour les boutons du panneau si ouvert
+  // Mettre à jour les boutons du panneau
   document.querySelectorAll('.display-mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });

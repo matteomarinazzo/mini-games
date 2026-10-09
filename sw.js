@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.31.2026-10-09.0";
+const CACHE_NAME = "mini-games-cache-v1.31.2026-10-09.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -180,42 +180,14 @@ const ASSETS_TO_CACHE = [
 
     // Game: snow-digger
     'games/snow-digger/index.html',
-    'games/snow-digger/style.css',
-    'games/snow-digger/js/main.js',
-    'games/snow-digger/js/core/camera.js',
-    'games/snow-digger/js/core/cameraHints.js',
-    'games/snow-digger/js/core/canvas.js',
-    'games/snow-digger/js/core/inputs.js',
-    'games/snow-digger/js/core/loop.js',
+    'games/snow-digger/css/game.css',
+    'games/snow-digger/js/game.js',
+    'games/snow-digger/js/core/state.js',
+    'games/snow-digger/js/core/assets.js',
     'games/snow-digger/js/core/terrain.js',
-    'games/snow-digger/js/core/textures.js',
-    'games/snow-digger/js/ctrl/mainCtrl.js',
-    'games/snow-digger/js/ctrl/weatherCtrl.js',
-    'games/snow-digger/js/entities/floatingTexts.js',
-    'games/snow-digger/js/entities/skier.js',
-    'games/snow-digger/js/entities/snowflakes.js',
-    'games/snow-digger/js/ui/informations.js',
-    'games/snow-digger/js/ui/menu.js',
-    'games/snow-digger/js/ui/menuParams.js',
-
-    // Snow-digger assets
-    'games/snow-digger/ressources/img/skieur/skieur.png',
-    'games/snow-digger/ressources/img/pelles/niv1.png',
-    'games/snow-digger/ressources/img/pelles/niv2.png',
-    'games/snow-digger/ressources/img/pelles/niv3.png',
-    'games/snow-digger/ressources/img/pelles/niv4.png',
-    'games/snow-digger/ressources/img/pelles/niv5.png',
-    'games/snow-digger/ressources/img/pelles/niv6.png',
-    'games/snow-digger/ressources/img/flocons/flocon1.png',
-    'games/snow-digger/ressources/img/flocons/flocon2.png',
-    'games/snow-digger/ressources/img/flocons/flocon3.png',
-    'games/snow-digger/ressources/img/flocons/flocon4.png',
-    'games/snow-digger/ressources/img/flocons/flocon5.png',
-    'games/snow-digger/ressources/img/flocons/flocon6.png',
-    'games/snow-digger/ressources/img/flocons/flocon7.png',
-    'games/snow-digger/ressources/img/flocons/flocon8.png',
-    'games/snow-digger/ressources/img/flocons/flocon9.png',
-    'games/snow-digger/ressources/img/flocons/flocon10.png',
+    'games/snow-digger/js/core/input.js',
+    'games/snow-digger/js/core/weather.js',
+    'games/snow-digger/js/core/skier.js',
 
     // Game: lostBelow
     'games/lostBelow/index.html',

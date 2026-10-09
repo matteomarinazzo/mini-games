@@ -1,21 +1,19 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 
-  <title>Snow Digger – Clicker gratuit en ligne | Mini‑Games</title>
-
+  <title>Snow Digger – Jeu de déneigement gratuit en ligne | Mini‑Games</title>
   <meta name="description"
-    content="Jouez gratuitement à Snow Digger sur Mini‑Games. Cliquez ou maintenez pour déneiger, débloquez des skieurs et améliorez votre pelle dans ce jeu fun et addictif. Compatible mobile et PC, sans téléchargement.">
-
+    content="Jouez gratuitement à Snow Digger sur Mini‑Games. Cliquez pour déneiger, débloquez des skieurs et améliorez votre pelle dans ce jeu fun et addictif. Compatible mobile et PC.">
   <link rel="canonical" href="https://mini-games.ch/games/snow-digger/" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Snow Digger – Jeu de déneigement gratuit en ligne | Mini‑Games">
+  <meta property="og:title" content="Snow Digger – Jeu de déneigement gratuit | Mini‑Games">
   <meta property="og:description"
-    content="Déneigez en cliquant ou en maintenant le clic, débloquez des skieurs et améliorez votre équipement. Jouable sur mobile et PC.">
+    content="Déneigez en cliquant, débloquez des skieurs et améliorez votre équipement. Jouable sur mobile et PC.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mini-games.ch/games/snow-digger/">
   <meta property="og:image" content="https://mini-games.ch/assets/logos/snow-digger.webp">
@@ -24,9 +22,8 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Snow Digger – Jeu de déneigement gratuit en ligne | Mini‑Games">
-  <meta name="twitter:description"
-    content="Déneigez, améliorez votre pelle et débloquez des skieurs dans ce jeu gratuit jouable sur mobile et PC.">
+  <meta name="twitter:title" content="Snow Digger – Jeu de déneigement gratuit | Mini‑Games">
+  <meta name="twitter:description" content="Déneigez, améliorez votre pelle et débloquez des skieurs.">
   <meta name="twitter:image" content="https://mini-games.ch/assets/logos/snow-digger.webp">
 
   <!-- Schema.org -->
@@ -36,20 +33,17 @@
     "@type": "VideoGame",
     "name": "Snow Digger",
     "url": "https://mini-games.ch/games/snow-digger/",
-    "description": "Jeu gratuit où vous déneigez en cliquant ou en maintenant le clic, débloquez des skieurs et améliorez votre pelle.",
+    "description": "Jeu de déneigement clicker : débloquez des skieurs et améliorez votre pelle.",
     "applicationCategory": "Game",
     "operatingSystem": "Any",
     "genre": ["Arcade", "Clicker"],
     "inLanguage": "fr",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Mini‑Games"
-    }
+    "publisher": { "@type": "Organization", "name": "Mini‑Games" }
   }
   </script>
 
-  <link rel="stylesheet" href="./style.css" />
   <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+  <link rel="stylesheet" href="./css/game.css" />
 
   <!-- Script Google Adsense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
@@ -67,110 +61,169 @@
 </head>
 
 <body>
-  <canvas id="canvas"></canvas>
+  <!-- Canvas principal -->
+  <canvas id="gameCanvas"></canvas>
 
-  <!-- Menu principal en haut -->
-  <div id="menuOptions">
-    <button id="homeBtn">Accueil</button>
-    <button id="settingsBtn">⚙️ Paramètres</button>
-    <button id="fullscreenBtn" , title="Plein écran">⛶</button>
-  </div>
+  <!-- Storm overlay -->
+  <div id="stormOverlay"></div>
 
-  <!-- Menu d'upgrades fixé en bas -->
-  <div id="menuUpgrades">
-    <button id="shovelBtn">Augmenter la pelle</button>
-    <button id="coinBtn">Augmenter les gains</button>
+  <!-- HUD global -->
+  <div id="hud">
 
-    <button id="spawnSkierBtn">Débloquer les skieurs</button>
-    <button id="spawnTimeBtn">Diminuer le temps d'attente</button>
-    <button id="spawnRateBtn">Augmenter le nombre de skieurs</button>
-  </div>
+    <!-- Bouton retour accueil -->
+    <button id="homeBtn" onclick="location.href='https://mini-games.ch'" title="Accueil"
+      aria-label="Retour à l'accueil">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+        <path d="M3 10.5 12 3l9 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </button>
 
-  <!-- Menu paramètres déroulable -->
-  <div id="menuParams" style="display: none">
-    <h3>Paramètres du jeu</h3>
+    <!-- Bouton Règles -->
+    <button id="rulesBtn" class="icon-btn" title="Règles du jeu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    </button>
 
-    <label>
-      Largeur du terrain :
-      <input type="number" id="terrainWidth" min="800" max="20000" value="2000" />
-    </label>
-    <label>
-      Hauteur du terrain :
-      <input type="number" id="terrainHeight" min="600" max="20000" value="2000" />
-    </label>
-    <button id="applyTerrainSize">Appliquer</button>
-    <hr />
-
-    <label>
-      Taille initiale de la pelle :
-      <input type="number" id="shovelSize" min="1" max="20" value="1" />
-    </label>
-    <hr />
-
-    <label>
-      Vitesse des skieurs :
-      <input type="number" id="skierSpeed" min="1" max="100" value="6" />
-    </label>
-    <hr />
-
-    <label>
-      Ratio argent / tuile :
-      <input type="number" step="0.1" id="coinRatio" min="0.1" max="10000" value="0.1" />
-    </label>
-    <hr />
-
-    <label>
-      Temps d’attente entre spawn de skieur (s) :
-      <input type="number" id="spawnTime" min="0" max="30" value="30" />
-    </label>
-    <hr />
-
-    <label>
-      Nombre de skieurs par clic droit :
-      <input type="number" id="spawnRate" min="1" max="10" value="1" />
-    </label>
-    <hr />
-
-    <label>
-      <input type="checkbox" id="infiniteCoins" />
-      Mode “infinite coins”
-    </label>
-  </div>
-
-  <!-- Indicateurs de direction de la caméra -->
-  <div id="cameraHints">
-    <div class="arrow up">▲</div>
-    <div class="arrow down">▼</div>
-    <div class="arrow left">◀</div>
-    <div class="arrow right">▶</div>
-  </div>
-
-  <!-- Infos de gauche (Stats) -->
-  <div class="ui-panel left-panel">
-    <div class="ui-row">
-      <span class="label">🏔️ Terrain :</span>
-      <span id="ui-percent" class="value">0%</span>
+    <!-- Barre de stats (haut centre) -->
+    <div id="statBar" aria-live="polite">
+      <div class="stat-item">
+        <span class="stat-icon">💰</span>
+        <span id="coins-val" class="stat-val">0</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item" id="progressWrap">
+        <span class="stat-icon">🏔️</span>
+        <div id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="progressFill"></div>
+        </div>
+        <span id="pct-val" class="stat-val">0%</span>
+      </div>
     </div>
-    <div class="ui-row">
-      <span class="label">💰 Pièces :</span>
-      <span id="ui-coins" class="value gold">0</span>
+
+    <!-- Indicateurs de caméra -->
+    <div id="camHints" aria-hidden="true">
+      <span class="cam-arrow up">▲</span>
+      <span class="cam-arrow down">▼</span>
+      <span class="cam-arrow left">◀</span>
+      <span class="cam-arrow right">▶</span>
+    </div>
+
+    <!-- Conteneur bas pour alignement flexible -->
+    <div id="bottomHUD">
+      <!-- Pill skieurs (au-dessus du shop) -->
+      <div id="skierPill" aria-live="polite">🔒 Skieurs non débloqués</div>
+
+      <!-- Shop (bas) -->
+      <div id="shop" role="toolbar" aria-label="Améliorations">
+
+        <!-- Pelle -->
+        <button class="shop-card" id="btn-shovel" aria-label="Améliorer la pelle">
+          <span class="shop-level-badge">Niv.1</span>
+          <div class="shop-icon" aria-hidden="true">
+            <!-- SVG pelle injecté par JS -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="36" viewBox="0 0 24 36">
+              <path d="M10 20 L14 20 L16 8 C16 4 8 4 8 8 Z" fill="#c0c0c0" stroke="#888" stroke-width="1" />
+              <rect x="11" y="20" width="2" height="14" rx="1" fill="#8B5E3C" />
+            </svg>
+          </div>
+          <span class="shop-label">Pelle</span>
+          <span class="shop-cost">💰 80</span>
+        </button>
+
+        <!-- Gains -->
+        <button class="shop-card" id="btn-ratio" aria-label="Améliorer les gains">
+          <div class="shop-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#ffd43b" stroke="#e6ac00" stroke-width="2" />
+              <text x="20" y="27" text-anchor="middle" font-size="20" font-weight="bold" fill="#a07800">$</text>
+            </svg>
+          </div>
+          <span class="shop-label">Gains</span>
+          <span class="shop-cost">💰 120</span>
+        </button>
+
+        <div class="shop-sep" aria-hidden="true"></div>
+
+        <!-- Débloquer skieurs -->
+        <button class="shop-card" id="btn-skier-unlock" aria-label="Débloquer les skieurs">
+          <div class="shop-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="44" viewBox="0 0 28 44">
+              <rect x="3" y="8" width="5" height="34" rx="2.5" fill="#1a1a2e" />
+              <rect x="20" y="8" width="5" height="34" rx="2.5" fill="#1a1a2e" />
+              <ellipse cx="14" cy="24" rx="7" ry="10" fill="#1565c0" />
+              <circle cx="14" cy="12" r="7" fill="#d32f2f" />
+              <path d="M8 14 Q14 19 20 14" fill="#f5a623" opacity="0.85" />
+            </svg>
+          </div>
+          <span class="shop-label">Skieurs</span>
+          <span class="shop-cost">💰 400</span>
+        </button>
+
+        <!-- Nombre de skieurs -->
+        <button class="shop-card" id="btn-spawn-rate" aria-label="Augmenter le nombre de skieurs">
+          <div class="shop-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="36" viewBox="0 0 40 36">
+              <circle cx="12" cy="12" r="6" fill="#d32f2f" />
+              <circle cx="28" cy="12" r="6" fill="#1565c0" />
+              <rect x="8" y="20" width="10" height="14" rx="3" fill="#d32f2f" opacity="0.8" />
+              <rect x="22" y="20" width="10" height="14" rx="3" fill="#1565c0" opacity="0.8" />
+            </svg>
+          </div>
+          <span class="shop-label">Nb. skieurs</span>
+          <span class="shop-cost cant-afford">💰 300</span>
+        </button>
+
+        <!-- Vitesse spawn -->
+        <button class="shop-card" id="btn-spawn-time" aria-label="Réduire le temps de recharge">
+          <div class="shop-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+              <circle cx="20" cy="22" r="16" fill="none" stroke="#4a9fff" stroke-width="3" />
+              <line x1="20" y1="22" x2="20" y2="10" stroke="#4a9fff" stroke-width="2.5" stroke-linecap="round" />
+              <line x1="20" y1="22" x2="28" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+              <circle cx="20" cy="6" r="3" fill="#4a9fff" />
+              <line x1="14" y1="2" x2="26" y2="2" stroke="#4a9fff" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="shop-label">Recharge</span>
+          <span class="shop-cost cant-afford">💰 200</span>
+        </button>
+
+      </div><!-- /#shop -->
+    </div><!-- /#bottomHUD -->
+  </div><!-- /#hud -->
+
+  <!-- Toast notifications -->
+  <div id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Hint mobile (joystick zone) -->
+  <div id="joystickHint" aria-hidden="true">🎮<br>Caméra</div>
+
+  <!-- Modal Règles -->
+  <div class="overlay" id="rulesOverlay" style="display: none;">
+    <div class="modal">
+      <h2>Comment jouer ?</h2>
+      <ul style="text-align: left; margin: 15px 0; padding-left: 20px; color: var(--text);">
+        <li style="margin-bottom: 8px;"><b>Déblayez</b> la neige en cliquant ou glissant (mobile).</li>
+        <li style="margin-bottom: 8px;">Achetez de <b>meilleures pelles</b> pour déblayer plus large.</li>
+        <li style="margin-bottom: 8px;"><b>Débloquez des skieurs</b> qui déblaieront pour vous de manière autonome.</li>
+        <li style="margin-bottom: 8px;">Achetez l'amélioration <b>Gains</b> pour augmenter l'argent rapporté.</li>
+        <li style="margin-bottom: 8px;">Vous pouvez lancer la descente des skieurs lorsqu'ils sont prêts.</li>
+      </ul>
+      <button class="close-btn" id="closeRulesBtn">Fermer</button>
     </div>
   </div>
 
-  <!-- Infos de droite (Upgrades) -->
-  <div class="ui-panel right-panel">
-    <div class="ui-row">
-      <span class="label">🛠️ Pelle :</span>
-      <span id="ui-shovel" class="value">Niveau 1</span>
-    </div>
-    <div id="ui-skier-status" class="ui-status">Skieurs non débloqués</div>
-  </div>
-
-  <!-- Scripts -->
-  <script type="module" src="./js/main.js"></script>
-  <script type="module" src="./js/ui/menu.js"></script>
-  <script type="module" src="./js/ui/menuParams.js"></script>
+  <!-- Temps de jeu (compteur du site) -->
   <script type="module" src="../../js/countPlayedTime.js"></script>
+
+  <!-- Jeu -->
+  <script type="module" src="./js/game.js"></script>
 </body>
 
 </html>

@@ -153,6 +153,10 @@
             "snake": {
                 "name": "Snake",
                 "description": "Fais grandir ton serpent en mangeant des fruits, mais attention à ne pas te mordre la queue !"
+            },
+            "maze": {
+                "name": "Labyrinthe 3D",
+                "description": "Explore un labyrinthe en 3D et trouve la sortie avant de te perdre !"
             }
         },
         "badges": {

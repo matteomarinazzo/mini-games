@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Labyrinthe 3D – Trouve la sortie | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Labyrinthe 3D sur Mini‑Games. Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/maze/" />
+
+    <!-- Open Graph (og:image / twitter:image volontairement absents : visuel assets/logos/maze.webp à créer, voir README) -->
+    <meta property="og:title" content="Labyrinthe 3D – Trouve la sortie | Mini‑Games">
+    <meta property="og:description" content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/maze/">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Labyrinthe 3D – Trouve la sortie | Mini‑Games">
+    <meta name="twitter:description" content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Labyrinthe 3D",
+      "url": "https://mini-games.ch/games/maze/",
+      "description": "Jeu d'exploration : parcourez un labyrinthe en pseudo-3D à la première personne et trouvez la sortie le plus vite possible.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Adventure Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- SKY BACKGROUND -->
+    <canvas id="skyCanvas"></canvas>
+
+    <!-- GAME CANVAS (vue à la première personne) -->
+    <canvas id="gameCanvas" aria-label="Vue à la première personne du labyrinthe"></canvas>
+
+    <!-- ─── START OVERLAY ─── -->
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🧭</div>
+            <h2 class="start-title">Labyrinthe 3D</h2>
+            <p class="start-text">Trouve la <strong>sortie</strong> : une colonne <strong>rose</strong> au bout d'un
+                cul-de-sac.<br>Plus tu es rapide, mieux c'est !</p>
+            <p class="start-keys">↑ ↓ · W / S · Z : avancer, reculer<br>← → · A / D · Q : tourner<br>Échap : pause · sur mobile : boutons en bas</p>
+            <div class="diff-row" id="diffRow" role="group" aria-label="Taille du labyrinthe">
+                <button class="diff-btn" data-level="easy" aria-pressed="false">Petit<span>8×8</span></button>
+                <button class="diff-btn selected" data-level="normal" aria-pressed="true">Moyen<span>15×15</span></button>
+                <button class="diff-btn" data-level="hard" aria-pressed="false">Grand<span>25×25</span></button>
+                <button class="diff-btn" data-level="custom" aria-pressed="false">Perso<span id="customSizeLabel">12×12</span></button>
+            </div>
+            <div class="custom-panel" id="customPanel" hidden>
+                <label class="custom-field">Colonnes
+                    <input type="number" id="customCols" inputmode="numeric" min="2" max="60" step="1" value="12" autocomplete="off">
+                </label>
+                <span class="custom-x" aria-hidden="true">×</span>
+                <label class="custom-field">Lignes
+                    <input type="number" id="customRows" inputmode="numeric" min="2" max="60" step="1" value="12" autocomplete="off">
+                </label>
+                <p class="custom-note">De 2 à 60 par côté. Pas de record pour cette taille.</p>
+            </div>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+        </div>
+    </div>
+
+    <!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Nouveau labyrinthe</button>
+                <button class="btn-sky secondary" id="sizePauseBtn">Changer la taille</button>
+                <button class="btn-sky secondary danger" id="abandonBtn">Abandonner</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+                <div class="tertiary-controls">
+                    <button class="btn-tertiary" id="soundToggle" title="Son">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                    </button>
+                    <button class="btn-tertiary" id="musicToggle" title="Musique">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18V5l12-2v13"></path>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <circle cx="18" cy="16" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── VICTOIRE OVERLAY (avec vue de dessus) ─── -->
+    <div class="overlay" id="winOverlay">
+        <div class="modal win-modal">
+            <div class="gameover-title win-title" id="winTitle">🏁 Sortie trouvée !</div>
+            <div class="win-record" id="winRecord" hidden>🏆 Nouveau record !</div>
+            <div class="win-note" id="winNote" hidden></div>
+
+            <div class="map-wrap" id="mapWrap">
+                <canvas id="mapCanvas" aria-label="Vue de dessus du labyrinthe : départ, sortie, ton trajet et le chemin le plus court"></canvas>
+            </div>
+            <div class="map-legend">
+                <span class="map-key"><i class="dot start"></i>Départ</span>
+                <span class="map-key"><i class="dot exit"></i>Sortie</span>
+                <button class="map-chip on" data-layer="trail" aria-pressed="true"><i class="line trail"></i>Mon trajet</button>
+                <button class="map-chip on" data-layer="best" aria-pressed="true"><i class="line best"></i>Chemin le plus court</button>
+            </div>
+
+            <div class="final-stats">
+                <div class="stat-row"><span>Temps</span><span class="stat-val" id="winTime">0:00.0</span></div>
+                <div class="stat-row"><span>Meilleur temps</span><span class="stat-val" id="winRecTime">–</span></div>
+                <div class="stat-row"><span>Record mondial</span><span class="stat-val" id="winWorld">–</span></div>
+                <div class="stat-row"><span>Distance parcourue</span><span class="stat-val"><span id="winDist">0</span> m</span></div>
+                <div class="stat-row"><span>Chemin le plus court</span><span class="stat-val"><span id="winBest">0</span> m</span></div>
+                <div class="stat-row"><span>Labyrinthe</span><span class="stat-val" id="winSize">15×15</span></div>
+            </div>
+            <div class="pause-menu">
+                <button class="btn-sky" id="winAgainBtn">Nouveau labyrinthe</button>
+                <button class="btn-sky secondary" id="winSizeBtn">Changer la taille</button>
+                <button class="btn-sky secondary" id="winMenuBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── RÈGLES OVERLAY (placé après les autres : s'ouvre par-dessus) ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose" aria-label="Fermer">✕</button>
+            <h2>📖 Règles du Labyrinthe 3D</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Trouve la <strong>sortie</strong> (colonne <strong>rose</strong>) le plus vite possible.</li>
+                    <li>Le chrono démarre au premier pas et s'arrête à la sortie.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🧭 Le labyrinthe</h3>
+                <ul>
+                    <li>Un seul chemin relie le <strong>départ</strong> (dalle verte) à la sortie.</li>
+                    <li>Les murs sont infranchissables : tu glisses le long.</li>
+                    <li>À l'arrivée, une <strong>vue de dessus</strong> montre ton trajet et le chemin le plus court (tu peux afficher ou masquer chaque tracé).</li>
+                    <li>Tu peux <strong>abandonner</strong> depuis le menu pause : la vue de dessus s'affiche aussi, sans enregistrer de temps.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📐 Tailles</h3>
+                <ul>
+                    <li><strong>Petit</strong> 8×8, <strong>Moyen</strong> 15×15, <strong>Grand</strong> 25×25 : meilleur temps et record mondial.</li>
+                    <li><strong>Perso</strong> : de 2 à 60 colonnes et lignes, <strong>sans record</strong>.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>↑ ↓</strong> ou <strong>W S</strong> (<strong>Z</strong>) – Avancer, reculer</li>
+                    <li><strong>← →</strong> ou <strong>A D</strong> (<strong>Q</strong>) – Tourner</li>
+                    <li><strong>Mobile</strong> – Boutons ◀ ▶ (tourner) et ▼ ▲ (reculer, avancer), maintenir ; plusieurs doigts possibles</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY (meilleurs temps locaux) ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose" aria-label="Fermer">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+            <section class="records-section">
+                <h3>👤 Mes meilleurs temps</h3>
+                <div class="record-grid">
+                    <div class="record-card"><span class="rc-label">Petit · 8×8</span><span class="rc-value" id="recEasy">–</span></div>
+                    <div class="record-card"><span class="rc-label">Moyen · 15×15</span><span class="rc-value" id="recNormal">–</span></div>
+                    <div class="record-card"><span class="rc-label">Grand · 25×25</span><span class="rc-value" id="recHard">–</span></div>
+                </div>
+            </section>
+            <section class="records-section">
+                <h3>🌍 Record mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global"><span class="rc-label">Petit · 8×8</span><span class="rc-value" id="wrEasy">–</span></div>
+                    <div class="record-card global"><span class="rc-label">Moyen · 15×15</span><span class="rc-value" id="wrNormal">–</span></div>
+                    <div class="record-card global"><span class="rc-label">Grand · 25×25</span><span class="rc-value" id="wrHard">–</span></div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+            <p class="records-note">La taille personnalisée n'a pas de record.</p>
+        </div>
+    </div>
+
+    <!-- ─── POPUP RECORD MONDIAL (au-dessus des autres fenêtres) ─── -->
+    <div class="overlay" id="recordMessagePopup">
+        <div class="modal">
+            <h2>🏆 Record mondial !</h2>
+            <p>Tu as battu le record mondial. Laisse un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Ton message..." maxlength="50" autocomplete="off">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label" id="hudLabel">Temps</span>
+            <span class="score-value" id="timeValue">0:00.0</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" />
+                    <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- INDICATEURS LATÉRAUX (comme Ball Rush) -->
+    <div id="bestBadge">Meilleur<span id="bestVal">–</span></div>
+    <div id="heightIndicator">
+        <span class="hi-label">Distance</span>
+        <span class="hi-value"><span id="distVal">0</span> m</span>
+    </div>
+
+    <!-- CONTROL HINT (clavier) -->
+    <div id="tapHint">↑ ↓ pour avancer · ← → pour tourner</div>
+
+    <!-- COMMANDES TACTILES : tourner à gauche, avancer/reculer à droite (maintenir) -->
+    <div class="pad" id="pad">
+        <div class="pad-group">
+            <button class="pad-btn" data-act="left" aria-label="Tourner à gauche">◀</button>
+            <button class="pad-btn" data-act="right" aria-label="Tourner à droite">▶</button>
+        </div>
+        <div class="pad-group">
+            <button class="pad-btn" data-act="back" aria-label="Reculer">▼</button>
+            <button class="pad-btn" data-act="fwd" aria-label="Avancer">▲</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

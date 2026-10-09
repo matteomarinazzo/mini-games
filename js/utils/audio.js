@@ -3269,7 +3269,7 @@ export function playLetterbyLetterSound(type, step = 0) {
 // GESTION DE LA VISIBILITÉ DE LA PAGE
 // ─────────────────────────────────────────────
 const musicStates = {
-    music: false, bp: false, bs: false, lp: false, menu: false, casino: false, funfair: false, gq: false
+    music: false, bp: false, bs: false, lp: false, menu: false, casino: false, funfair: false, gq: false, maze: false
 };
 
 document.addEventListener("visibilitychange", () => {
@@ -3282,6 +3282,7 @@ document.addEventListener("visibilitychange", () => {
         musicStates.casino = casinoMusicRunning;
         musicStates.funfair = funfairMusicRunning;
         musicStates.gq = gqMusicRunning;
+        musicStates.maze = typeof mazeMusicRunning !== 'undefined' ? mazeMusicRunning : false;
 
         stopMusic();
         stopBpMusic();
@@ -3291,6 +3292,7 @@ document.addEventListener("visibilitychange", () => {
         stopCasinoMusic();
         stopFunfairMusic();
         stopGqMusic();
+        if (typeof stopMazeMusic === 'function') stopMazeMusic();
     } else {
         if (musicStates.music) startMusic();
         if (musicStates.bp) startBpMusic();
@@ -3300,5 +3302,234 @@ document.addEventListener("visibilitychange", () => {
         if (musicStates.casino) startCasinoMusic();
         if (musicStates.funfair) startFunfairMusic();
         if (musicStates.gq) startGqMusic();
+        if (musicStates.maze && typeof startMazeMusic === 'function') startMazeMusic();
     }
 });
+
+// ─────────────────────────────────────────────
+// SONS ET MUSIQUE — MAZE (Labyrinthe 3D)
+// ─────────────────────────────────────────────
+
+export function playMazeSound(type) {
+    if (localStorage.getItem("maze_sound") === "false") return;
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    if (type === 'move') {
+        // Son discret (pas)
+        const master = out(ctx, 0.15);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.6, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 0.06);
+    } else if (type === 'win') {
+        // Son de victoire atmosphérique et cinématique (soulagement après l'angoisse)
+        const master = out(ctx, 0.8);
+
+        // Accord majeur riche et spatial (C majeur 9)
+        const notes = [130.81, 164.81, 196.00, 246.94, 293.66, 523.25];
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(200, now);
+        filter.frequency.exponentialRampToValueAtTime(3000, now + 1.5);
+        filter.frequency.exponentialRampToValueAtTime(400, now + 4);
+        filter.connect(master);
+
+        notes.forEach((f) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.value = f;
+
+            // Swell (montée douce)
+            g.gain.setValueAtTime(0, now);
+            g.gain.linearRampToValueAtTime(0.12, now + 0.5);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 4);
+
+            osc.connect(g); g.connect(filter);
+            osc.start(now); osc.stop(now + 4);
+
+            // Doubler avec une onde sinusoïdale pour la rondeur et la profondeur
+            const osc2 = ctx.createOscillator();
+            const g2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.value = f;
+            g2.gain.setValueAtTime(0, now);
+            g2.gain.linearRampToValueAtTime(0.2, now + 0.5);
+            g2.gain.exponentialRampToValueAtTime(0.001, now + 4);
+            osc2.connect(g2); g2.connect(master);
+            osc2.start(now); osc2.stop(now + 4);
+        });
+    } else if (type === 'abandon') {
+        // Son d'abandon organique (cœur qui s'arrête + vent sombre)
+        const master = out(ctx, 0.7);
+
+        // Battement grave
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(60, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 2);
+
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.7, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.1, now + 0.4);
+        g.gain.linearRampToValueAtTime(0.5, now + 0.7);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+        // Effet de tremblement/angoisse sur le battement
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(8, now);
+        lfo.frequency.linearRampToValueAtTime(2, now + 2);
+        lfoGain.gain.value = 0.5;
+        lfo.connect(lfoGain);
+        lfoGain.connect(g.gain);
+        lfo.start(now); lfo.stop(now + 2.5);
+
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 2.5);
+
+        // Souffle lugubre (bruit blanc filtré descendant)
+        const dur = 2.5;
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buf;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, now);
+        filter.frequency.exponentialRampToValueAtTime(80, now + dur);
+
+        const ng = ctx.createGain();
+        ng.gain.setValueAtTime(0, now);
+        ng.gain.linearRampToValueAtTime(0.4, now + 0.2);
+        ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+        noise.connect(filter); filter.connect(ng); ng.connect(master);
+        noise.start(now); noise.stop(now + dur);
+    }
+}
+
+export let mazeMusicRunning = false;
+let mazeMusicScheduler = null;
+let mazeBeat = 0;
+const MAZE_TEMPO = 90;
+
+function scheduleBar_maze() {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const beatDur = 60 / MAZE_TEMPO;
+
+    const master = out(ctx, 0.25);
+
+    // 1. Drone de fond très grave et évolutif (solitude, peur)
+    if (mazeBeat % 8 === 0) {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+
+        // Fréquences basses dissonantes et inquiétantes
+        const freqs = [55.00, 65.41, 73.42, 61.74]; // A1, C2, D2, B1
+        osc.frequency.value = freqs[(mazeBeat >> 3) % freqs.length];
+
+        // LFO pour faire vibrer le drone (sensation d'angoisse)
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.3; // lent
+        lfoGain.gain.value = 3; // +/- 3 Hz
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        lfo.start(now);
+        lfo.stop(now + beatDur * 8);
+
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.5, now + beatDur * 4); // Monte doucement
+        g.gain.linearRampToValueAtTime(0, now + beatDur * 8);   // Redescend
+
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + beatDur * 8);
+    }
+
+    // 2. Bruits de vent ou souffles aléatoires (présence fantomatique)
+    if (Math.random() < 0.3) {
+        const dur = beatDur * (1 + Math.random() * 2);
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buf;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 300 + Math.random() * 1000; // Fréquence hurlante aléatoire
+        filter.Q.value = 2 + Math.random() * 4; // Résonance marquée
+
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.15 + Math.random() * 0.1, now + dur / 2);
+        g.gain.linearRampToValueAtTime(0, now + dur);
+
+        noise.connect(filter); filter.connect(g); g.connect(master);
+        noise.start(now); noise.stop(now + dur);
+    }
+
+    // 3. Goutte d'eau isolée ou tintement métallique réverbérant
+    if (Math.random() < 0.15) {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        // Note très aiguë
+        osc.frequency.setValueAtTime(1000 + Math.random() * 2000, now);
+        g.gain.setValueAtTime(0.2, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 2); // Queue longue (réverbération simulée)
+        osc.connect(g); g.connect(master);
+        osc.start(now); osc.stop(now + 2);
+    }
+
+    mazeBeat++;
+}
+
+export function startMazeMusic() {
+    if (mazeMusicRunning || localStorage.getItem("maze_music") === "false") return;
+    mazeMusicRunning = true;
+    mazeBeat = 0;
+    const beatDur = 60 / MAZE_TEMPO;
+    scheduleBar_maze();
+    mazeMusicScheduler = setInterval(() => {
+        if (mazeMusicRunning) scheduleBar_maze();
+    }, beatDur * 1000);
+}
+
+export function stopMazeMusic() {
+    mazeMusicRunning = false;
+    if (mazeMusicScheduler) clearInterval(mazeMusicScheduler);
+}
+
+export function toggleMazeMusic() {
+    const isEnabled = localStorage.getItem("maze_music") !== "false";
+    const newState = !isEnabled;
+    localStorage.setItem("maze_music", newState);
+    if (newState) startMazeMusic();
+    else stopMazeMusic();
+    return newState;
+}
+
+export function toggleMazeSound() {
+    const isEnabled = localStorage.getItem("maze_sound") !== "false";
+    const newState = !isEnabled;
+    localStorage.setItem("maze_sound", newState);
+    return newState;
+}

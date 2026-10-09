@@ -47,6 +47,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "maze": {
+      "path": "./games/maze/index.html",
+      "name": "Labyrinthe 3D",
+      "emoji": "🌀",
+      "description": "Explore un labyrinthe en 3D et trouve la sortie avant de te perdre !",
+      "tags": [
+        "survival",
+        "exploration",
+        "reflexion",
+        "solo"
+      ],
+      "badge": "adventure",
+      "badgeText": "Aventure",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "rocketeer": {
       "path": "./games/rocketeer/index.html",
       "name": "Rocketeer",

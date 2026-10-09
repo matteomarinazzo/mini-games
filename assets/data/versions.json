@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.29.2026-10-09",
+    "currentVersion": "1.30.2026-10-09",
     "lastUpdate": "2026-10-09",
     "history": [
+        {
+            "version": "1.30.2026-10-09",
+            "date": "2026-10-09",
+            "changes": [
+                "Ajout du jeu Labyrinthe 3D"
+            ]
+        },
         {
             "version": "1.29.2026-10-09",
             "date": "2026-10-09",

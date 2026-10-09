@@ -1,0 +1,660 @@
+/* =============================================
+   SNOW DIGGER — game.css
+   Thème hivernal moderne, mobile-first
+   ============================================= */
+
+:root {
+  --snow-white: #f0f8ff;
+  --snow-bg: #e8f4fd;
+  --ice-blue: #a8d8f0;
+  --frost: #4a9fff;
+  --arctic: #1e3a5f;
+  --sky-top: #0d1b2e;
+  --sky-mid: #1a2f4e;
+  --sky-bot: #2a4a72;
+  --gold: #ffd43b;
+  --gold-dark: #e6ac00;
+  --green: #4caf50;
+  --panel-bg: rgba(10, 25, 50, 0.75);
+  --panel-border: rgba(100, 180, 255, 0.25);
+  --text: #e8f4ff;
+  --text-dim: rgba(200, 230, 255, 0.65);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --radius: 16px;
+  --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background: var(--sky-top);
+  cursor: none;
+  touch-action: none;
+}
+
+/* ── Canvas ── */
+#gameCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 1;
+  touch-action: none;
+}
+
+/* ── HUD container (au-dessus du canvas) ── */
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ── Stat bar (haut) ── */
+#statBar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: 50px;
+  padding: 8px 20px;
+  box-shadow: var(--shadow);
+  pointer-events: auto;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stat-item .stat-icon {
+  font-size: 16px;
+}
+
+.stat-item .stat-val {
+  color: var(--gold);
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: right;
+}
+
+.stat-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--panel-border);
+}
+
+/* Barre de progression terrain */
+#progressWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#progressBar {
+  width: 90px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--frost), #80cfff);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+#progressPct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--frost);
+  min-width: 38px;
+}
+
+/* Bouton accueil */
+#homeBtn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+#homeBtn:hover {
+  background: rgba(74, 159, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Bouton Règles */
+#rulesBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--text);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#rulesBtn:hover {
+  background: rgba(74, 159, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Modal / Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--sky-mid);
+  border: 2px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.modal h2 {
+  margin-bottom: 15px;
+  color: var(--gold);
+}
+
+.close-btn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  background: var(--gold-dark);
+  transform: scale(1.05);
+}
+
+/* ── HUD Bas (Conteneur) ── */
+#bottomHUD {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* ── Shop (bas) ── */
+#shop {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: auto;
+  max-width: 98vw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.shop-card {
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 88px;
+  max-width: 110px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(74, 159, 255, 0.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.shop-card:hover::before {
+  opacity: 1;
+}
+
+.shop-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(74, 159, 255, 0.5);
+}
+
+.shop-card:active {
+  transform: translateY(-1px);
+}
+
+.shop-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.shop-card.locked:hover {
+  transform: none;
+  border-color: var(--panel-border);
+}
+
+.shop-card.maxed {
+  border-color: rgba(255, 212, 59, 0.4);
+  cursor: default;
+}
+
+.shop-card.maxed:hover {
+  transform: none;
+}
+
+.shop-card.affordable {
+  border-color: rgba(74, 159, 255, 0.5);
+}
+
+.shop-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.shop-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.shop-cost {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.shop-cost.free {
+  color: #5fffaa;
+}
+
+.shop-cost.max-txt {
+  color: var(--gold-dark);
+  font-size: 10px;
+}
+
+.shop-cost.cant-afford {
+  color: #ff8080;
+}
+
+/* Badge niveau sur la pelle */
+.shop-level-badge {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--gold);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 1px 4px;
+}
+
+/* Séparateur de catégorie dans le shop */
+.shop-sep {
+  width: 1px;
+  height: 60px;
+  background: var(--panel-border);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ── Skier status pill (dessus du shop) ── */
+#skierPill {
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+#skierPill.active {
+  color: #5fffaa;
+  border-color: rgba(95, 255, 170, 0.3);
+}
+
+#skierPill.recharge {
+  color: #ff8080;
+  border-color: rgba(255, 128, 128, 0.3);
+}
+
+/* ── Floating text (canvas-side, rendu en CSS pour la perf) ── */
+.float-txt {
+  position: fixed;
+  pointer-events: none;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--gold);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  z-index: 15;
+  animation: floatUp 1s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.85);
+  }
+}
+
+/* ── Indicateurs camera (flèches) ── */
+#camHints {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.cam-arrow {
+  position: absolute;
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.55);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  display: none;
+  animation: pulseFade 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseFade {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.cam-arrow.up {
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cam-arrow.down {
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cam-arrow.left {
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.cam-arrow.right {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ── Storm overlay ── */
+#stormOverlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(to bottom, rgba(100, 160, 220, 0.0), rgba(100, 160, 220, 0.0));
+  transition: background 3s ease;
+}
+
+#stormOverlay.storming {
+  background: linear-gradient(to bottom, rgba(80, 130, 200, 0.15), rgba(100, 160, 220, 0.08));
+}
+
+/* ── Mobile joystick hint ── */
+#joystickHint {
+  position: absolute;
+  bottom: 110px;
+  left: 10px;
+  width: 90px;
+  height: 90px;
+  border: 2px dashed rgba(74, 159, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(74, 159, 255, 0.5);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+  animation: pulseFade 2s ease-in-out infinite;
+}
+
+/* ── Toast notifications ── */
+#toastContainer {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--panel-border);
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+}
+
+.toast.success {
+  border-color: rgba(95, 255, 170, 0.4);
+  color: #5fffaa;
+}
+
+.toast.error {
+  border-color: rgba(255, 100, 100, 0.4);
+  color: #ff8080;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0)
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-10px)
+  }
+}
+
+/* ── Responsive mobile ── */
+@media (max-width: 600px),
+(max-aspect-ratio: 3/4) {
+  #statBar {
+    gap: 10px;
+    padding: 6px 13px;
+    font-size: 12px;
+  }
+
+  .stat-item .stat-val {
+    font-size: 13px;
+  }
+
+  #progressBar {
+    width: 60px;
+  }
+
+  .shop-card {
+    min-width: 66px;
+    max-width: 80px;
+    padding: 6px 6px;
+    gap: 4px;
+  }
+
+  .shop-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .shop-label {
+    font-size: 9px;
+  }
+
+  .shop-cost {
+    font-size: 10px;
+  }
+
+  #skierPill {
+    font-size: 10px;
+    padding: 4px 12px;
+  }
+
+  .cam-arrow {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  #statBar {
+    flex-wrap: wrap;
+    width: 92vw;
+    justify-content: center;
+    border-radius: var(--radius);
+  }
+
+  #shop {
+    gap: 4px;
+  }
+
+  .shop-card {
+    min-width: 60px;
+    max-width: 72px;
+    padding: 4px 4px;
+  }
+}

@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.31.2026-10-09",
-    "lastUpdate": "2026-10-09",
+    "currentVersion": "1.31.2026-10-10",
+    "lastUpdate": "2026-10-10",
     "history": [
+        {
+            "version": "1.31.2026-10-10",
+            "date": "2026-10-10",
+            "changes": [
+                "Refonte totale du jeu Snow Digger"
+            ]
+        },
         {
             "version": "1.31.2026-10-09",
             "date": "2026-10-09",

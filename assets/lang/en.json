@@ -147,6 +147,10 @@
             "crossword": {
                 "name": "Crossword",
                 "description": "Find the hidden words in the grid, then discover the mystery word with the remaining letters."
+            },
+            "snake": {
+                "name": "Snake",
+                "description": "Grow your snake by eating fruits, but be careful not to bite your own tail!"
             }
         },
         "badges": {

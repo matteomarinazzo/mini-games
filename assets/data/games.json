@@ -179,6 +179,21 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "snake": {
+      "path": "./games/snake/index.html",
+      "name": "Snake",
+      "emoji": "🐍",
+      "description": "Fais grandir ton serpent en mangeant des fruits, mais attention à ne pas te mordre la queue !",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "classic"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "lights-out-reflex": {
       "path": "./games/lights-out-reflex/index.html",
       "name": "Lights Out Reflex",

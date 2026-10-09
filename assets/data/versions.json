@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.28.2026-10-08",
-    "lastUpdate": "2026-10-08",
+    "currentVersion": "1.29.2026-10-09",
+    "lastUpdate": "2026-10-09",
     "history": [
+        {
+            "version": "1.29.2026-10-09",
+            "date": "2026-10-09",
+            "changes": [
+                "Ajout du jeu Snake"
+            ]
+        },
         {
             "version": "1.28.2026-10-08",
             "date": "2026-10-08",

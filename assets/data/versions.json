@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.30.2026-10-09",
+    "currentVersion": "1.31.2026-10-09",
     "lastUpdate": "2026-10-09",
     "history": [
+        {
+            "version": "1.31.2026-10-09",
+            "date": "2026-10-09",
+            "changes": [
+                "Refonte totale de la page d'accueil et de la page à propos"
+            ]
+        },
         {
             "version": "1.30.2026-10-09",
             "date": "2026-10-09",

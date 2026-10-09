@@ -1,8 +1,6 @@
-// Importez les fonctions nécessaires de l'SDK Firebase
-//import { database, ref, onValue, get, set } from "../js/config/firebase-config.js";
-import { listenToRatingChanges, getRating, saveRating, saveUserRating, getLocalRating, getUserRating, calculateAverage, updateRatingDisplay, generateStars } from "../js/firebaseWrk.js";
+import { listenToRatingChanges, getRating, saveRating, saveUserRating, getUserRating, calculateAverage, updateRatingDisplay } from "./firebaseWrk.js";
+import { playGameSound } from "./utils/audio.js";
 
-const STAR_ICON = "\u2605";
 const subscribedRatings = new Set();
 
 // Initialiser le système de notation
@@ -30,7 +28,7 @@ async function loadAndDisplayRatings() {
   }
 }
 
-// Configurer les listeners
+// Configurer les listeners sur les cartes
 function setupRatingListeners() {
   const gameCards = document.querySelectorAll(".game-card:not(.coming-soon)");
 
@@ -39,84 +37,156 @@ function setupRatingListeners() {
     const rating = card.querySelector(".rating");
 
     if (!rating) return;
-
-    // Éviter d'ajouter plusieurs fois le même listener
     if (rating.dataset.ratingListener) return;
 
     rating.style.cursor = "pointer";
-    rating.title = "Cliquez pour noter ce jeu";
+    rating.title = window.t ? window.t("menu.rating.title") : "Noter ce jeu";
 
     rating.addEventListener("click", (e) => {
       e.stopPropagation();
       openRatingModal(gameId);
     });
 
-    // Marquer comme ayant un listener
     rating.dataset.ratingListener = "true";
   });
 }
 
+// Helper pour récupérer le nom du jeu
+function getGameInfo(gameId) {
+  const card = document.querySelector(`.game-card[data-game="${gameId}"]`);
+  const rawTitle = card?.querySelector(".card-title")?.textContent || gameId;
+  const translatedName = window.t ? window.t(`menu.games.${gameId}.name`) : rawTitle;
+  return {
+    name: translatedName || rawTitle,
+    logoUrl: `assets/logos/${gameId}.webp`
+  };
+}
+
+// Helper i18n
+function tr(key, fallback = "") {
+  if (typeof window.t === "function") {
+    const val = window.t(key);
+    if (val && val !== key) return val;
+  }
+  return fallback;
+}
+
 // Ouvrir la modal
-async function openRatingModal(gameId) {
+export async function openRatingModal(gameId) {
+  // Fermer toute modal ouverte existante
+  document.querySelectorAll(".rating-modal").forEach(m => m.remove());
+
   const ratingData = await getRating(gameId);
   const userRating = getUserRating(gameId);
-  const hasRated = userRating !== null;
+  const hasRated = userRating !== null && userRating !== undefined;
+  const gameInfo = getGameInfo(gameId);
+
+  const avgScore = calculateAverage(ratingData.total, ratingData.count);
+
+  const scoreSentiments = {
+    1: tr("menu.rating.score_1", "Pas terrible 😕"),
+    2: tr("menu.rating.score_2", "Moyen 😐"),
+    3: tr("menu.rating.score_3", "Pas mal 🙂"),
+    4: tr("menu.rating.score_4", "Très bon ! 😄"),
+    5: tr("menu.rating.score_5", "Chef-d'œuvre ! 🤩")
+  };
 
   const modal = document.createElement("div");
   modal.className = "rating-modal";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-label", tr("menu.rating.title", "Noter ce jeu"));
+
   modal.innerHTML = `
     <div class="rating-modal-content">
-      <button class="modal-close">&times;</button>
-      <h3>Notez ce jeu</h3>
-      <p class="modal-subtitle">
-        ${hasRated ? "Vous avez déjà noté ce jeu. Vous pouvez modifier votre note." : "Votre avis compte !"}
-      </p>
+      <!-- Accent Top Glow Rim -->
+      <div class="rating-modal-rim"></div>
       
-      <div class="star-rating">
-        ${[5, 4, 3, 2, 1]
-      .map(
-        (star) => `
-          <input type="radio" id="star${star}-${gameId}" name="rating" value="${star}" 
-                 ${userRating === star ? "checked" : ""}>
-          <label for="star${star}-${gameId}" title="${star} \u00e9toile${star > 1 ? "s" : ""}">${STAR_ICON}</label>
-        `,
-      )
-      .join("")}
+      <button class="modal-close" aria-label="Fermer" title="Fermer">✕</button>
+      
+      <!-- Game Info Header -->
+      <div class="rating-game-header">
+        <div class="rating-game-logo-wrap">
+          <img src="${gameInfo.logoUrl}" alt="${gameInfo.name}" class="rating-game-logo" 
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <span class="rating-game-fallback-icon" style="display:none;">🎮</span>
+        </div>
+        <div class="rating-game-text">
+          <h4 class="rating-game-name">${gameInfo.name}</h4>
+          <p class="rating-modal-subtitle">
+            ${hasRated ? tr("menu.rating.subtitle_rated", "Vous avez déjà noté ce jeu. Vous pouvez modifier votre note.") : tr("menu.rating.subtitle_default", "Votre avis compte pour la communauté !")}
+          </p>
+        </div>
+      </div>
+
+      <!-- Star Rating Input Interactive -->
+      <div class="star-rating-container">
+        <div class="star-rating" id="starRatingGroup">
+          ${[5, 4, 3, 2, 1].map((star) => `
+            <input type="radio" id="star${star}-${gameId}" name="rating" value="${star}" 
+                   ${userRating === star ? "checked" : ""}>
+            <label for="star${star}-${gameId}" data-star="${star}" title="${star} ⭐" aria-label="${star} étoiles">
+              <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </label>
+          `).join("")}
+        </div>
+        
+        <!-- Reaction Feedback Tag -->
+        <div class="star-sentiment-pill ${userRating ? 'is-active' : ''}" id="starSentimentPill">
+          ${userRating ? scoreSentiments[userRating] : '—'}
+        </div>
       </div>
       
+      <!-- Live Community Stats -->
       <div class="modal-stats">
-        <p>Note moyenne: <strong>${calculateAverage(ratingData.total, ratingData.count)}/5</strong></p>
-        <p>Nombre de votes: <strong>${ratingData.count}</strong></p>
-        ${hasRated ? `<p>Votre note: <strong>${userRating} ${STAR_ICON}</strong></p>` : ""}
+        <div class="stat-pill">
+          <span class="stat-label">${tr("menu.rating.average", "Note moyenne")}</span>
+          <span class="stat-val highlight"><span class="star-mini">⭐</span> ${avgScore} <small>/ 5</small></span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">${tr("menu.rating.votes", "Nombre de votes")}</span>
+          <span class="stat-val">${ratingData.count || 0}</span>
+        </div>
+        ${hasRated ? `
+          <div class="stat-pill user-current">
+            <span class="stat-label">${tr("menu.rating.your_rating", "Votre note")}</span>
+            <span class="stat-val user-val">${userRating} ⭐</span>
+          </div>
+        ` : ""}
       </div>
       
+      <!-- Buttons -->
       <div class="modal-buttons">
-        <button class="btn-cancel">Annuler</button>
-        <button class="btn-submit" ${userRating === null ? "disabled" : ""}>
-          ${hasRated ? "Modifier" : "Valider"}
+        <button class="btn-cancel" type="button">${tr("menu.rating.btn_cancel", "Annuler")}</button>
+        <button class="btn-submit" type="button" ${userRating === null ? "disabled" : ""}>
+          ${hasRated ? tr("menu.rating.btn_modify", "Mettre à jour") : tr("menu.rating.btn_submit", "Valider ma note")}
         </button>
       </div>
       
-      <p class="modal-info">"🌍 Les notes sont partagées entre tous les joueurs"</p>
+      <p class="modal-info">${tr("menu.rating.info_shared", "🌍 Les notes sont partagées en temps réel entre tous les joueurs")}</p>
     </div>
   `;
 
   document.body.appendChild(modal);
-  setTimeout(() => modal.classList.add("show"), 10);
+  requestAnimationFrame(() => modal.classList.add("show"));
 
-  setupModalListeners(modal, gameId, ratingData, userRating);
+  setupModalListeners(modal, gameId, ratingData, userRating, scoreSentiments);
 }
 
 // Configurer les listeners de la modal
-function setupModalListeners(modal, gameId, ratingData, currentUserRating) {
+function setupModalListeners(modal, gameId, ratingData, currentUserRating, scoreSentiments) {
   const closeBtn = modal.querySelector(".modal-close");
   const cancelBtn = modal.querySelector(".btn-cancel");
   const submitBtn = modal.querySelector(".btn-submit");
   const radioInputs = modal.querySelectorAll('input[name="rating"]');
+  const labels = modal.querySelectorAll('.star-rating label');
+  const sentimentPill = modal.querySelector('#starSentimentPill');
 
   const closeModal = () => {
     modal.classList.remove("show");
-    setTimeout(() => modal.remove(), 300);
+    setTimeout(() => modal.remove(), 320);
   };
 
   closeBtn.addEventListener("click", closeModal);
@@ -125,9 +195,67 @@ function setupModalListeners(modal, gameId, ratingData, currentUserRating) {
     if (e.target === modal) closeModal();
   });
 
+  // Clavier Escape
+  const keyHandler = (e) => {
+    if (e.key === "Escape") {
+      closeModal();
+      document.removeEventListener("keydown", keyHandler);
+    }
+    // Raccourcis touches 1 à 5
+    if (['1', '2', '3', '4', '5'].includes(e.key)) {
+      const star = parseInt(e.key);
+      const radio = modal.querySelector(`input[name="rating"][value="${star}"]`);
+      if (radio) {
+        radio.checked = true;
+        submitBtn.disabled = false;
+        updateSentiment(star);
+        if (playGameSound) playGameSound('menu_hover');
+      }
+    }
+    if (e.key === "Enter" && !submitBtn.disabled) {
+      submitBtn.click();
+    }
+  };
+  document.addEventListener("keydown", keyHandler);
+
+  function updateSentiment(starVal) {
+    if (!sentimentPill) return;
+    if (scoreSentiments[starVal]) {
+      sentimentPill.textContent = scoreSentiments[starVal];
+      sentimentPill.classList.add('is-active');
+      sentimentPill.style.animation = 'none';
+      sentimentPill.offsetHeight; // reflow
+      sentimentPill.style.animation = 'pillBounce 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+  }
+
+  // Hover sur les étoiles pour prévisualiser la réaction
+  labels.forEach((lbl) => {
+    lbl.addEventListener("mouseenter", () => {
+      const star = parseInt(lbl.dataset.star);
+      updateSentiment(star);
+    });
+    lbl.addEventListener("mouseleave", () => {
+      const checked = modal.querySelector('input[name="rating"]:checked');
+      if (checked) {
+        updateSentiment(parseInt(checked.value));
+      } else {
+        if (sentimentPill) {
+          sentimentPill.textContent = '—';
+          sentimentPill.classList.remove('is-active');
+        }
+      }
+    });
+  });
+
   radioInputs.forEach((input) => {
     input.addEventListener("change", () => {
       submitBtn.disabled = false;
+      const starVal = parseInt(input.value);
+      updateSentiment(starVal);
+
+      if (playGameSound) playGameSound('menu_hover');
+      if (navigator.vibrate) navigator.vibrate(25);
     });
   });
 
@@ -137,7 +265,7 @@ function setupModalListeners(modal, gameId, ratingData, currentUserRating) {
 
     const rating = parseInt(selectedRating.value);
 
-    submitBtn.innerHTML = "⏳ Enregistrement...";
+    submitBtn.innerHTML = `<span class="btn-spinner"></span> ${tr("menu.rating.saving", "Enregistrement en cours…")}`;
     submitBtn.disabled = true;
 
     const success = await submitRating(
@@ -148,69 +276,60 @@ function setupModalListeners(modal, gameId, ratingData, currentUserRating) {
     );
 
     if (success) {
+      document.removeEventListener("keydown", keyHandler);
       const content = modal.querySelector(".rating-modal-content");
       content.innerHTML = `
+        <div class="rating-modal-rim"></div>
         <div class="success-message">
-          <div class="success-icon">✓</div>
-          <h3>Merci !</h3>
-          <p>Votre note a été enregistrée</p>
-          '<p class="success-subtitle">Elle est maintenant visible par tous les joueurs !</p>'
+          <div class="success-icon-wrap">
+            <svg class="success-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="success-title">${tr("menu.rating.success_title", "Merci pour ton vote !")}</h3>
+          <p class="success-desc">${tr("menu.rating.success_desc", "Ta note a été enregistrée avec succès.")}</p>
+          <div class="success-score-badge">${rating} ⭐</div>
+          <p class="success-subtitle">${tr("menu.rating.success_sub", "🌍 Visible instantanément par tous les joueurs !")}</p>
         </div>
       `;
 
-      if (navigator.vibrate) navigator.vibrate(50);
-      setTimeout(closeModal, 2000);
+      if (playGameSound) playGameSound('menu_hover');
+      if (navigator.vibrate) navigator.vibrate([40, 60, 80]);
+      setTimeout(closeModal, 1800);
     } else {
-      submitBtn.innerHTML = "❌ Erreur - Réessayer";
+      submitBtn.innerHTML = tr("menu.rating.error", "❌ Erreur — Réessayer");
       submitBtn.disabled = false;
     }
   });
 }
 
-// Soumettre une note - VERSION CORRIGÉE
+// Soumettre une note
 async function submitRating(gameId, newRating, currentData, oldUserRating) {
   try {
-    console.log(`🎯 Soumission note pour ${gameId}:`, {
-      newRating,
-      currentData,
-      oldUserRating,
-    });
-
-    // S'assurer que currentData existe et a des valeurs valides
     const initialData = currentData || { total: 0, count: 0 };
     let total = initialData.total || 0;
     let count = initialData.count || 0;
 
-    // CORRECTION: Vérifier que oldUserRating n'est pas null AVANT de soustraire
     if (oldUserRating !== null && oldUserRating !== undefined) {
       total -= oldUserRating;
       count -= 1;
-    } else {
-      console.log(`🆕 Première note pour ce jeu: ${newRating}`);
     }
 
-    // Ajouter la nouvelle note
     total += newRating;
     count += 1;
 
     const newData = { total, count };
 
-    // Validation des données
     if (
       typeof newData.total !== "number" ||
       isNaN(newData.total) ||
       newData.total < 0 ||
       typeof newData.count !== "number" ||
       isNaN(newData.count) ||
-      newData.count < 0
+      newData.count < 0 ||
+      newData.total > newData.count * 5
     ) {
       console.error("❌ Les données de notation sont invalides :", newData);
-      return false;
-    }
-
-    // Validation supplémentaire: total ne peut pas dépasser count * 5
-    if (newData.total > newData.count * 5) {
-      console.error("❌ Total invalide (> count * 5) :", newData);
       return false;
     }
 
@@ -218,7 +337,6 @@ async function submitRating(gameId, newRating, currentData, oldUserRating) {
     if (!saved) return false;
 
     saveUserRating(gameId, newRating);
-
     return true;
   } catch (error) {
     console.error("❌ Erreur soumission:", error);
@@ -226,7 +344,6 @@ async function submitRating(gameId, newRating, currentData, oldUserRating) {
   }
 }
 
-// Stats (pour debug)
 export async function getRatingStats(gameId) {
   const ratingData = await getRating(gameId);
   const userRating = getUserRating(gameId);

@@ -105,11 +105,13 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
+  <!-- Ambient FX Container for custom themes (Fire, Cyberpunk, Forest, Midnight...) -->
+  <div class="theme-ambient-fx" id="themeAmbientFx" aria-hidden="true"></div>
 
   <!-- Header -->
   <header class="header" style="position: relative;">
 
-    <!-- Profile Button (top-left) -->
+    <!-- Profile & XP Area (top-left) -->
     <div class="profile-btn-wrapper">
       <button id="profileBtn" class="profile-btn" title="Mon Profil">
         <span class="profile-avatar" id="profileAvatar">
@@ -120,6 +122,15 @@
           </svg>
         </span>
         <span class="profile-badge-count" id="profileBadgeCount" style="display:none">0</span>
+      </button>
+
+      <!-- Mini-widget XP & Niveau dans le Header -->
+      <button id="headerXpWidget" class="header-xp-widget" title="Progression du niveau - Ouvrir le profil">
+        <span class="header-xp-level" id="headerXpLevel">⭐ Niv. 1</span>
+        <div class="header-xp-bar" aria-hidden="true">
+          <div class="header-xp-bar-fill" id="headerXpBarFill" style="width: 0%;"></div>
+        </div>
+        <span class="header-xp-val" id="headerXpVal">0/250</span>
       </button>
     </div>
 
@@ -196,9 +207,74 @@
       </div>
     </div>
 
-    <!-- Search Bar-->
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Rechercher un jeu..." data-i18n="menu.search_placeholder" />
+    <!-- Search & Sort Bar Controls -->
+    <div class="search-controls-wrapper">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Rechercher un jeu..." data-i18n="menu.search_placeholder"
+          autocomplete="off" />
+        <button id="searchClearBtn" class="search-clear-btn hidden" type="button" title="Effacer la recherche"
+          aria-label="Effacer">✕</button>
+      </div>
+
+      <div class="sort-selector-wrapper">
+        <span class="sort-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+          <span data-i18n="menu.sort_label">Trier par :</span>
+        </span>
+        <div class="sort-select-box" id="sortSelectorBox">
+          <!-- Dropdown custom injecté dynamiquement par initSortControls() -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured & Recently Played Section -->
+    <div class="featured-recent-container" id="featuredRecentContainer">
+      <!-- Jeu vedette du jour -->
+      <div class="daily-boost-card hidden" id="dailyBoostCard">
+        <div class="boost-badge">
+          <span class="boost-star">⭐</span>
+          <span data-i18n="menu.daily_boost_badge">VEDETTE DU JOUR</span>
+        </div>
+        <div class="boost-main">
+          <div class="boost-thumb" id="boostThumb">
+            <!-- Icone ou logo -->
+          </div>
+          <div class="boost-info">
+            <h4 class="boost-title" id="boostGameTitle">—</h4>
+            <p class="boost-desc" data-i18n="menu.daily_boost_desc">Joue à ce jeu aujourd'hui pour remporter un bonus
+              exclusif !</p>
+          </div>
+        </div>
+        <div class="boost-action">
+          <div class="boost-reward" data-i18n="menu.daily_boost_bonus">+50 XP Bonus</div>
+          <button class="btn-boost-play" id="boostPlayBtn" data-i18n="menu.play">Jouer</button>
+        </div>
+      </div>
+
+      <!-- Bandeau Récemment Joués -->
+      <div class="recent-games-wrapper hidden" id="recentGamesWrapper">
+        <div class="recent-header">
+          <span class="recent-title" data-i18n="menu.recent_games_title">🕹️ Reprendre la partie</span>
+        </div>
+        <div class="recent-games-list" id="recentGamesList">
+          <!-- Injecté par JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State for Search / Filters -->
+    <div id="searchEmptyState" class="search-empty-state hidden">
+      <div class="empty-icon-wrap">
+        <span class="empty-icon">🔍</span>
+      </div>
+      <h3 class="empty-title" data-i18n="menu.empty_search_title">Aucun jeu ne correspond à ta recherche 🔍</h3>
+      <p class="empty-desc" data-i18n="menu.empty_search_desc">Essaie un autre mot-clé ou réinitialise les filtres.</p>
+      <button id="emptyResetBtn" class="btn-empty-reset" type="button" data-i18n="menu.empty_search_reset">Réinitialiser
+        les filtres</button>
     </div>
 
     <!-- Games Grid -->
@@ -532,24 +608,45 @@
           </div>
           <div class="display-mode-group" id="displayModeGroup">
             <button class="display-mode-btn active" data-mode="grid" title="Grille">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="3" y="3" width="8" height="8" rx="1" />
-                <rect x="13" y="3" width="8" height="8" rx="1" />
-                <rect x="3" y="13" width="8" height="8" rx="1" />
-                <rect x="13" y="13" width="8" height="8" rx="1" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                <rect x="13" y="3" width="8" height="8" rx="1.5" />
+                <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                <rect x="13" y="13" width="8" height="8" rx="1.5" />
               </svg>
               <span data-i18n="profile.display_grid">Grille</span>
             </button>
+            <button class="display-mode-btn" data-mode="compact" title="Compact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="5" height="5" rx="1" />
+                <rect x="9.5" y="3" width="5" height="5" rx="1" />
+                <rect x="16" y="3" width="5" height="5" rx="1" />
+                <rect x="3" y="9.5" width="5" height="5" rx="1" />
+                <rect x="9.5" y="9.5" width="5" height="5" rx="1" />
+                <rect x="16" y="9.5" width="5" height="5" rx="1" />
+                <rect x="3" y="16" width="5" height="5" rx="1" />
+                <rect x="9.5" y="16" width="5" height="5" rx="1" />
+                <rect x="16" y="16" width="5" height="5" rx="1" />
+              </svg>
+              <span data-i18n="profile.display_compact">Compact</span>
+            </button>
             <button class="display-mode-btn" data-mode="list" title="Liste">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="3" y="4" width="4" height="4" rx="1" />
                 <rect x="9" y="5" width="12" height="2" rx="1" />
-                <rect x="3" y="11" width="4" height="4" rx="1" />
-                <rect x="9" y="12" width="12" height="2" rx="1" />
-                <rect x="3" y="18" width="4" height="4" rx="1" />
-                <rect x="9" y="19" width="12" height="2" rx="1" />
+                <rect x="3" y="10" width="4" height="4" rx="1" />
+                <rect x="9" y="11" width="12" height="2" rx="1" />
+                <rect x="3" y="16" width="4" height="4" rx="1" />
+                <rect x="9" y="17" width="12" height="2" rx="1" />
               </svg>
               <span data-i18n="profile.display_list">Liste</span>
+            </button>
+            <button class="display-mode-btn" data-mode="showcase" title="Vitrine">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="4" width="18" height="7" rx="1.5" />
+                <rect x="3" y="13" width="18" height="7" rx="1.5" />
+              </svg>
+              <span data-i18n="profile.display_showcase">Vitrine</span>
             </button>
           </div>
         </div>
@@ -591,6 +688,80 @@
           <div class="cloud-status" id="cloudStatus"></div>
         </div>
 
+        <!-- Options Éco & Système -->
+        <div class="settings-section">
+          <div class="settings-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" style="vertical-align: sub; margin-right: 8px;">
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            </svg> <span>Performances & Énergie</span>
+          </div>
+
+          <div class="profile-toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label" data-i18n="profile.eco_mode">Mode Éco (Batterie)</span>
+              <span class="toggle-desc" data-i18n="profile.eco_mode_desc">Désactive les animations lourdes de fond pour
+                économiser la batterie</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="ecoModeToggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="profile-toggle-row" style="margin-top: 14px;">
+            <div class="toggle-info">
+              <span class="toggle-label" data-i18n="profile.auto_theme">Thème Système Automatique</span>
+              <span class="toggle-desc" data-i18n="profile.auto_theme_desc">S'adapte automatiquement au mode
+                clair/sombre de ton appareil</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="autoThemeToggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Arcade Roulette Modal -->
+  <div id="arcadeRouletteModal" class="arcade-roulette-modal hidden" aria-hidden="true">
+    <div class="roulette-backdrop" id="rouletteBackdrop"></div>
+    <div class="roulette-dialog">
+      <button class="roulette-close-btn" id="rouletteCloseBtn" aria-label="Fermer">✕</button>
+      <div class="roulette-header">
+        <span class="roulette-pill">🎰 MINI GAMES CASINO</span>
+        <h2 data-i18n="menu.roulette_title">Roulette Arcade</h2>
+        <p class="roulette-sub" data-i18n="menu.roulette_desc">Laisse tourner la roulette et découvre ton défi du moment
+          !</p>
+      </div>
+
+      <div class="roulette-viewport">
+        <div class="roulette-needle top">▼</div>
+        <div class="roulette-wheel" id="rouletteWheel">
+          <!-- Injecté par JS : items qui défilent -->
+        </div>
+        <div class="roulette-needle bottom">▲</div>
+      </div>
+
+      <div class="roulette-winner-card hidden" id="rouletteWinnerCard">
+        <div class="winner-glow"></div>
+        <div class="winner-thumb" id="winnerThumb"></div>
+        <div class="winner-details">
+          <span class="winner-kicker" data-i18n="menu.roulette_result">Ton défi sélectionné :</span>
+          <h3 class="winner-name" id="winnerName">—</h3>
+          <p class="winner-desc" id="winnerDesc">—</p>
+        </div>
+      </div>
+
+      <div class="roulette-actions">
+        <button id="roulettePlayBtn" class="btn-roulette-action play hidden" data-i18n="menu.roulette_play">C'est parti
+          ! 🚀</button>
+        <button id="rouletteRespinBtn" class="btn-roulette-action respin hidden"
+          data-i18n="menu.roulette_respin">Relancer 🎲</button>
       </div>
     </div>
   </div>

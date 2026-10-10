@@ -1,7 +1,17 @@
 {
-    "currentVersion": "1.32.2026-10-10",
-    "lastUpdate": "2026-10-10",
+    "currentVersion": "1.33.2026-10-11",
+    "lastUpdate": "2026-10-11",
     "history": [
+        {
+            "version": "1.33.2026-10-11",
+            "date": "2026-10-11",
+            "changes": [
+                "Ajout du jeu Mindplay : Lumière",
+                "Ajout du jeu Mindplay : Séquence",
+                "Ajout du jeu Mindplay : Mots",
+                "Ajout du jeu Mindplay : Paires"
+            ]
+        },
         {
             "version": "1.32.2026-10-10",
             "date": "2026-10-10",

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Color Rush – Jeu de conquête de territoire en ligne | Mini‑Games</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Joue à Color Rush gratuitement : trace des boucles de peinture, conquiers le territoire et élimine jusqu'à 30 adversaires. Jouable sur mobile et ordinateur.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/color-rush/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Color Rush – Jeu de conquête de territoire en ligne | Mini‑Games">
+    <meta property="og:description"
+        content="Trace des boucles de peinture, conquiers la carte et élimine tes adversaires. Skins, effets, objets et 16 cartes à débloquer.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/color-rush/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/color-rush.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Color Rush – Jeu de conquête de territoire en ligne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Trace des boucles de peinture, conquiers la carte et élimine tes adversaires.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/color-rush.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Color Rush",
+      "url": "https://mini-games.ch/games/color-rush/",
+      "description": "Jeu de conquête de territoire : trace une traînée de peinture, referme ta boucle pour capturer la zone et élimine jusqu'à 30 IA.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Arcade Game", "Strategy Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="menu-body" id="body">
+
+    <!-- Retour à la plateforme (menu) / au menu du jeu (boutique) -->
+    <a href="../../index.html" class="pause-btn" id="platformBack" style="left: 12px; right: auto;"
+        title="Retour aux jeux" aria-label="Retour aux jeux">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    </a>
+
+    <!-- ══ ÉCRAN — MENU ══ -->
+    <main class="screen menu-container" id="screenMenu">
+        <div class="menu-header">
+            <div class="menu-icon">🎨</div>
+            <h1 class="menu-title">COLOR <span class="menu-title-pro">RUSH</span></h1>
+            <p class="menu-subtitle">Conquiers la carte</p>
+        </div>
+
+        <div class="coins-badge" aria-live="polite">🪙 <span id="coins">0</span></div>
+
+        <section class="maps-section" aria-label="Choix de la carte">
+            <h2 class="section-title">Choisis ta carte</h2>
+            <div class="maps" id="mapList" role="group" aria-label="Cartes disponibles"></div>
+        </section>
+
+        <p class="msg" id="menuMsg" role="status" aria-live="polite"></p>
+
+        <div class="menu-actions">
+            <button class="btn-primary" id="playBtn">JOUER</button>
+            <button class="btn-secondary" id="shopBtn">🛒 BOUTIQUE</button>
+        </div>
+
+        <p class="menu-note" id="howto"></p>
+    </main>
+
+    <!-- ══ ÉCRAN — BOUTIQUE ══ -->
+    <section class="screen menu-container shop" id="screenShop" hidden>
+        <div class="menu-header">
+            <h2 class="menu-title shop-title">BOUTIQUE</h2>
+            <p class="menu-subtitle">Tes achats sont permanents</p>
+        </div>
+        <div class="coins-badge" aria-live="polite">🪙 <span id="shopCoins">0</span></div>
+        <div class="tabs" id="shopTabs" role="tablist">
+            <button class="tab active" data-tab="skins" role="tab">Skins</button>
+            <button class="tab" data-tab="effects" role="tab">Effets</button>
+            <button class="tab" data-tab="gear" role="tab">Objets</button>
+            <button class="tab" data-tab="maps" role="tab">Cartes</button>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+        <p class="msg" id="shopMsg" role="status" aria-live="polite"></p>
+        <div class="menu-actions">
+            <button class="btn-primary" id="shopBack">← RETOUR AU MENU</button>
+        </div>
+    </section>
+
+    <!-- ══ ÉCRAN — PARTIE ══ -->
+    <section class="screen game-screen" id="screenGame" hidden>
+        <button class="pause-btn" id="gameBack" style="left: 12px; right: auto;" title="Menu"
+            aria-label="Retour au menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+        </button>
+        <button class="pause-btn" id="pauseBtn" style="right: 12px; left: auto;" title="Pause" aria-label="Pause">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="5" width="4" height="14" rx="1" />
+                <rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+        </button>
+
+        <div class="hud">
+            <div class="hud-item hud-main">
+                <div class="label">TERRITOIRE</div>
+                <div class="value hud-pct" id="hudPct">0 %</div>
+                <div class="hud-bar" aria-hidden="true"><i id="hudBar"></i></div>
+            </div>
+            <div class="hud-item">
+                <div class="label">IA EN VIE</div>
+                <div class="value" id="hudAi">0</div>
+            </div>
+            <div class="hud-item">
+                <div class="label">TEMPS</div>
+                <div class="value" id="hudTime">0:00</div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage">
+            <canvas id="canvas" aria-label="Carte de Color Rush"></canvas>
+            <canvas id="minimap" class="minimap" aria-label="Mini-carte"></canvas>
+            <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <!-- ══ OVERLAY — Départ / aide ══ -->
+    <div class="game-overlay" id="startOverlay" hidden>
+        <div class="overlay-content">
+            <h2>COLOR RUSH</h2>
+            <p class="overlay-text" id="startInfo"></p>
+            <ul class="help">
+                <li>⌨️ <b>Flèches</b> ou <b>WASD / ZQSD</b> : dirige le cube (diagonales possibles)</li>
+                <li>📱 <b>Pose le doigt</b> n'importe où sur la carte et <b>glisse</b> dans la direction voulue</li>
+                <li>🎨 Sors de ton territoire, trace une boucle et <b>reviens</b> pour capturer la zone</li>
+                <li>⚠️ Si quelqu'un touche ta traînée, tu es éliminé. Touche la sienne pour l'éliminer !</li>
+                <li>🏆 Possède <b>100 %</b> de la carte pour gagner</li>
+            </ul>
+            <button class="btn-primary" id="startBtn">C'EST PARTI</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Pause ══ -->
+    <div class="game-overlay" id="pauseOverlay" hidden>
+        <div class="overlay-content">
+            <h2>Pause</h2>
+            <p class="overlay-text">Quitter enregistre les pièces gagnées avec ton territoire actuel.</p>
+            <button class="btn-primary" id="resumeBtn">REPRENDRE</button>
+            <button class="btn-secondary" id="quitBtn" style="margin-top:8px;">Quitter la partie</button>
+        </div>
+    </div>
+
+    <!-- ══ OVERLAY — Fin de partie ══ -->
+    <div class="game-overlay" id="overOverlay" hidden>
+        <div class="overlay-content" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+            <div class="win-trophy" id="ovIcon">💥</div>
+            <h2 id="ovTitle">Éliminé !</h2>
+            <div class="recap">
+                <div class="recap-row"><span>Résultat</span><b id="ovResult">—</b></div>
+                <div class="recap-row"><span>Territoire</span><b id="ovPct">—</b></div>
+                <div class="recap-row"><span>IA éliminées</span><b id="ovAi">—</b></div>
+                <div class="recap-row"><span>Durée</span><b id="ovTime">—</b></div>
+                <div class="recap-row"><span id="ovCoinsLabel">Pièces gagnées</span><b id="ovCoins">—</b></div>
+                <div class="recap-row recap-total"><span>Nouveau solde</span><b id="ovBalance">—</b></div>
+            </div>
+            <p class="overlay-text" id="ovNote"></p>
+            <button class="btn-primary" id="replayBtn">REJOUER</button>
+            <button class="btn-secondary" id="menuBtn" style="margin-top:8px;">Retour au menu</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

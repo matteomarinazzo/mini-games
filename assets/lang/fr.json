@@ -199,6 +199,10 @@
             "maze": {
                 "name": "Labyrinthe 3D",
                 "description": "Explore un labyrinthe en 3D et trouve la sortie avant de te perdre !"
+            },
+            "color-rush": {
+                "name": "Color Rush",
+                "description": "Un jeu en solo contre des IA. Conquiers le plus de territoire en coloriant la carte. Évite les autres joueurs et sécurise tes zones !"
             }
         },
         "badges": {
@@ -262,7 +266,8 @@
             "racing": "🚗 Course",
             "platformer": "🏃 Plateforme",
             "traps": "🎯 Pièges",
-            "vocabulary": "📖 Vocabulaire"
+            "vocabulary": "📖 Vocabulaire",
+            "colors": "🎨 Couleurs"
         }
     },
     "about": {

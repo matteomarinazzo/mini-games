@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.31.2026-10-10",
+    "currentVersion": "1.32.2026-10-10",
     "lastUpdate": "2026-10-10",
     "history": [
+        {
+            "version": "1.32.2026-10-10",
+            "date": "2026-10-10",
+            "changes": [
+                "Ajout du jeu Color Rush"
+            ]
+        },
         {
             "version": "1.31.2026-10-10",
             "date": "2026-10-10",

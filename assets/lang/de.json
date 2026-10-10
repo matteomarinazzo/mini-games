@@ -76,7 +76,9 @@
             "modal_reward": "{xp} XP wenn abgeschlossen",
             "modal_button": "JETZT SPIELEN",
             "modal_not_ready": "Noch nicht verfügbar",
-            "success": "Tägliche Herausforderung abgeschlossen!"
+            "success": "Tägliche Herausforderung abgeschlossen!",
+            "offline_title": "Offline",
+            "offLine_message": "Die tägliche Herausforderung erfordert eine Internetverbindung."
         },
         "games": {
             "battleship": {
@@ -202,6 +204,22 @@
             "color-rush": {
                 "name": "Color Rush",
                 "description": "Ein Einzelspiel gegen KI. Erobere das größte Territorium, indem du die Karte einfärbst. Weiche anderen Spielern aus und sichere deine Gebiete!"
+            },
+            "mindplay-lights": {
+                "name": "Mindplay : Licht",
+                "description": "Merke dir die erleuchteten Felder. Bis wohin reicht dein Gedächtnis?"
+            },
+            "mindplay-sequence": {
+                "name": "Mindplay: Sequenz",
+                "description": "Merke dir die Farbfolge und wiederhole sie in der richtigen Reihenfolge. Wie weit reicht dein Gedächtnis?"
+            },
+            "mindplay-words": {
+                "name": "Mindplay: Wörter",
+                "description": "Merke dir eine Liste von Wörtern und finde sie unter den Fremdwörtern. Wie weit reicht dein Gedächtnis?"
+            },
+            "mindplay-pairs": {
+                "name": "Mindplay : Paare",
+                "description": "Merke dir die Karten und finde alle Paare. Wie weit reicht dein Gedächtnis?"
             }
         },
         "badges": {
@@ -225,11 +243,8 @@
             "strategy": "🧠 Strategie & Management",
             "quiz": "🌍 Quiz & Wissen",
             "retro": "🕹️ Retro & Arcade",
-            "classic": "🎮 Klassiker",
-            "geo": "🌍 Geografie",
-            "clicker": "📈 Clicker",
-            "random": "🎲 Zufall",
-            "fun": "⚡ Spaß"
+            "fun": "⚡ Spaß",
+            "memory": "🧠 Gedächtnis"
         },
         "tags": {
             "real-time": "⚡ Echtzeit",
@@ -266,7 +281,8 @@
             "platformer": "🏃 Plattform",
             "traps": "🎯 Fallen",
             "vocabulary": "📖 Vokabular",
-            "colors": "🎨 Farben"
+            "colors": "🎨 Farben",
+            "memory": "🧠 Gedächtnis"
         }
     },
     "about": {

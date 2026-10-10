@@ -203,6 +203,22 @@
             "color-rush": {
                 "name": "Color Rush",
                 "description": "Un jeu en solo contre des IA. Conquiers le plus de territoire en coloriant la carte. Évite les autres joueurs et sécurise tes zones !"
+            },
+            "mindplay-lights": {
+                "name": "Mindplay : Lumière",
+                "description": "Mémorise les cases qui s’allument. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-sequence": {
+                "name": "Mindplay : Séquence",
+                "description": "Mémorise la séquence de couleurs et reproduis-la dans le bon ordre. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-words": {
+                "name": "Mindplay : Mots",
+                "description": "Mémorise une liste de mots et retrouve-les parmi les intrus. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-pairs": {
+                "name": "Mindplay : Paires",
+                "description": "Mémorise les cartes et retrouve toutes les paires. Jusqu’où ira ta mémoire ?"
             }
         },
         "badges": {
@@ -226,11 +242,8 @@
             "strategy": "🧠 Stratégie & Gestion",
             "quiz": "🌍 Quiz & Culture",
             "retro": "🕹️ Rétro & Arcade",
-            "classic": "🎮 Classiques",
-            "geo": "🌍 Géographie",
-            "clicker": "📈 Clicker",
-            "random": "🎲 Hasard",
-            "fun": "⚡ Fun"
+            "fun": "⚡ Fun",
+            "memory": "🧠 Mémoire"
         },
         "tags": {
             "real-time": "⚡ Temps réel",
@@ -267,7 +280,8 @@
             "platformer": "🏃 Plateforme",
             "traps": "🎯 Pièges",
             "vocabulary": "📖 Vocabulaire",
-            "colors": "🎨 Couleurs"
+            "colors": "🎨 Couleurs",
+            "memory": "🧠 Mémoire"
         }
     },
     "about": {

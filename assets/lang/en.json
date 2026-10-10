@@ -76,7 +76,9 @@
             "modal_reward": "{xp} XP if successful",
             "modal_button": "PLAY NOW",
             "modal_not_ready": "Not now",
-            "success": "Daily challenge completed!"
+            "success": "Daily challenge completed!",
+            "offline_title": "Network required",
+            "offLine_message": "The daily challenge requires an internet connection."
         },
         "games": {
             "battleship": {
@@ -202,6 +204,22 @@
             "color-rush": {
                 "name": "Color Rush",
                 "description": "A solo game against AI. Conquer as much territory as possible by coloring the map. Avoid other players and secure your areas!"
+            },
+            "mindplay-lights": {
+                "name": "Mindplay : Lights",
+                "description": "Remember the illuminated cells. How far will your memory go?"
+            },
+            "mindplay-sequence": {
+                "name": "Mindplay : Sequence",
+                "description": "Remember the color sequence and reproduce it in the right order. How far will your memory go?"
+            },
+            "mindplay-words": {
+                "name": "Mindplay : Words",
+                "description": "Remember a list of words and find them among the intruders. How far will your memory go?"
+            },
+            "mindplay-pairs": {
+                "name": "Mindplay : Pairs",
+                "description": "Remember the cards and find all the pairs. How far will your memory go?"
             }
         },
         "badges": {
@@ -225,11 +243,8 @@
             "strategy": "🧠 Strategy & Management",
             "quiz": "🌍 Quiz & Trivia",
             "retro": "🕹️ Retro & Arcade",
-            "classic": "🎮 Classics",
-            "geo": "🌍 Geography",
-            "clicker": "📈 Clicker",
-            "random": "🎲 Random",
-            "fun": "⚡ Fun"
+            "fun": "⚡ Fun",
+            "memory": "🧠 Memory"
         },
         "tags": {
             "real-time": "⚡ Real time",
@@ -266,7 +281,8 @@
             "platformer": "🏃 Platform",
             "traps": "🎯 Traps",
             "vocabulary": "📖 Vocabulary",
-            "colors": "🎨 Colors"
+            "colors": "🎨 Colors",
+            "memory": "🧠 Memory"
         }
     },
     "about": {

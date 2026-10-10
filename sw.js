@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.32.2026-10-09.0";
+const CACHE_NAME = "mini-games-cache-v1.33.2026-10-11.5";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -88,6 +88,10 @@ const ASSETS_TO_CACHE = [
     'assets/logos/snake.webp',
     'assets/logos/maze.webp',
     'assets/logos/color-rush.webp',
+    'assets/logos/mindplay-lights.webp',
+    'assets/logos/mindplay-sequence.webp',
+    'assets/logos/mindplay-words.webp',
+    'assets/logos/mindplay-pairs.webp',
 
     // About
     'about/about.html',
@@ -433,6 +437,26 @@ const ASSETS_TO_CACHE = [
     'games/color-rush/js/renderer.js',
     'games/color-rush/js/storage.js',
 
+    // Game: Mindplay: Lights
+    'games/mindplay-lights/index.html',
+    'games/mindplay-lights/css/game.css',
+    'games/mindplay-lights/js/game.js',
+
+    // Game: Mindplay: Sequence
+    'games/mindplay-sequence/index.html',
+    'games/mindplay-sequence/css/game.css',
+    'games/mindplay-sequence/js/game.js',
+
+    // Game: Mindplay: Words
+    'games/mindplay-words/index.html',
+    'games/mindplay-words/css/game.css',
+    'games/mindplay-words/js/game.js',
+    'games/mindplay-words/js/words.js',
+
+    // Game: Mindplay: Pairs
+    'games/mindplay-pairs/index.html',
+    'games/mindplay-pairs/css/game.css',
+    'games/mindplay-pairs/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

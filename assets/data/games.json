@@ -226,6 +226,69 @@
       "stars": "☆☆☆☆☆"
     }
   },
+  "memory": {
+    "mindplay-lights": {
+      "path": "./games/mindplay-lights/index.html",
+      "name": "Mindplay : Lumière",
+      "emoji": "💡",
+      "description": "Mémorise les cases qui s’allument. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-sequence": {
+      "path": "./games/mindplay-sequence/index.html",
+      "name": "Mindplay : Séquence",
+      "emoji": "🌈",
+      "description": "Mémorise la séquence de couleurs et reproduis-la dans le bon ordre. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "colors",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-words": {
+      "path": "./games/mindplay-words/index.html",
+      "name": "Mindplay : Mots",
+      "emoji": "📝",
+      "description": "Mémorise une liste de mots et retrouve-les parmi les intrus. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "vocabulary",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-pairs": {
+      "path": "./games/mindplay-pairs/index.html",
+      "name": "Mindplay : Paires",
+      "emoji": "🃏",
+      "description": "Mémorise les cartes et retrouve toutes les paires. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
+  },
   "multiplayer": {
     "draw-guess": {
       "path": "./games/draw-guess/index.html",
@@ -421,7 +484,7 @@
     "color-rush": {
       "path": "./games/color-rush/index.html",
       "name": "Color Rush",
-      "emoji": "🌈",
+      "emoji": "🎨",
       "description": "Enchaîne les bonnes couleurs le plus vite possible, évite les erreurs et bats ton meilleur score !",
       "tags": [
         "arcade",

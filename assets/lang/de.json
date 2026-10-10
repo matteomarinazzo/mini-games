@@ -198,6 +198,10 @@
             "maze": {
                 "name": "Labyrinth 3D",
                 "description": "Erkunde ein 3D-Labyrinth und finde den Ausgang, bevor du dich verirrst!"
+            },
+            "color-rush": {
+                "name": "Color Rush",
+                "description": "Ein Einzelspiel gegen KI. Erobere das größte Territorium, indem du die Karte einfärbst. Weiche anderen Spielern aus und sichere deine Gebiete!"
             }
         },
         "badges": {
@@ -261,7 +265,8 @@
             "racing": "🚗 Rennen",
             "platformer": "🏃 Plattform",
             "traps": "🎯 Fallen",
-            "vocabulary": "📖 Vokabular"
+            "vocabulary": "📖 Vokabular",
+            "colors": "🎨 Farben"
         }
     },
     "about": {

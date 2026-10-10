@@ -418,6 +418,23 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "color-rush": {
+      "path": "./games/color-rush/index.html",
+      "name": "Color Rush",
+      "emoji": "🌈",
+      "description": "Enchaîne les bonnes couleurs le plus vite possible, évite les erreurs et bats ton meilleur score !",
+      "tags": [
+        "arcade",
+        "colors",
+        "reflexes",
+        "speed",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "casse-briques": {
       "path": "./games/casse-briques/index.html",
       "name": "Casse-Briques",

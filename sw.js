@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.31.2026-10-09.1";
+const CACHE_NAME = "mini-games-cache-v1.32.2026-10-09.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -87,6 +87,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/crossword.webp',
     'assets/logos/snake.webp',
     'assets/logos/maze.webp',
+    'assets/logos/color-rush.webp',
 
     // About
     'about/about.html',
@@ -420,6 +421,18 @@ const ASSETS_TO_CACHE = [
     'games/maze/js/core/maze-size.js',
     'games/maze/js/core/maze-storage.js',
     'games/maze/js/core/maze-world.js',
+
+    // Game: Color Rush
+    'games/color-rush/index.html',
+    'games/color-rush/css/game.css',
+    'games/color-rush/js/game.js',
+    'games/color-rush/js/config.js',
+    'games/color-rush/js/ai.js',
+    'games/color-rush/js/engine.js',
+    'games/color-rush/js/maps.js',
+    'games/color-rush/js/renderer.js',
+    'games/color-rush/js/storage.js',
+
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

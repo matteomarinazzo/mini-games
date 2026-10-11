@@ -237,7 +237,7 @@
         "puzzle",
         "solo"
       ],
-      "badge": "brain",
+      "badge": "memory",
       "badgeText": "Mémoire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
@@ -253,7 +253,7 @@
         "puzzle",
         "solo"
       ],
-      "badge": "brain",
+      "badge": "memory",
       "badgeText": "Mémoire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
@@ -268,7 +268,7 @@
         "vocabulary",
         "solo"
       ],
-      "badge": "brain",
+      "badge": "memory",
       "badgeText": "Mémoire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
@@ -283,7 +283,55 @@
         "puzzle",
         "solo"
       ],
-      "badge": "brain",
+      "badge": "memory",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-numbers": {
+      "path": "./games/mindplay-numbers/index.html",
+      "name": "Mindplay : Nombres",
+      "emoji": "🔢",
+      "description": "Mémorise le nombre affiché, puis retape-le. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "numbers",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "memory",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-differences": {
+      "path": "./games/mindplay-differences/index.html",
+      "name": "Mindplay : Différences",
+      "emoji": "🔍",
+      "description": "Observe deux scènes et repère toutes les différences. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "observation",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "memory",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "mindplay-shapes": {
+      "path": "./games/mindplay-shapes/index.html",
+      "name": "Mindplay : Formes",
+      "emoji": "🔷",
+      "description": "Mémorise une composition de formes, puis reconstitue-la. Jusqu’où ira ta mémoire ?",
+      "tags": [
+        "memory",
+        "shapes",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "memory",
       "badgeText": "Mémoire",
       "rating": "0",
       "stars": "☆☆☆☆☆"

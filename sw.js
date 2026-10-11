@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.33.2026-10-11.5";
+const CACHE_NAME = "mini-games-cache-v1.33.2026-10-11.8";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -92,6 +92,9 @@ const ASSETS_TO_CACHE = [
     'assets/logos/mindplay-sequence.webp',
     'assets/logos/mindplay-words.webp',
     'assets/logos/mindplay-pairs.webp',
+    'assets/logos/mindplay-numbers.webp',
+    'assets/logos/mindplay-differences.webp',
+    'assets/logos/mindplay-shapes.webp',
 
     // About
     'about/about.html',
@@ -457,6 +460,22 @@ const ASSETS_TO_CACHE = [
     'games/mindplay-pairs/index.html',
     'games/mindplay-pairs/css/game.css',
     'games/mindplay-pairs/js/game.js',
+
+    // Game: Mindplay: Numbers
+    'games/mindplay-numbers/index.html',
+    'games/mindplay-numbers/css/game.css',
+    'games/mindplay-numbers/js/game.js',
+
+    // Game: Mindplay: Differences
+    'games/mindplay-differences/index.html',
+    'games/mindplay-differences/css/game.css',
+    'games/mindplay-differences/js/game.js',
+
+    // Game: Mindplay: Shapes
+    'games/mindplay-shapes/index.html',
+    'games/mindplay-shapes/css/game.css',
+    'games/mindplay-shapes/js/game.js',
+    'games/mindplay-shapes/js/shapes-core.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

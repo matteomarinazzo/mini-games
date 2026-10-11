@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mindplay : Formes – Jeu de mémoire des formes | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Mindplay : Formes sur Mini‑Games. Mémorisez la composition de formes, puis reconstituez-la : position, taille et rotation, avec seulement trois vies !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/mindplay-shapes/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Mindplay : Formes – Jeu de mémoire des formes | Mini‑Games">
+    <meta property="og:description"
+        content="Mémorisez la composition, reconstituez-la avec précision et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/mindplay-shapes/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/mindplay-shapes.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mindplay : Formes – Jeu de mémoire des formes | Mini‑Games">
+    <meta name="twitter:description"
+        content="Mémorisez la composition, reconstituez-la avec précision et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/mindplay-shapes.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Mindplay : Formes",
+      "url": "https://mini-games.ch/games/mindplay-shapes/",
+      "description": "Jeu de mémoire visuelle : une composition de formes géométriques s'affiche brièvement, puis disparaît ; reconstituez-la en plaçant, redimensionnant et pivotant chaque forme.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Memory Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- ─── START OVERLAY ─── -->
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🔷</div>
+            <h2 class="start-title">Mindplay : Formes</h2>
+            <p class="start-text">Une composition de formes s'affiche <strong>quelques instants</strong>, puis disparaît.<br>
+                <strong>Reconstitue-la</strong> : place, agrandis et pivote chaque forme, avec <strong>3 vies</strong>.</p>
+            <p class="start-keys">Glisser les formes sur le plateau · poignées ou deux doigts · flèches · Échap pour la pause</p>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="startRulesBtn">📖 Règles du jeu</button>
+        </div>
+    </div>
+
+    <!-- ─── RULES OVERLAY ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de Mindplay : Formes</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Atteins le <strong>niveau le plus élevé</strong> possible.</li>
+                    <li>Chaque réussite rapporte des <strong>points</strong>, d'autant plus que ta reconstitution est précise.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🔷 Déroulement d'une manche</h3>
+                <ul>
+                    <li>Une composition de formes s'affiche <strong>brièvement</strong>, puis disparaît :
+                        <strong>mémorise-la</strong>.</li>
+                    <li>Les formes de la composition se <strong>chevauchent toujours</strong> : croisées, l'une
+                        <strong>dans</strong> l'autre, ou autour d'une autre. Elles forment une seule grande figure.</li>
+                    <li>Reconstitue-la avec la <strong>palette</strong> : <strong>glisse</strong> chaque forme là où tu
+                        veux la poser sur le plateau (la <strong>grille</strong> t'aide à te repérer), puis
+                        <strong>redimensionne-la</strong> et <strong>pivote-la</strong> si besoin.</li>
+                    <li>Appuie sur <strong>Valider</strong> quand tu as terminé : tu n'as <strong>aucune limite de
+                            temps</strong> pour répondre.</li>
+                    <li>Une <strong>petite différence</strong> de position, de taille ou de rotation est acceptée.
+                        Il faut en revanche poser <strong>le bon nombre de formes</strong>, du bon type.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>❤️ Vies</h3>
+                <ul>
+                    <li>Chaque manche commence avec <strong class="js-lives">3</strong> vies.</li>
+                    <li>Une reconstitution trop éloignée coûte <strong>une vie</strong> : la manche recommence avec une
+                        <strong>nouvelle composition</strong>.</li>
+                    <li>À la dernière vie perdue, la partie est <strong>terminée</strong> : tu repars du niveau 1,
+                        manche 1.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📈 Niveaux</h3>
+                <ul>
+                    <li>Le niveau 1 compte <strong class="js-start-shapes">3</strong> formes, puis
+                        <strong>une de plus</strong> à chaque niveau.</li>
+                    <li>Chaque niveau compte <strong>2 manches</strong>.</li>
+                    <li>Manche 1 : <strong class="js-show-1">1</strong> s d'observation par forme. Manche 2 :
+                        <strong class="js-show-2">0,5</strong> s par forme, soit <strong>deux fois moins</strong> de temps.</li>
+                    <li>Les compositions se complexifient : plus de types de formes, des tailles et des rotations
+                        plus variées.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🏆 Records</h3>
+                <ul>
+                    <li>Classement selon le <strong>niveau atteint</strong>, puis la <strong>durée la plus
+                            courte</strong> en cas d'égalité.</li>
+                    <li>La durée ne compte pas le temps passé en <strong>pause</strong>.</li>
+                    <li>Le jeu fonctionne aussi <strong>hors ligne</strong> : ton record personnel est conservé.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>Palette</strong> – <strong>Glisser</strong> une forme sur le plateau pour la poser (relâcher hors du plateau
+                        annule ; un simple appui la pose au centre)</li>
+                    <li><strong>Toucher</strong> une forme posée – La sélectionner ; la <strong>glisser</strong> – La déplacer</li>
+                    <li><strong>Carré</strong> de la poignée – Taille ; <strong>rond</strong> au-dessus – Rotation</li>
+                    <li><strong>Deux doigts</strong> sur le plateau – Taille et rotation de la forme choisie</li>
+                    <li><strong>Boutons ↺ ↻ − + 🗑</strong> – Pivoter, réduire, agrandir, supprimer</li>
+                    <li><strong>Flèches</strong> (Maj = plus vite) / <strong>Suppr</strong> – Déplacer / supprimer</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── PROGRESSION OVERLAY ─── -->
+    <div class="overlay" id="progressOverlay" role="dialog" aria-modal="true" aria-labelledby="progressTitle">
+        <div class="modal progress-modal">
+            <div class="gameover-emoji">🎉</div>
+            <div class="gameover-title" id="progressTitle">Niveau réussi !</div>
+            <p class="progress-text">Prochain niveau : <strong id="progressNext">4 formes</strong><br>
+                Le chronomètre reprend quand tu continues.</p>
+            <button class="btn-sky" id="continueBtn">Continuer</button>
+        </div>
+    </div>
+
+    <!-- ─── GAME OVER OVERLAY ─── -->
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">💥</div>
+            <div class="gameover-title" id="goTitle">Partie terminée</div>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Niveau atteint</span>
+                    <span class="stat-val" id="goLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Score</span>
+                    <span class="stat-val" id="goScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Durée</span>
+                    <span class="stat-val" id="goDuration">0:00,0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Meilleur niveau</span>
+                    <span class="stat-val" id="goBest">—</span>
+                </div>
+            </div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer (niveau 1)</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Niveau</span>
+                        <span class="rc-value" id="recPersonalLevel">—</span>
+                        <span class="rc-label">Durée</span>
+                        <span class="rc-value" id="recPersonalTime">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard">
+                        <span class="rc-label">Niveau</span>
+                        <span class="rc-value" id="recGlobalLevel">—</span>
+                        <span class="rc-label">Durée</span>
+                        <span class="rc-value" id="recGlobalTime">—</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label" id="hudInfo">Niveau 1 · Manche 1/2</span>
+            <div class="hud-row">
+                <span class="hud-score" id="scoreHud">0 pts</span>
+                <div class="lives" id="lives" role="img" aria-label="3 vies restantes"></div>
+            </div>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ─── ZONE DE JEU ─── -->
+    <main id="stage">
+        <div class="board">
+            <div class="stat-bar">
+                <div class="stat-chip"><span class="chip-label">Meilleur</span><span class="chip-value"
+                        id="bestVal">—</span></div>
+                <div class="stat-chip"><span class="chip-label">Formes</span><span class="chip-value"
+                        id="shapesVal">3</span></div>
+                <div class="stat-chip"><span class="chip-label">Durée</span><span class="chip-value"
+                        id="timeVal">0:00</span></div>
+            </div>
+            <div class="round-info" id="roundInfo">Manche 1 / 2</div>
+            <div class="status-line" id="statusLine" aria-live="polite">Prépare-toi…</div>
+            <div class="scene-wrap">
+                <div id="scene" role="group" aria-label="Plateau de jeu"></div>
+                <div class="expo-timer" id="expoTimer"><div class="expo-fill" id="expoFill"></div></div>
+            </div>
+            <div class="dock off" id="dock">
+                <div class="palette" id="palette" role="group" aria-label="Palette de formes"></div>
+                <div class="tools" role="group" aria-label="Outils">
+                    <button type="button" class="icon-btn tool-btn" id="rotLBtn" title="Pivoter à gauche" aria-label="Pivoter à gauche">↺</button>
+                    <button type="button" class="icon-btn tool-btn" id="rotRBtn" title="Pivoter à droite" aria-label="Pivoter à droite">↻</button>
+                    <button type="button" class="icon-btn tool-btn" id="smallerBtn" title="Réduire" aria-label="Réduire">−</button>
+                    <button type="button" class="icon-btn tool-btn" id="biggerBtn" title="Agrandir" aria-label="Agrandir">+</button>
+                    <button type="button" class="icon-btn tool-btn" id="deleteBtn" title="Supprimer la forme" aria-label="Supprimer la forme">🗑</button>
+                    <button type="button" class="btn-sky" id="validateBtn">Valider</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

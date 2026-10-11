@@ -206,20 +206,32 @@
                 "description": "A solo game against AI. Conquer as much territory as possible by coloring the map. Avoid other players and secure your areas!"
             },
             "mindplay-lights": {
-                "name": "Mindplay : Lights",
+                "name": "Mindplay: Lights",
                 "description": "Remember the illuminated cells. How far will your memory go?"
             },
             "mindplay-sequence": {
-                "name": "Mindplay : Sequence",
+                "name": "Mindplay: Sequence",
                 "description": "Remember the color sequence and reproduce it in the right order. How far will your memory go?"
             },
             "mindplay-words": {
-                "name": "Mindplay : Words",
+                "name": "Mindplay: Words",
                 "description": "Remember a list of words and find them among the intruders. How far will your memory go?"
             },
             "mindplay-pairs": {
-                "name": "Mindplay : Pairs",
+                "name": "Mindplay: Pairs",
                 "description": "Remember the cards and find all the pairs. How far will your memory go?"
+            },
+            "mindplay-numbers": {
+                "name": "Mindplay: Numbers",
+                "description": "Remember the number displayed, then type it back. How far will your memory go?"
+            },
+            "mindplay-differences": {
+                "name": "Mindplay: Differences",
+                "description": "Compare the two scenes and find all the differences. How far will your memory go?"
+            },
+            "mindplay-shapes": {
+                "name": "Mindplay: Shapes",
+                "description": "Remember a composition of shapes, then recreate it. How far will your memory go?"
             }
         },
         "badges": {
@@ -233,6 +245,7 @@
             "strategy": "Strategy",
             "action": "Action",
             "exploration": "Exploration",
+            "memory": "Memory",
             "random": "CHALLENGE"
         },
         "categories": {
@@ -282,7 +295,10 @@
             "traps": "🎯 Traps",
             "vocabulary": "📖 Vocabulary",
             "colors": "🎨 Colors",
-            "memory": "🧠 Memory"
+            "memory": "🧠 Memory",
+            "numbers": "🔢 Numbers",
+            "observation": "🔍 Observation",
+            "shapes": "🔷 Shapes"
         }
     },
     "about": {

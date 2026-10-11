@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mindplay : Nombres – Jeu de mémoire de nombres | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Mindplay : Nombres sur Mini‑Games. Mémorisez le nombre qui s'affiche brièvement, retapez-le sans la moindre erreur et grimpez de niveau !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/mindplay-numbers/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Mindplay : Nombres – Jeu de mémoire de nombres | Mini‑Games">
+    <meta property="og:description"
+        content="Mémorisez le nombre, retapez-le sans erreur et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/mindplay-numbers/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/mindplay-numbers.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mindplay : Nombres – Jeu de mémoire de nombres | Mini‑Games">
+    <meta name="twitter:description"
+        content="Mémorisez le nombre, retapez-le sans erreur et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/mindplay-numbers.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Mindplay : Nombres",
+      "url": "https://mini-games.ch/games/mindplay-numbers/",
+      "description": "Jeu de mémoire de nombres : un nombre s'affiche brièvement, puis disparaît ; retapez-le exactement, avec un chiffre de plus à chaque niveau.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Memory Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- ─── START OVERLAY ─── -->
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🔢</div>
+            <h2 class="start-title">Mindplay : Nombres</h2>
+            <p class="start-text">Un nombre s'affiche <strong>quelques instants</strong>, puis disparaît.<br>
+                <strong>Retape-le</strong>, chiffre pour chiffre, <strong>sans aucune erreur</strong>.</p>
+            <p class="start-keys">Clavier ou pavé numérique · Entrée pour valider · Échap pour la pause</p>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="startRulesBtn">📖 Règles du jeu</button>
+        </div>
+    </div>
+
+    <!-- ─── RULES OVERLAY ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de Mindplay : Nombres</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Atteins le <strong>niveau le plus élevé</strong> possible.</li>
+                    <li>Une seule erreur et la partie est <strong>terminée</strong> : tu repars du niveau 1, manche 1.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🔢 Déroulement d'une manche</h3>
+                <ul>
+                    <li>Un nombre s'affiche <strong>brièvement</strong>, puis disparaît : <strong>mémorise-le</strong>.</li>
+                    <li>Retape ensuite le nombre <strong>exact</strong>, puis valide avec le bouton ou la touche
+                        <strong>Entrée</strong>.</li>
+                    <li>Tu n'as <strong>aucune limite de temps</strong> pour répondre.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📈 Niveaux</h3>
+                <ul>
+                    <li>Le nombre commence avec <strong class="js-start-digits">3</strong> chiffres et gagne
+                        <strong>un chiffre</strong> à chaque niveau réussi.</li>
+                    <li>Chaque niveau compte <strong>2 manches</strong>.</li>
+                    <li>Manche 1 : <strong>2/3 de seconde</strong> par chiffre. Manche 2 : <strong>1/3 de seconde</strong>
+                        par chiffre, soit environ <strong>deux fois moins</strong> de temps.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🏆 Records</h3>
+                <ul>
+                    <li>Classement selon le <strong>niveau atteint</strong>, puis la <strong>durée la plus
+                            courte</strong> en cas d'égalité.</li>
+                    <li>La durée ne compte pas le temps passé en <strong>pause</strong>.</li>
+                    <li>Le jeu fonctionne aussi <strong>hors ligne</strong> : ton record personnel est conservé.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>0 – 9</strong> – Saisir les chiffres (clavier numérique sur mobile)</li>
+                    <li><strong>Entrée</strong> – Valider la réponse</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    
+<!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── GAME OVER OVERLAY ─── -->
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">💥</div>
+            <div class="gameover-title" id="goTitle">Partie terminée</div>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Niveau atteint</span>
+                    <span class="stat-val" id="goLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Durée</span>
+                    <span class="stat-val" id="goDuration">0:00,0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Meilleur niveau</span>
+                    <span class="stat-val" id="goBest">—</span>
+                </div>
+            </div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer (niveau 1)</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Niveau</span>
+                        <span class="rc-value" id="recPersonalLevel">—</span>
+                        <span class="rc-label">Durée</span>
+                        <span class="rc-value" id="recPersonalTime">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard">
+                        <span class="rc-label">Niveau</span>
+                        <span class="rc-value" id="recGlobalLevel">—</span>
+                        <span class="rc-label">Durée</span>
+                        <span class="rc-value" id="recGlobalTime">—</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label">Niveau</span>
+            <span class="score-value" id="levelValue">1</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ─── ZONE DE JEU ─── -->
+    <main id="stage">
+        <div class="board">
+            <div class="stat-bar">
+                <div class="stat-chip"><span class="chip-label">Meilleur</span><span class="chip-value"
+                        id="bestVal">—</span></div>
+                <div class="stat-chip"><span class="chip-label">Chiffres</span><span class="chip-value"
+                        id="digitsVal">3</span></div>
+                <div class="stat-chip"><span class="chip-label">Durée</span><span class="chip-value"
+                        id="timeVal">0:00</span></div>
+            </div>
+            <div class="round-info" id="roundInfo">Manche 1 / 2</div>
+            <div class="status-line" id="statusLine" aria-live="polite">Prépare-toi…</div>
+            <div class="panel" id="panel" role="group" aria-label="Zone du nombre">
+                <div class="show-view">
+                    <div class="number-display" id="numberDisplay" aria-hidden="true"></div>
+                    <div class="expo-timer"><div class="expo-fill" id="expoFill"></div></div>
+                    <div class="expo-sec" id="expoSec"></div>
+                </div>
+                <div class="input-view">
+                    <input type="text" class="num-input" id="numInput" inputmode="numeric" pattern="[0-9]*"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        enterkeyhint="done" aria-label="Retape le nombre mémorisé">
+                    <button class="btn-sky" id="submitBtn" type="button">Valider</button>
+                </div>
+                <div class="result-view" id="resultView" aria-live="polite"></div>
+            </div>
+        </div>
+    </main>
+
+    
+<!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

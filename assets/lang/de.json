@@ -206,7 +206,7 @@
                 "description": "Ein Einzelspiel gegen KI. Erobere das größte Territorium, indem du die Karte einfärbst. Weiche anderen Spielern aus und sichere deine Gebiete!"
             },
             "mindplay-lights": {
-                "name": "Mindplay : Licht",
+                "name": "Mindplay: Licht",
                 "description": "Merke dir die erleuchteten Felder. Bis wohin reicht dein Gedächtnis?"
             },
             "mindplay-sequence": {
@@ -218,8 +218,20 @@
                 "description": "Merke dir eine Liste von Wörtern und finde sie unter den Fremdwörtern. Wie weit reicht dein Gedächtnis?"
             },
             "mindplay-pairs": {
-                "name": "Mindplay : Paare",
+                "name": "Mindplay: Paare",
                 "description": "Merke dir die Karten und finde alle Paare. Wie weit reicht dein Gedächtnis?"
+            },
+            "mindplay-numbers": {
+                "name": "Mindplay: Zahlen",
+                "description": "Merke dir die Zahlen und tippe sie in der richtigen Reihenfolge ein. Wie weit reicht dein Gedächtnis?"
+            },
+            "mindplay-differences": {
+                "name": "Mindplay: Unterschiede",
+                "description": "Vergleiche die beiden Szenen und finde alle Unterschiede. Wie weit reicht dein Gedächtnis?"
+            },
+            "mindplay-shapes": {
+                "name": "Mindplay: Formen",
+                "description": "Merke dir die Formen und tippe sie in der richtigen Reihenfolge ein. Wie weit reicht dein Gedächtnis?"
             }
         },
         "badges": {
@@ -233,6 +245,7 @@
             "strategy": "Strategie",
             "action": "Action",
             "exploration": "Erkundung",
+            "memory": "Gedächtnis",
             "random": "MUT"
         },
         "categories": {
@@ -282,7 +295,10 @@
             "traps": "🎯 Fallen",
             "vocabulary": "📖 Vokabular",
             "colors": "🎨 Farben",
-            "memory": "🧠 Gedächtnis"
+            "memory": "🧠 Gedächtnis",
+            "numbers": "🔢 Zahlen",
+            "observation": "🔍 Observation",
+            "shapes": "🔷 Formen"
         }
     },
     "about": {

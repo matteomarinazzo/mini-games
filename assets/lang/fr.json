@@ -219,6 +219,18 @@
             "mindplay-pairs": {
                 "name": "Mindplay : Paires",
                 "description": "Mémorise les cartes et retrouve toutes les paires. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-numbers": {
+                "name": "Mindplay : Nombres",
+                "description": "Mémorise le nombre affiché, puis retape-le. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-differences": {
+                "name": "Mindplay : Différences",
+                "description": "Observe deux scènes et repère toutes les différences. Jusqu’où ira ta mémoire ?"
+            },
+            "mindplay-shapes": {
+                "name": "Mindplay : Formes",
+                "description": "Mémorise une composition de formes, puis reconstitue-la. Jusqu’où ira ta mémoire ?"
             }
         },
         "badges": {
@@ -232,6 +244,7 @@
             "strategy": "Stratégie",
             "action": "Action",
             "exploration": "Exploration",
+            "memory": "Mémoire",
             "random": "DÉFI"
         },
         "categories": {
@@ -281,7 +294,10 @@
             "traps": "🎯 Pièges",
             "vocabulary": "📖 Vocabulaire",
             "colors": "🎨 Couleurs",
-            "memory": "🧠 Mémoire"
+            "memory": "🧠 Mémoire",
+            "numbers": "🔢 Nombres",
+            "observation": "🔍 Observation",
+            "shapes": "🔷 Formes"
         }
     },
     "about": {

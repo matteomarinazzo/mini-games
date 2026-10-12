@@ -231,6 +231,10 @@
             "mindplay-shapes": {
                 "name": "Mindplay : Formes",
                 "description": "Mémorise une composition de formes, puis reconstitue-la. Jusqu’où ira ta mémoire ?"
+            },
+            "culturequiz": {
+                "name": "CultureQuiz",
+                "description": "Teste ta culture générale avec des questions variées. Choisis tes catégories, cumule des points et bats tes records !"
             }
         },
         "badges": {
@@ -297,7 +301,8 @@
             "memory": "🧠 Mémoire",
             "numbers": "🔢 Nombres",
             "observation": "🔍 Observation",
-            "shapes": "🔷 Formes"
+            "shapes": "🔷 Formes",
+            "quiz": "📚 Quiz"
         }
     },
     "about": {

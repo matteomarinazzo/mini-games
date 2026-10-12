@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CultureQuiz – Quiz de culture générale | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à CultureQuiz sur Mini‑Games. Testez votre culture générale en 10, 15 ou 20 questions : plus vous répondez vite, plus vous marquez de points !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/culturequiz/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CultureQuiz – Quiz de culture générale | Mini‑Games">
+    <meta property="og:description"
+        content="Répondez vite et juste à des questions de culture générale et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/culturequiz/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/culturequiz.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CultureQuiz – Quiz de culture générale | Mini‑Games">
+    <meta name="twitter:description"
+        content="Répondez vite et juste à des questions de culture générale et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/culturequiz.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "CultureQuiz",
+      "url": "https://mini-games.ch/games/culturequiz/",
+      "description": "Quiz de culture générale en français : choisissez 10, 15 ou 20 questions et vos catégories (histoire, géographie, sciences, arts, sport…). Plus vous répondez vite, plus vous marquez de points.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Quiz Game", "Trivia Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- ─── CONFIGURATION (démarrage / nouvelle série) ─── -->
+    <div class="overlay open" id="setupOverlay">
+        <div class="modal setup-modal">
+            <div class="gameover-emoji">🧠</div>
+            <h2 class="start-title">CultureQuiz</h2>
+            <p class="start-text">Réponds <strong>vite et juste</strong> : jusqu'à <strong>100 points</strong> par bonne
+                réponse.</p>
+
+            <h3>Nombre de questions</h3>
+            <div class="seg" id="countSeg" role="radiogroup" aria-label="Nombre de questions">
+                <button type="button" class="seg-btn" role="radio" data-count="10">10</button>
+                <button type="button" class="seg-btn" role="radio" data-count="15">15</button>
+                <button type="button" class="seg-btn" role="radio" data-count="20">20</button>
+            </div>
+
+            <h3>Catégories</h3>
+            <div class="chips" id="catChips"></div>
+            <div class="avail" id="availLine">Chargement des questions…</div>
+
+            <button class="btn-sky" id="playBtn" disabled>Jouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="startRulesBtn">📖 Règles du jeu</button>
+        </div>
+    </div>
+
+    <!-- ─── RULES OVERLAY ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de CultureQuiz</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Réponds à <strong>10, 15 ou 20 questions</strong> de culture générale et <strong>marque le plus
+                            de
+                            points</strong> possible.</li>
+                    <li>Avant la partie, choisis le nombre de questions et une ou plusieurs <strong>catégories</strong>
+                        (ou « Tout »).</li>
+                </ul>
+            </section>
+            <section>
+                <h3>❓ Types de questions</h3>
+                <ul>
+                    <li><strong>Choix multiple</strong> : une seule bonne réponse parmi les propositions.</li>
+                    <li><strong>Vrai ou faux</strong> : tranche l'affirmation.</li>
+                    <li><strong>Réponse libre</strong> : tape la réponse. La casse, les accents et les espaces en trop
+                        sont
+                        ignorés ; plusieurs formulations sont acceptées.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⭐ Points</h3>
+                <ul>
+                    <li>Mauvaise réponse : <strong>0 point</strong>.</li>
+                    <li>Bonne réponse : de <strong>100 points</strong> (réponse immédiate) à <strong>10 points</strong>
+                        (30 secondes ou plus), en baisse régulière.</li>
+                    <li>Après chaque réponse, la bonne réponse est révélée. Clique sur <strong>Continuer</strong> quand
+                        tu
+                        es prêt.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⏱️ Temps</h3>
+                <ul>
+                    <li>Le chronomètre ne tourne que <strong>pendant que tu réponds</strong> : pas pendant la
+                        correction, ni
+                        en <strong>pause</strong>.</li>
+                    <li>Une question n'est jamais répétée au cours d'une même partie.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🏆 Records</h3>
+                <ul>
+                    <li>Un record par format (10, 15, 20 questions) : le <strong>score</strong> le plus élevé, puis le
+                        <strong>temps le plus court</strong> en cas d'égalité.
+                    </li>
+                    <li>Le jeu fonctionne aussi <strong>hors ligne</strong> : ton record personnel est conservé.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>Clic / toucher</strong> – Répondre</li>
+                    <li><strong>1 · 2 · 3 · 4</strong> – Choisir une proposition ; <strong>V</strong> /
+                        <strong>F</strong> –
+                        Vrai / Faux
+                    </li>
+                    <li><strong>Entrée</strong> – Valider / Continuer</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── GAME OVER OVERLAY ─── -->
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">🎉</div>
+            <div class="gameover-title" id="goTitle">Partie terminée</div>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Bonnes réponses</span>
+                    <span class="stat-val" id="goCorrect">0/10</span>
+                </div>
+                <div class="stat-row">
+                    <span>Score total</span>
+                    <span class="stat-val" id="goScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Temps total</span>
+                    <span class="stat-val" id="goDuration">0:00,0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Temps moyen / question</span>
+                    <span class="stat-val" id="goAvg">0,0 s</span>
+                </div>
+                <div class="stat-row">
+                    <span id="goBestLabel">Meilleur score</span>
+                    <span class="stat-val" id="goBest">—</span>
+                </div>
+            </div>
+            <div class="go-message" id="goMessage"></div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Nouvelle partie</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <div class="seg rec-tabs" id="recTabs" role="tablist" aria-label="Format">
+                <button type="button" class="seg-btn" role="tab" data-count="10">10 questions</button>
+                <button type="button" class="seg-btn" role="tab" data-count="15">15 questions</button>
+                <button type="button" class="seg-btn" role="tab" data-count="20">20 questions</button>
+            </div>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <div class="rc-pair"><span class="rc-label">Score</span><span class="rc-value"
+                                id="recPersonalScore">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Temps</span><span class="rc-value"
+                                id="recPersonalTime">—</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard">
+                        <div class="rc-pair"><span class="rc-label">Score</span><span class="rc-value"
+                                id="recGlobalScore">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Temps</span><span class="rc-value"
+                                id="recGlobalTime">—</span></div>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <div class="hud-cell">
+                <span class="score-label">Question</span>
+                <span class="hud-value" id="qValue">0/10</span>
+            </div>
+            <div class="hud-cell main">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="scoreValue">0</span>
+            </div>
+            <div class="hud-cell">
+                <span class="score-label">Temps</span>
+                <span class="hud-value" id="timeValue">0:00</span>
+            </div>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ─── ZONE DE JEU ─── -->
+    <main id="stage">
+        <div class="board">
+            <div class="panel" id="panel">
+                <div class="q-meta">
+                    <span class="badge" id="qBadge">—</span>
+                    <span class="q-pts" id="qPts">⚡ 100 pts</span>
+                </div>
+                <div class="q-type" id="qType"></div>
+                <h1 class="q-text" id="qText">Prépare-toi…</h1>
+                <div class="q-timer" aria-hidden="true">
+                    <div class="q-timer-fill" id="qTimerFill"></div>
+                </div>
+                <div class="answers" id="answers"></div>
+
+                <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+
+                <div class="question-actions" id="questionActions" hidden>
+                    <button type="button" class="btn-sky" id="nextQuestionBtn">
+                        Continuer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

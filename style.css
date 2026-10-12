@@ -146,6 +146,106 @@ body.no-scroll {
 }
 
 /* =============================================
+   TOAST MAJ CACHE
+   ============================================= */
+
+.toast {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 13px 20px;
+
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+
+  background: linear-gradient(135deg,
+      rgba(30, 33, 65, 0.94),
+      rgba(72, 48, 112, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+
+  box-shadow:
+    0 12px 36px rgba(20, 15, 50, 0.32),
+    0 0 22px rgba(240, 147, 251, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  transform: translateX(-50%);
+  animation: toastEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Petite icône de mise à jour */
+.toast::before {
+  content: '↻';
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 50%;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.35);
+}
+
+.toast-success::before {
+  content: '✓';
+  background: linear-gradient(135deg, #51cf66, #20a85a);
+  box-shadow: 0 3px 12px rgba(81, 207, 102, 0.35);
+}
+
+/* Animation de l’icône pendant la mise à jour */
+.toast:has(+ .toast) {
+  /* Aucun style particulier requis : garde-fou si plusieurs toasts apparaissent. */
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -14px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .toast {
+    top: max(12px, env(safe-area-inset-top));
+    max-width: calc(100vw - 24px);
+    padding: 11px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* =============================================
    SCROLL PROGRESS BAR
    ============================================= */
 .scroll-progress {

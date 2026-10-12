@@ -457,7 +457,24 @@
       "emoji": "🌍",
       "description": "Devine les drapeaux ou les contours des pays du monde. Deux modes, plusieurs difficultés, continents et langues.",
       "tags": [
+        "quiz",
         "geography",
+        "culture",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "culturequiz": {
+      "path": "./games/culturequiz/index.html",
+      "name": "CultureQuiz",
+      "emoji": "🧠",
+      "description": "Teste ta culture générale avec des questions variées. Choisis tes catégories, cumule des points et bats tes records !",
+      "tags": [
+        "quiz",
+        "reflexion",
         "culture",
         "solo"
       ],

@@ -232,6 +232,10 @@
             "mindplay-shapes": {
                 "name": "Mindplay: Shapes",
                 "description": "Remember a composition of shapes, then recreate it. How far will your memory go?"
+            },
+            "culturequiz": {
+                "name": "CultureQuiz",
+                "description": "Test your general knowledge with varied questions. Choose your categories, accumulate points and beat your records!"
             }
         },
         "badges": {
@@ -298,7 +302,8 @@
             "memory": "🧠 Memory",
             "numbers": "🔢 Numbers",
             "observation": "🔍 Observation",
-            "shapes": "🔷 Shapes"
+            "shapes": "🔷 Shapes",
+            "quiz": "📚 Quiz"
         }
     },
     "about": {

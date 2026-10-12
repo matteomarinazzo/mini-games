@@ -232,6 +232,10 @@
             "mindplay-shapes": {
                 "name": "Mindplay: Formen",
                 "description": "Merke dir die Formen und tippe sie in der richtigen Reihenfolge ein. Wie weit reicht dein Gedächtnis?"
+            },
+            "culturequiz": {
+                "name": "KulturQuiz",
+                "description": "Teste dein Allgemeinwissen mit abwechslungsreichen Fragen. Wähle deine Kategorien, sammle Punkte und schlage deine Rekorde!"
             }
         },
         "badges": {
@@ -298,7 +302,8 @@
             "memory": "🧠 Gedächtnis",
             "numbers": "🔢 Zahlen",
             "observation": "🔍 Observation",
-            "shapes": "🔷 Formen"
+            "shapes": "🔷 Formen",
+            "quiz": "📚 Quiz"
         }
     },
     "about": {

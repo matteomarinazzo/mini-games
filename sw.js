@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.33.2026-10-11.8";
+const CACHE_NAME = "mini-games-cache-v1.34.2026-10-12.00";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -95,6 +95,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/mindplay-numbers.webp',
     'assets/logos/mindplay-differences.webp',
     'assets/logos/mindplay-shapes.webp',
+    'assets/logos/culturequiz.webp',
 
     // About
     'about/about.html',
@@ -476,6 +477,12 @@ const ASSETS_TO_CACHE = [
     'games/mindplay-shapes/css/game.css',
     'games/mindplay-shapes/js/game.js',
     'games/mindplay-shapes/js/shapes-core.js',
+
+    // Game: CultureQuiz
+    'games/culturequiz/index.html',
+    'games/culturequiz/css/game.css',
+    'games/culturequiz/js/game.js',
+    'games/culturequiz/data/questions.json',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

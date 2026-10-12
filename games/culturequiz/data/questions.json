@@ -1,0 +1,6017 @@
+{
+  "_doc": {
+    "version": 3,
+    "resume": "Banque de questions de CultureQuiz, version 3, avec une banque étendue. Les clés commençant par _ sont ignorées par le jeu.",
+    "categories": "Liste { id, label, emoji }. Une catégorie sans question n'est pas proposée au joueur.",
+    "questions": "Liste d'objets question. Chaque id doit être unique (un id en double est ignoré).",
+    "champs": {
+      "id": "Identifiant unique, texte, ex. « hist-001 ».",
+      "category": "id d'une catégorie déclarée dans « categories ».",
+      "type": "« choix_multiple », « vrai_faux » ou « reponse_libre ».",
+      "question": "Énoncé affiché au joueur.",
+      "choices": "choix_multiple uniquement : 2 à 6 propositions distinctes (l'ordre est mélangé à l'affichage).",
+      "answer": "choix_multiple : texte identique à l'une des propositions ; vrai_faux : true ou false ; reponse_libre : réponse affichée comme bonne réponse.",
+      "acceptedAnswers": "reponse_libre uniquement, facultatif : variantes acceptées en plus de « answer ». Casse, accents, ponctuation, espaces superflus et article initial (le, la, les, l', un, une) sont ignorés à la comparaison.",
+      "explanation": "Facultatif : courte explication affichée après la réponse."
+    }
+  },
+  "categories": [
+    {
+      "id": "histoire",
+      "label": "Histoire",
+      "emoji": "🏛️"
+    },
+    {
+      "id": "geographie",
+      "label": "Géographie",
+      "emoji": "🌍"
+    },
+    {
+      "id": "sciences",
+      "label": "Sciences",
+      "emoji": "🔬"
+    },
+    {
+      "id": "nature",
+      "label": "Nature",
+      "emoji": "🌿"
+    },
+    {
+      "id": "arts",
+      "label": "Arts",
+      "emoji": "🎨"
+    },
+    {
+      "id": "litterature",
+      "label": "Littérature",
+      "emoji": "📚"
+    },
+    {
+      "id": "sport",
+      "label": "Sport",
+      "emoji": "⚽"
+    },
+    {
+      "id": "cinema",
+      "label": "Cinéma",
+      "emoji": "🎬"
+    },
+    {
+      "id": "musique",
+      "label": "Musique",
+      "emoji": "🎵"
+    },
+    {
+      "id": "technologie",
+      "label": "Technologie",
+      "emoji": "💻"
+    },
+    {
+      "id": "societe",
+      "label": "Société",
+      "emoji": "🏙️"
+    },
+    {
+      "id": "culture-generale",
+      "label": "Culture générale",
+      "emoji": "💡"
+    },
+    {
+      "id": "suisse",
+      "label": "Suisse",
+      "emoji": "🇨🇭"
+    },
+    {
+      "id": "gastronomie",
+      "label": "Gastronomie",
+      "emoji": "🍽️"
+    },
+    {
+      "id": "mythologie",
+      "label": "Mythologie",
+      "emoji": "⚡"
+    },
+    {
+      "id": "espace",
+      "label": "Espace",
+      "emoji": "🚀"
+    }
+  ],
+  "questions": [
+    {
+      "id": "hist-001",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "En quelle année la Révolution française a-t-elle commencé ?",
+      "choices": [
+        "1769",
+        "1789",
+        "1799",
+        "1815"
+      ],
+      "answer": "1789",
+      "explanation": "La prise de la Bastille a eu lieu le 14 juillet 1789."
+    },
+    {
+      "id": "geo-001",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quelle est la capitale de l'Australie ?",
+      "answer": "Canberra",
+      "acceptedAnswers": [],
+      "explanation": "Canberra a été choisie comme compromis entre Sydney et Melbourne."
+    },
+    {
+      "id": "sci-001",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "Au niveau de la mer, l'eau pure bout à 100 °C.",
+      "answer": true,
+      "explanation": "C'est vrai sous la pression atmosphérique normale (1013 hPa)."
+    },
+    {
+      "id": "nat-001",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel est le plus grand mammifère terrestre actuel ?",
+      "choices": [
+        "La girafe",
+        "Le rhinocéros blanc",
+        "L'éléphant d'Afrique",
+        "L'hippopotame"
+      ],
+      "answer": "L'éléphant d'Afrique",
+      "explanation": "Il peut dépasser 6 tonnes ; la girafe est la plus haute, mais moins lourde."
+    },
+    {
+      "id": "arts-001",
+      "category": "arts",
+      "type": "reponse_libre",
+      "question": "Quel artiste a peint « La Joconde » ?",
+      "answer": "Léonard de Vinci",
+      "acceptedAnswers": [
+        "De Vinci",
+        "Leonardo da Vinci",
+        "Léonard",
+        "Vinci",
+        "Da Vinci"
+      ],
+      "explanation": "Le tableau est exposé au musée du Louvre, à Paris."
+    },
+    {
+      "id": "lit-001",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit « Les Misérables » ?",
+      "choices": [
+        "Émile Zola",
+        "Victor Hugo",
+        "Honoré de Balzac",
+        "Alexandre Dumas"
+      ],
+      "answer": "Victor Hugo",
+      "explanation": "Le roman a été publié en 1862."
+    },
+    {
+      "id": "sport-001",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "La distance officielle d'un marathon est de 42,195 km.",
+      "answer": true,
+      "explanation": "Cette distance a été fixée officiellement en 1921."
+    },
+    {
+      "id": "cine-001",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Quel réalisateur a tourné « Les Dents de la mer » (1975) ?",
+      "answer": "Steven Spielberg",
+      "acceptedAnswers": [
+        "Spielberg"
+      ],
+      "explanation": "Ce film est considéré comme le premier grand « blockbuster » estival."
+    },
+    {
+      "id": "mus-001",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Combien de touches compte un piano standard ?",
+      "choices": [
+        "66",
+        "76",
+        "88",
+        "100"
+      ],
+      "answer": "88",
+      "explanation": "52 touches blanches et 36 touches noires."
+    },
+    {
+      "id": "tech-001",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un octet est composé de 8 bits.",
+      "answer": true,
+      "explanation": "Un bit ne peut valoir que 0 ou 1 ; un octet en regroupe huit."
+    },
+    {
+      "id": "soc-001",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Que signifie le sigle « ONU » ?",
+      "answer": "Organisation des Nations unies",
+      "acceptedAnswers": [
+        "Nations unies"
+      ],
+      "explanation": "L'ONU a été fondée en 1945, à la fin de la Seconde Guerre mondiale."
+    },
+    {
+      "id": "cg-001",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Combien de jours compte une année bissextile ?",
+      "choices": [
+        "364",
+        "365",
+        "366",
+        "367"
+      ],
+      "answer": "366",
+      "explanation": "Le 29 février s'ajoute au calendrier tous les quatre ans (avec quelques exceptions séculaires)."
+    },
+    {
+      "id": "hist-002",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel pharaon fit construire la grande pyramide de Gizeh ?",
+      "choices": [
+        "Khéops",
+        "Ramsès II",
+        "Toutânkhamon",
+        "Akhenaton"
+      ],
+      "answer": "Khéops",
+      "explanation": "La pyramide de Khéops est la plus grande des pyramides de Gizeh."
+    },
+    {
+      "id": "hist-003",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "En quelle année l’Empire romain d’Occident a-t-il traditionnellement pris fin ?",
+      "choices": [
+        "395",
+        "410",
+        "476",
+        "622"
+      ],
+      "answer": "476",
+      "explanation": "La déposition de Romulus Augustule en 476 est une date conventionnelle."
+    },
+    {
+      "id": "hist-004",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Qui fut le premier empereur romain ?",
+      "choices": [
+        "Jules César",
+        "Auguste",
+        "Néron",
+        "Trajan"
+      ],
+      "answer": "Auguste",
+      "explanation": "Octave reçut le titre d’Auguste en 27 avant notre ère."
+    },
+    {
+      "id": "hist-005",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "La Magna Carta fut scellée en quel pays ?",
+      "choices": [
+        "France",
+        "Angleterre",
+        "Espagne",
+        "Italie"
+      ],
+      "answer": "Angleterre",
+      "explanation": "La charte fut scellée en Angleterre en 1215."
+    },
+    {
+      "id": "hist-006",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quelle civilisation a construit Machu Picchu ?",
+      "choices": [
+        "Les Mayas",
+        "Les Aztèques",
+        "Les Incas",
+        "Les Olmèques"
+      ],
+      "answer": "Les Incas",
+      "explanation": "Machu Picchu est un site emblématique de l’Empire inca."
+    },
+    {
+      "id": "hist-007",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Qui était le principal auteur de la Déclaration d’indépendance américaine ?",
+      "choices": [
+        "George Washington",
+        "Thomas Jefferson",
+        "Benjamin Franklin",
+        "John Adams"
+      ],
+      "answer": "Thomas Jefferson",
+      "explanation": "Thomas Jefferson en rédigea le texte principal en 1776."
+    },
+    {
+      "id": "hist-008",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel traité a mis fin à la Première Guerre mondiale avec l’Allemagne ?",
+      "choices": [
+        "Le traité de Rome",
+        "Le traité de Versailles",
+        "Le traité de Tordesillas",
+        "Le traité de Vienne"
+      ],
+      "answer": "Le traité de Versailles",
+      "explanation": "Le traité de Versailles fut signé en 1919."
+    },
+    {
+      "id": "hist-009",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "Cléopâtre VII était une reine d’Égypte de la dynastie des Ptolémées.",
+      "answer": true,
+      "explanation": "Cléopâtre appartenait à la dynastie macédonienne des Ptolémées."
+    },
+    {
+      "id": "hist-010",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La bataille de Waterloo a eu lieu en 1815.",
+      "answer": true,
+      "explanation": "Napoléon fut vaincu à Waterloo le 18 juin 1815."
+    },
+    {
+      "id": "hist-011",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "Les Vikings ont fondé l’Empire aztèque.",
+      "answer": false,
+      "explanation": "Les Vikings et les Aztèques appartiennent à des contextes historiques très différents."
+    },
+    {
+      "id": "hist-012",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La Renaissance a commencé en Italie avant de se diffuser en Europe.",
+      "answer": true,
+      "explanation": "Les cités italiennes furent un foyer majeur de la Renaissance."
+    },
+    {
+      "id": "hist-013",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quel peuple a inventé l’écriture cunéiforme ?",
+      "answer": "Les Sumériens",
+      "acceptedAnswers": [
+        "Sumériens",
+        "Sumer",
+        "les Sumeriens"
+      ],
+      "explanation": "Les Sumériens de Mésopotamie ont développé cette écriture."
+    },
+    {
+      "id": "hist-014",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quel célèbre navire a coulé en 1912 après avoir heurté un iceberg ?",
+      "answer": "Titanic",
+      "acceptedAnswers": [
+        "Le Titanic",
+        "RMS Titanic"
+      ],
+      "explanation": "Le Titanic a sombré dans l’Atlantique Nord en avril 1912."
+    },
+    {
+      "id": "hist-015",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Comment s’appelait le chef militaire carthaginois qui franchit les Alpes ?",
+      "answer": "Hannibal",
+      "acceptedAnswers": [
+        "Hannibal Barca",
+        "Hannibal"
+      ],
+      "explanation": "Hannibal mena une campagne contre Rome durant la deuxième guerre punique."
+    },
+    {
+      "id": "hist-016",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quel mur séparait Berlin-Est de Berlin-Ouest ?",
+      "answer": "Le mur de Berlin",
+      "acceptedAnswers": [
+        "Mur de Berlin",
+        "le Mur de Berlin"
+      ],
+      "explanation": "Le mur de Berlin est tombé en novembre 1989."
+    },
+    {
+      "id": "hist-017",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quelle cité antique fut ensevelie par l’éruption du Vésuve en 79 ?",
+      "answer": "Pompéi",
+      "acceptedAnswers": [
+        "Pompei",
+        "Pompéi"
+      ],
+      "explanation": "Pompéi fut ensevelie par l’éruption du Vésuve en 79."
+    },
+    {
+      "id": "geo-002",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel est le plus long fleuve d’Amérique du Sud ?",
+      "choices": [
+        "Le Paraná",
+        "L’Amazone",
+        "L’Orénoque",
+        "Le São Francisco"
+      ],
+      "answer": "L’Amazone",
+      "explanation": "L’Amazone forme le plus vaste bassin fluvial du monde."
+    },
+    {
+      "id": "geo-003",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel pays possède la plus grande superficie au monde ?",
+      "choices": [
+        "Le Canada",
+        "La Chine",
+        "La Russie",
+        "Les États-Unis"
+      ],
+      "answer": "La Russie",
+      "explanation": "La Russie s’étend sur l’Europe et l’Asie."
+    },
+    {
+      "id": "geo-004",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Dans quel océan se trouve Madagascar ?",
+      "choices": [
+        "L’océan Atlantique",
+        "L’océan Indien",
+        "L’océan Pacifique",
+        "L’océan Arctique"
+      ],
+      "answer": "L’océan Indien",
+      "explanation": "Madagascar est une île de l’océan Indien, à l’est de l’Afrique."
+    },
+    {
+      "id": "geo-005",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle chaîne de montagnes sépare traditionnellement la France et l’Espagne ?",
+      "choices": [
+        "Les Alpes",
+        "Les Carpates",
+        "Les Pyrénées",
+        "Les Apennins"
+      ],
+      "answer": "Les Pyrénées",
+      "explanation": "Les Pyrénées forment une frontière naturelle entre les deux pays."
+    },
+    {
+      "id": "geo-006",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel est le plus grand désert chaud du monde ?",
+      "choices": [
+        "Le Gobi",
+        "Le Sahara",
+        "Le Kalahari",
+        "Le Thar"
+      ],
+      "answer": "Le Sahara",
+      "explanation": "Le Sahara couvre une grande partie de l’Afrique du Nord."
+    },
+    {
+      "id": "geo-007",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle ville est traversée par le fleuve Tage ?",
+      "choices": [
+        "Madrid",
+        "Lisbonne",
+        "Rome",
+        "Athènes"
+      ],
+      "answer": "Lisbonne",
+      "explanation": "Le Tage se jette dans l’Atlantique à Lisbonne."
+    },
+    {
+      "id": "geo-008",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel pays est surnommé le pays du Soleil-Levant ?",
+      "choices": [
+        "La Corée du Sud",
+        "Le Japon",
+        "La Thaïlande",
+        "La Chine"
+      ],
+      "answer": "Le Japon",
+      "explanation": "Le Japon est associé à cette appellation traditionnelle."
+    },
+    {
+      "id": "geo-009",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel lac est le plus profond du monde ?",
+      "choices": [
+        "Le lac Victoria",
+        "Le lac Supérieur",
+        "Le lac Baïkal",
+        "Le lac Titicaca"
+      ],
+      "answer": "Le lac Baïkal",
+      "explanation": "Le lac Baïkal atteint plus de 1 600 mètres de profondeur."
+    },
+    {
+      "id": "geo-010",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "Le Nil se jette dans la mer Méditerranée.",
+      "answer": true,
+      "explanation": "Le Nil traverse notamment l’Égypte avant d’atteindre la Méditerranée."
+    },
+    {
+      "id": "geo-011",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "Le mont Everest se trouve entièrement au Népal.",
+      "answer": false,
+      "explanation": "Son sommet se situe sur la frontière entre le Népal et la Chine."
+    },
+    {
+      "id": "geo-012",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "L’équateur traverse le Brésil.",
+      "answer": true,
+      "explanation": "L’équateur traverse le nord du Brésil."
+    },
+    {
+      "id": "geo-013",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "La mer Morte est un lac salé.",
+      "answer": true,
+      "explanation": "La mer Morte est un lac salé fermé, très riche en sels minéraux."
+    },
+    {
+      "id": "geo-014",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quelle est la capitale du Canada ?",
+      "answer": "Ottawa",
+      "acceptedAnswers": [
+        "Ottawa"
+      ],
+      "explanation": "Ottawa est la capitale fédérale du Canada."
+    },
+    {
+      "id": "geo-015",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quel est le plus petit continent par sa superficie ?",
+      "answer": "L’Océanie",
+      "acceptedAnswers": [
+        "Océanie",
+        "Oceanie"
+      ],
+      "explanation": "L’Océanie est généralement considérée comme le plus petit continent."
+    },
+    {
+      "id": "geo-016",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Dans quel pays se trouve la ville de Marrakech ?",
+      "answer": "Le Maroc",
+      "acceptedAnswers": [
+        "Maroc",
+        "le Maroc"
+      ],
+      "explanation": "Marrakech est une grande ville historique du Maroc."
+    },
+    {
+      "id": "geo-017",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quel pays a pour capitale Reykjavik ?",
+      "answer": "L’Islande",
+      "acceptedAnswers": [
+        "Islande",
+        "l’Islande"
+      ],
+      "explanation": "Reykjavik est la capitale de l’Islande."
+    },
+    {
+      "id": "sci-002",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle planète est la plus proche du Soleil ?",
+      "choices": [
+        "Vénus",
+        "Mercure",
+        "Mars",
+        "Jupiter"
+      ],
+      "answer": "Mercure",
+      "explanation": "Mercure est la première planète du système solaire."
+    },
+    {
+      "id": "sci-003",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel gaz les plantes absorbent-elles principalement pour la photosynthèse ?",
+      "choices": [
+        "L’oxygène",
+        "L’azote",
+        "Le dioxyde de carbone",
+        "L’hydrogène"
+      ],
+      "answer": "Le dioxyde de carbone",
+      "explanation": "La photosynthèse utilise le dioxyde de carbone et libère de l’oxygène."
+    },
+    {
+      "id": "sci-004",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle unité mesure une force ?",
+      "choices": [
+        "Le joule",
+        "Le watt",
+        "Le newton",
+        "Le pascal"
+      ],
+      "answer": "Le newton",
+      "explanation": "Le newton est l’unité SI de la force."
+    },
+    {
+      "id": "sci-005",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel organe pompe le sang dans le corps humain ?",
+      "choices": [
+        "Le foie",
+        "Le poumon",
+        "Le cœur",
+        "Le rein"
+      ],
+      "answer": "Le cœur",
+      "explanation": "Les contractions du cœur font circuler le sang."
+    },
+    {
+      "id": "sci-006",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel est le symbole chimique de l’or ?",
+      "choices": [
+        "Ag",
+        "Au",
+        "Fe",
+        "Or"
+      ],
+      "answer": "Au",
+      "explanation": "Au vient du latin aurum."
+    },
+    {
+      "id": "sci-007",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on le passage de l’état liquide à l’état gazeux ?",
+      "choices": [
+        "La fusion",
+        "La vaporisation",
+        "La solidification",
+        "La condensation"
+      ],
+      "answer": "La vaporisation",
+      "explanation": "La vaporisation comprend notamment l’évaporation et l’ébullition."
+    },
+    {
+      "id": "sci-008",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle particule porte une charge électrique négative ?",
+      "choices": [
+        "Le proton",
+        "Le neutron",
+        "L’électron",
+        "Le positon"
+      ],
+      "answer": "L’électron",
+      "explanation": "L’électron porte une charge négative élémentaire."
+    },
+    {
+      "id": "sci-009",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel instrument mesure la pression atmosphérique ?",
+      "choices": [
+        "Le thermomètre",
+        "Le baromètre",
+        "L’hygromètre",
+        "Le sismographe"
+      ],
+      "answer": "Le baromètre",
+      "explanation": "Le baromètre mesure la pression de l’air."
+    },
+    {
+      "id": "sci-010",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "La lumière se déplace plus vite dans le vide que dans l’air.",
+      "answer": true,
+      "explanation": "La vitesse dans le vide est légèrement supérieure à celle dans l’air."
+    },
+    {
+      "id": "sci-011",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "L’ADN est présent uniquement chez les animaux.",
+      "answer": false,
+      "explanation": "L’ADN est le support génétique de très nombreux êtres vivants."
+    },
+    {
+      "id": "sci-012",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "Un son ne se propage pas dans le vide.",
+      "answer": true,
+      "explanation": "Le son a besoin d’un milieu matériel pour se propager."
+    },
+    {
+      "id": "sci-013",
+      "category": "sciences",
+      "type": "reponse_libre",
+      "question": "Quel est le nom du satellite naturel de la Terre ?",
+      "answer": "La Lune",
+      "acceptedAnswers": [
+        "Lune",
+        "la Lune"
+      ],
+      "explanation": "La Lune est le seul satellite naturel permanent de la Terre."
+    },
+    {
+      "id": "sci-014",
+      "category": "sciences",
+      "type": "reponse_libre",
+      "question": "Quelle est la formule chimique de l’eau ?",
+      "answer": "H2O",
+      "acceptedAnswers": [
+        "H₂O",
+        "H2O"
+      ],
+      "explanation": "Une molécule d’eau contient deux atomes d’hydrogène et un atome d’oxygène."
+    },
+    {
+      "id": "sci-015",
+      "category": "sciences",
+      "type": "reponse_libre",
+      "question": "Quel scientifique a formulé la théorie de la relativité ?",
+      "answer": "Albert Einstein",
+      "acceptedAnswers": [
+        "Einstein",
+        "Albert Einstein"
+      ],
+      "explanation": "Einstein a publié les théories de la relativité restreinte et générale."
+    },
+    {
+      "id": "sci-016",
+      "category": "sciences",
+      "type": "reponse_libre",
+      "question": "Combien de chromosomes possède normalement une cellule humaine somatique ?",
+      "answer": "46",
+      "acceptedAnswers": [
+        "quarante-six",
+        "46"
+      ],
+      "explanation": "Les cellules somatiques humaines possèdent 23 paires de chromosomes."
+    },
+    {
+      "id": "sci-017",
+      "category": "sciences",
+      "type": "reponse_libre",
+      "question": "Quel est le nom de la science qui étudie les êtres vivants ?",
+      "answer": "La biologie",
+      "acceptedAnswers": [
+        "biologie",
+        "la biologie"
+      ],
+      "explanation": "La biologie étudie les êtres vivants et leurs interactions."
+    },
+    {
+      "id": "nat-002",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal est le plus grand mammifère marin ?",
+      "choices": [
+        "L’orque",
+        "La baleine bleue",
+        "Le cachalot",
+        "Le requin-baleine"
+      ],
+      "answer": "La baleine bleue",
+      "explanation": "La baleine bleue est le plus grand animal connu."
+    },
+    {
+      "id": "nat-003",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel est le seul mammifère capable de vol actif ?",
+      "choices": [
+        "L’écureuil volant",
+        "La chauve-souris",
+        "Le colugo",
+        "Le hérisson"
+      ],
+      "answer": "La chauve-souris",
+      "explanation": "Les chauves-souris volent grâce à leurs ailes membraneuses."
+    },
+    {
+      "id": "nat-004",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Comment s’appelle le processus par lequel une chenille devient papillon ?",
+      "choices": [
+        "La germination",
+        "La métamorphose",
+        "La mue",
+        "La photosynthèse"
+      ],
+      "answer": "La métamorphose",
+      "explanation": "La métamorphose transforme profondément la larve en adulte."
+    },
+    {
+      "id": "nat-005",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel arbre produit des glands ?",
+      "choices": [
+        "Le hêtre",
+        "Le chêne",
+        "Le bouleau",
+        "Le sapin"
+      ],
+      "answer": "Le chêne",
+      "explanation": "Les glands sont les fruits du chêne."
+    },
+    {
+      "id": "nat-006",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal est connu pour changer de couleur grâce à ses chromatophores ?",
+      "choices": [
+        "Le caméléon",
+        "Le panda",
+        "Le castor",
+        "Le manchot"
+      ],
+      "answer": "Le caméléon",
+      "explanation": "Le caméléon peut modifier sa coloration et ses motifs."
+    },
+    {
+      "id": "nat-007",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quelle partie de la plante absorbe principalement l’eau du sol ?",
+      "choices": [
+        "Les fleurs",
+        "Les feuilles",
+        "Les racines",
+        "Les fruits"
+      ],
+      "answer": "Les racines",
+      "explanation": "Les racines absorbent l’eau et les sels minéraux."
+    },
+    {
+      "id": "nat-008",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel est le plus grand félin vivant ?",
+      "choices": [
+        "Le lion",
+        "Le tigre",
+        "Le léopard",
+        "Le jaguar"
+      ],
+      "answer": "Le tigre",
+      "explanation": "Le tigre est le plus grand des félins actuels."
+    },
+    {
+      "id": "nat-009",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les abeilles jouent un rôle important dans la pollinisation.",
+      "answer": true,
+      "explanation": "En butinant, elles transportent du pollen entre les fleurs."
+    },
+    {
+      "id": "nat-010",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les manchots vivent naturellement au pôle Nord.",
+      "answer": false,
+      "explanation": "Les manchots vivent dans l’hémisphère Sud, notamment en Antarctique."
+    },
+    {
+      "id": "nat-011",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les champignons appartiennent au règne végétal.",
+      "answer": false,
+      "explanation": "Les champignons constituent un règne distinct des plantes."
+    },
+    {
+      "id": "nat-012",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Une graine peut contenir une plante miniature en développement.",
+      "answer": true,
+      "explanation": "L’embryon de la future plante se trouve dans la graine."
+    },
+    {
+      "id": "nat-013",
+      "category": "nature",
+      "type": "reponse_libre",
+      "question": "Quel animal est souvent appelé le roi des animaux ?",
+      "answer": "Le lion",
+      "acceptedAnswers": [
+        "lion",
+        "le lion"
+      ],
+      "explanation": "Cette expression traditionnelle désigne le lion."
+    },
+    {
+      "id": "nat-014",
+      "category": "nature",
+      "type": "reponse_libre",
+      "question": "Comment appelle-t-on le petit de la grenouille ?",
+      "answer": "Le têtard",
+      "acceptedAnswers": [
+        "têtard",
+        "tetard",
+        "le têtard"
+      ],
+      "explanation": "Le têtard est la larve aquatique de la grenouille."
+    },
+    {
+      "id": "nat-015",
+      "category": "nature",
+      "type": "reponse_libre",
+      "question": "Quel phénomène naturel mesure l’échelle de Richter ?",
+      "answer": "Les séismes",
+      "acceptedAnswers": [
+        "séisme",
+        "séismes",
+        "tremblement de terre"
+      ],
+      "explanation": "Cette échelle évalue la magnitude des séismes."
+    },
+    {
+      "id": "nat-016",
+      "category": "nature",
+      "type": "reponse_libre",
+      "question": "Quel arbre est le symbole du Canada sur son drapeau ?",
+      "answer": "L’érable",
+      "acceptedAnswers": [
+        "érable",
+        "erable",
+        "l’érable"
+      ],
+      "explanation": "La feuille d’érable figure au centre du drapeau canadien."
+    },
+    {
+      "id": "nat-017",
+      "category": "nature",
+      "type": "reponse_libre",
+      "question": "Quel animal fabrique du miel ?",
+      "answer": "L’abeille",
+      "acceptedAnswers": [
+        "abeille",
+        "l’abeille"
+      ],
+      "explanation": "Les abeilles produisent du miel à partir du nectar des fleurs."
+    },
+    {
+      "id": "arts-002",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Qui a sculpté le David exposé à Florence ?",
+      "choices": [
+        "Donatello",
+        "Michel-Ange",
+        "Bernini",
+        "Rodin"
+      ],
+      "answer": "Michel-Ange",
+      "explanation": "Michel-Ange a sculpté son David au début du XVIe siècle."
+    },
+    {
+      "id": "arts-003",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel mouvement artistique est associé à Claude Monet ?",
+      "choices": [
+        "Le cubisme",
+        "L’impressionnisme",
+        "Le surréalisme",
+        "Le dadaïsme"
+      ],
+      "answer": "L’impressionnisme",
+      "explanation": "Monet est l’un des fondateurs de l’impressionnisme."
+    },
+    {
+      "id": "arts-004",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Dans quel musée se trouve principalement la Vénus de Milo ?",
+      "choices": [
+        "Le Prado",
+        "Le Louvre",
+        "Le MoMA",
+        "Les Offices"
+      ],
+      "answer": "Le Louvre",
+      "explanation": "La Vénus de Milo est conservée au musée du Louvre."
+    },
+    {
+      "id": "arts-005",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Qui a peint Guernica ?",
+      "choices": [
+        "Pablo Picasso",
+        "Salvador Dalí",
+        "Joan Miró",
+        "Paul Cézanne"
+      ],
+      "answer": "Pablo Picasso",
+      "explanation": "Picasso a peint Guernica en 1937."
+    },
+    {
+      "id": "arts-006",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel architecte a conçu la Sagrada Família de Barcelone ?",
+      "choices": [
+        "Le Corbusier",
+        "Antoni Gaudí",
+        "Frank Lloyd Wright",
+        "Oscar Niemeyer"
+      ],
+      "answer": "Antoni Gaudí",
+      "explanation": "Gaudí est l’architecte principal de la basilique."
+    },
+    {
+      "id": "arts-007",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel art japonais consiste à plier du papier ?",
+      "choices": [
+        "L’ikebana",
+        "L’origami",
+        "Le kabuki",
+        "Le shibori"
+      ],
+      "answer": "L’origami",
+      "explanation": "L’origami est l’art du pliage du papier."
+    },
+    {
+      "id": "arts-008",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel peintre est l’auteur de La Nuit étoilée ?",
+      "choices": [
+        "Paul Gauguin",
+        "Vincent van Gogh",
+        "Édouard Manet",
+        "Henri Matisse"
+      ],
+      "answer": "Vincent van Gogh",
+      "explanation": "Van Gogh a peint cette œuvre en 1889."
+    },
+    {
+      "id": "arts-009",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel matériau est traditionnellement associé à la sculpture de Michel-Ange ?",
+      "choices": [
+        "Le bronze",
+        "Le marbre",
+        "Le verre",
+        "Le plâtre"
+      ],
+      "answer": "Le marbre",
+      "explanation": "Michel-Ange a notamment travaillé le marbre de Carrare."
+    },
+    {
+      "id": "arts-010",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Le cubisme est associé à Pablo Picasso et Georges Braque.",
+      "answer": true,
+      "explanation": "Ces deux artistes ont joué un rôle fondateur dans le cubisme."
+    },
+    {
+      "id": "arts-011",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Le Louvre est situé à Londres.",
+      "answer": false,
+      "explanation": "Le musée du Louvre se trouve à Paris."
+    },
+    {
+      "id": "arts-012",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Une fresque est peinte sur un mur ou un enduit.",
+      "answer": true,
+      "explanation": "La fresque est une peinture murale réalisée sur un enduit."
+    },
+    {
+      "id": "arts-013",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Le vitrail utilise généralement des morceaux de verre coloré.",
+      "answer": true,
+      "explanation": "Les morceaux de verre sont assemblés et maintenus par du plomb ou un matériau équivalent."
+    },
+    {
+      "id": "arts-014",
+      "category": "arts",
+      "type": "reponse_libre",
+      "question": "Quel peintre a réalisé les fresques de la chapelle Sixtine ?",
+      "answer": "Michel-Ange",
+      "acceptedAnswers": [
+        "Michel Ange",
+        "Michelangelo",
+        "Michel-Ange"
+      ],
+      "explanation": "Michel-Ange a peint notamment le plafond de la chapelle Sixtine."
+    },
+    {
+      "id": "arts-015",
+      "category": "arts",
+      "type": "reponse_libre",
+      "question": "Quel art consiste à créer des images avec une caméra ?",
+      "answer": "La photographie",
+      "acceptedAnswers": [
+        "photographie",
+        "la photographie"
+      ],
+      "explanation": "La photographie fixe des images au moyen de la lumière."
+    },
+    {
+      "id": "arts-016",
+      "category": "arts",
+      "type": "reponse_libre",
+      "question": "Quel mouvement artistique est associé à Salvador Dalí ?",
+      "answer": "Le surréalisme",
+      "acceptedAnswers": [
+        "surréalisme",
+        "le surréalisme"
+      ],
+      "explanation": "Dalí est une figure majeure du surréalisme."
+    },
+    {
+      "id": "arts-017",
+      "category": "arts",
+      "type": "reponse_libre",
+      "question": "Quel peintre a réalisé La Persistance de la mémoire ?",
+      "answer": "Salvador Dalí",
+      "acceptedAnswers": [
+        "Salvador Dalí",
+        "Dali",
+        "Dalí"
+      ],
+      "explanation": "La Persistance de la mémoire est une œuvre surréaliste de Dalí."
+    },
+    {
+      "id": "lit-002",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit L’Odyssée ?",
+      "choices": [
+        "Homère",
+        "Virgile",
+        "Sophocle",
+        "Platon"
+      ],
+      "answer": "Homère",
+      "explanation": "L’Odyssée est une épopée grecque traditionnellement attribuée à Homère."
+    },
+    {
+      "id": "lit-003",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel personnage est créé par Cervantès ?",
+      "choices": [
+        "Sherlock Holmes",
+        "Don Quichotte",
+        "Huckleberry Finn",
+        "Gargantua"
+      ],
+      "answer": "Don Quichotte",
+      "explanation": "Don Quichotte est le héros du roman de Cervantès."
+    },
+    {
+      "id": "lit-004",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit Madame Bovary ?",
+      "choices": [
+        "Gustave Flaubert",
+        "Guy de Maupassant",
+        "Stendhal",
+        "Marcel Proust"
+      ],
+      "answer": "Gustave Flaubert",
+      "explanation": "Flaubert publia Madame Bovary en 1857."
+    },
+    {
+      "id": "lit-005",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel genre est Roméo et Juliette ?",
+      "choices": [
+        "Une épopée",
+        "Une tragédie",
+        "Une fable",
+        "Un essai"
+      ],
+      "answer": "Une tragédie",
+      "explanation": "La pièce de Shakespeare est une tragédie en cinq actes."
+    },
+    {
+      "id": "lit-006",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui est l’auteur du Petit Prince ?",
+      "choices": [
+        "Jules Verne",
+        "Antoine de Saint-Exupéry",
+        "Albert Camus",
+        "Boris Vian"
+      ],
+      "answer": "Antoine de Saint-Exupéry",
+      "explanation": "Le Petit Prince a été publié en 1943."
+    },
+    {
+      "id": "lit-007",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Dans quelle langue Dante a-t-il écrit principalement la Divine Comédie ?",
+      "choices": [
+        "Le latin",
+        "L’italien",
+        "Le français",
+        "L’espagnol"
+      ],
+      "answer": "L’italien",
+      "explanation": "Dante a composé ce poème en italien médiéval."
+    },
+    {
+      "id": "lit-008",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit Le Rouge et le Noir ?",
+      "choices": [
+        "Stendhal",
+        "Balzac",
+        "Zola",
+        "Diderot"
+      ],
+      "answer": "Stendhal",
+      "explanation": "Le Rouge et le Noir est un roman de Stendhal."
+    },
+    {
+      "id": "lit-009",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Molière a écrit L’Avare.",
+      "answer": true,
+      "explanation": "L’Avare est une comédie de Molière créée en 1668."
+    },
+    {
+      "id": "lit-010",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Une autobiographie raconte la vie d’une autre personne.",
+      "answer": false,
+      "explanation": "Une autobiographie est le récit de la propre vie de son auteur."
+    },
+    {
+      "id": "lit-011",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Victor Hugo a écrit Notre-Dame de Paris.",
+      "answer": true,
+      "explanation": "Le roman de Victor Hugo paraît en 1831."
+    },
+    {
+      "id": "lit-012",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Le haïku est une forme poétique japonaise.",
+      "answer": true,
+      "explanation": "Le haïku traditionnel est un très court poème japonais."
+    },
+    {
+      "id": "lit-013",
+      "category": "litterature",
+      "type": "reponse_libre",
+      "question": "Quel est le prénom de Proust, auteur d’À la recherche du temps perdu ?",
+      "answer": "Marcel",
+      "acceptedAnswers": [
+        "Marcel",
+        "Proust"
+      ],
+      "explanation": "Marcel Proust est l’auteur de cette vaste œuvre romanesque."
+    },
+    {
+      "id": "lit-014",
+      "category": "litterature",
+      "type": "reponse_libre",
+      "question": "Comment s’appelle le détective créé par Arthur Conan Doyle ?",
+      "answer": "Sherlock Holmes",
+      "acceptedAnswers": [
+        "Sherlock",
+        "Sherlock Holmes"
+      ],
+      "explanation": "Sherlock Holmes est le détective de nombreuses nouvelles et romans."
+    },
+    {
+      "id": "lit-015",
+      "category": "litterature",
+      "type": "reponse_libre",
+      "question": "Quel dramaturge a écrit Hamlet ?",
+      "answer": "William Shakespeare",
+      "acceptedAnswers": [
+        "Shakespeare",
+        "William Shakespeare"
+      ],
+      "explanation": "Hamlet est une tragédie de Shakespeare."
+    },
+    {
+      "id": "lit-016",
+      "category": "litterature",
+      "type": "reponse_libre",
+      "question": "Quel animal accompagne le narrateur dans Le Tour du monde en quatre-vingts jours ?",
+      "answer": "Passepartout",
+      "acceptedAnswers": [
+        "Passepartout"
+      ],
+      "explanation": "Passepartout est le serviteur de Phileas Fogg."
+    },
+    {
+      "id": "lit-017",
+      "category": "litterature",
+      "type": "reponse_libre",
+      "question": "Quel auteur a écrit Vingt mille lieues sous les mers ?",
+      "answer": "Jules Verne",
+      "acceptedAnswers": [
+        "Jules Verne",
+        "Verne"
+      ],
+      "explanation": "Jules Verne est l’auteur de ce roman d’aventures."
+    },
+    {
+      "id": "sport-002",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Combien de joueurs une équipe de football aligne-t-elle sur le terrain ?",
+      "choices": [
+        "7",
+        "9",
+        "11",
+        "13"
+      ],
+      "answer": "11",
+      "explanation": "Une équipe de football compte onze joueurs sur le terrain."
+    },
+    {
+      "id": "sport-003",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Dans quel sport utilise-t-on un volant ?",
+      "choices": [
+        "Le tennis",
+        "Le badminton",
+        "Le squash",
+        "Le hockey"
+      ],
+      "answer": "Le badminton",
+      "explanation": "Le volant est frappé avec une raquette au badminton."
+    },
+    {
+      "id": "sport-004",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quelle nation a remporté la première Coupe du monde de football en 1930 ?",
+      "choices": [
+        "Le Brésil",
+        "L’Italie",
+        "L’Uruguay",
+        "L’Argentine"
+      ],
+      "answer": "L’Uruguay",
+      "explanation": "L’Uruguay a gagné le tournoi organisé à domicile en 1930."
+    },
+    {
+      "id": "sport-005",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Combien de joueurs composent une équipe de basket sur le terrain ?",
+      "choices": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "answer": "5",
+      "explanation": "Chaque équipe de basket compte cinq joueurs sur le terrain."
+    },
+    {
+      "id": "sport-006",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Dans quelle épreuve nage-t-on, pédale-t-on et court-on ?",
+      "choices": [
+        "Le décathlon",
+        "Le pentathlon",
+        "Le triathlon",
+        "Le duathlon"
+      ],
+      "answer": "Le triathlon",
+      "explanation": "Le triathlon enchaîne natation, cyclisme et course à pied."
+    },
+    {
+      "id": "sport-007",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quelle est la surface traditionnelle de Roland-Garros ?",
+      "choices": [
+        "Le gazon",
+        "La terre battue",
+        "Le béton",
+        "La moquette"
+      ],
+      "answer": "La terre battue",
+      "explanation": "Le tournoi de Roland-Garros se joue sur terre battue."
+    },
+    {
+      "id": "sport-008",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel sport pratique-t-on sur un tatami ?",
+      "choices": [
+        "La voile",
+        "Le judo",
+        "Le cyclisme",
+        "L’escrime"
+      ],
+      "answer": "Le judo",
+      "explanation": "Le tatami est le tapis utilisé notamment en judo."
+    },
+    {
+      "id": "sport-009",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Combien de cases compte un échiquier ?",
+      "choices": [
+        "48",
+        "พ64",
+        "64",
+        "81"
+      ],
+      "answer": "64",
+      "explanation": "Un échiquier comporte huit rangées de huit cases."
+    },
+    {
+      "id": "sport-010",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Au tennis, un jeu peut se terminer à 40-40 par un avantage.",
+      "answer": true,
+      "explanation": "À égalité 40-40, il faut généralement deux points d’écart."
+    },
+    {
+      "id": "sport-011",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le Tour de France est une course de natation.",
+      "answer": false,
+      "explanation": "Le Tour de France est une course cycliste par étapes."
+    },
+    {
+      "id": "sport-012",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Au rugby à XV, une équipe compte quinze joueurs sur le terrain.",
+      "answer": true,
+      "explanation": "Le rugby à XV oppose deux équipes de quinze joueurs."
+    },
+    {
+      "id": "sport-013",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le ski alpin se pratique avec une seule planche.",
+      "answer": false,
+      "explanation": "Le ski alpin se pratique normalement avec deux skis."
+    },
+    {
+      "id": "sport-014",
+      "category": "sport",
+      "type": "reponse_libre",
+      "question": "Quel sport est associé au tournoi de Wimbledon ?",
+      "answer": "Le tennis",
+      "acceptedAnswers": [
+        "tennis",
+        "le tennis"
+      ],
+      "explanation": "Wimbledon est un tournoi majeur de tennis sur gazon."
+    },
+    {
+      "id": "sport-015",
+      "category": "sport",
+      "type": "reponse_libre",
+      "question": "Combien de trous compte un parcours de golf standard ?",
+      "answer": "18",
+      "acceptedAnswers": [
+        "dix-huit",
+        "18"
+      ],
+      "explanation": "Un parcours de golf standard comprend dix-huit trous."
+    },
+    {
+      "id": "sport-016",
+      "category": "sport",
+      "type": "reponse_libre",
+      "question": "Quel art martial coréen signifie « voie du pied et du poing » ?",
+      "answer": "Le taekwondo",
+      "acceptedAnswers": [
+        "taekwondo",
+        "le taekwondo"
+      ],
+      "explanation": "Le taekwondo est un art martial originaire de Corée."
+    },
+    {
+      "id": "sport-017",
+      "category": "sport",
+      "type": "reponse_libre",
+      "question": "Quel objet frappe-t-on au baseball ?",
+      "answer": "Une balle",
+      "acceptedAnswers": [
+        "balle",
+        "une balle"
+      ],
+      "explanation": "Au baseball, le batteur frappe une balle avec une batte."
+    },
+    {
+      "id": "cine-002",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film de Charlie Chaplin met en scène le personnage de Charlot dans une usine ?",
+      "choices": [
+        "Le Dictateur",
+        "Les Temps modernes",
+        "La Ruée vers l’or",
+        "Le Kid"
+      ],
+      "answer": "Les Temps modernes",
+      "explanation": "Les Temps modernes critique le travail industriel à la chaîne."
+    },
+    {
+      "id": "cine-003",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Qui a réalisé 2001, l’Odyssée de l’espace ?",
+      "choices": [
+        "Stanley Kubrick",
+        "Ridley Scott",
+        "Alfred Hitchcock",
+        "Orson Welles"
+      ],
+      "answer": "Stanley Kubrick",
+      "explanation": "Kubrick a réalisé ce film de science-fiction en 1968."
+    },
+    {
+      "id": "cine-004",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film d’animation met en scène Woody et Buzz l’Éclair ?",
+      "choices": [
+        "Shrek",
+        "Toy Story",
+        "Le Roi lion",
+        "Ratatouille"
+      ],
+      "answer": "Toy Story",
+      "explanation": "Toy Story est le premier long métrage de Pixar."
+    },
+    {
+      "id": "cine-005",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel acteur joue le personnage principal dans Forrest Gump ?",
+      "choices": [
+        "Tom Hanks",
+        "Brad Pitt",
+        "Robin Williams",
+        "Matt Damon"
+      ],
+      "answer": "Tom Hanks",
+      "explanation": "Tom Hanks interprète Forrest Gump."
+    },
+    {
+      "id": "cine-006",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel réalisateur est associé à Pulp Fiction ?",
+      "choices": [
+        "Quentin Tarantino",
+        "David Lynch",
+        "Tim Burton",
+        "James Cameron"
+      ],
+      "answer": "Quentin Tarantino",
+      "explanation": "Pulp Fiction est un film de Quentin Tarantino sorti en 1994."
+    },
+    {
+      "id": "cine-007",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel genre cinématographique met souvent en scène des cow-boys ?",
+      "choices": [
+        "Le western",
+        "Le mélodrame",
+        "Le péplum",
+        "Le film noir"
+      ],
+      "answer": "Le western",
+      "explanation": "Le western se déroule souvent dans l’Ouest américain."
+    },
+    {
+      "id": "cine-008",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film raconte le naufrage d’un paquebot nommé Titanic ?",
+      "choices": [
+        "Titanic",
+        "Avatar",
+        "Gladiator",
+        "Inception"
+      ],
+      "answer": "Titanic",
+      "explanation": "Titanic est le film de James Cameron sorti en 1997."
+    },
+    {
+      "id": "cine-009",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Le film muet n’utilise pas de dialogues enregistrés audibles.",
+      "answer": true,
+      "explanation": "Le cinéma muet était accompagné de musique et parfois d’intertitres."
+    },
+    {
+      "id": "cine-010",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Alfred Hitchcock a réalisé Psychose.",
+      "answer": true,
+      "explanation": "Psychose est un thriller réalisé par Hitchcock en 1960."
+    },
+    {
+      "id": "cine-011",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Le montage consiste à assembler des plans pour construire un film.",
+      "answer": true,
+      "explanation": "Le montage organise les plans et le rythme du récit."
+    },
+    {
+      "id": "cine-012",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Le Festival de Cannes se déroule en Allemagne.",
+      "answer": false,
+      "explanation": "Le Festival de Cannes se déroule en France."
+    },
+    {
+      "id": "cine-013",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Quel réalisateur a créé le personnage d’E.T. ?",
+      "answer": "Steven Spielberg",
+      "acceptedAnswers": [
+        "Spielberg",
+        "Steven Spielberg"
+      ],
+      "explanation": "E.T. l’extra-terrestre a été réalisé par Steven Spielberg."
+    },
+    {
+      "id": "cine-014",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Comment appelle-t-on la personne qui dirige le tournage d’un film ?",
+      "answer": "Le réalisateur",
+      "acceptedAnswers": [
+        "réalisateur",
+        "la réalisatrice",
+        "le réalisateur"
+      ],
+      "explanation": "Le réalisateur dirige la création artistique et la mise en scène."
+    },
+    {
+      "id": "cine-015",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Quel acteur a incarné le personnage de Jack dans Titanic ?",
+      "answer": "Leonardo DiCaprio",
+      "acceptedAnswers": [
+        "DiCaprio",
+        "Leonardo DiCaprio"
+      ],
+      "explanation": "Leonardo DiCaprio interprète Jack Dawson."
+    },
+    {
+      "id": "cine-016",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Quel prix récompense le meilleur film à Cannes ?",
+      "answer": "La Palme d’or",
+      "acceptedAnswers": [
+        "Palme d’or",
+        "la Palme d’or"
+      ],
+      "explanation": "La Palme d’or est la récompense suprême du Festival de Cannes."
+    },
+    {
+      "id": "cine-017",
+      "category": "cinema",
+      "type": "reponse_libre",
+      "question": "Quel film de science-fiction met en scène le personnage de Neo ?",
+      "answer": "Matrix",
+      "acceptedAnswers": [
+        "Matrix"
+      ],
+      "explanation": "Matrix est un film de science-fiction réalisé par les Wachowski."
+    },
+    {
+      "id": "mus-002",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel compositeur a écrit la Neuvième Symphonie ?",
+      "choices": [
+        "Wolfgang Mozart",
+        "Ludwig van Beethoven",
+        "Johannes Brahms",
+        "Franz Schubert"
+      ],
+      "answer": "Ludwig van Beethoven",
+      "explanation": "La Neuvième Symphonie est une œuvre majeure de Beethoven."
+    },
+    {
+      "id": "mus-003",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel instrument possède généralement 6 cordes ?",
+      "choices": [
+        "Le violon",
+        "La guitare",
+        "La trompette",
+        "La harpe"
+      ],
+      "answer": "La guitare",
+      "explanation": "La guitare classique ou électrique possède généralement six cordes."
+    },
+    {
+      "id": "mus-004",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel chanteur est surnommé le « King of Pop » ?",
+      "choices": [
+        "Elvis Presley",
+        "Michael Jackson",
+        "Prince",
+        "David Bowie"
+      ],
+      "answer": "Michael Jackson",
+      "explanation": "Michael Jackson est couramment surnommé le roi de la pop."
+    },
+    {
+      "id": "mus-005",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel compositeur était sourd à la fin de sa vie ?",
+      "choices": [
+        "Beethoven",
+        "Vivaldi",
+        "Chopin",
+        "Haydn"
+      ],
+      "answer": "Beethoven",
+      "explanation": "Beethoven souffrit d’une surdité progressive."
+    },
+    {
+      "id": "mus-006",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Combien de notes compte la gamme diatonique majeure ?",
+      "choices": [
+        "5",
+        "6",
+        "7",
+        "12"
+      ],
+      "answer": "7",
+      "explanation": "Une gamme diatonique majeure comporte sept degrés."
+    },
+    {
+      "id": "mus-007",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel genre musical est né à La Nouvelle-Orléans ?",
+      "choices": [
+        "Le flamenco",
+        "Le jazz",
+        "Le reggae",
+        "La techno"
+      ],
+      "answer": "Le jazz",
+      "explanation": "La Nouvelle-Orléans est un berceau historique du jazz."
+    },
+    {
+      "id": "mus-008",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel instrument à vent possède des touches et un bec ?",
+      "choices": [
+        "La clarinette",
+        "Le violoncelle",
+        "Le tuba",
+        "La cymbale"
+      ],
+      "answer": "La clarinette",
+      "explanation": "La clarinette est un instrument à anche simple."
+    },
+    {
+      "id": "mus-009",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Qui a composé Les Quatre Saisons ?",
+      "choices": [
+        "Antonio Vivaldi",
+        "Bach",
+        "Haendel",
+        "Liszt"
+      ],
+      "answer": "Antonio Vivaldi",
+      "explanation": "Vivaldi a composé ce cycle de concertos baroques."
+    },
+    {
+      "id": "mus-010",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Une octave correspond à un intervalle de huit degrés dans une gamme.",
+      "answer": true,
+      "explanation": "Une octave sépare deux notes portant le même nom."
+    },
+    {
+      "id": "mus-011",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Le reggae est originaire de Jamaïque.",
+      "answer": true,
+      "explanation": "Le reggae s’est développé en Jamaïque à partir des années 1960."
+    },
+    {
+      "id": "mus-012",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Un orchestre symphonique ne comprend jamais de cordes.",
+      "answer": false,
+      "explanation": "Les cordes constituent une famille centrale de l’orchestre symphonique."
+    },
+    {
+      "id": "mus-013",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "La batterie est un instrument à cordes.",
+      "answer": false,
+      "explanation": "La batterie est un ensemble d’instruments de percussion."
+    },
+    {
+      "id": "mus-014",
+      "category": "musique",
+      "type": "reponse_libre",
+      "question": "Quel chanteur a interprété la chanson Imagine ?",
+      "answer": "John Lennon",
+      "acceptedAnswers": [
+        "Lennon",
+        "John Lennon"
+      ],
+      "explanation": "Imagine est une chanson composée et chantée par John Lennon."
+    },
+    {
+      "id": "mus-015",
+      "category": "musique",
+      "type": "reponse_libre",
+      "question": "Quel instrument joue-t-on avec un archet et qui possède quatre cordes ?",
+      "answer": "Le violon",
+      "acceptedAnswers": [
+        "violon",
+        "le violon"
+      ],
+      "explanation": "Le violon possède généralement quatre cordes frottées par un archet."
+    },
+    {
+      "id": "mus-016",
+      "category": "musique",
+      "type": "reponse_libre",
+      "question": "Comment appelle-t-on une œuvre musicale écrite pour deux interprètes ?",
+      "answer": "Un duo",
+      "acceptedAnswers": [
+        "duo",
+        "un duo"
+      ],
+      "explanation": "Un duo est une œuvre ou un ensemble pour deux interprètes."
+    },
+    {
+      "id": "mus-017",
+      "category": "musique",
+      "type": "reponse_libre",
+      "question": "Quel instrument possède des touches noires et blanches ?",
+      "answer": "Le piano",
+      "acceptedAnswers": [
+        "piano",
+        "le piano"
+      ],
+      "explanation": "Le piano possède généralement 88 touches."
+    },
+    {
+      "id": "tech-002",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Que signifie l’acronyme HTML ?",
+      "choices": [
+        "HighText Machine Language",
+        "HyperText Markup Language",
+        "Home Tool Markup Language",
+        "Hyperlink Text Management Language"
+      ],
+      "answer": "HyperText Markup Language",
+      "explanation": "HTML est le langage de balisage des pages web."
+    },
+    {
+      "id": "tech-003",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel composant exécute principalement les instructions d’un ordinateur ?",
+      "choices": [
+        "La carte son",
+        "Le processeur",
+        "Le clavier",
+        "Le disque dur"
+      ],
+      "answer": "Le processeur",
+      "explanation": "Le processeur, ou CPU, exécute les instructions."
+    },
+    {
+      "id": "tech-004",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel protocole est principalement utilisé pour consulter des pages web ?",
+      "choices": [
+        "FTP",
+        "HTTP",
+        "SMTP",
+        "SSH"
+      ],
+      "answer": "HTTP",
+      "explanation": "HTTP permet les échanges entre navigateur et serveur web."
+    },
+    {
+      "id": "tech-005",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quelle mémoire conserve les données même hors tension ?",
+      "choices": [
+        "La RAM",
+        "La mémoire morte",
+        "La mémoire cache",
+        "Les registres"
+      ],
+      "answer": "La mémoire morte",
+      "explanation": "La mémoire morte, ou ROM, conserve son contenu hors tension."
+    },
+    {
+      "id": "tech-006",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel langage est souvent utilisé pour styliser les pages web ?",
+      "choices": [
+        "CSS",
+        "SQL",
+        "BASIC",
+        "Fortran"
+      ],
+      "answer": "CSS",
+      "explanation": "CSS décrit la présentation visuelle des documents web."
+    },
+    {
+      "id": "tech-007",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Que mesure un écran en pixels ?",
+      "choices": [
+        "Son poids",
+        "Sa définition",
+        "Sa consommation",
+        "Sa fréquence sonore"
+      ],
+      "answer": "Sa définition",
+      "explanation": "La définition correspond au nombre de pixels affichés."
+    },
+    {
+      "id": "tech-008",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel système d’exploitation est développé par Microsoft pour les PC ?",
+      "choices": [
+        "Linux",
+        "Android",
+        "Windows",
+        "iOS"
+      ],
+      "answer": "Windows",
+      "explanation": "Windows est un système d’exploitation de Microsoft."
+    },
+    {
+      "id": "tech-009",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel appareil convertit un document papier en fichier numérique ?",
+      "choices": [
+        "Un routeur",
+        "Un scanner",
+        "Un modem",
+        "Un projecteur"
+      ],
+      "answer": "Un scanner",
+      "explanation": "Un scanner numérise des documents ou des images."
+    },
+    {
+      "id": "tech-010",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Le Wi-Fi est une technologie de réseau sans fil.",
+      "answer": true,
+      "explanation": "Le Wi-Fi transmet des données par ondes radio."
+    },
+    {
+      "id": "tech-011",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un fichier PDF est obligatoirement une image sans texte sélectionnable.",
+      "answer": false,
+      "explanation": "Un PDF peut contenir du texte, des images et des éléments interactifs."
+    },
+    {
+      "id": "tech-012",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un mot de passe long et unique améliore généralement la sécurité.",
+      "answer": true,
+      "explanation": "La longueur et l’unicité rendent les attaques plus difficiles."
+    },
+    {
+      "id": "tech-013",
+      "category": "technologie",
+      "type": "reponse_libre",
+      "question": "Que signifie l’acronyme GPS ?",
+      "answer": "Global Positioning System",
+      "acceptedAnswers": [
+        "Global Positioning System",
+        "système de positionnement global"
+      ],
+      "explanation": "Le GPS utilise des satellites pour déterminer une position."
+    },
+    {
+      "id": "tech-014",
+      "category": "technologie",
+      "type": "reponse_libre",
+      "question": "Quel symbole est utilisé dans une adresse électronique ?",
+      "answer": "@",
+      "acceptedAnswers": [
+        "arobase",
+        "arrobase",
+        "@"
+      ],
+      "explanation": "Le caractère @ sépare généralement le nom et le domaine."
+    },
+    {
+      "id": "tech-015",
+      "category": "technologie",
+      "type": "reponse_libre",
+      "question": "Comment appelle-t-on un programme malveillant ?",
+      "answer": "Un logiciel malveillant",
+      "acceptedAnswers": [
+        "malware",
+        "logiciel malveillant",
+        "un malware"
+      ],
+      "explanation": "Un logiciel malveillant est conçu pour nuire ou s’introduire sans autorisation."
+    },
+    {
+      "id": "tech-016",
+      "category": "technologie",
+      "type": "reponse_libre",
+      "question": "Quel appareil distribue une connexion réseau entre plusieurs équipements ?",
+      "answer": "Un routeur",
+      "acceptedAnswers": [
+        "routeur",
+        "un routeur"
+      ],
+      "explanation": "Un routeur dirige les paquets entre réseaux ou appareils."
+    },
+    {
+      "id": "tech-017",
+      "category": "technologie",
+      "type": "reponse_libre",
+      "question": "Quel langage est utilisé pour interroger des bases de données relationnelles ?",
+      "answer": "SQL",
+      "acceptedAnswers": [
+        "sql",
+        "SQL"
+      ],
+      "explanation": "SQL sert notamment à interroger et manipuler des bases relationnelles."
+    },
+    {
+      "id": "soc-002",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quelle institution vote les lois en France avec le Sénat ?",
+      "choices": [
+        "Le Conseil constitutionnel",
+        "L’Assemblée nationale",
+        "La Cour de cassation",
+        "Le Conseil d’État"
+      ],
+      "answer": "L’Assemblée nationale",
+      "explanation": "L’Assemblée nationale et le Sénat forment le Parlement."
+    },
+    {
+      "id": "soc-003",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel est le rôle principal d’un maire ?",
+      "choices": [
+        "Diriger une région",
+        "Administrer une commune",
+        "Commander l’armée",
+        "Rendre la justice internationale"
+      ],
+      "answer": "Administrer une commune",
+      "explanation": "Le maire dirige l’administration de la commune."
+    },
+    {
+      "id": "soc-004",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel document encadre les droits fondamentaux dans l’Union européenne ?",
+      "choices": [
+        "La Charte des droits fondamentaux",
+        "Le Code civil",
+        "Le traité de Versailles",
+        "La Convention de Genève"
+      ],
+      "answer": "La Charte des droits fondamentaux",
+      "explanation": "La Charte rassemble les droits et libertés reconnus dans l’Union européenne."
+    },
+    {
+      "id": "soc-005",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quelle est la monnaie officielle du Japon ?",
+      "choices": [
+        "Le won",
+        "Le yen",
+        "Le yuan",
+        "La roupie"
+      ],
+      "answer": "Le yen",
+      "explanation": "Le yen est la monnaie japonaise."
+    },
+    {
+      "id": "soc-006",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel système politique donne le pouvoir aux citoyens par le vote ?",
+      "choices": [
+        "La monarchie absolue",
+        "La démocratie",
+        "La dictature",
+        "La théocratie"
+      ],
+      "answer": "La démocratie",
+      "explanation": "La démocratie repose notamment sur la participation des citoyens."
+    },
+    {
+      "id": "soc-007",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel impôt est généralement prélevé sur la consommation en France ?",
+      "choices": [
+        "L’ISF",
+        "La TVA",
+        "La taxe foncière",
+        "La CSG"
+      ],
+      "answer": "La TVA",
+      "explanation": "La taxe sur la valeur ajoutée s’applique à de nombreux achats."
+    },
+    {
+      "id": "soc-008",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel organisme publie les recensements de la population en France ?",
+      "choices": [
+        "L’Insee",
+        "L’ONU",
+        "La Banque centrale européenne",
+        "L’Unesco"
+      ],
+      "answer": "L’Insee",
+      "explanation": "L’Insee produit des statistiques officielles françaises."
+    },
+    {
+      "id": "soc-009",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Le suffrage universel signifie que tous les citoyens remplissant les conditions légales peuvent voter.",
+      "answer": true,
+      "explanation": "Le suffrage universel élargit le droit de vote à l’ensemble des citoyens concernés."
+    },
+    {
+      "id": "soc-010",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Une constitution définit souvent l’organisation des pouvoirs d’un État.",
+      "answer": true,
+      "explanation": "Elle fixe les règles fondamentales des institutions."
+    },
+    {
+      "id": "soc-011",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "L’UNESCO est une fédération sportive.",
+      "answer": false,
+      "explanation": "L’UNESCO est une organisation de l’ONU pour l’éducation, la science et la culture."
+    },
+    {
+      "id": "soc-012",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Une langue officielle est nécessairement la langue maternelle de tous les habitants.",
+      "answer": false,
+      "explanation": "Un État peut avoir une langue officielle sans qu’elle soit maternelle pour toute sa population."
+    },
+    {
+      "id": "soc-013",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Quel est le nom de l’hymne national français ?",
+      "answer": "La Marseillaise",
+      "acceptedAnswers": [
+        "Marseillaise",
+        "La Marseillaise"
+      ],
+      "explanation": "La Marseillaise est l’hymne national français."
+    },
+    {
+      "id": "soc-014",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Quel est le nom de la monnaie de l’Union européenne dans de nombreux pays ?",
+      "answer": "L’euro",
+      "acceptedAnswers": [
+        "euro",
+        "l’euro",
+        "EUR"
+      ],
+      "explanation": "L’euro est la monnaie commune adoptée par les pays de la zone euro."
+    },
+    {
+      "id": "soc-015",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Comment appelle-t-on le déplacement d’une population vers un autre pays ?",
+      "answer": "L’immigration",
+      "acceptedAnswers": [
+        "immigration",
+        "l’immigration"
+      ],
+      "explanation": "L’immigration désigne l’installation dans un pays d’accueil."
+    },
+    {
+      "id": "soc-016",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Quel principe garantit qu’une personne est considérée innocente avant jugement ?",
+      "answer": "La présomption d’innocence",
+      "acceptedAnswers": [
+        "présomption d’innocence",
+        "la présomption d’innocence"
+      ],
+      "explanation": "La présomption d’innocence est un principe fondamental de justice."
+    },
+    {
+      "id": "soc-017",
+      "category": "societe",
+      "type": "reponse_libre",
+      "question": "Quel document officiel identifie une personne dans de nombreux pays ?",
+      "answer": "La carte d’identité",
+      "acceptedAnswers": [
+        "carte d’identité",
+        "la carte didentité",
+        "carte didentite"
+      ],
+      "explanation": "La carte d’identité est un document officiel d’identification."
+    },
+    {
+      "id": "cg-002",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Combien de côtés possède un hexagone ?",
+      "choices": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": "6",
+      "explanation": "Un hexagone est un polygone à six côtés."
+    },
+    {
+      "id": "cg-003",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quelle couleur obtient-on en mélangeant du bleu et du jaune ?",
+      "choices": [
+        "Le violet",
+        "Le vert",
+        "L’orange",
+        "Le rose"
+      ],
+      "answer": "Le vert",
+      "explanation": "En synthèse soustractive usuelle, bleu et jaune donnent du vert."
+    },
+    {
+      "id": "cg-004",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel est le nombre premier suivant 7 ?",
+      "choices": [
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "answer": "11",
+      "explanation": "11 est le premier nombre premier supérieur à 7."
+    },
+    {
+      "id": "cg-005",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quelle langue compte le plus de locuteurs natifs ?",
+      "choices": [
+        "L’anglais",
+        "Le chinois mandarin",
+        "L’espagnol",
+        "L’arabe"
+      ],
+      "answer": "Le chinois mandarin",
+      "explanation": "Le mandarin est la langue maternelle de centaines de millions de personnes."
+    },
+    {
+      "id": "cg-006",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Combien de continents compte le modèle géographique le plus courant en France ?",
+      "choices": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": "7",
+      "explanation": "Le modèle enseigné en France distingue généralement sept continents."
+    },
+    {
+      "id": "cg-007",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel métal est attiré par un aimant ?",
+      "choices": [
+        "Le cuivre",
+        "Le fer",
+        "L’aluminium",
+        "L’or"
+      ],
+      "answer": "Le fer",
+      "explanation": "Le fer est un matériau ferromagnétique."
+    },
+    {
+      "id": "cg-008",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel est le symbole mathématique de la division ?",
+      "choices": [
+        "+",
+        "−",
+        "×",
+        "÷"
+      ],
+      "answer": "÷",
+      "explanation": "Le signe ÷ est couramment utilisé pour représenter une division."
+    },
+    {
+      "id": "cg-009",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel mois vient juste après septembre ?",
+      "choices": [
+        "Août",
+        "Octobre",
+        "Novembre",
+        "Décembre"
+      ],
+      "answer": "Octobre",
+      "explanation": "Octobre suit septembre dans le calendrier."
+    },
+    {
+      "id": "cg-010",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Un triangle possède toujours trois côtés.",
+      "answer": true,
+      "explanation": "C’est la définition géométrique d’un triangle."
+    },
+    {
+      "id": "cg-011",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le zéro est un nombre négatif.",
+      "answer": false,
+      "explanation": "Le zéro n’est ni positif ni négatif."
+    },
+    {
+      "id": "cg-012",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Une année compte toujours exactement 365 jours.",
+      "answer": false,
+      "explanation": "Une année bissextile compte 366 jours."
+    },
+    {
+      "id": "cg-013",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le symbole chimique O désigne l’oxygène.",
+      "answer": true,
+      "explanation": "O est le symbole international de l’oxygène."
+    },
+    {
+      "id": "cg-014",
+      "category": "culture-generale",
+      "type": "reponse_libre",
+      "question": "Combien de minutes y a-t-il dans une heure ?",
+      "answer": "60",
+      "acceptedAnswers": [
+        "soixante",
+        "60"
+      ],
+      "explanation": "Une heure est divisée en soixante minutes."
+    },
+    {
+      "id": "cg-015",
+      "category": "culture-generale",
+      "type": "reponse_libre",
+      "question": "Quelle forme a quatre côtés égaux et quatre angles droits ?",
+      "answer": "Le carré",
+      "acceptedAnswers": [
+        "carré",
+        "le carré"
+      ],
+      "explanation": "Un carré est un quadrilatère à quatre côtés égaux et quatre angles droits."
+    },
+    {
+      "id": "cg-016",
+      "category": "culture-generale",
+      "type": "reponse_libre",
+      "question": "Quel est le contraire du mot « ancien » ?",
+      "answer": "Nouveau",
+      "acceptedAnswers": [
+        "nouveau",
+        "récents",
+        "récent"
+      ],
+      "explanation": "Nouveau est un antonyme courant d’ancien."
+    },
+    {
+      "id": "cg-017",
+      "category": "culture-generale",
+      "type": "reponse_libre",
+      "question": "Combien de jours compte une semaine ?",
+      "answer": "7",
+      "acceptedAnswers": [
+        "sept",
+        "7"
+      ],
+      "explanation": "Une semaine comporte sept jours."
+    },
+    {
+      "id": "hist-018",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel traité a officiellement mis fin à la Première Guerre mondiale ?",
+      "choices": [
+        "Traité de Versailles",
+        "Traité de Rome",
+        "Traité de Tordesillas",
+        "Traité de Maastricht"
+      ],
+      "answer": "Traité de Versailles",
+      "explanation": "Il a été signé en 1919."
+    },
+    {
+      "id": "hist-019",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Qui fut le premier empereur des Français ?",
+      "choices": [
+        "Napoléon Ier",
+        "Charlemagne",
+        "Louis XIV",
+        "Napoléon III"
+      ],
+      "answer": "Napoléon Ier",
+      "explanation": "Napoléon Bonaparte se couronna empereur en 1804."
+    },
+    {
+      "id": "hist-020",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quelle civilisation a construit Machu Picchu ?",
+      "answer": "Les Incas",
+      "acceptedAnswers": [
+        "Incas",
+        "les Incas"
+      ],
+      "explanation": "Machu Picchu est un site majeur de la civilisation inca."
+    },
+    {
+      "id": "hist-021",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La chute du mur de Berlin a eu lieu en 1989.",
+      "answer": true,
+      "explanation": "Le mur est tombé le 9 novembre 1989."
+    },
+    {
+      "id": "hist-022",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel pharaon est associé au célèbre masque funéraire en or ?",
+      "choices": [
+        "Toutânkhamon",
+        "Ramsès II",
+        "Cléopâtre",
+        "Akhenaton"
+      ],
+      "answer": "Toutânkhamon",
+      "explanation": "Son tombeau a été découvert en 1922."
+    },
+    {
+      "id": "hist-023",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Dans quelle ville Jules César a-t-il été assassiné ?",
+      "choices": [
+        "Rome",
+        "Athènes",
+        "Carthage",
+        "Alexandrie"
+      ],
+      "answer": "Rome",
+      "explanation": "Il fut assassiné aux ides de mars, à Rome, en 44 av. J.-C."
+    },
+    {
+      "id": "hist-024",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quel navigateur a atteint l’Amérique en 1492 ?",
+      "answer": "Christophe Colomb",
+      "acceptedAnswers": [
+        "Christophe Colomb",
+        "Colomb"
+      ],
+      "explanation": "Son expédition atteint les Caraïbes en 1492."
+    },
+    {
+      "id": "hist-025",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La Renaissance a débuté en Italie.",
+      "answer": true,
+      "explanation": "L’Italie est le berceau généralement retenu de la Renaissance."
+    },
+    {
+      "id": "hist-026",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel événement est commémoré le 14 juillet en France ?",
+      "choices": [
+        "La prise de la Bastille",
+        "Le sacre de Napoléon",
+        "La signature de l’armistice",
+        "La Commune de Paris"
+      ],
+      "answer": "La prise de la Bastille",
+      "explanation": "La fête nationale rappelle notamment la prise de la Bastille de 1789."
+    },
+    {
+      "id": "hist-027",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Qui a été la première femme à recevoir un prix Nobel ?",
+      "choices": [
+        "Marie Curie",
+        "Rosa Parks",
+        "Ada Lovelace",
+        "Florence Nightingale"
+      ],
+      "answer": "Marie Curie",
+      "explanation": "Elle reçut le Nobel de physique en 1903."
+    },
+    {
+      "id": "hist-028",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "Quel empire avait pour capitale Constantinople ?",
+      "answer": "L’Empire byzantin",
+      "acceptedAnswers": [
+        "Empire byzantin",
+        "Byzance"
+      ],
+      "explanation": "Constantinople fut la capitale de l’Empire romain d’Orient."
+    },
+    {
+      "id": "hist-029",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La Déclaration des droits de l’homme et du citoyen date de 1789.",
+      "answer": true,
+      "explanation": "Elle a été adoptée pendant la Révolution française."
+    },
+    {
+      "id": "hist-030",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel peuple a inventé l’écriture cunéiforme ?",
+      "choices": [
+        "Les Sumériens",
+        "Les Vikings",
+        "Les Romains",
+        "Les Celtes"
+      ],
+      "answer": "Les Sumériens",
+      "explanation": "La cunéiforme apparaît en Mésopotamie."
+    },
+    {
+      "id": "hist-031",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel roi français était surnommé le Roi-Soleil ?",
+      "choices": [
+        "Louis XIV",
+        "Louis IX",
+        "François Ier",
+        "Henri IV"
+      ],
+      "answer": "Louis XIV",
+      "explanation": "Son règne a duré de 1643 à 1715."
+    },
+    {
+      "id": "hist-032",
+      "category": "histoire",
+      "type": "reponse_libre",
+      "question": "En quelle année l’homme a-t-il marché sur la Lune pour la première fois ?",
+      "answer": "1969",
+      "acceptedAnswers": [
+        "1969"
+      ],
+      "explanation": "Apollo 11 a aluni en juillet 1969."
+    },
+    {
+      "id": "hist-033",
+      "category": "histoire",
+      "type": "vrai_faux",
+      "question": "La bataille de Waterloo s’est déroulée en 1815.",
+      "answer": true,
+      "explanation": "Elle marque la défaite finale de Napoléon Ier."
+    },
+    {
+      "id": "hist-034",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel pays a offert la statue de la Liberté aux États-Unis ?",
+      "choices": [
+        "La France",
+        "L’Espagne",
+        "Le Royaume-Uni",
+        "L’Italie"
+      ],
+      "answer": "La France",
+      "explanation": "La statue fut inaugurée à New York en 1886."
+    },
+    {
+      "id": "hist-035",
+      "category": "histoire",
+      "type": "choix_multiple",
+      "question": "Quel mouvement a été lancé par Martin Luther au XVIe siècle ?",
+      "choices": [
+        "La Réforme protestante",
+        "Le romantisme",
+        "Le surréalisme",
+        "Le mouvement ouvrier"
+      ],
+      "answer": "La Réforme protestante",
+      "explanation": "Ses thèses de 1517 ont déclenché la Réforme."
+    },
+    {
+      "id": "geo-018",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel est le plus long fleuve d’Europe ?",
+      "choices": [
+        "La Volga",
+        "Le Danube",
+        "Le Rhin",
+        "La Loire"
+      ],
+      "answer": "La Volga",
+      "explanation": "La Volga traverse notamment la Russie européenne."
+    },
+    {
+      "id": "geo-019",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle est la capitale du Canada ?",
+      "choices": [
+        "Ottawa",
+        "Toronto",
+        "Montréal",
+        "Vancouver"
+      ],
+      "answer": "Ottawa",
+      "explanation": "Ottawa est la capitale fédérale du Canada."
+    },
+    {
+      "id": "geo-020",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quel est le plus grand océan du monde ?",
+      "answer": "L’océan Pacifique",
+      "acceptedAnswers": [
+        "océan Pacifique",
+        "Pacifique"
+      ],
+      "explanation": "Le Pacifique couvre la plus vaste superficie océanique."
+    },
+    {
+      "id": "geo-021",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "Le Nil traverse l’Égypte.",
+      "answer": true,
+      "explanation": "Le Nil traverse le pays avant de se jeter dans la Méditerranée."
+    },
+    {
+      "id": "geo-022",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Dans quel pays se trouve le mont Fuji ?",
+      "choices": [
+        "Japon",
+        "Chine",
+        "Corée du Sud",
+        "Népal"
+      ],
+      "answer": "Japon",
+      "explanation": "Le Fuji est le plus haut sommet du Japon."
+    },
+    {
+      "id": "geo-023",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle mer sépare l’Europe et l’Afrique ?",
+      "choices": [
+        "La Méditerranée",
+        "La mer Baltique",
+        "La mer du Nord",
+        "La mer Noire"
+      ],
+      "answer": "La Méditerranée",
+      "explanation": "Elle s’étend entre les deux continents."
+    },
+    {
+      "id": "geo-024",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quel est le plus grand pays du monde par sa superficie ?",
+      "answer": "La Russie",
+      "acceptedAnswers": [
+        "Russie",
+        "la Russie"
+      ],
+      "explanation": "La Russie s’étend sur l’Europe et l’Asie."
+    },
+    {
+      "id": "geo-025",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "L’Australie est à la fois un pays et un continent.",
+      "answer": true,
+      "explanation": "L’Australie est généralement considérée comme un continent insulaire."
+    },
+    {
+      "id": "geo-026",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle est la capitale de l’Argentine ?",
+      "choices": [
+        "Buenos Aires",
+        "Lima",
+        "Santiago",
+        "Montevideo"
+      ],
+      "answer": "Buenos Aires",
+      "explanation": "Buenos Aires est la capitale argentine."
+    },
+    {
+      "id": "geo-027",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel désert couvre une grande partie de l’Afrique du Nord ?",
+      "choices": [
+        "Le Sahara",
+        "Le Gobi",
+        "Le Kalahari",
+        "L’Atacama"
+      ],
+      "answer": "Le Sahara",
+      "explanation": "Le Sahara est le plus grand désert chaud."
+    },
+    {
+      "id": "geo-028",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Sur quel continent se trouve le Kenya ?",
+      "answer": "Afrique",
+      "acceptedAnswers": [
+        "Afrique",
+        "l’Afrique"
+      ],
+      "explanation": "Le Kenya se trouve en Afrique de l’Est."
+    },
+    {
+      "id": "geo-029",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "Le Danube se jette dans la mer Noire.",
+      "answer": true,
+      "explanation": "Son delta se trouve sur les côtes de la mer Noire."
+    },
+    {
+      "id": "geo-030",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quelle chaîne de montagnes sépare la France et l’Espagne ?",
+      "choices": [
+        "Les Pyrénées",
+        "Les Alpes",
+        "Les Carpates",
+        "Les Andes"
+      ],
+      "answer": "Les Pyrénées",
+      "explanation": "Les Pyrénées forment la frontière naturelle principale."
+    },
+    {
+      "id": "geo-031",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel pays est surnommé le pays du Soleil-Levant ?",
+      "choices": [
+        "Le Japon",
+        "La Thaïlande",
+        "L’Inde",
+        "La Chine"
+      ],
+      "answer": "Le Japon",
+      "explanation": "Cette expression fait référence à sa position à l’est de l’Asie."
+    },
+    {
+      "id": "geo-032",
+      "category": "geographie",
+      "type": "reponse_libre",
+      "question": "Quelle est la capitale de l’Italie ?",
+      "answer": "Rome",
+      "acceptedAnswers": [
+        "Rome"
+      ],
+      "explanation": "Rome est la capitale italienne."
+    },
+    {
+      "id": "geo-033",
+      "category": "geographie",
+      "type": "vrai_faux",
+      "question": "Le lac Baïkal se trouve en Russie.",
+      "answer": true,
+      "explanation": "Le Baïkal est situé en Sibérie."
+    },
+    {
+      "id": "geo-034",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel est le plus haut sommet des Alpes ?",
+      "choices": [
+        "Le mont Blanc",
+        "Le Cervin",
+        "Le mont Rose",
+        "Le Grossglockner"
+      ],
+      "answer": "Le mont Blanc",
+      "explanation": "Le mont Blanc culmine à environ 4 809 mètres."
+    },
+    {
+      "id": "geo-035",
+      "category": "geographie",
+      "type": "choix_multiple",
+      "question": "Quel pays possède la ville de Marrakech ?",
+      "choices": [
+        "Le Maroc",
+        "L’Algérie",
+        "La Tunisie",
+        "La Jordanie"
+      ],
+      "answer": "Le Maroc",
+      "explanation": "Marrakech est une ville marocaine."
+    },
+    {
+      "id": "sci-018",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle planète est la plus proche du Soleil ?",
+      "choices": [
+        "Mercure",
+        "Vénus",
+        "Mars",
+        "Jupiter"
+      ],
+      "answer": "Mercure",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-019",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel organe pompe le sang ?",
+      "choices": [
+        "Le cœur",
+        "Le foie",
+        "Le poumon",
+        "Le rein"
+      ],
+      "answer": "Le cœur",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-020",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel gaz les plantes absorbent-elles principalement ?",
+      "choices": [
+        "Le dioxyde de carbone",
+        "L’oxygène",
+        "L’azote",
+        "L’hélium"
+      ],
+      "answer": "Le dioxyde de carbone",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-021",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "La lumière se déplace-t-elle plus vite que le son ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sci-022",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle est l’unité de base du vivant ?",
+      "choices": [
+        "La cellule",
+        "L’atome",
+        "Le tissu",
+        "L’organe"
+      ],
+      "answer": "La cellule",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-023",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel métal est liquide à température ambiante ?",
+      "choices": [
+        "Le mercure",
+        "Le fer",
+        "Le cuivre",
+        "L’aluminium"
+      ],
+      "answer": "Le mercure",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-024",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Combien de chromosomes possède normalement une cellule humaine somatique ?",
+      "choices": [
+        "46",
+        "23",
+        "44",
+        "48"
+      ],
+      "answer": "46",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-025",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel phénomène transforme un liquide en gaz ?",
+      "choices": [
+        "La vaporisation",
+        "La fusion",
+        "La solidification",
+        "La condensation"
+      ],
+      "answer": "La vaporisation",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-026",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel scientifique a formulé la relativité ?",
+      "choices": [
+        "Albert Einstein",
+        "Isaac Newton",
+        "Louis Pasteur",
+        "Galilée"
+      ],
+      "answer": "Albert Einstein",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-027",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "L’ADN porte-t-il une information génétique ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sci-028",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel est le pH d’une solution neutre à 25 °C ?",
+      "choices": [
+        "7",
+        "0",
+        "14",
+        "10"
+      ],
+      "answer": "7",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-029",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel instrument mesure la température ?",
+      "choices": [
+        "Le thermomètre",
+        "Le baromètre",
+        "L’anémomètre",
+        "Le sismographe"
+      ],
+      "answer": "Le thermomètre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-030",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel est le symbole chimique de l’or ?",
+      "choices": [
+        "Au",
+        "Ag",
+        "O",
+        "Fe"
+      ],
+      "answer": "Au",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-031",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on le passage du solide au liquide ?",
+      "choices": [
+        "La fusion",
+        "La sublimation",
+        "La condensation",
+        "L’évaporation"
+      ],
+      "answer": "La fusion",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-032",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel est le satellite naturel de la Terre ?",
+      "choices": [
+        "La Lune",
+        "Phobos",
+        "Europe",
+        "Titan"
+      ],
+      "answer": "La Lune",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-033",
+      "category": "sciences",
+      "type": "vrai_faux",
+      "question": "La gravité attire-t-elle les objets vers le centre de la Terre ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sci-034",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quel scientifique a découvert la pénicilline ?",
+      "choices": [
+        "Alexander Fleming",
+        "Darwin",
+        "Mendel",
+        "Cavendish"
+      ],
+      "answer": "Alexander Fleming",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sci-035",
+      "category": "sciences",
+      "type": "choix_multiple",
+      "question": "Quelle particule porte une charge électrique négative ?",
+      "choices": [
+        "L’électron",
+        "Le proton",
+        "Le neutron",
+        "Le photon"
+      ],
+      "answer": "L’électron",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-018",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal est le plus grand mammifère ?",
+      "choices": [
+        "La baleine bleue",
+        "L’éléphant d’Afrique",
+        "La girafe",
+        "L’hippopotame"
+      ],
+      "answer": "La baleine bleue",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-019",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel arbre produit des glands ?",
+      "choices": [
+        "Le chêne",
+        "Le hêtre",
+        "Le bouleau",
+        "Le sapin"
+      ],
+      "answer": "Le chêne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-020",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les champignons sont-ils des végétaux ?",
+      "answer": false,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "nat-021",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel est le régime du panda géant ?",
+      "choices": [
+        "Principalement herbivore",
+        "Carnivore strict",
+        "Insectivore",
+        "Frugivore exclusif"
+      ],
+      "answer": "Principalement herbivore",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-022",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel insecte produit le miel ?",
+      "choices": [
+        "L’abeille",
+        "La fourmi",
+        "La libellule",
+        "Le grillon"
+      ],
+      "answer": "L’abeille",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-023",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Comment s’appelle le petit de la grenouille ?",
+      "choices": [
+        "Le têtard",
+        "Le faon",
+        "Le poussin",
+        "L’alevin"
+      ],
+      "answer": "Le têtard",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-024",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal possède une trompe ?",
+      "choices": [
+        "L’éléphant",
+        "Le rhinocéros",
+        "Le zèbre",
+        "Le lama"
+      ],
+      "answer": "L’éléphant",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-025",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les coraux sont-ils des animaux ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "nat-026",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quelle plante carnivore capture souvent des insectes avec des feuilles en piège ?",
+      "choices": [
+        "La dionée",
+        "Le cactus",
+        "Le lierre",
+        "La fougère"
+      ],
+      "answer": "La dionée",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-027",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel félin est connu pour ses rayures ?",
+      "choices": [
+        "Le tigre",
+        "Le lion",
+        "Le guépard",
+        "Le lynx"
+      ],
+      "answer": "Le tigre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-028",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel oiseau ne vole généralement pas et vit en Antarctique ?",
+      "choices": [
+        "Le manchot",
+        "L’aigle",
+        "Le flamant rose",
+        "La cigogne"
+      ],
+      "answer": "Le manchot",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-029",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "La photosynthèse produit-elle du dioxygène ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "nat-030",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal est un marsupial ?",
+      "choices": [
+        "Le kangourou",
+        "Le panda",
+        "Le dauphin",
+        "Le renard"
+      ],
+      "answer": "Le kangourou",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-031",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel arbre est associé aux pommes ?",
+      "choices": [
+        "Le pommier",
+        "L’olivier",
+        "Le figuier",
+        "Le noyer"
+      ],
+      "answer": "Le pommier",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-032",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel est le plus grand animal terrestre actuel ?",
+      "choices": [
+        "L’éléphant d’Afrique",
+        "La girafe",
+        "Le bison",
+        "Le rhinocéros"
+      ],
+      "answer": "L’éléphant d’Afrique",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-033",
+      "category": "nature",
+      "type": "vrai_faux",
+      "question": "Les baleines respirent-elles avec des poumons ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "nat-034",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quel animal change de couleur pour se camoufler ?",
+      "choices": [
+        "Le caméléon",
+        "Le cheval",
+        "Le manchot",
+        "Le castor"
+      ],
+      "answer": "Le caméléon",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "nat-035",
+      "category": "nature",
+      "type": "choix_multiple",
+      "question": "Quelle partie de la fleur attire souvent les pollinisateurs par ses couleurs ?",
+      "choices": [
+        "Les pétales",
+        "Les racines",
+        "Les étamines seules",
+        "L’écorce"
+      ],
+      "answer": "Les pétales",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-018",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Qui a peint La Joconde ?",
+      "choices": [
+        "Léonard de Vinci",
+        "Raphaël",
+        "Monet",
+        "Van Gogh"
+      ],
+      "answer": "Léonard de Vinci",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-019",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel art consiste à modeler des formes en trois dimensions ?",
+      "choices": [
+        "La sculpture",
+        "La gravure",
+        "La photographie",
+        "La calligraphie"
+      ],
+      "answer": "La sculpture",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-020",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Le cubisme est associé à Picasso.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "arts-021",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel peintre est célèbre pour ses Nymphéas ?",
+      "choices": [
+        "Claude Monet",
+        "Matisse",
+        "Dalí",
+        "Rembrandt"
+      ],
+      "answer": "Claude Monet",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-022",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel instrument possède habituellement 88 touches ?",
+      "choices": [
+        "Le piano",
+        "La harpe",
+        "La flûte",
+        "Le violon"
+      ],
+      "answer": "Le piano",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-023",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel courant artistique est lié à Salvador Dalí ?",
+      "choices": [
+        "Le surréalisme",
+        "Le baroque",
+        "Le réalisme",
+        "Le fauvisme"
+      ],
+      "answer": "Le surréalisme",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-024",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on un portrait de soi-même ?",
+      "choices": [
+        "Un autoportrait",
+        "Une nature morte",
+        "Une fresque",
+        "Un triptyque"
+      ],
+      "answer": "Un autoportrait",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-025",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "La perspective sert-elle à représenter la profondeur ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "arts-026",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel matériau est traditionnellement associé au vitrail ?",
+      "choices": [
+        "Le verre",
+        "Le marbre",
+        "Le bronze",
+        "Le liège"
+      ],
+      "answer": "Le verre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-027",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Qui a peint Guernica ?",
+      "choices": [
+        "Pablo Picasso",
+        "Joan Miró",
+        "Paul Cézanne",
+        "Edvard Munch"
+      ],
+      "answer": "Pablo Picasso",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-028",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel art utilise principalement l’objectif et la lumière pour créer des images ?",
+      "choices": [
+        "La photographie",
+        "La danse",
+        "La céramique",
+        "La poésie"
+      ],
+      "answer": "La photographie",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-029",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Le baroque est antérieur à l’impressionnisme.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "arts-030",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel sculpteur a créé Le Penseur ?",
+      "choices": [
+        "Auguste Rodin",
+        "Henry Moore",
+        "Brancusi",
+        "Donatello"
+      ],
+      "answer": "Auguste Rodin",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-031",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel mouvement artistique privilégie les impressions de lumière et de couleur ?",
+      "choices": [
+        "L’impressionnisme",
+        "Le classicisme",
+        "Le dadaïsme",
+        "Le pop art"
+      ],
+      "answer": "L’impressionnisme",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-032",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel monument parisien est une tour métallique ?",
+      "choices": [
+        "La tour Eiffel",
+        "Le Sacré-Cœur",
+        "L’Arc de triomphe",
+        "Le Panthéon"
+      ],
+      "answer": "La tour Eiffel",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-033",
+      "category": "arts",
+      "type": "vrai_faux",
+      "question": "Une fresque est-elle peinte sur un mur ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "arts-034",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel peintre a réalisé La Nuit étoilée ?",
+      "choices": [
+        "Vincent van Gogh",
+        "Manet",
+        "Kandinsky",
+        "Goya"
+      ],
+      "answer": "Vincent van Gogh",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "arts-035",
+      "category": "arts",
+      "type": "choix_multiple",
+      "question": "Quel art scénique utilise le mouvement du corps en musique ?",
+      "choices": [
+        "La danse",
+        "La sculpture",
+        "La gravure",
+        "Le vitrail"
+      ],
+      "answer": "La danse",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-018",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit Les Misérables ?",
+      "choices": [
+        "Victor Hugo",
+        "Émile Zola",
+        "Molière",
+        "Albert Camus"
+      ],
+      "answer": "Victor Hugo",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-019",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel genre raconte des événements imaginaires en prose ?",
+      "choices": [
+        "Le roman",
+        "Le dictionnaire",
+        "L’essai scientifique",
+        "Le traité"
+      ],
+      "answer": "Le roman",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-020",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Molière a écrit Le Malade imaginaire.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "lit-021",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui est l’auteur de L’Étranger ?",
+      "choices": [
+        "Albert Camus",
+        "Marcel Proust",
+        "André Gide",
+        "Jules Verne"
+      ],
+      "answer": "Albert Camus",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-022",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on un récit bref avec une morale ?",
+      "choices": [
+        "Une fable",
+        "Une épopée",
+        "Une biographie",
+        "Une ode"
+      ],
+      "answer": "Une fable",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-023",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel personnage vit à Baker Street ?",
+      "choices": [
+        "Sherlock Holmes",
+        "Don Quichotte",
+        "Hercule Poirot",
+        "Gargantua"
+      ],
+      "answer": "Sherlock Holmes",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-024",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit Vingt mille lieues sous les mers ?",
+      "choices": [
+        "Jules Verne",
+        "Alexandre Dumas",
+        "Stendhal",
+        "Balzac"
+      ],
+      "answer": "Jules Verne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-025",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Un alexandrin compte-t-il douze syllabes ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "lit-026",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel auteur a créé le personnage de Harry Potter ?",
+      "choices": [
+        "J. K. Rowling",
+        "Jane Austen",
+        "Agatha Christie",
+        "Suzanne Collins"
+      ],
+      "answer": "J. K. Rowling",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-027",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel est le contraire d’un prologue ?",
+      "choices": [
+        "Un épilogue",
+        "Un dialogue",
+        "Un incipit",
+        "Un refrain"
+      ],
+      "answer": "Un épilogue",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-028",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit Madame Bovary ?",
+      "choices": [
+        "Gustave Flaubert",
+        "Guy de Maupassant",
+        "Victor Hugo",
+        "Colette"
+      ],
+      "answer": "Gustave Flaubert",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-029",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Le théâtre est destiné à être joué devant un public.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "lit-030",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel poète a écrit « Le Dormeur du val » ?",
+      "choices": [
+        "Arthur Rimbaud",
+        "Paul Verlaine",
+        "Charles Baudelaire",
+        "Guillaume Apollinaire"
+      ],
+      "answer": "Arthur Rimbaud",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-031",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on le début d’un récit ?",
+      "choices": [
+        "L’incipit",
+        "La chute",
+        "La morale",
+        "La didascalie"
+      ],
+      "answer": "L’incipit",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-032",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Qui a écrit L’Odyssée selon la tradition antique ?",
+      "choices": [
+        "Homère",
+        "Virgile",
+        "Sophocle",
+        "Platon"
+      ],
+      "answer": "Homère",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-033",
+      "category": "litterature",
+      "type": "vrai_faux",
+      "question": "Une métaphore compare-t-elle sans outil de comparaison ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "lit-034",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel auteur français a créé Arsène Lupin ?",
+      "choices": [
+        "Maurice Leblanc",
+        "Georges Simenon",
+        "Romain Gary",
+        "Jean de La Fontaine"
+      ],
+      "answer": "Maurice Leblanc",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "lit-035",
+      "category": "litterature",
+      "type": "choix_multiple",
+      "question": "Quel genre met en scène des personnages et des dialogues ?",
+      "choices": [
+        "Le théâtre",
+        "Le haïku",
+        "Le lexique",
+        "Le manuel"
+      ],
+      "answer": "Le théâtre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-018",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Combien de joueurs une équipe de football aligne-t-elle au coup d’envoi ?",
+      "choices": [
+        "11",
+        "7",
+        "9",
+        "13"
+      ],
+      "answer": "11",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-019",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le marathon mesure-t-il environ 42,195 km ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sport-020",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel sport se joue à Roland-Garros ?",
+      "choices": [
+        "Le tennis",
+        "Le rugby",
+        "Le golf",
+        "L’escrime"
+      ],
+      "answer": "Le tennis",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-021",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel pays a inventé le judo ?",
+      "choices": [
+        "Le Japon",
+        "La Chine",
+        "La Corée",
+        "La Mongolie"
+      ],
+      "answer": "Le Japon",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-022",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Dans quel sport utilise-t-on un ballon ovale ?",
+      "choices": [
+        "Le rugby",
+        "Le tennis",
+        "La natation",
+        "Le cyclisme"
+      ],
+      "answer": "Le rugby",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-023",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel nageur a remporté de nombreux titres olympiques ?",
+      "choices": [
+        "Michael Phelps",
+        "Usain Bolt",
+        "Roger Federer",
+        "Tony Parker"
+      ],
+      "answer": "Michael Phelps",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-024",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le Tour de France est-il une course cycliste ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sport-025",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel sport pratique-t-on sur un tatami ?",
+      "choices": [
+        "Le judo",
+        "Le ski",
+        "Le cricket",
+        "Le baseball"
+      ],
+      "answer": "Le judo",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-026",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Combien de périodes compte un match de hockey sur glace ?",
+      "choices": [
+        "3",
+        "2",
+        "4",
+        "5"
+      ],
+      "answer": "3",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-027",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel athlète est associé au record du 100 mètres ?",
+      "choices": [
+        "Usain Bolt",
+        "Rafael Nadal",
+        "Zinédine Zidane",
+        "Lewis Hamilton"
+      ],
+      "answer": "Usain Bolt",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-028",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le ski alpin se pratique-t-il sur neige ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sport-029",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel sport utilise un fleuret, une épée ou un sabre ?",
+      "choices": [
+        "L’escrime",
+        "Le tir à l’arc",
+        "La boxe",
+        "Le handball"
+      ],
+      "answer": "L’escrime",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-030",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel tournoi de tennis se joue sur gazon à Londres ?",
+      "choices": [
+        "Wimbledon",
+        "Roland-Garros",
+        "Flushing Meadows",
+        "Bercy"
+      ],
+      "answer": "Wimbledon",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-031",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Un carton rouge entraîne-t-il l’exclusion au football ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sport-032",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel sport se pratique sur un ring avec des gants ?",
+      "choices": [
+        "La boxe",
+        "Le volley-ball",
+        "L’aviron",
+        "Le tir"
+      ],
+      "answer": "La boxe",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-033",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel pays a remporté la Coupe du monde de football 2018 ?",
+      "choices": [
+        "La France",
+        "La Croatie",
+        "L’Allemagne",
+        "Le Brésil"
+      ],
+      "answer": "La France",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sport-034",
+      "category": "sport",
+      "type": "vrai_faux",
+      "question": "Le biathlon combine-t-il ski de fond et tir ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sport-035",
+      "category": "sport",
+      "type": "choix_multiple",
+      "question": "Quel est le but du saut en hauteur ?",
+      "choices": [
+        "Franchir une barre",
+        "Lancer un poids",
+        "Courir en relais",
+        "Toucher un filet"
+      ],
+      "answer": "Franchir une barre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-018",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Qui a réalisé E.T. l’extra-terrestre ?",
+      "choices": [
+        "Steven Spielberg",
+        "James Cameron",
+        "Tim Burton",
+        "George Lucas"
+      ],
+      "answer": "Steven Spielberg",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-019",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film met en scène le paquebot Titanic ?",
+      "choices": [
+        "Titanic",
+        "Avatar",
+        "Gladiator",
+        "Inception"
+      ],
+      "answer": "Titanic",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-020",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Le cinéma muet existait-il avant le cinéma parlant ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cine-021",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Qui joue le personnage principal dans Le Fabuleux Destin d’Amélie Poulain ?",
+      "choices": [
+        "Audrey Tautou",
+        "Marion Cotillard",
+        "Juliette Binoche",
+        "Catherine Deneuve"
+      ],
+      "answer": "Audrey Tautou",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-022",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel réalisateur a créé la saga Star Wars ?",
+      "choices": [
+        "George Lucas",
+        "Peter Jackson",
+        "Christopher Nolan",
+        "Ridley Scott"
+      ],
+      "answer": "George Lucas",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-023",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel prix récompense le meilleur film au Festival de Cannes ?",
+      "choices": [
+        "La Palme d’or",
+        "Le Lion d’or",
+        "L’Ours d’or",
+        "Le César d’or"
+      ],
+      "answer": "La Palme d’or",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-024",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel genre fait généralement rire le spectateur ?",
+      "choices": [
+        "La comédie",
+        "Le documentaire",
+        "Le film noir",
+        "Le western"
+      ],
+      "answer": "La comédie",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-025",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Le montage assemble-t-il des plans filmés ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cine-026",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel acteur incarne souvent Indiana Jones ?",
+      "choices": [
+        "Harrison Ford",
+        "Tom Hanks",
+        "Brad Pitt",
+        "Will Smith"
+      ],
+      "answer": "Harrison Ford",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-027",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film d’animation met en scène un ogre vert ?",
+      "choices": [
+        "Shrek",
+        "Ratatouille",
+        "Cars",
+        "Bambi"
+      ],
+      "answer": "Shrek",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-028",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Qui a réalisé Le Voyage de Chihiro ?",
+      "choices": [
+        "Hayao Miyazaki",
+        "Isao Takahata",
+        "Satoshi Kon",
+        "Akira Kurosawa"
+      ],
+      "answer": "Hayao Miyazaki",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-029",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Les Oscars sont-ils remis principalement aux États-Unis ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cine-030",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel film de Chaplin met en scène un personnage appelé Charlot ?",
+      "choices": [
+        "Les Temps modernes",
+        "Le Parrain",
+        "Psychose",
+        "Metropolis"
+      ],
+      "answer": "Les Temps modernes",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-031",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on la musique d’un film ?",
+      "choices": [
+        "La bande originale",
+        "Le générique",
+        "Le doublage",
+        "Le décor"
+      ],
+      "answer": "La bande originale",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-032",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel acteur interprète Jack dans Titanic ?",
+      "choices": [
+        "Leonardo DiCaprio",
+        "Matt Damon",
+        "Johnny Depp",
+        "Jude Law"
+      ],
+      "answer": "Leonardo DiCaprio",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-033",
+      "category": "cinema",
+      "type": "vrai_faux",
+      "question": "Un documentaire vise-t-il généralement à présenter le réel ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cine-034",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Quel réalisateur est associé à Pulp Fiction ?",
+      "choices": [
+        "Quentin Tarantino",
+        "David Fincher",
+        "Wes Anderson",
+        "Brian De Palma"
+      ],
+      "answer": "Quentin Tarantino",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cine-035",
+      "category": "cinema",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on le texte parlé par un personnage ?",
+      "choices": [
+        "Une réplique",
+        "Un décor",
+        "Un plan",
+        "Un fondu"
+      ],
+      "answer": "Une réplique",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-018",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel instrument possède des cordes et se joue avec un archet ?",
+      "choices": [
+        "Le violon",
+        "La trompette",
+        "La clarinette",
+        "Le tambour"
+      ],
+      "answer": "Le violon",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-019",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Qui a composé La Flûte enchantée ?",
+      "choices": [
+        "Wolfgang Amadeus Mozart",
+        "Beethoven",
+        "Bach",
+        "Chopin"
+      ],
+      "answer": "Wolfgang Amadeus Mozart",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-020",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Une symphonie est-elle une œuvre musicale pour orchestre ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "mus-021",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel groupe a interprété « Hey Jude » ?",
+      "choices": [
+        "The Beatles",
+        "ABBA",
+        "Queen",
+        "The Rolling Stones"
+      ],
+      "answer": "The Beatles",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-022",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on la vitesse d’un morceau ?",
+      "choices": [
+        "Le tempo",
+        "Le timbre",
+        "La portée",
+        "Le refrain"
+      ],
+      "answer": "Le tempo",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-023",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel instrument possède généralement 6 cordes ?",
+      "choices": [
+        "La guitare",
+        "Le hautbois",
+        "La harpe",
+        "Le trombone"
+      ],
+      "answer": "La guitare",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-024",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Le jazz est né aux États-Unis.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "mus-025",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Qui a composé la Neuvième Symphonie ?",
+      "choices": [
+        "Ludwig van Beethoven",
+        "Mozart",
+        "Vivaldi",
+        "Schubert"
+      ],
+      "answer": "Ludwig van Beethoven",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-026",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel genre musical est associé au tango ?",
+      "choices": [
+        "La danse et la musique rioplatenses",
+        "Le chant grégorien",
+        "Le blues rural",
+        "La musique baroque"
+      ],
+      "answer": "La danse et la musique rioplatenses",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-027",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on une voix féminine aiguë ?",
+      "choices": [
+        "Soprano",
+        "Alto",
+        "Ténor",
+        "Basse"
+      ],
+      "answer": "Soprano",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-028",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Une octave contient-elle huit degrés diatoniques ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "mus-029",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel chanteur est surnommé le « King of Pop » ?",
+      "choices": [
+        "Michael Jackson",
+        "Elvis Presley",
+        "Prince",
+        "Bob Dylan"
+      ],
+      "answer": "Michael Jackson",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-030",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel instrument frappe-t-on avec des baguettes ?",
+      "choices": [
+        "La batterie",
+        "La flûte",
+        "Le violoncelle",
+        "La cornemuse"
+      ],
+      "answer": "La batterie",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-031",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel compositeur est devenu sourd à la fin de sa vie ?",
+      "choices": [
+        "Beethoven",
+        "Vivaldi",
+        "Liszt",
+        "Debussy"
+      ],
+      "answer": "Beethoven",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-032",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Le reggae est associé à la Jamaïque.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "mus-033",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on la personne qui dirige un orchestre ?",
+      "choices": [
+        "Le chef d’orchestre",
+        "Le soliste",
+        "Le parolier",
+        "Le producteur"
+      ],
+      "answer": "Le chef d’orchestre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-034",
+      "category": "musique",
+      "type": "choix_multiple",
+      "question": "Quel duo français a produit « Get Lucky » avec Pharrell Williams ?",
+      "choices": [
+        "Daft Punk",
+        "Air",
+        "Justice",
+        "Phoenix"
+      ],
+      "answer": "Daft Punk",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "mus-035",
+      "category": "musique",
+      "type": "vrai_faux",
+      "question": "Une chanson peut-elle avoir un refrain répété ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-018",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Que signifie WWW ?",
+      "choices": [
+        "World Wide Web",
+        "World Wire Window",
+        "Web Wide World",
+        "Wireless Web Work"
+      ],
+      "answer": "World Wide Web",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-019",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un octet contient-il 8 bits ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-020",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel langage structure une page web ?",
+      "choices": [
+        "HTML",
+        "SQL",
+        "Python",
+        "C"
+      ],
+      "answer": "HTML",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-021",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel appareil permet de déplacer le pointeur ?",
+      "choices": [
+        "La souris",
+        "Le modem",
+        "Le routeur",
+        "Le scanner"
+      ],
+      "answer": "La souris",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-022",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Que signifie GPS ?",
+      "choices": [
+        "Global Positioning System",
+        "General Program Service",
+        "Geographic Phone Signal",
+        "Global Private Satellite"
+      ],
+      "answer": "Global Positioning System",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-023",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un pare-feu protège-t-il un réseau ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-024",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel système d’exploitation est développé par Microsoft ?",
+      "choices": [
+        "Windows",
+        "Linux",
+        "Android",
+        "iOS"
+      ],
+      "answer": "Windows",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-025",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel composant exécute les instructions principales ?",
+      "choices": [
+        "Le processeur",
+        "Le clavier",
+        "L’écran",
+        "Le disque optique"
+      ],
+      "answer": "Le processeur",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-026",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Le cloud désigne-t-il des services accessibles en ligne ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-027",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel langage est souvent utilisé pour les scripts web côté client ?",
+      "choices": [
+        "JavaScript",
+        "Fortran",
+        "COBOL",
+        "BASIC"
+      ],
+      "answer": "JavaScript",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-028",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Que mesure la fréquence d’un processeur ?",
+      "choices": [
+        "Des hertz",
+        "Des litres",
+        "Des pixels",
+        "Des volts"
+      ],
+      "answer": "Des hertz",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-029",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un fichier PDF est-il un format de document ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-030",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel appareil convertit un document papier en image numérique ?",
+      "choices": [
+        "Le scanner",
+        "Le routeur",
+        "Le projecteur",
+        "Le microphone"
+      ],
+      "answer": "Le scanner",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-031",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel est le rôle d’un mot de passe ?",
+      "choices": [
+        "Authentifier ou protéger un accès",
+        "Refroidir un processeur",
+        "Compresser une photo",
+        "Alimenter une batterie"
+      ],
+      "answer": "Authentifier ou protéger un accès",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-032",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "La fibre optique transmet-elle des données par la lumière ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-033",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel langage est connu pour sa lisibilité et son usage général ?",
+      "choices": [
+        "Python",
+        "HTML",
+        "CSS",
+        "JSON"
+      ],
+      "answer": "Python",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "tech-034",
+      "category": "technologie",
+      "type": "vrai_faux",
+      "question": "Un algorithme est-il une suite d’instructions ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "tech-035",
+      "category": "technologie",
+      "type": "choix_multiple",
+      "question": "Quel périphérique imprime sur papier ?",
+      "choices": [
+        "L’imprimante",
+        "Le micro",
+        "La webcam",
+        "Le joystick"
+      ],
+      "answer": "L’imprimante",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-018",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel document officiel prouve généralement l’identité ?",
+      "choices": [
+        "La carte d’identité",
+        "Le ticket de caisse",
+        "Le billet de train",
+        "La carte de fidélité"
+      ],
+      "answer": "La carte d’identité",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-019",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Le vote est-il un acte de participation citoyenne ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-020",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel service soigne les personnes malades ?",
+      "choices": [
+        "L’hôpital",
+        "La bibliothèque",
+        "Le musée",
+        "La mairie"
+      ],
+      "answer": "L’hôpital",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-021",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Que signifie ONU ?",
+      "choices": [
+        "Organisation des Nations unies",
+        "Office national urbain",
+        "Observatoire nordique uni",
+        "Organisation numérique universelle"
+      ],
+      "answer": "Organisation des Nations unies",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-022",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel est le rôle principal d’une école ?",
+      "choices": [
+        "Éduquer et instruire",
+        "Vendre des aliments",
+        "Rendre la justice",
+        "Transporter des voyageurs"
+      ],
+      "answer": "Éduquer et instruire",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-023",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Une constitution définit-elle des règles fondamentales d’un État ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-024",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel professionnel défend un client devant la justice ?",
+      "choices": [
+        "L’avocat",
+        "Le pharmacien",
+        "L’architecte",
+        "Le libraire"
+      ],
+      "answer": "L’avocat",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-025",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "La liberté de la presse concerne-t-elle l’information ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-026",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel organisme collecte souvent les impôts ?",
+      "choices": [
+        "L’État",
+        "La gare",
+        "Le théâtre",
+        "La poste"
+      ],
+      "answer": "L’État",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-027",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Que signifie PIB ?",
+      "choices": [
+        "Produit intérieur brut",
+        "Programme international bancaire",
+        "Plan industriel de base",
+        "Partage interne budgétaire"
+      ],
+      "answer": "Produit intérieur brut",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-028",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Le bénévolat est-il une activité volontaire non rémunérée ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-029",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel lieu prête des livres ?",
+      "choices": [
+        "La bibliothèque",
+        "La boulangerie",
+        "La piscine",
+        "La banque"
+      ],
+      "answer": "La bibliothèque",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-030",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel est le rôle d’un maire ?",
+      "choices": [
+        "Administrer une commune",
+        "Diriger une équipe sportive",
+        "Piloter un avion",
+        "Écrire les lois internationales"
+      ],
+      "answer": "Administrer une commune",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-031",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Les droits humains s’appliquent-ils à toutes les personnes ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-032",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel moyen de transport circule sur des rails ?",
+      "choices": [
+        "Le train",
+        "L’autobus",
+        "L’avion",
+        "Le vélo"
+      ],
+      "answer": "Le train",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-033",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Que désigne le recyclage ?",
+      "choices": [
+        "La transformation de déchets en nouvelles matières",
+        "La production de pétrole",
+        "La construction d’une route",
+        "La conservation d’un musée"
+      ],
+      "answer": "La transformation de déchets en nouvelles matières",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "soc-034",
+      "category": "societe",
+      "type": "vrai_faux",
+      "question": "Une démocratie repose-t-elle notamment sur la participation des citoyens ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "soc-035",
+      "category": "societe",
+      "type": "choix_multiple",
+      "question": "Quel service postal distribue des lettres et colis ?",
+      "choices": [
+        "La poste",
+        "La douane",
+        "La météo",
+        "La justice"
+      ],
+      "answer": "La poste",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-018",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Combien de jours compte une année bissextile ?",
+      "choices": [
+        "366",
+        "365",
+        "364",
+        "360"
+      ],
+      "answer": "366",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-019",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quelle langue est principalement parlée au Brésil ?",
+      "choices": [
+        "Le portugais",
+        "L’espagnol",
+        "Le français",
+        "L’anglais"
+      ],
+      "answer": "Le portugais",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-020",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le symbole chimique de l’eau est-il H₂O ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cg-021",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel animal figure sur le logo du WWF ?",
+      "choices": [
+        "Le panda",
+        "Le tigre",
+        "Le dauphin",
+        "L’aigle"
+      ],
+      "answer": "Le panda",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-022",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Combien de côtés possède un hexagone ?",
+      "choices": [
+        "6",
+        "5",
+        "7",
+        "8"
+      ],
+      "answer": "6",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-023",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel est le contraire de « nocturne » ?",
+      "choices": [
+        "Diurne",
+        "Souterrain",
+        "Hivernal",
+        "Maritime"
+      ],
+      "answer": "Diurne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-024",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "La Terre tourne-t-elle autour du Soleil ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cg-025",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel métal est attiré par un aimant ?",
+      "choices": [
+        "Le fer",
+        "L’or",
+        "L’argent",
+        "Le cuivre"
+      ],
+      "answer": "Le fer",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-026",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel mois vient après septembre ?",
+      "choices": [
+        "Octobre",
+        "Août",
+        "Novembre",
+        "Juillet"
+      ],
+      "answer": "Octobre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-027",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel instrument indique le nord magnétique ?",
+      "choices": [
+        "La boussole",
+        "Le sextant",
+        "Le thermomètre",
+        "Le baromètre"
+      ],
+      "answer": "La boussole",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-028",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le triangle possède-t-il trois côtés ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cg-029",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel est le résultat de 9 × 9 ?",
+      "choices": [
+        "81",
+        "72",
+        "99",
+        "90"
+      ],
+      "answer": "81",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-030",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel pays a pour capitale Lisbonne ?",
+      "choices": [
+        "Le Portugal",
+        "Le Pérou",
+        "La Slovénie",
+        "La Croatie"
+      ],
+      "answer": "Le Portugal",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-031",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on un mot de sens contraire ?",
+      "choices": [
+        "Un antonyme",
+        "Un synonyme",
+        "Un homonyme",
+        "Un acronyme"
+      ],
+      "answer": "Un antonyme",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-032",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le Soleil est-il une étoile ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "cg-033",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel est le plus petit nombre premier ?",
+      "choices": [
+        "2",
+        "0",
+        "1",
+        "3"
+      ],
+      "answer": "2",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-034",
+      "category": "culture-generale",
+      "type": "choix_multiple",
+      "question": "Quel animal est le symbole traditionnel de la paix ?",
+      "choices": [
+        "La colombe",
+        "Le corbeau",
+        "Le paon",
+        "Le renard"
+      ],
+      "answer": "La colombe",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "cg-035",
+      "category": "culture-generale",
+      "type": "vrai_faux",
+      "question": "Le français s’écrit-il avec l’alphabet latin ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sui-001",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quelle est la capitale de la Suisse ?",
+      "choices": [
+        "Berne",
+        "Zurich",
+        "Genève",
+        "Lausanne"
+      ],
+      "answer": "Berne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-002",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Combien de langues nationales la Suisse compte-t-elle ?",
+      "choices": [
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "answer": "4",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-003",
+      "category": "suisse",
+      "type": "vrai_faux",
+      "question": "Le Cervin est-il une montagne suisse emblématique ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sui-004",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel lac borde notamment Genève ?",
+      "choices": [
+        "Le Léman",
+        "Le lac de Constance",
+        "Le lac de Neuchâtel",
+        "Le lac de Thoune"
+      ],
+      "answer": "Le Léman",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-005",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel est le nom de la monnaie suisse ?",
+      "choices": [
+        "Le franc suisse",
+        "L’euro",
+        "Le mark suisse",
+        "La couronne suisse"
+      ],
+      "answer": "Le franc suisse",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-006",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Dans quel canton se trouve Zurich ?",
+      "choices": [
+        "Zurich",
+        "Berne",
+        "Vaud",
+        "Tessin"
+      ],
+      "answer": "Zurich",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-007",
+      "category": "suisse",
+      "type": "vrai_faux",
+      "question": "La Suisse est-elle un pays sans accès à la mer ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sui-008",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quelle ville suisse accueille le siège européen de l’ONU ?",
+      "choices": [
+        "Genève",
+        "Bâle",
+        "Sion",
+        "Lucerne"
+      ],
+      "answer": "Genève",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-009",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel sport est associé à Roger Federer ?",
+      "choices": [
+        "Le tennis",
+        "Le ski",
+        "Le cyclisme",
+        "Le hockey"
+      ],
+      "answer": "Le tennis",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-010",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel est le code international de la Suisse ?",
+      "choices": [
+        "CH",
+        "SW",
+        "SZ",
+        "SU"
+      ],
+      "answer": "CH",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-011",
+      "category": "suisse",
+      "type": "vrai_faux",
+      "question": "Le chocolat suisse est-il une spécialité connue ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sui-012",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel canton est principalement italophone ?",
+      "choices": [
+        "Le Tessin",
+        "Vaud",
+        "Zurich",
+        "Glaris"
+      ],
+      "answer": "Le Tessin",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-013",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quelle ville est célèbre pour son pont de la Chapelle ?",
+      "choices": [
+        "Lucerne",
+        "Berne",
+        "Bâle",
+        "Fribourg"
+      ],
+      "answer": "Lucerne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-014",
+      "category": "suisse",
+      "type": "vrai_faux",
+      "question": "La Suisse est-elle une république fédérale ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "sui-015",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel massif abrite le col du Saint-Gothard ?",
+      "choices": [
+        "Les Alpes",
+        "Les Pyrénées",
+        "Les Carpates",
+        "Les Apennins"
+      ],
+      "answer": "Les Alpes",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "sui-016",
+      "category": "suisse",
+      "type": "choix_multiple",
+      "question": "Quel instrument est traditionnel dans la musique alpine suisse ?",
+      "choices": [
+        "Le cor des Alpes",
+        "Le sitar",
+        "Le shamisen",
+        "La cornemuse écossaise"
+      ],
+      "answer": "Le cor des Alpes",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-001",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel ingrédient compose principalement le guacamole ?",
+      "choices": [
+        "L’avocat",
+        "La tomate",
+        "La pomme de terre",
+        "Le pois chiche"
+      ],
+      "answer": "L’avocat",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-002",
+      "category": "gastronomie",
+      "type": "vrai_faux",
+      "question": "Le sushi est une spécialité japonaise.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "gastro-003",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel fromage entre traditionnellement dans la fondue savoyarde ?",
+      "choices": [
+        "Le gruyère",
+        "Le cheddar",
+        "La feta",
+        "Le parmesan seul"
+      ],
+      "answer": "Le gruyère",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-004",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel fruit sec donne le massepain ?",
+      "choices": [
+        "L’amande",
+        "La noisette",
+        "La noix de coco",
+        "La pistache"
+      ],
+      "answer": "L’amande",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-005",
+      "category": "gastronomie",
+      "type": "vrai_faux",
+      "question": "Le couscous est associé aux cuisines du Maghreb.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "gastro-006",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel est l’ingrédient principal du houmous ?",
+      "choices": [
+        "Le pois chiche",
+        "Le riz",
+        "La lentille",
+        "Le maïs"
+      ],
+      "answer": "Le pois chiche",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-007",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quelle herbe parfume souvent le pesto génois ?",
+      "choices": [
+        "Le basilic",
+        "La menthe",
+        "Le thym",
+        "La coriandre"
+      ],
+      "answer": "Le basilic",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-008",
+      "category": "gastronomie",
+      "type": "vrai_faux",
+      "question": "Le chocolat est fabriqué à partir de fèves de cacao.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "gastro-009",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel plat espagnol est préparé avec du riz ?",
+      "choices": [
+        "La paella",
+        "Le cassoulet",
+        "Le tajine",
+        "Le risotto"
+      ],
+      "answer": "La paella",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-010",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel produit obtient-on en barattant la crème ?",
+      "choices": [
+        "Le beurre",
+        "Le yaourt",
+        "Le fromage bleu",
+        "Le tofu"
+      ],
+      "answer": "Le beurre",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-011",
+      "category": "gastronomie",
+      "type": "vrai_faux",
+      "question": "Le miso est une pâte fermentée japonaise.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "gastro-012",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel dessert français est caramélisé en surface ?",
+      "choices": [
+        "La crème brûlée",
+        "Le clafoutis",
+        "La mousse au chocolat",
+        "Le far breton"
+      ],
+      "answer": "La crème brûlée",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-013",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel agrume est traditionnel dans le taboulé levantin ?",
+      "choices": [
+        "Le citron",
+        "L’orange sanguine",
+        "Le pamplemousse",
+        "Le kumquat"
+      ],
+      "answer": "Le citron",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-014",
+      "category": "gastronomie",
+      "type": "vrai_faux",
+      "question": "Le pain est-il une base du sandwich ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "gastro-015",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel fromage italien est souvent utilisé sur la pizza ?",
+      "choices": [
+        "La mozzarella",
+        "Le comté",
+        "Le gouda",
+        "Le roquefort"
+      ],
+      "answer": "La mozzarella",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "gastro-016",
+      "category": "gastronomie",
+      "type": "choix_multiple",
+      "question": "Quel épice donne sa couleur jaune au curry et à certains plats ?",
+      "choices": [
+        "Le curcuma",
+        "Le safran uniquement",
+        "Le cumin noir",
+        "Le paprika fumé"
+      ],
+      "answer": "Le curcuma",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-001",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Qui est le dieu grec de la foudre ?",
+      "choices": [
+        "Zeus",
+        "Apollon",
+        "Arès",
+        "Hermès"
+      ],
+      "answer": "Zeus",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-002",
+      "category": "mythologie",
+      "type": "vrai_faux",
+      "question": "Ulysse est un héros de la mythologie grecque.",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "myth-003",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel dieu romain correspond à Zeus ?",
+      "choices": [
+        "Jupiter",
+        "Mars",
+        "Neptune",
+        "Vulcain"
+      ],
+      "answer": "Jupiter",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-004",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel monstre possède des serpents à la place des cheveux ?",
+      "choices": [
+        "Méduse",
+        "Le Minotaure",
+        "Cerbère",
+        "Le Sphinx"
+      ],
+      "answer": "Méduse",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-005",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Qui est le dieu grec de la mer ?",
+      "choices": [
+        "Poséidon",
+        "Hadès",
+        "Héphaïstos",
+        "Dionysos"
+      ],
+      "answer": "Poséidon",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-006",
+      "category": "mythologie",
+      "type": "vrai_faux",
+      "question": "Le Minotaure vivait-il dans le labyrinthe de Crète ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "myth-007",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel oiseau renaît de ses cendres ?",
+      "choices": [
+        "Le phénix",
+        "Le griffon",
+        "Le corbeau",
+        "La harpie"
+      ],
+      "answer": "Le phénix",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-008",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Qui est la déesse grecque de la sagesse ?",
+      "choices": [
+        "Athéna",
+        "Héra",
+        "Aphrodite",
+        "Artémis"
+      ],
+      "answer": "Athéna",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-009",
+      "category": "mythologie",
+      "type": "vrai_faux",
+      "question": "Anubis appartient-il à la mythologie égyptienne ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "myth-010",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel héros a vaincu le Minotaure ?",
+      "choices": [
+        "Thésée",
+        "Persée",
+        "Achille",
+        "Jason"
+      ],
+      "answer": "Thésée",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-011",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel dieu nordique manie le marteau Mjöllnir ?",
+      "choices": [
+        "Thor",
+        "Odin",
+        "Loki",
+        "Baldr"
+      ],
+      "answer": "Thor",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-012",
+      "category": "mythologie",
+      "type": "vrai_faux",
+      "question": "Le Styx est-il un fleuve des Enfers grecs ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "myth-013",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Qui est la déesse grecque de l’amour ?",
+      "choices": [
+        "Aphrodite",
+        "Athéna",
+        "Déméter",
+        "Hestia"
+      ],
+      "answer": "Aphrodite",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-014",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel objet permet à Hermès de voler dans certaines représentations ?",
+      "choices": [
+        "Des sandales ailées",
+        "Un trident",
+        "Un arc d’argent",
+        "Un anneau magique"
+      ],
+      "answer": "Des sandales ailées",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "myth-015",
+      "category": "mythologie",
+      "type": "vrai_faux",
+      "question": "Hercule est-il le nom romain d’Héraclès ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "myth-016",
+      "category": "mythologie",
+      "type": "choix_multiple",
+      "question": "Quel dieu égyptien est souvent représenté avec une tête de faucon ?",
+      "choices": [
+        "Horus",
+        "Osiris",
+        "Seth",
+        "Thot"
+      ],
+      "answer": "Horus",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-001",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle planète est surnommée la planète rouge ?",
+      "choices": [
+        "Mars",
+        "Vénus",
+        "Jupiter",
+        "Mercure"
+      ],
+      "answer": "Mars",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-002",
+      "category": "espace",
+      "type": "vrai_faux",
+      "question": "La Lune est-elle le satellite naturel de la Terre ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "esp-003",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle étoile est au centre du système solaire ?",
+      "choices": [
+        "Le Soleil",
+        "Sirius",
+        "Polaris",
+        "Véga"
+      ],
+      "answer": "Le Soleil",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-004",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quel est le premier homme à avoir marché sur la Lune ?",
+      "choices": [
+        "Neil Armstrong",
+        "Youri Gagarine",
+        "Buzz Aldrin",
+        "John Glenn"
+      ],
+      "answer": "Neil Armstrong",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-005",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle planète possède de célèbres anneaux ?",
+      "choices": [
+        "Saturne",
+        "Mars",
+        "Mercure",
+        "Vénus"
+      ],
+      "answer": "Saturne",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-006",
+      "category": "espace",
+      "type": "vrai_faux",
+      "question": "La Voie lactée est-elle une galaxie ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "esp-007",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on un objet rocheux qui atteint le sol ?",
+      "choices": [
+        "Une météorite",
+        "Une comète",
+        "Un astéroïde",
+        "Une nébuleuse"
+      ],
+      "answer": "Une météorite",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-008",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle planète est la plus grande du système solaire ?",
+      "choices": [
+        "Jupiter",
+        "Saturne",
+        "Neptune",
+        "Terre"
+      ],
+      "answer": "Jupiter",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-009",
+      "category": "espace",
+      "type": "vrai_faux",
+      "question": "Youri Gagarine fut-il le premier humain dans l’espace ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "esp-010",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quel instrument observe les astres depuis la Terre ?",
+      "choices": [
+        "Le télescope",
+        "Le microscope",
+        "Le baromètre",
+        "Le sonar"
+      ],
+      "answer": "Le télescope",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-011",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle planète est connue pour sa rotation rétrograde et ses nuages épais ?",
+      "choices": [
+        "Vénus",
+        "Mars",
+        "Uranus",
+        "Neptune"
+      ],
+      "answer": "Vénus",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-012",
+      "category": "espace",
+      "type": "vrai_faux",
+      "question": "Les astronautes ressentent-ils l’apesanteur en orbite ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "esp-013",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Comment appelle-t-on le chemin d’un astre autour d’un autre ?",
+      "choices": [
+        "Une orbite",
+        "Un axe",
+        "Un méridien",
+        "Un horizon"
+      ],
+      "answer": "Une orbite",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-014",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quel est le nom du satellite naturel de Mars ?",
+      "choices": [
+        "Phobos",
+        "Europe",
+        "Titan",
+        "Io"
+      ],
+      "answer": "Phobos",
+      "explanation": "Cette réponse correspond au fait demandé."
+    },
+    {
+      "id": "esp-015",
+      "category": "espace",
+      "type": "vrai_faux",
+      "question": "La Station spatiale internationale est-elle en orbite autour de la Terre ?",
+      "answer": true,
+      "explanation": "Fait couramment admis et vérifiable."
+    },
+    {
+      "id": "esp-016",
+      "category": "espace",
+      "type": "choix_multiple",
+      "question": "Quelle planète est la plus éloignée du Soleil parmi les huit ?",
+      "choices": [
+        "Neptune",
+        "Uranus",
+        "Saturne",
+        "Jupiter"
+      ],
+      "answer": "Neptune",
+      "explanation": "Cette réponse correspond au fait demandé."
+    }
+  ]
+}

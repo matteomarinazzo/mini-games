@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.33.2026-10-11",
-    "lastUpdate": "2026-10-11",
+    "currentVersion": "1.34.2026-10-12",
+    "lastUpdate": "2026-10-12",
     "history": [
+        {
+            "version": "1.34.2026-10-12",
+            "date": "2026-10-12",
+            "changes": [
+                "Ajout du jeu CultureQuiz",
+                "Ajout d'un message informatif lors de la mise à jour du cache"
+            ]
+        },
         {
             "version": "1.33.2026-10-11",
             "date": "2026-10-11",

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billard – 8-ball, 9-ball, 10-ball | Mini‑Games</title>
+    <meta name="description"
+        content="Billard à deux joueurs sur le même écran : 8-ball, 9-ball ou 10-ball. Gratuit sur Mini‑Games.">
+    <link rel="canonical" href="https://mini-games.ch" />
+    <meta property="og:title" content="Billard – 8-ball, 9-ball, 10-ball | Mini‑Games">
+    <meta property="og:description" content="Billard à deux joueurs sur le même écran.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch">
+    <meta property="og:image" content="https://mini-games.ch">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Billard – 8-ball, 9-ball, 10-ball | Mini‑Games">
+    <meta name="twitter:description" content="Billard à deux joueurs sur le même écran.">
+    <meta name="twitter:image" content="https://mini-games.ch">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"VideoGame","name":"Billard","url":"https://mini-games.ch","description":"Billard 8-ball, 9-ball et 10-ball à deux joueurs sur le même écran.","applicationCategory":"Game","operatingSystem":"Any","genre":["Sports","Multiplayer"],"inLanguage":"fr","publisher":{"@type":"Organization","name":"Mini‑Games"}}
+    </script>
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="container main-menu" id="mainMenu">
+        <header class="header">
+            <h1>Billard</h1>
+            <p class="subtitle">Deux joueurs, un seul écran. Choisis ton mode.</p>
+        </header>
+        <div class="seg" id="opp" role="radiogroup" aria-label="Adversaire">
+            <button type="button" role="radio" data-opp="2p" aria-checked="true">👥 Deux joueurs</button>
+            <button type="button" role="radio" data-opp="cpu" aria-checked="false">🖥️ Contre l'ordinateur</button>
+        </div>
+        <nav class="modes" id="modes">
+            <a class="mode" data-mode="8ball" href="game.html?mode=8ball"><b>8-ball</b><span>Pleines ou rayées, puis la
+                    noire.</span></a>
+            <a class="mode" data-mode="9ball" href="game.html?mode=9ball"><b>9-ball</b><span>Dans l'ordre, jusqu'à la
+                    9.</span></a>
+            <a class="mode" data-mode="10ball" href="game.html?mode=10ball"><b>10-ball</b><span>Dans l'ordre, jusqu'à la
+                    10.</span></a>
+        </nav>
+        <button class="cfg" id="cfgBtn" type="button">⚙️ Personnaliser les règles <small id="cfgCount"></small></button>
+        <!-- <p class="note">Version 6 : contre l'ordinateur, règles personnalisables. Règles de base simplifiées (voir
+            README_V6.md).</p> -->
+    </div>
+    <div class="ov" id="cfgOv" hidden>
+        <div class="modal" role="dialog" aria-labelledby="cfgTitle">
+            <button class="x" id="cfgClose" type="button" aria-label="Fermer">✕</button>
+            <h2 id="cfgTitle">Personnaliser les règles</h2>
+            <p>Appliqué aux nouvelles parties. Une partie en cours garde ses règles.</p>
+            <div id="cfgList"></div>
+            <div class="stack"><button class="btn sec" id="cfgReset" type="button">Tout désactiver</button><button
+                    class="btn" id="cfgOk" type="button">OK</button></div>
+        </div>
+    </div>
+    <div class="ov" id="resOv" hidden>
+        <div class="modal" role="alertdialog" aria-labelledby="resTitle">
+            <h2 id="resTitle">Partie en cours</h2>
+            <p id="resText">Une partie est sauvegardée pour ce mode.</p>
+            <div class="stack"><button class="btn" id="resGo" type="button">Reprendre</button>
+                <button class="btn sec" id="resNew" type="button">Nouvelle partie (remplace la sauvegarde)</button>
+                <button class="btn sec" id="resNo" type="button">Annuler</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

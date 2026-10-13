@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Billard | Mini‑Games</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/game.css" />
+  <!-- Rotation CSS forcée en paysage (même technique qu'At Your Own Risk) : --rw / --rh = taille réelle de la zone visible,
+       classe force-land sur <html> si l'écran tactile est tenu en portrait. Voir ROTATION.md. -->
+  <script>
+    (() => {
+      const root = document.documentElement, vv = window.visualViewport;
+      const touch = matchMedia('(pointer: coarse) and (hover: none)');
+      function fit() {
+        const w = Math.round((vv && vv.width) || innerWidth), h = Math.round((vv && vv.height) || innerHeight);
+        root.style.setProperty('--rw', w + 'px');   // largeur réelle
+        root.style.setProperty('--rh', h + 'px');   // hauteur réelle
+        root.classList.toggle('force-land', touch.matches && h > w);
+      }
+      fit();
+      addEventListener('resize', fit);
+      addEventListener('orientationchange', () => { fit(); setTimeout(fit, 150); });
+      if (vv) vv.addEventListener('resize', fit);
+      if (touch.addEventListener) touch.addEventListener('change', fit);
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+  <!-- Script Google Adsense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+    crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-QYX3ZK4KB2');
+  </script>
+</head>
+
+<body class="studio-body gs-game-body">
+  <div class="hud">
+    <a class="ib" href="./index.html" title="Menu" aria-label="Retour au menu"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></a>
+    <button class="ib" id="rulesBtn" type="button" title="Règles du jeu" aria-label="Règles du jeu"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></button>
+    <b id="hudMode">8-ball</b>
+    <div id="p0" class="pl"><b>Joueur 1</b><small></small></div><b id="timer">30</b><div id="p1" class="pl"><b>Joueur 2</b><small></small></div><span class="sp"></span>
+    <button class="ib" id="pauseBtn" type="button" title="Pause (P)" aria-label="Pause" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+    <button class="ib" id="restartBtn" type="button" title="Nouvelle partie" aria-label="Nouvelle partie"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+  </div>
+
+  <div id="stage">
+    <canvas id="cv" width="1100" height="646"></canvas>
+    <div id="status" data-state="aiming" role="status" aria-live="polite"></div>
+    <div id="power">
+      <div class="bar"><div id="powerFill"></div></div>
+      <span id="powerPct">0 %</span>
+    </div>
+    <button id="confirmBtn" class="btn" type="button" hidden>✔ Placer</button>
+
+    <div class="ov" id="pauseOv" hidden><div class="modal">
+      <h2 id="pauseTitle">Pause</h2><p>Le chrono est arrêté, la partie est conservée.</p>
+      <div class="stack"><button class="btn" id="resumeBtn" type="button">Reprendre</button>
+      <button class="btn sec" id="pauseNew" type="button">Nouvelle partie</button>
+      <a class="btn sec" href="./index.html">Menu</a></div>
+    </div></div>
+
+    <div class="ov" id="end" hidden><div class="modal">
+      <div class="big">🏆</div><h2 id="endTitle"></h2><p id="endReason"></p>
+      <div class="stack"><button class="btn" id="endRestart" type="button">Rejouer</button>
+      <a class="btn sec" href="./index.html">Menu</a></div>
+    </div></div>
+
+    <div class="ov" id="rulesOv" hidden><div class="modal wide" role="dialog" aria-labelledby="rulesTitle">
+      <button class="x" id="rulesClose" type="button" aria-label="Fermer">✕</button>
+      <h2 id="rulesTitle">Règles</h2><div id="rulesBody"></div>
+    </div></div>
+
+    <div class="ov" id="confirmOv" hidden><div class="modal" role="alertdialog">
+      <h2>Nouvelle partie ?</h2><p>La partie en cours et sa sauvegarde seront remplacées.</p>
+      <div class="stack"><button class="btn" id="confirmYes" type="button">Nouvelle partie</button>
+      <button class="btn sec" id="confirmNo" type="button">Annuler</button></div>
+    </div></div>
+  </div>
+
+  <div id="warn" hidden></div>
+  <script type="module" src="js/game.js"></script>
+  <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

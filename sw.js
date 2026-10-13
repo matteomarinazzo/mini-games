@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.34.2026-10-12.00";
+const CACHE_NAME = "mini-games-cache-v1.35.2026-10-14.2";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -96,6 +96,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/mindplay-differences.webp',
     'assets/logos/mindplay-shapes.webp',
     'assets/logos/culturequiz.webp',
+    'assets/logos/billard.webp',
 
     // About
     'about/about.html',
@@ -483,6 +484,25 @@ const ASSETS_TO_CACHE = [
     'games/culturequiz/css/game.css',
     'games/culturequiz/js/game.js',
     'games/culturequiz/data/questions.json',
+
+    // Game: Billard
+    'games/billard/index.html',
+    'games/billard/game.html',
+    'games/billard/css/menu.css',
+    'games/billard/css/game.css',
+    'games/billard/js/game.js',
+    'games/billard/js/menu.js',
+    'games/billard/js/core/config.js',
+    'games/billard/js/core/cpu.js',
+    'games/billard/js/core/help.js',
+    'games/billard/js/core/input.js',
+    'games/billard/js/core/modes.js',
+    'games/billard/js/core/physics.js',
+    'games/billard/js/core/render.js',
+    'games/billard/js/core/roll.js',
+    'games/billard/js/core/rules.js',
+    'games/billard/js/core/save.js',
+    'games/billard/js/core/ui.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

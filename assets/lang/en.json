@@ -236,6 +236,10 @@
             "culturequiz": {
                 "name": "CultureQuiz",
                 "description": "Test your general knowledge with varied questions. Choose your categories, accumulate points and beat your records!"
+            },
+            "billard": {
+                "name": "Billard",
+                "description": "Play 8ball, 9ball or 10ball billiards against AI or a friend!"
             }
         },
         "badges": {
@@ -303,7 +307,9 @@
             "numbers": "🔢 Numbers",
             "observation": "🔍 Observation",
             "shapes": "🔷 Shapes",
-            "quiz": "📚 Quiz"
+            "quiz": "📚 Quiz",
+            "sports": "🏆 Sports",
+            "2d": "📏 2D"
         }
     },
     "about": {

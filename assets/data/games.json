@@ -369,6 +369,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "billard": {
+      "path": "./games/billard/index.html",
+      "name": "Billard",
+      "emoji": "🎱",
+      "description": "Joue au billard 8ball, 9ball ou 10ball contre l'IA ou un ami !",
+      "tags": [
+        "sports",
+        "strategy",
+        "physics",
+        "2d"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "morpion": {
       "path": "./games/morpion/index.html",
       "name": "Morpion",

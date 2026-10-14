@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Partie en cours – Page Mystère | Mini‑Games</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="mp-body">
+    <header class="mp-hud">
+        <div class="mp-timer" id="timer" aria-label="Temps écoulé">0:00,0</div>
+        <div class="mp-stats"><span id="statTries">0 essai</span> · <span id="statWords">0 mot</span></div>
+        <div class="mp-actions">
+            <button class="btn btn-outline mp-sm" id="hintBtn" aria-label="Indice" title="Indice" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path
+                        d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z" />
+                </svg>
+            </button>
+            <button class="btn btn-outline mp-sm" id="recordsBtn" title="Records" aria-label="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="btn btn-outline mp-sm" id="pauseBtn" title="Pause" aria-label="Pause" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <form class="mp-guess" id="guessForm" autocomplete="off">
+        <input type="text" id="guessInput" placeholder="Un mot ou le titre de la page…" aria-label="Ton mot ou le titre"
+            enterkeyhint="send" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" disabled />
+        <button class="btn btn-primary mp-sm" type="submit" id="guessBtn" disabled>Valider</button>
+    </form>
+    <div class="mp-msg" id="msg" aria-live="polite"></div>
+
+    <main class="mp-reader" id="reader">
+        <h1 class="mp-title" id="title"></h1>
+        <div class="mp-article" id="article"></div>
+    </main>
+
+    <div class="mp-loader" id="loader" hidden>
+        <span id="loaderText">Chargement…</span>
+        <button class="btn btn-secondary mp-sm" id="loaderRetry" hidden>Réessayer</button>
+    </div>
+
+    <!-- ─── PAUSE ─── -->
+    <div class="cq-overlay" id="pauseOverlay">
+        <div class="cq-modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="quitPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── FIN DE PARTIE (solo) ─── -->
+    <div class="cq-overlay" id="gameoverOverlay">
+        <div class="cq-modal">
+            <div class="gameover-emoji" id="goEmoji">🎉</div>
+            <div class="gameover-title" id="goTitle">Page trouvée !</div>
+            <div class="final-stats">
+                <div class="stat-row"><span>Page mystère</span><span class="stat-val" id="goPage">—</span></div>
+                <div class="stat-row"><span>Temps total</span><span class="stat-val" id="goDuration">0:00,0</span></div>
+                <div class="stat-row"><span>Essais</span><span class="stat-val" id="goTries">0</span></div>
+                <div class="stat-row"><span>Mots révélés</span><span class="stat-val" id="goWords">0</span></div>
+                <div class="stat-row"><span>Indices utilisés</span><span class="stat-val" id="goHints">0</span></div>
+                <div class="stat-row"><span>Meilleur temps</span><span class="stat-val" id="goBest">—</span></div>
+            </div>
+            <div class="go-message" id="goMessage"></div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Nouvelle partie</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goViewBtn">Voir la page</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS ─── -->
+    <div class="cq-overlay" id="recordsOverlay">
+        <div class="cq-modal records-modal">
+            <button class="cq-modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <div class="rc-pair"><span class="rc-label">Temps</span><span class="rc-value"
+                                id="recPersonalTime">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Essais</span><span class="rc-value"
+                                id="recPersonalTries">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Mots</span><span class="rc-value"
+                                id="recPersonalWords">—</span></div>
+                    </div>
+                </div>
+            </section>
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard">
+                        <div class="rc-pair"><span class="rc-label">Temps</span><span class="rc-value"
+                                id="recGlobalTime">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Essais</span><span class="rc-value"
+                                id="recGlobalTries">—</span></div>
+                        <div class="rc-pair"><span class="rc-label">Mots</span><span class="rc-value"
+                                id="recGlobalWords">—</span></div>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── MESSAGE DE RECORD ─── -->
+    <div class="cq-overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="cq-modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <!-- ─── CLASSEMENT FINAL (multijoueur) ─── -->
+    <div class="cq-overlay" id="rankOverlay">
+        <div class="cq-modal rank-modal">
+            <div class="gameover-emoji" id="rankEmoji">🏆</div>
+            <div class="gameover-title" id="rankTitle">Classement</div>
+            <p class="rank-note" id="rankNote"></p>
+            <ol class="rank-list" id="rankList"></ol>
+            <div class="rank-actions">
+                <button class="btn-sky" id="rankReplayBtn" hidden>Rejouer</button>
+                <p class="rank-note" id="waitLeader" hidden>En attente du créateur pour la prochaine manche…</p>
+                <button class="btn-sky secondary" id="closeRankBtn" hidden>Voir la page</button>
+                <button class="btn-sky secondary" id="rankQuitBtn">Quitter</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

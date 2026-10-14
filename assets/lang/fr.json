@@ -239,6 +239,10 @@
             "billard": {
                 "name": "Billard",
                 "description": "Joue au billard 8-ball, 9-ball ou 10-ball contre l'IA ou un ami !"
+            },
+            "mystery-page": {
+                "name": "Page Mystère",
+                "description": "Révèle les mots d’un article Wikipédia et devine son titre. Joue en solo ou défie tes amis en multijoueur !"
             }
         },
         "badges": {

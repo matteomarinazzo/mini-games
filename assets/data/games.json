@@ -529,6 +529,23 @@
       "badgeText": "Casse-tête",
       "rating": "0",
       "stars": "☆☆☆☆☆"
+    },
+    "mystery-page": {
+      "path": "./games/mystery-page/index.html",
+      "name": "Page Mystère",
+      "emoji": "📖",
+      "description": "Révèle les mots d’un article Wikipédia et devine son titre. Joue en solo ou défie tes amis en multijoueur !",
+      "tags": [
+        "quiz",
+        "vocabulary",
+        "culture",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
     }
   },
   "retro": {

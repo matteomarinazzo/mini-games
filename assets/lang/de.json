@@ -240,6 +240,10 @@
             "billard": {
                 "name": "Billard",
                 "description": "Spiele Billard 8-ball, 9-ball oder 10-ball gegen die KI oder einen Freund!"
+            },
+            "mystery-page": {
+                "name": "Mysterienseite",
+                "description": "Entdecke die Wörter eines Wikipedia-Artikels und errate seinen Titel. Spiele allein oder fordere deine Freunde im Mehrspielermodus heraus!"
             }
         },
         "badges": {

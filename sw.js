@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.35.2026-10-14.3";
+const CACHE_NAME = "mini-games-cache-v1.36.2026-10-14.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -97,6 +97,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/mindplay-shapes.webp',
     'assets/logos/culturequiz.webp',
     'assets/logos/billard.webp',
+    'assets/logos/mystery-page.webp',
 
     // About
     'about/about.html',
@@ -506,6 +507,16 @@ const ASSETS_TO_CACHE = [
     'games/billard/js/core/save.js',
     'games/billard/js/core/sync.js',
     'games/billard/js/core/ui.js',
+
+    // Game: Mystery Page
+    'games/mystery-page/index.html',
+    'games/mystery-page/game.html',
+    'games/mystery-page/css/menu.css',
+    'games/mystery-page/css/game.css',
+    'games/mystery-page/js/menu.js',
+    'games/mystery-page/js/game.js',
+    'games/mystery-page/js/core/topics.js',
+    'games/mystery-page/js/core/wikipedia.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

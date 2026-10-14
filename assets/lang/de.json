@@ -239,7 +239,7 @@
             },
             "billard": {
                 "name": "Billard",
-                "description": "Spiele Billard 8ball, 9ball oder 10ball gegen die KI oder einen Freund!"
+                "description": "Spiele Billard 8-ball, 9-ball oder 10-ball gegen die KI oder einen Freund!"
             }
         },
         "badges": {

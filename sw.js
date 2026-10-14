@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.35.2026-10-14.2";
+const CACHE_NAME = "mini-games-cache-v1.35.2026-10-14.3";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -492,16 +492,19 @@ const ASSETS_TO_CACHE = [
     'games/billard/css/game.css',
     'games/billard/js/game.js',
     'games/billard/js/menu.js',
+    'games/billard/js/menu-net.js',
     'games/billard/js/core/config.js',
     'games/billard/js/core/cpu.js',
     'games/billard/js/core/help.js',
     'games/billard/js/core/input.js',
     'games/billard/js/core/modes.js',
+    'games/billard/js/core/online.js',
     'games/billard/js/core/physics.js',
     'games/billard/js/core/render.js',
     'games/billard/js/core/roll.js',
     'games/billard/js/core/rules.js',
     'games/billard/js/core/save.js',
+    'games/billard/js/core/sync.js',
     'games/billard/js/core/ui.js',
 ];
 

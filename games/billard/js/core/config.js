@@ -30,4 +30,4 @@ export function writePrefs(st, patch) {
   try { const d = readPrefs(st); Object.assign(d, patch); st.setItem(KEY, JSON.stringify(d)); return true; } catch { return false; }
 }
 export const getRules = st => normalize(readPrefs(st).rules);
-export const getOpp = st => (readPrefs(st).opp === 'cpu' ? 'cpu' : '2p');
+export const getOpp = st => { const o = readPrefs(st).opp; return o === 'cpu' || o === 'online' ? o : '2p'; };   // V7 : 'online' = salon à distance

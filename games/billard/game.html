@@ -46,46 +46,96 @@
 
 <body class="studio-body gs-game-body">
   <div class="hud">
-    <a class="ib" href="./index.html" title="Menu" aria-label="Retour au menu"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></a>
-    <button class="ib" id="rulesBtn" type="button" title="Règles du jeu" aria-label="Règles du jeu"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></button>
+    <a class="ib" href="./index.html" title="Menu" aria-label="Retour au menu"><svg viewBox="0 0 24 24">
+        <polyline points="15 18 9 12 15 6" />
+      </svg></a>
+    <button class="ib" id="rulesBtn" type="button" title="Règles du jeu" aria-label="Règles du jeu"><svg
+        viewBox="0 0 24 24">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg></button>
     <b id="hudMode">8-ball</b>
-    <div id="p0" class="pl"><b>Joueur 1</b><small></small></div><b id="timer">30</b><div id="p1" class="pl"><b>Joueur 2</b><small></small></div><span class="sp"></span>
-    <button class="ib" id="pauseBtn" type="button" title="Pause (P)" aria-label="Pause" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
-    <button class="ib" id="restartBtn" type="button" title="Nouvelle partie" aria-label="Nouvelle partie"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+    <div id="p0" class="pl"><b>Joueur 1</b><small></small></div><b id="timer">30</b>
+    <div id="p1" class="pl"><b>Joueur 2</b><small></small></div><span class="sp"></span>
+    <button class="ib" id="pauseBtn" type="button" title="Pause (P)" aria-label="Pause" aria-pressed="false"><svg
+        viewBox="0 0 24 24">
+        <rect x="6" y="4" width="4" height="16" />
+        <rect x="14" y="4" width="4" height="16" />
+      </svg></button>
+    <button class="ib" id="restartBtn" type="button" title="Nouvelle partie" aria-label="Nouvelle partie"><svg
+        viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <polyline points="3 3 3 9 9 9" />
+      </svg></button>
   </div>
 
   <div id="stage">
     <canvas id="cv" width="1100" height="646"></canvas>
     <div id="status" data-state="aiming" role="status" aria-live="polite"></div>
     <div id="power">
-      <div class="bar"><div id="powerFill"></div></div>
+      <div class="bar">
+        <div id="powerFill"></div>
+      </div>
       <span id="powerPct">0 %</span>
     </div>
     <button id="confirmBtn" class="btn" type="button" hidden>✔ Placer</button>
 
-    <div class="ov" id="pauseOv" hidden><div class="modal">
-      <h2 id="pauseTitle">Pause</h2><p>Le chrono est arrêté, la partie est conservée.</p>
-      <div class="stack"><button class="btn" id="resumeBtn" type="button">Reprendre</button>
-      <button class="btn sec" id="pauseNew" type="button">Nouvelle partie</button>
-      <a class="btn sec" href="./index.html">Menu</a></div>
-    </div></div>
+    <div class="ov" id="pauseOv" hidden>
+      <div class="modal">
+        <h2 id="pauseTitle">Pause</h2>
+        <p>Le chrono est arrêté, la partie est conservée.</p>
+        <div class="stack"><button class="btn" id="resumeBtn" type="button">Reprendre</button>
+          <button class="btn sec" id="pauseNew" type="button">Nouvelle partie</button>
+          <a class="btn sec" href="./index.html">Menu</a>
+        </div>
+      </div>
+    </div>
 
-    <div class="ov" id="end" hidden><div class="modal">
-      <div class="big">🏆</div><h2 id="endTitle"></h2><p id="endReason"></p>
-      <div class="stack"><button class="btn" id="endRestart" type="button">Rejouer</button>
-      <a class="btn sec" href="./index.html">Menu</a></div>
-    </div></div>
+    <div class="ov" id="end" hidden>
+      <div class="modal">
+        <div class="big">🏆</div>
+        <h2 id="endTitle"></h2>
+        <p id="endReason"></p>
+        <div class="stack"><button class="btn" id="endRestart" type="button">Rejouer</button>
+          <a class="btn sec" href="./index.html">Menu</a>
+        </div>
+      </div>
+    </div>
 
-    <div class="ov" id="rulesOv" hidden><div class="modal wide" role="dialog" aria-labelledby="rulesTitle">
-      <button class="x" id="rulesClose" type="button" aria-label="Fermer">✕</button>
-      <h2 id="rulesTitle">Règles</h2><div id="rulesBody"></div>
-    </div></div>
+    <div class="ov" id="rulesOv" hidden>
+      <div class="modal wide" role="dialog" aria-labelledby="rulesTitle">
+        <button class="x" id="rulesClose" type="button" aria-label="Fermer">✕</button>
+        <h2 id="rulesTitle">Règles</h2>
+        <div id="rulesBody"></div>
+      </div>
+    </div>
 
-    <div class="ov" id="confirmOv" hidden><div class="modal" role="alertdialog">
-      <h2>Nouvelle partie ?</h2><p>La partie en cours et sa sauvegarde seront remplacées.</p>
-      <div class="stack"><button class="btn" id="confirmYes" type="button">Nouvelle partie</button>
-      <button class="btn sec" id="confirmNo" type="button">Annuler</button></div>
-    </div></div>
+    <div class="ov" id="confirmOv" hidden>
+      <div class="modal" role="alertdialog">
+        <h2>Nouvelle partie ?</h2>
+        <p>La partie en cours et sa sauvegarde seront remplacées.</p>
+        <div class="stack"><button class="btn" id="confirmYes" type="button">Nouvelle partie</button>
+          <button class="btn sec" id="confirmNo" type="button">Annuler</button>
+        </div>
+      </div>
+    </div>
+    <div class="ov" id="leaveOv" hidden>
+      <div class="modal" role="alertdialog">
+        <h2>Quitter la partie ?</h2>
+        <p>Si tu quittes maintenant, la partie est perdue (abandon).</p>
+        <div class="stack"><button class="btn" id="leaveYes" type="button">Quitter</button>
+          <button class="btn sec" id="leaveNo" type="button">Rester</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov" id="netOv" hidden>
+      <div class="modal" role="alertdialog">
+        <h2>Salon indisponible</h2>
+        <p id="netMsg"></p>
+        <div class="stack"><a class="btn" href="./index.html">Retour au menu</a></div>
+      </div>
+    </div>
   </div>
 
   <div id="warn" hidden></div>

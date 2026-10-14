@@ -3,25 +3,49 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Billard – 8-ball, 9-ball, 10-ball | Mini‑Games</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow">
     <meta name="description"
-        content="Billard à deux joueurs sur le même écran : 8-ball, 9-ball ou 10-ball. Gratuit sur Mini‑Games.">
-    <link rel="canonical" href="https://mini-games.ch" />
+        content="Billard à deux joueurs (même écran, contre l'ordinateur ou à distance) : 8-ball, 9-ball ou 10-ball. Gratuit sur Mini‑Games.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/billard/" />
+
+    <!-- Open Graph -->
     <meta property="og:title" content="Billard – 8-ball, 9-ball, 10-ball | Mini‑Games">
     <meta property="og:description" content="Billard à deux joueurs sur le même écran.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mini-games.ch">
-    <meta property="og:image" content="https://mini-games.ch">
+    <meta property="og:url" content="https://mini-games.ch/games/billard/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/billard.webp">
     <meta property="og:site_name" content="Mini‑Games">
     <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Billard – 8-ball, 9-ball, 10-ball | Mini‑Games">
     <meta name="twitter:description" content="Billard à deux joueurs sur le même écran.">
-    <meta name="twitter:image" content="https://mini-games.ch">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/billard.webp">
+
+    <!-- Schema.org -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"VideoGame","name":"Billard","url":"https://mini-games.ch","description":"Billard 8-ball, 9-ball et 10-ball à deux joueurs sur le même écran.","applicationCategory":"Game","operatingSystem":"Any","genre":["Sports","Multiplayer"],"inLanguage":"fr","publisher":{"@type":"Organization","name":"Mini‑Games"}}
+    {
+        "@context":"https://schema.org",
+        "@type":"VideoGame",
+        "name":"Billard",
+        "url":"https://mini-games.ch",
+        "description":"Billard 8-ball, 9-ball et 10-ball à deux joueurs sur le même écran.",
+        "applicationCategory":"Game",
+        "operatingSystem":"Any",
+        "genre":["Sports","Multiplayer"],
+        "inLanguage":"fr",
+        "publisher":{
+            "@type":"Organization",
+            "name":"Mini‑Games"
+            }
+        }
     </script>
+
     <link rel="stylesheet" href="css/menu.css" />
     <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
 
@@ -51,11 +75,12 @@
     <div class="container main-menu" id="mainMenu">
         <header class="header">
             <h1>Billard</h1>
-            <p class="subtitle">Deux joueurs, un seul écran. Choisis ton mode.</p>
+            <p class="subtitle">Sur le même écran, contre l'ordinateur ou à distance. Choisis ton mode.</p>
         </header>
         <div class="seg" id="opp" role="radiogroup" aria-label="Adversaire">
             <button type="button" role="radio" data-opp="2p" aria-checked="true">👥 Deux joueurs</button>
             <button type="button" role="radio" data-opp="cpu" aria-checked="false">🖥️ Contre l'ordinateur</button>
+            <button type="button" role="radio" data-opp="online" aria-checked="false">🌐 En ligne</button>
         </div>
         <nav class="modes" id="modes">
             <a class="mode" data-mode="8ball" href="game.html?mode=8ball"><b>8-ball</b><span>Pleines ou rayées, puis la
@@ -66,8 +91,8 @@
                     10.</span></a>
         </nav>
         <button class="cfg" id="cfgBtn" type="button">⚙️ Personnaliser les règles <small id="cfgCount"></small></button>
-        <!-- <p class="note">Version 6 : contre l'ordinateur, règles personnalisables. Règles de base simplifiées (voir
-            README_V6.md).</p> -->
+        <!--<p class="note">Version 7 : salons en ligne à deux (créer ou rejoindre avec un code), contre l'ordinateur,
+            règles personnalisables. Règles de base simplifiées (voir README_V7.md).</p>-->
     </div>
     <div class="ov" id="cfgOv" hidden>
         <div class="modal" role="dialog" aria-labelledby="cfgTitle">
@@ -87,6 +112,37 @@
                 <button class="btn sec" id="resNew" type="button">Nouvelle partie (remplace la sauvegarde)</button>
                 <button class="btn sec" id="resNo" type="button">Annuler</button>
             </div>
+        </div>
+    </div>
+    <div class="ov" id="netOv" hidden>
+        <div class="modal" role="dialog" aria-labelledby="netTitle">
+            <button class="x" id="netClose" type="button" aria-label="Fermer">✕</button>
+            <h2 id="netTitle">Jouer en ligne</h2>
+            <div id="netStep1">
+                <p id="netModeInfo"></p>
+                <label class="fld">Ton nom<input id="netName" maxlength="15" autocomplete="nickname"
+                        placeholder="Joueur"></label>
+                <div class="stack">
+                    <button class="btn" id="netCreate" type="button">Créer un salon</button>
+                    <label class="fld">…ou rejoindre avec un code<input id="netCode" maxlength="6" autocomplete="off"
+                            autocapitalize="characters" spellcheck="false" placeholder="ABC234"></label>
+                    <button class="btn sec" id="netJoin" type="button">Rejoindre</button>
+                    <button class="btn sec" id="netResume" type="button" hidden>Reprendre le salon</button>
+                </div>
+            </div>
+            <div id="netStep2" hidden>
+                <p>Partage ce code avec ton adversaire :</p>
+                <div class="code"><b id="netCodeShown">······</b><button class="btn sec" id="netCopy" type="button"
+                        aria-label="Copier le code">Copier</button></div>
+                <p id="netRules"></p>
+                <div class="plist" id="netPlayers"></div>
+                <p id="netWait"></p>
+                <div class="stack"><button class="btn" id="netStart" type="button" hidden disabled>Lancer la
+                        partie</button>
+                    <button class="btn sec" id="netLeave" type="button">Quitter le salon</button>
+                </div>
+            </div>
+            <p id="netErr" role="alert"></p>
         </div>
     </div>
     <script type="module" src="js/menu.js"></script>

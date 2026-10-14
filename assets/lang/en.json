@@ -239,7 +239,7 @@
             },
             "billard": {
                 "name": "Billard",
-                "description": "Play 8ball, 9ball or 10ball billiards against AI or a friend!"
+                "description": "Play 8-ball, 9-ball or 10-ball billiards against AI or a friend!"
             }
         },
         "badges": {

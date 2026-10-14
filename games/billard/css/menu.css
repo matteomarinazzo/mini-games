@@ -57,3 +57,20 @@ h1 { font-size: clamp(28px, 6vw, 44px); margin: 0 0 6px }
 .btn:hover { filter: brightness(1.12) } .btn:active { transform: scale(.97) }
 .btn.sec { background: rgba(255,255,255,.07); box-shadow: none; border: 1px solid rgba(255,255,255,.14) }
 @media (max-height: 460px) { .modal { padding: 14px 16px } .stack { flex-direction: row; flex-wrap: wrap } .stack .btn { flex: 1 1 140px } }
+
+/* V7 : salons en ligne */
+.fld { display: block; margin: 0; text-align: left; font-size: 13px; color: var(--pale) }
+.fld input { display: block; width: 100%; min-height: 44px; margin-top: 4px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.07); color: var(--txt); font: 600 16px system-ui, sans-serif }
+.fld input:focus-visible { outline: 3px solid #ffdc00; outline-offset: 1px }
+#netCode { text-transform: uppercase; letter-spacing: 6px; text-align: center; font-size: 20px }
+#netErr { min-height: 18px; margin: 10px 0 0; color: #ff8a80; font-size: 13px; text-align: center }
+#netErr[data-ok="1"] { color: var(--pale) }
+.code { display: flex; gap: 10px; justify-content: center; align-items: center; margin: 4px 0 10px }
+.code b { font: 700 32px ui-monospace, monospace; letter-spacing: 6px; color: var(--accent) }
+.code .btn { width: auto; min-height: 40px; padding: 8px 14px; font-size: 14px }
+.plist { display: grid; gap: 8px; margin: 8px 0 }
+.chip { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1) }
+.chip em { font-style: normal; color: var(--pale); font-size: 12px }
+.chip.off { opacity: .5 } .chip.empty { opacity: .6; border-style: dashed; justify-content: center }
+.btn:disabled { background: #556; box-shadow: none; opacity: .6; cursor: not-allowed }
+.btn[hidden] { display: none }

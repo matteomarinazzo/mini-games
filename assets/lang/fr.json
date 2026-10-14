@@ -238,7 +238,7 @@
             },
             "billard": {
                 "name": "Billard",
-                "description": "Joue au billard 8ball, 9ball ou 10ball contre l'IA ou un ami !"
+                "description": "Joue au billard 8-ball, 9-ball ou 10-ball contre l'IA ou un ami !"
             }
         },
         "badges": {

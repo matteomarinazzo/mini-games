@@ -37,18 +37,19 @@ const CUSTOM = {
   twoShots: 'Faute « aucune bille touchée » ou « mauvaise première bille » : l\'adversaire joue 2 coups, sans blanche en main. Blanche empochée (même avec une autre faute) : blanche en main mais 1 seul coup. 1er des 2 coups sans faute et sans bille empochée : il garde le 2e. S\'il empoche une bille légale, le 2e est perdu et son tour continue normalement. Faute pendant ses coups : le tour passe. Temps écoulé : blanche en main, 1 coup.',
   blackOpp: 'La 8 doit entrer dans la poche opposée à celle où est entrée la dernière bille de ton groupe (même empochée par l\'adversaire). Opposée = symétrique par rapport au centre : coin ↔ coin diagonal, milieu haut ↔ milieu bas. Autre poche : défaite. La poche imposée est entourée d\'un anneau doré.',
 };
-function custom(modeId, opts, cpu) {
+function custom(modeId, opts, cpu, online) {
   const on = RULES.filter(r => opts?.[r.id]).map(r => r.title + ' — ' + CUSTOM[r.id]);
   const off = RULES.filter(r => !isAvailable(r.id, modeId)).map(r => r.title + ' : indisponible dans ce mode.');
   const items = [...(on.length ? on : ['Aucune option personnalisée : règles standard de ce livret.']), ...off];
   if (cpu) items.push('Contre l\'ordinateur : il joue le Joueur 2, vise et tire comme toi (même physique, même chrono) ; IA simple, il peut rater.');
+  if (online) items.push('En ligne : l\'hôte (Joueur 1) simule la physique et valide chaque coup ; l\'invité voit la même partie. Pas de pause : le chrono continue, et il est suspendu si un joueur est déconnecté.');
   return ['🧩 Règles de cette partie', items];
 }
 
-export function fillRules(title, body, modeId, opts, cpu) {
+export function fillRules(title, body, modeId, opts, cpu, online) {
   title.textContent = 'Règles · ' + (MODES[modeId]?.label ?? '');
   body.textContent = '';
-  for (const [h, items] of [custom(modeId, opts, cpu), ...sections(modeId), ['⌨️ Commandes', COMMANDES], ['ℹ️ Simplifications', SIMPLIF]]) {
+  for (const [h, items] of [custom(modeId, opts, cpu, online), ...sections(modeId), ['⌨️ Commandes', COMMANDES], ['ℹ️ Simplifications', SIMPLIF]]) {
     const s = document.createElement('section'), t = document.createElement('h3'), ul = document.createElement('ul');
     t.textContent = h;
     for (const it of items) { const li = document.createElement('li'); li.textContent = it; ul.appendChild(li); }

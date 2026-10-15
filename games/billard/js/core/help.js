@@ -28,8 +28,10 @@ function sections(id) {
 }
 const COMMANDES = ['PC : vise avec la souris ; clic maintenu puis recule la souris pour la puissance ; relâche pour tirer ; clic droit ou Échap annule ; touche P = pause.',
   'Mobile : glisse sur la table pour viser ; règle la puissance avec la jauge à droite et relâche pour tirer (relâcher loin de la jauge annule).',
-  'Trait de visée rouge avec ✕ : la première bille touchée serait illégale. Trait blanc : tir légal, ou bande touchée en premier (non évalué).'];
-const SIMPLIF = ['Pas de règle « bande après contact », pas de poche annoncée, pas de casse spéciale ; les billes empochées par erreur restent au fond. Anneau bleu / orange sur le plateau : Joueur 1 / Joueur 2.'];
+  'Trait de visée rouge avec ✕ : la première bille touchée serait illégale. Trait blanc : tir légal, ou bande touchée en premier (non évalué).',
+  'Effet : la petite bille à gauche de la table représente la blanche vue de derrière. Place le point (glisser ; double-clic / double-tape = centrer) : haut = suivi, bas = rétro, côtés = effet latéral. Il est remis au centre après chaque tir.'];
+const SIMPLIF = ['Pas de règle « bande après contact », pas de poche annoncée, pas de casse spéciale ; les billes empochées par erreur restent au fond. Anneau bleu / orange sur le plateau : Joueur 1 / Joueur 2.',
+  'Effets : le suivi / rétro agit au 1er contact de la blanche avec une bille, l\'effet latéral quand elle touche une bande ; l\'effet s\'estompe avec le temps. Pas de massé, pas de déviation de la queue, pas d\'effet transmis à la bille touchée.'];
 
 // Règles personnalisées V6 : texte exact de ce qui est codé dans rules.js (voir README_V6.md §3).
 const CUSTOM = {
@@ -42,7 +44,7 @@ function custom(modeId, opts, cpu, online) {
   const off = RULES.filter(r => !isAvailable(r.id, modeId)).map(r => r.title + ' : indisponible dans ce mode.');
   const items = [...(on.length ? on : ['Aucune option personnalisée : règles standard de ce livret.']), ...off];
   if (cpu) items.push('Contre l\'ordinateur : il joue le Joueur 2, vise et tire comme toi (même physique, même chrono) ; IA simple, il peut rater.');
-  if (online) items.push('En ligne : l\'hôte (Joueur 1) simule la physique et valide chaque coup ; l\'invité voit la même partie. Pas de pause : le chrono continue, et il est suspendu si un joueur est déconnecté.');
+  if (online) items.push('En ligne : l\'hôte (Joueur 1) simule la physique et valide chaque coup ; l\'invité voit la même partie. Pas de pause : le chrono continue, et il est suspendu si un joueur est déconnecté. Revanche : à la fin, les deux joueurs doivent accepter « Rejouer » dans le salon ; la mise en jeu alterne à chaque manche.');
   return ['🧩 Règles de cette partie', items];
 }
 

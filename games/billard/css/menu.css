@@ -74,3 +74,6 @@ h1 { font-size: clamp(28px, 6vw, 44px); margin: 0 0 6px }
 .chip.off { opacity: .5 } .chip.empty { opacity: .6; border-style: dashed; justify-content: center }
 .btn:disabled { background: #556; box-shadow: none; opacity: .6; cursor: not-allowed }
 .btn[hidden] { display: none }
+
+/* V8 : un double-clic sur le code le sélectionne en entier (collage propre) */
+.code b { user-select: all; -webkit-user-select: all }

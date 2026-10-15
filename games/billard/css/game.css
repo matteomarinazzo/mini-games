@@ -532,7 +532,6 @@ a:focus-visible {
 /* V7 : en ligne (pas de pause ni de nouvelle partie locale ; bandeau d'état) */
 .online #pauseBtn,
 .online #restartBtn,
-.online #endRestart,
 .online #pauseNew {
   display: none
 }
@@ -610,4 +609,68 @@ html.force-land #power {
   html.force-land .stack .btn {
     flex: 1 1 140px
   }
+}
+
+/* ===== V8 : contrôle d'effet sur la blanche (à gauche de la table ; la jauge de puissance reste à droite) ===== */
+#spin {
+  position: absolute;
+  left: max(8px, env(safe-area-inset-left));
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 3;
+  touch-action: none
+}
+
+#spinBall {
+  position: relative;
+  width: clamp(54px, 8vw, 78px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: none;
+  border: 2px solid #fff;
+  background: linear-gradient(#0000 calc(50% - 1px), #0003 0 calc(50% + 1px), #0000 0), linear-gradient(90deg, #0000 calc(50% - 1px), #0003 0 calc(50% + 1px), #0000 0),
+    radial-gradient(circle at 38% 35%, #fff, #dcdcd4 70%, #b9b9ae)
+}
+
+#spinDot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: #d62828;
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px #0008;
+  transform: translate(-50%, -50%);
+  pointer-events: none
+}
+
+#spin.off {
+  opacity: .4
+}
+
+#spin.off #spinBall {
+  pointer-events: none
+}
+
+#endRm {
+  min-height: 1.2em
+}
+
+#endRm[hidden],
+#endDecline[hidden] {
+  display: none
+}
+
+html.force-land #spin {
+  left: max(8px, env(safe-area-inset-top))
+}
+
+html.force-land #spinBall {
+  width: clamp(54px, calc(var(--rh) * .08), 78px)
 }

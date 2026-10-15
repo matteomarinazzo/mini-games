@@ -2,6 +2,7 @@
 // Module pur (ni DOM ni Firebase), testable sous Node (tests/test_v7.mjs). Toute donnée venue du réseau passe ici AVANT d'être utilisée.
 import { TABLE } from './physics.js';
 import { restore } from './save.js';
+import { rmOk } from './rematch.js';
 
 export const PREFIX = 'billard_';                       // id de salon = « billard_<CODE> » (rooms/billard_ABC234)
 export const CODE_RE = /^[A-HJ-NP-Z2-9]{6}$/;           // sans I, O, 0, 1 (confusions à la dictée)
@@ -14,6 +15,9 @@ export function newCode(rnd) {
 }
 export const cleanName = (s, fb = 'Joueur') => String(s ?? '').replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, 15) || fb;
 
+// V8 : code saisi ou collé (espaces, retours à la ligne, tirets, minuscules, caractères pleine chasse…) → forme canonique, sans validation.
+export const normCode = s => String(s ?? '').normalize('NFKC').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
 const num = (v, lo, hi) => typeof v === 'number' && Number.isFinite(v) && v >= lo && v <= hi;
 const opt = (v, lo, hi) => (num(v, lo, hi) ? v : undefined);
 
@@ -22,14 +26,15 @@ export function parseAct(a) {
   if (!a || typeof a !== 'object') return null;
   const { id, seq, type } = a;
   if (!Number.isSafeInteger(id) || id <= 0 || !Number.isSafeInteger(seq) || seq < 0) return null;
-  if (type === 'shot') return num(a.aim, -10, 10) && num(a.power, 0, 1) ? { id, seq, type, aim: a.aim, power: a.power } : null;
+  if (type === 'shot') return num(a.aim, -10, 10) && num(a.power, 0, 1) ? { id, seq, type, aim: a.aim, power: a.power, sx: opt(a.sx, -1, 1) ?? 0, sy: opt(a.sy, -1, 1) ?? 0 } : null;
+  if (type === 'rematch') return (a.v === 0 || a.v === 1 || a.v === 2) && Number.isSafeInteger(a.rd) && a.rd >= 0 ? { id, seq, type, v: a.v, rd: a.rd } : null;   // V8 : vote de revanche
   if (type === 'place') return num(a.x, -100, TABLE.W + 100) && num(a.y, -100, TABLE.H + 100) ? { id, seq, type, x: a.x, y: a.y } : null;
   return null;
 }
 // Aperçu en direct du joueur actif (visée, puissance, position de la blanche) et, pour l'hôte, temps restant / onglet en arrière-plan.
 export function parseLive(l) {
   if (!l || typeof l !== 'object') return null;
-  return { a: opt(l.a, -10, 10), p: opt(l.p, 0, 1), gx: opt(l.gx, -100, TABLE.W + 100), gy: opt(l.gy, -100, TABLE.H + 100), tl: opt(l.tl, 0, 60), bg: l.bg === 1 };
+  return { a: opt(l.a, -10, 10), p: opt(l.p, 0, 1), sx: opt(l.sx, -1, 1), sy: opt(l.sy, -1, 1), gx: opt(l.gx, -100, TABLE.W + 100), gy: opt(l.gy, -100, TABLE.H + 100), tl: opt(l.tl, 0, 60), bg: l.bg === 1 };
 }
 
 // Image de billes pendant un tir : { n: tour, k: n° d'image, t: temps simulé (s), b: [x0,y0,x1,y1…], o: billes empochées (ordre), c: blanche empochée }
@@ -61,9 +66,14 @@ export const restoreFrom = (sn, modeId) => (sn ? restore({ getItem: () => JSON.s
 /* ---- Filtres : chacun renvoie la donnée à appliquer, ou null (invalide, doublon, désordre, ancien tour) ---- */
 // Hôte : une intention n'est appliquée qu'une fois (id strictement croissant) et seulement pour le tour courant (seq). L'id est consommé même
 // si le tour ne correspond pas : une intention périmée ne pourra jamais être rejouée plus tard.
-export function makeActGate() {
-  let last = 0;
-  return (raw, curSeq) => { const a = parseAct(raw); if (!a || a.id <= last) return null; last = a.id; return a.seq === curSeq ? a : null; };
+// V8 : init/seed = dernier id déjà consommé (publié par l'hôte dans le document « tour », donc survit à une actualisation de l'hôte) ;
+// un vote de revanche n'est lié qu'à la manche (rd, contrôlée par l'appelant), pas au n° de tour.
+export function makeActGate(init = 0) {
+  let last = Number.isSafeInteger(init) ? init : 0;
+  const f = (raw, curSeq) => { const a = parseAct(raw); if (!a || a.id <= last) return null; last = a.id; return a.seq === curSeq || a.type === 'rematch' ? a : null; };
+  f.last = () => last;
+  f.seed = v => { if (Number.isSafeInteger(v) && v > last) last = v; };
+  return f;
 }
 // Invité : documents « tour » à seq strictement croissant.
 export function makeTurnGate() {
@@ -71,7 +81,7 @@ export function makeTurnGate() {
   return v => {
     if (!v || typeof v !== 'object' || !Number.isSafeInteger(v.seq) || v.seq <= last || typeof v.snap !== 'string' || v.snap.length > 30000) return null;
     last = v.seq;
-    return { seq: v.seq, snap: v.snap, msg: typeof v.msg === 'string' ? v.msg.slice(0, 120) : '' };
+    return { seq: v.seq, snap: v.snap, msg: typeof v.msg === 'string' ? v.msg.slice(0, 120) : '', rd: Number.isSafeInteger(v.rd) && v.rd >= 0 ? v.rd : 0, rm: rmOk(v.rm) ? v.rm : 0 };
   };
 }
 // Invité : images du tour courant uniquement, n° d'image strictement croissant.

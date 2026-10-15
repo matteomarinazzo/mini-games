@@ -23,6 +23,8 @@ const FRICTION_PROP = 0.3;     // part proportionnelle à la vitesse (1/s) : fre
 const V_STOP = 6;              // sous ce seuil la bille est arrêtée net (évite tremblements et rampement infini)
 const E_WALL = 0.75;           // restitution bande
 const E_BALL = 0.95;           // restitution bille-bille
+// V8 — effets de la blanche (voir README_V8.md) : suivi / rétro au 1er contact avec une bille, effet latéral à la bande ; l'effet s'estompe avec le temps.
+const SPIN_FOLLOW = 0.4, SPIN_DRAW = 0.55, SPIN_SIDE = 0.3, SPIN_DECAY = 0.4, SPIN_DV_MAX = 700;
 
 // Dispositions provisoires (PAS les règles officielles) : numéros par rangée, sommet sur la mouche de pied.
 const ROWS = {
@@ -45,15 +47,26 @@ export function createWorld(modeId) {
 
 export const powerToSpeed = p => V_MIN + (V_MAX - V_MIN) * Math.min(1, Math.max(0, p));
 
-export function shoot(world, angle, power) {
-  const v = powerToSpeed(power);
-  world.cue.first = null;
-  world.cue.vx = Math.cos(angle) * v;
-  world.cue.vy = Math.sin(angle) * v;
+// spin = { x, y } dans le disque unité (y > 0 suivi, y < 0 rétro, x > 0 droite vue de derrière la queue) ; absent = aucun effet (comportement V7).
+export function shoot(world, angle, power, spin) {
+  const v = powerToSpeed(power), c = world.cue;
+  let sx = Number(spin?.x) || 0, sy = Number(spin?.y) || 0; const m = Math.hypot(sx, sy);
+  if (m > 1) { sx /= m; sy /= m; }
+  c.first = null; c.dx = Math.cos(angle); c.dy = Math.sin(angle);
+  c.vx = c.dx * v; c.vy = c.dy * v;
+  c.sx = sx; c.sy = sy; c.spinDone = false;
 }
 
 export const isMoving = world => world.balls.some(b => !b.out && (b.vx !== 0 || b.vy !== 0));
-export function stopAll(world) { for (const b of world.balls) b.vx = b.vy = 0; }
+export function stopAll(world) { for (const b of world.balls) { b.vx = b.vy = 0; b.sx = b.sy = 0; } }
+
+// Effet latéral à la bande : la blanche gagne une vitesse le long de la bande, du côté de sa droite (sx > 0) ou de sa gauche (sx < 0).
+function english(b, vertical, vin) {
+  if (b.n !== 0 || !b.sx) return;
+  const sp = Math.hypot(b.vx, b.vy) || 1, rx = -b.vy / sp, ry = b.vx / sp, dv = b.sx * SPIN_SIDE * vin;
+  if (vertical) b.vy += (ry >= 0 ? 1 : -1) * dv; else b.vx += (rx >= 0 ? 1 : -1) * dv;
+  b.sx *= 0.5;
+}
 
 // Un pas de simulation de durée DT.
 function step(balls, onPocket) {
@@ -61,6 +74,11 @@ function step(balls, onPocket) {
   // 1) friction puis déplacement
   for (const b of balls) {
     if (b.out) continue;
+    if (b.n === 0 && (b.sx || b.sy)) {            // V8 : l'effet s'estompe
+      const f = 1 - SPIN_DECAY * DT; b.sx *= f; b.sy *= f;
+      if (Math.abs(b.sx) < 0.01) b.sx = 0;
+      if (Math.abs(b.sy) < 0.01) b.sy = 0;
+    }
     const sp = Math.hypot(b.vx, b.vy);
     if (sp === 0) continue;
     const ns = sp - (FRICTION_CONST + FRICTION_PROP * sp) * DT;
@@ -86,6 +104,12 @@ function step(balls, onPocket) {
         if (vn < 0) {
           const j2 = -(1 + E_BALL) * vn / 2;
           a.vx -= j2 * nx; a.vy -= j2 * ny; b.vx += j2 * nx; b.vy += j2 * ny;
+          const cu = a.n === 0 ? a : b.n === 0 ? b : null;
+          if (cu && cu.sy && !cu.spinDone) {            // V8 : suivi / rétro, une seule fois au 1er contact, proportionnel à la vitesse d'approche
+            cu.spinDone = true;
+            const dv = Math.max(-SPIN_DV_MAX, Math.min(SPIN_DV_MAX, -vn * cu.sy * (cu.sy > 0 ? SPIN_FOLLOW : SPIN_DRAW)));
+            cu.vx += cu.dx * dv; cu.vy += cu.dy * dv;
+          }
         }
       }
     }
@@ -103,10 +127,10 @@ function step(balls, onPocket) {
     }
     if (b.out) continue;
     const maxX = TABLE.W - R, maxY = TABLE.H - R;
-    if (b.x < R) { b.x = R; if (b.vx < 0) b.vx = -b.vx * E_WALL; }
-    else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) b.vx = -b.vx * E_WALL; }
-    if (b.y < R) { b.y = R; if (b.vy < 0) b.vy = -b.vy * E_WALL; }
-    else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) b.vy = -b.vy * E_WALL; }
+    if (b.x < R) { b.x = R; if (b.vx < 0) { english(b, true, -b.vx); b.vx = -b.vx * E_WALL; } }
+    else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) { english(b, true, b.vx); b.vx = -b.vx * E_WALL; } }
+    if (b.y < R) { b.y = R; if (b.vy < 0) { english(b, false, -b.vy); b.vy = -b.vy * E_WALL; } }
+    else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) { english(b, false, b.vy); b.vy = -b.vy * E_WALL; } }
   }
 }
 

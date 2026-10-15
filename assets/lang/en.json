@@ -240,6 +240,10 @@
             "billard": {
                 "name": "Billard",
                 "description": "Play 8-ball, 9-ball or 10-ball billiards against AI or a friend!"
+            },
+            "mystery-page": {
+                "name": "Mystery Page",
+                "description": "Reveal the words of a Wikipedia article and guess its title. Play solo or challenge your friends in multiplayer!"
             }
         },
         "badges": {

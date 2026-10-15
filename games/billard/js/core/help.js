@@ -17,6 +17,11 @@ function sections(id) {
     ['⚠️ Fautes', FAUTES],
     ['🏆 Fin de partie', ['Empoche la 8 sans faute après avoir fini ton groupe : victoire.', 'La 8 empochée trop tôt, ou sur une faute (casse comprise) : défaite.']],
   ];
+  if (id === 'carom') return [
+    ['🎯 Objectif', ['Fais toucher les deux autres billes (jaune et rouge) par ta blanche en un seul coup : c\'est un point. Le premier à 10 points gagne.']],
+    ['🔄 Déroulement', [COMMUN[0], 'Pas de poches. Tu marques : tu rejoues. Sinon le tour passe, sans faute ni blanche en main (temps écoulé : le tour passe aussi).']],
+    ['🏆 Fin de partie', ['Le premier joueur à 10 points gagne la partie.']],
+  ];
   const N = id === '9ball' ? 9 : 10;
   return [
     ['🎯 Objectif', [`Empoche les billes dans l'ordre et gagne en empochant la ${N}.`]],

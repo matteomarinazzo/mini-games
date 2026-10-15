@@ -78,7 +78,7 @@
             "modal_not_ready": "Noch nicht verfügbar",
             "success": "Tägliche Herausforderung abgeschlossen!",
             "offline_title": "Offline",
-            "offLine_message": "Die tägliche Herausforderung erfordert eine Internetverbindung."
+            "offline_message": "Die tägliche Herausforderung erfordert eine Internetverbindung."
         },
         "games": {
             "battleship": {
@@ -244,6 +244,10 @@
             "mystery-page": {
                 "name": "Mysterienseite",
                 "description": "Entdecke die Wörter eines Wikipedia-Artikels und errate seinen Titel. Spiele allein oder fordere deine Freunde im Mehrspielermodus heraus!"
+            },
+            "tap-to-fly": {
+                "name": "Tap to Fly",
+                "description": "Lass deinen Vogel fliegen und weiche Hindernissen aus. Wie lange wirst du durchhalten?"
             }
         },
         "badges": {

@@ -7,6 +7,7 @@ import { TABLE } from './physics.js';
 import { normalize } from './config.js';
 
 export const TURN_TIME = 30;
+export const CAROM_TARGET = 10;   // V9 : points pour gagner en carambole
 export const groupOf = n => (n === 8 ? 'eight' : n < 8 ? 'solid' : 'stripe');
 const LABEL = { solid: 'pleines', stripe: 'rayées' };
 export const playerName = i => 'Joueur ' + (i + 1);
@@ -29,7 +30,7 @@ export function clampAim(a, fwd) {
 
 export const createGame = (mode, opts, cpu = false) => ({
   mode, cur: 0, groups: [null, null], hand: false, over: false, winner: null, reason: '',
-  opts: normalize(opts, mode), zone: null, fwd: null, sh: 1, ref: [null, null], cpu: !!cpu,
+  opts: normalize(opts, mode), zone: null, fwd: null, sh: 1, ref: [null, null], cpu: !!cpu, pts: [0, 0],
 });
 
 // s = coup évalué (faute de coup) ; absent = temps écoulé. twoShots : faute SANS blanche empochée → 2 coups, SANS blanche en main ;
@@ -44,10 +45,11 @@ const pass = (g, foul, msg, s) => {
 const end = (g, w, reason) => { g.over = true; g.winner = w; g.reason = reason; g.hand = false; g.sh = 1; return { keep: false, foul: false, over: true, msg: reason }; };
 const keep = (g, msg) => { g.sh = 1; return { keep: true, foul: false, msg }; };   // bille légale empochée : le 2e coup éventuel est perdu
 
-export const timeout = g => pass(g, true, `Temps écoulé : faute de ${nm(g, g.cur)}`);   // faute simple : jamais de 2 coups
+export const timeout = g => g.mode === 'carom' ? pass(g, false, `Temps écoulé : tour de ${nm(g, g.cur)} perdu`) : pass(g, true, `Temps écoulé : faute de ${nm(g, g.cur)}`);   // faute simple : jamais de 2 coups
 
 // Une bille n est-elle légale comme PREMIER contact du joueur courant ? before = billes sur la table (hors blanche).
 export function legalFirst(g, n, before) {
+  if (g.mode === 'carom') return true;
   if (g.mode === '8ball') {
     const gr = g.groups[g.cur];
     return !gr ? n !== 8 : before.some(m => groupOf(m) === gr) ? groupOf(n) === gr : n === 8;
@@ -63,6 +65,10 @@ function foulReason(g, s) {
 
 function ev(g, s) {
   const me = g.cur, op = 1 - me, who = nm(g, me), foul = foulReason(g, s);
+  if (g.mode === 'carom') {   // V9 : un point si la blanche touche les deux autres billes ; sinon le tour passe (ni faute ni blanche en main)
+    if (s.hits?.includes(1) && s.hits.includes(3)) { g.pts[me]++; return g.pts[me] >= CAROM_TARGET ? end(g, me, `${who} atteint ${CAROM_TARGET} points`) : keep(g, `${who} : ${g.pts[me]} point${g.pts[me] > 1 ? 's' : ''}`); }
+    return pass(g, false, '');
+  }
   if (g.mode !== '8ball') {
     const N = g.mode === '9ball' ? 9 : 10;
     if (s.pocketed.includes(N)) {
@@ -120,6 +126,7 @@ export const requiredPocket = (g, rem) => blackTarget(g, rem);
 // Texte d'information affiché sous le nom d'un joueur. rem = billes restantes sur la table.
 export function info(g, i, rem) {
   const x = i === g.cur && g.sh === 2 && !g.over ? ' · 2 coups' : '';
+  if (g.mode === 'carom') return `${g.pts[i]} / ${CAROM_TARGET} pts`;
   if (g.mode === '8ball') {
     const gr = g.groups[i];
     if (!gr) return 'table ouverte' + x;
@@ -132,6 +139,7 @@ export function info(g, i, rem) {
 // Billes à afficher dans le panneau du joueur i : { balls, next }. 8-ball : billes restantes de son groupe (ou la 8).
 // 9/10-ball : billes en jeu, affichées pour le joueur actif seulement ; next = bille à viser en premier.
 export function targets(g, i, rem) {
+  if (g.mode === 'carom') return { balls: [], next: null };
   if (g.mode === '8ball') {
     const gr = g.groups[i];
     if (!gr) return { balls: [], next: null };

@@ -15,6 +15,7 @@ import * as cpu from './core/cpu.js';
 import * as rules from './core/rules.js';
 import { SPIN0, clampSpin, roundSpin, spinLabel } from './core/spin.js';
 import { RM_READY, rmGet, rmSet, rmOk, rmView } from './core/rematch.js';
+import * as shop from './core/shop.js';
 
 const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d'), stage = $('stage');
@@ -58,6 +59,8 @@ const save = () => {            // jamais pendant le mouvement : on garde l'éta
   writeGame(store, mode.slot, snapshot({ g, aim, timeLeft, world, pocketed }));
 };
 
+const skin0 = store ? shop.cueOf(store) : shop.CUES[0];   // V9 : queue équipée (boutique du menu)
+let rewarded = false;
 const ui = createUI({ onConfirm: () => handlers.confirmPlacement(), onRestart: () => askNew(), onPause: () => togglePause(), names: NAMES });
 
 function setState(s) { state = s; ui.setState(s); }
@@ -80,7 +83,7 @@ function startTurn(msg, t) {
 
 // r = partie restaurée (save.js) ou undefined = nouvelle partie. Réinitialise TOUT (entrées, pause, animations).
 function newGame(r, first = 0) {
-  input.reset(); paused = false; ui.setPaused(false); last = performance.now();
+  rewarded = false; input.reset(); paused = false; ui.setPaused(false); last = performance.now();
   world = r ? r.world : createWorld(mode.id); g = r ? r.g : rules.createGame(mode.id, ONLINE ? roomOpts : (store ? getRules(store) : null), mode.cpu);   // règles figées pour toute la partie
   if (!r && first) g.cur = first;                       // V8 : en ligne, la mise en jeu alterne à chaque manche
   setSpin(SPIN0);
@@ -115,7 +118,7 @@ function applyResult(r) {
   ghost = null;
   if (g.over) {
     rmBits = 0; rmMine = null; rmSince = 0; setSpin(SPIN0);   // V8 : nouveaux votes de revanche
-    refreshPlayers(); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); renderRm(); save();
+    refreshPlayers(); ui.showEnd(winTitle(g.winner), g.reason + reward()); setState('gameOver'); renderRm(); save();
     if (isHost()) { pub(''); net?.setEnded(ROOM); }
   } else startTurn(r.msg);
 }
@@ -123,13 +126,21 @@ function applyResult(r) {
 function endShot() {
   stopAll(world);
   if (!shot) return;
-  const s = shot; shot = null; s.first = world.cue.first ?? null;
+  const s = shot; shot = null; s.first = world.cue.first ?? null; s.hits = world.cue.hits ?? [];
   applyResult(rules.evaluate(g, s));
 }
 
 function timeout() {
   if (state === 'charging') { chargeSource = null; setPower(0); ui.setCancelling(false); }
   applyResult(rules.timeout(g));
+}
+
+// V9 : pièces en fin de partie (une seule fois). Contre l'ordi / en ligne : victoire ou défaite de MON siège ; à deux sur le même écran : « égalité ».
+function reward() {
+  if (rewarded || !store || !g?.over) return ''; rewarded = true;
+  const me = ONLINE ? seat : 0, out = mode.cpu || ONLINE ? (g.winner === me ? 'win' : 'lose') : 'draw';
+  const n = shop.award(store, out, ONLINE ? ROOM + ':' + round : '');
+  return n ? ` · +${n} 🪙` : '';
 }
 
 const handlers = {
@@ -157,7 +168,7 @@ const handlers = {
     save();                                              // état d'avant le tir (positions + temps restant) : base de reprise
     g.fwd = null; g.zone = null;                         // la contrainte de tir ne vaut que pour le 1er coup après placement
     shot = { before: remaining(), pocketed: [], cue: false, first: null, pk: {}, cx: world.cue.x, cx0: world.cue.x };
-    shoot(world, aim, p, s); ui.setInfo('');
+    shoot(world, aim, p, s, ONLINE || (mode.cpu && g.cur === 1) ? 1 : skin0.pow); ui.setInfo('');   // bonus de queue : jamais en ligne (hôte autoritaire), jamais pour l'ordinateur
     shotTime = 0; dirty = true;
     setState('ballsMoving'); streamStart();
   },
@@ -304,7 +315,7 @@ function drawTable(g) {
   g.fillStyle = 'rgba(255,255,255,.35)';
   for (const fx of [.25, .75]) { g.beginPath(); g.arc(T.R + T.W * fx, T.R + T.H / 2, 4, 0, 7); g.fill(); }
   g.fillStyle = '#050505';
-  for (const p of POCKETS) { g.beginPath(); g.arc(T.R + p.x, T.R + p.y, p.r, 0, 7); g.fill(); }
+  if (mode.id !== 'carom') for (const p of POCKETS) { g.beginPath(); g.arc(T.R + p.x, T.R + p.y, p.r, 0, 7); g.fill(); }
   g.fillStyle = '#e8d9b0';
   for (let i = 1; i <= 7; i++) if (i !== 4) { diamond(g, T.R + T.W * i / 8, T.R / 2); diamond(g, T.R + T.W * i / 8, WH - T.R / 2); }
   for (let i = 1; i <= 3; i++) { diamond(g, T.R / 2, T.R + T.H * i / 4); diamond(g, LW - T.R / 2, T.R + T.H * i / 4); }
@@ -336,7 +347,7 @@ function drawBall(b, alpha = 1, s = 1) {
       }
     }
   }
-  if (n > 0) {
+  if (n > 0 && mode.id !== 'carom') {
     for (const sg of [-1, 1]) {                                  // sg = -1 : pastille avant (0,0,-1) ; 1 : arrière
       if (sg * O[8] > -.05) continue;                            // face cachée ou sur la tranche
       ctx.save();
@@ -348,7 +359,7 @@ function drawBall(b, alpha = 1, s = 1) {
     }
   } else {
     ctx.fillStyle = '#c0392b';
-    for (const [x, y, z] of SPOTS) {
+    for (const [x, y, z] of (n === 0 ? SPOTS : [])) {
       const vz = O[6] * x + O[7] * y + O[8] * z;
       if (vz > -.05) continue;
       ctx.beginPath(); ctx.arc(R * (O[0] * x + O[1] * y + O[2] * z), R * (O[3] * x + O[4] * y + O[5] * z), R * .13, 0, 7); ctx.fill();
@@ -373,14 +384,12 @@ function drawAim() {
   if (bad) { ctx.beginPath(); ctx.moveTo(hit.x - 6, hit.y - 6); ctx.lineTo(hit.x + 6, hit.y + 6); ctx.moveTo(hit.x + 6, hit.y - 6); ctx.lineTo(hit.x - 6, hit.y + 6); ctx.stroke(); }
   const gap = BALL_R + 6 + power * PULL_VISUAL, len = 380, nx = -dy, ny = dx;
   const tx = c.x - dx * gap, ty = c.y - dy * gap, bx = c.x - dx * (gap + len), by = c.y - dy * (gap + len);
-  ctx.fillStyle = '#e2b574';
+  const sk = mode.cpu && g.cur === 1 ? shop.CUES[0] : skin0, gr = ctx.createLinearGradient(tx, ty, bx, by);
+  for (const [p, c2] of sk.stops) gr.addColorStop(p, c2);
+  ctx.fillStyle = gr;
   ctx.beginPath();
   ctx.moveTo(tx + nx * 2.4, ty + ny * 2.4); ctx.lineTo(bx + nx * 6, by + ny * 6);
   ctx.lineTo(bx - nx * 6, by - ny * 6); ctx.lineTo(tx - nx * 2.4, ty - ny * 2.4); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = '#3a2410'; ctx.lineWidth = 2; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + dx * 60, by + dy * 60); ctx.stroke();
-  ctx.strokeStyle = '#6aa8ff'; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx - dx * 5, ty - dy * 5); ctx.stroke();
   ctx.restore();
 }
 
@@ -499,14 +508,14 @@ function onTurnDoc(v) {
   const d = turnGate(v); if (!d) return;
   const r = restoreFrom(decodeSnap(d.snap), mode.id);           // validation complète V6 (billes, groupes, options, zone, coups…)
   if (!r) { note('État reçu invalide : ignoré.'); return; }
-  if (d.rd !== round) { round = d.rd; ori.clear(); fx.length = 0; pocketed = []; pv.clear(); rmMine = null; rmSince = 0; ui.hideEnd(); setSpin(SPIN0); }   // V8 : nouvelle manche
+  if (d.rd !== round) { round = d.rd; ori.clear(); fx.length = 0; pocketed = []; pv.clear(); rmMine = null; rmSince = 0; ui.hideEnd(); setSpin(SPIN0); rewarded = false; }   // V8 : nouvelle manche
   rmBits = d.rm; if (rmMine && rmGet(rmBits, seat) === rmMine.v) rmMine = null;
   const old = pocketed;
   seq = d.seq; awaiting = 0; frames.length = 0; netReady = true;
   world = r.world; g = r.g; aim = r.aim; shot = null; ghost = null; shotTime = 0; pv.clear();
   pocketed = r.pocketed.map((e, k) => { const o = old.find(x => x.n === e.n); if (o?.a) o.a.slot = k; return { n: e.n, by: e.by, a: o ? o.a : null }; });
   chargeSource = null; setPower(0); ui.setCancelling(false); input.reset();
-  if (g.over) { refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.setCpu(''); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); renderRm(); return; }
+  if (g.over) { refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.setCpu(''); ui.showEnd(winTitle(g.winner), g.reason + reward()); setState('gameOver'); renderRm(); return; }
   startTurn(d.msg, r.timeLeft);
   if (pendingFrame) { const f = pendingFrame; pendingFrame = null; onFrame(f); }
 }

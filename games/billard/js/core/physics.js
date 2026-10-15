@@ -36,6 +36,7 @@ const ROWS = {
 const makeBall = (n, x, y) => ({ n, x, y, vx: 0, vy: 0, out: false });
 
 export function createWorld(modeId) {
+  if (modeId === 'carom') { const cb = [makeBall(0, HEAD_SPOT.x, HEAD_SPOT.y), makeBall(1, FOOT_SPOT.x, FOOT_SPOT.y), makeBall(3, HEAD_SPOT.x, HEAD_SPOT.y + 110)]; return { balls: cb, cue: cb[0], acc: 0, nop: true }; }   // V9 : blanche + jaune (1) + rouge (3)
   const rows = ROWS[modeId] || ROWS['8ball'];
   const d = 2 * BALL_R + 0.6;               // léger jeu entre billes : aucune surimpression au départ
   const dx = d * Math.sqrt(3) / 2;
@@ -48,11 +49,11 @@ export function createWorld(modeId) {
 export const powerToSpeed = p => V_MIN + (V_MAX - V_MIN) * Math.min(1, Math.max(0, p));
 
 // spin = { x, y } dans le disque unité (y > 0 suivi, y < 0 rétro, x > 0 droite vue de derrière la queue) ; absent = aucun effet (comportement V7).
-export function shoot(world, angle, power, spin) {
-  const v = powerToSpeed(power), c = world.cue;
+export function shoot(world, angle, power, spin, mult = 1) {
+  const v = Math.min(powerToSpeed(power) * (Number(mult) || 1), V_MAX * 1.15), c = world.cue;   // V9 : mult = bonus de queue
   let sx = Number(spin?.x) || 0, sy = Number(spin?.y) || 0; const m = Math.hypot(sx, sy);
   if (m > 1) { sx /= m; sy /= m; }
-  c.first = null; c.dx = Math.cos(angle); c.dy = Math.sin(angle);
+  c.first = null; c.hits = []; c.dx = Math.cos(angle); c.dy = Math.sin(angle);
   c.vx = c.dx * v; c.vy = c.dy * v;
   c.sx = sx; c.sy = sy; c.spinDone = false;
 }
@@ -69,7 +70,7 @@ function english(b, vertical, vin) {
 }
 
 // Un pas de simulation de durée DT.
-function step(balls, onPocket) {
+function step(balls, onPocket, nop) {
   const R = BALL_R, D2 = 4 * R * R;
   // 1) friction puis déplacement
   for (const b of balls) {
@@ -97,7 +98,7 @@ function step(balls, onPocket) {
         const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy;
         if (d2 >= D2) continue;
         const d = Math.sqrt(d2) || 1e-4;
-        if (a.n === 0) { if (a.first == null) a.first = b.n; } else if (b.n === 0 && b.first == null) b.first = a.n; // 1er contact de la blanche
+        if (a.n === 0) { if (a.first == null) a.first = b.n; if (a.hits && !a.hits.includes(b.n)) a.hits.push(b.n); } else if (b.n === 0) { if (b.first == null) b.first = a.n; if (b.hits && !b.hits.includes(a.n)) b.hits.push(a.n); } // 1er contact de la blanche
         const nx = dx / d, ny = dy / d, push = (2 * R - d) / 2;
         a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push;
         const vn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny; // < 0 : les billes se rapprochent
@@ -117,7 +118,7 @@ function step(balls, onPocket) {
   // 3) poches (testées avant les bandes pour qu'une bille entrant dans une poche ne rebondisse pas), puis bandes
   for (const b of balls) {
     if (b.out) continue;
-    for (const p of POCKETS) {
+    for (const p of nop ? [] : POCKETS) {   // V9 : carambole = pas de poches
       const px = b.x - p.x, py = b.y - p.y;
       if (px * px + py * py < p.cap * p.cap) {
         b.out = true; b.vx = b.vy = 0;
@@ -138,7 +139,7 @@ function step(balls, onPocket) {
 export function update(world, dtSec, onPocket) {
   world.acc += dtSec;
   let n = 0;
-  while (world.acc >= DT && n < MAX_STEPS) { step(world.balls, onPocket); world.acc -= DT; n++; }
+  while (world.acc >= DT && n < MAX_STEPS) { step(world.balls, onPocket, world.nop); world.acc -= DT; n++; }
   if (world.acc >= DT) world.acc = 0; // retard irrattrapable : on l'abandonne plutôt que de le rejouer
 }
 

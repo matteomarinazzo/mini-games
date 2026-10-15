@@ -77,3 +77,10 @@ h1 { font-size: clamp(28px, 6vw, 44px); margin: 0 0 6px }
 
 /* V8 : un double-clic sur le code le sélectionne en entier (collage propre) */
 .code b { user-select: all; -webkit-user-select: all }
+
+/* V9 : boutique de queues */
+.cue { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center; padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1) }
+.cue.eq { border-color: var(--accent); background: rgba(91,200,245,.14) }
+.cue i { grid-column: 1 / -1; height: 9px; border-radius: 5px }
+.cue span { display: flex; flex-direction: column } .cue small { color: var(--pale) }
+.cue .btn { width: auto; min-height: 38px; padding: 6px 14px; font-size: 14px }

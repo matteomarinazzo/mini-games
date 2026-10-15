@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.36.2026-10-15",
+    "currentVersion": "1.37.2026-10-15",
     "lastUpdate": "2026-10-15",
     "history": [
+        {
+            "version": "1.37.2026-10-15",
+            "date": "2026-10-15",
+            "changes": [
+                "Ajout du jeu Tap to Fly",
+                "Billard V9 - Carambole + shop",
+                "Amélioration du bouton 'défi du jeu'"
+            ]
+        },
         {
             "version": "1.36.2026-10-15",
             "date": "2026-10-15",
@@ -9,7 +18,7 @@
                 "Ajout du bouton'abandonner' dans le jeu Page Mystère",
                 "WikiChallenge : quand une personne gagne, la partie est terminée pour tout le monde",
                 "Correction de Network.js pour que le changement d'état dans offline.html",
-                "Billard V8"
+                "Billard V8 - Amélioration multijoueur"
             ]
         },
         {

@@ -596,6 +596,21 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "tap-to-fly": {
+      "path": "./games/tap-to-fly/index.html",
+      "name": "Tap to Fly",
+      "emoji": "🪽",
+      "description": "Fais voler ton oiseau et évite les obstacles. Combien de temps tiendras-tu ?",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "solo"
+      ],
+      "badge": "arcade",
+      "badgeText": "Arcade",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "casse-briques": {
       "path": "./games/casse-briques/index.html",
       "name": "Casse-Briques",

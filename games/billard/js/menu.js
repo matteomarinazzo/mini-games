@@ -2,6 +2,7 @@
 // (champs opp / rules / lastMode, voir config.js). Les liens fonctionnent même sans ce script (2 joueurs, règles de base).
 import { MODES } from './core/modes.js';
 import { RULES, normalize, readPrefs, writePrefs, getRules, getOpp } from './core/config.js';
+import * as shop from './core/shop.js';
 
 const st = (() => { try { return window.localStorage; } catch { return null; } })();
 const $ = id => document.getElementById(id);
@@ -10,10 +11,15 @@ const write = d => { if (st) writePrefs(st, d); };
 let opp = st ? getOpp(st) : '2p', rules = st ? getRules(st) : normalize(null);
 const slot = id => id + (opp === 'cpu' ? ':cpu' : '');
 const href = (id, extra = '') => `game.html?mode=${id}${opp === 'cpu' ? '&opp=cpu' : ''}${extra}`;
+// V9 : carambole + boutique de queues, injectées ici (index.html inchangé)
+if (!document.querySelector('.mode[data-mode="carom"]')) $('modes').insertAdjacentHTML('beforeend', '<a class="mode" data-mode="carom" href="game.html?mode=carom"><b>Carambole</b><span>Touche les deux autres billes, premier à 10 points.</span></a>');
+$('cfgBtn').insertAdjacentHTML('afterend', '<button class="cfg" id="shopBtn" type="button">🏪 Boutique de queues <small id="shopCoins"></small></button>');
+document.body.insertAdjacentHTML('beforeend', '<div class="ov" id="shopOv" hidden><div class="modal" role="dialog" aria-labelledby="shopTitle"><button class="x" id="shopClose" type="button" aria-label="Fermer">✕</button><h2 id="shopTitle">Boutique de queues</h2><p id="shopInfo"></p><div id="shopList"></div></div></div>');
 const modes = [...document.querySelectorAll('.mode')];
 for (const a of modes) if (!Object.hasOwn(MODES, a.dataset.mode)) a.remove();
 
 function refresh() {
+  if (st) $('shopCoins').textContent = '· ' + shop.getShop(st).coins + ' 🪙';
   const d = read();
   for (const a of modes) {
     if (!a.isConnected) continue;
@@ -34,7 +40,7 @@ for (const b of document.querySelectorAll('#opp button')) b.addEventListener('cl
 let openEl = null, from = null;
 function open(el) { from = document.activeElement; openEl = el; el.hidden = false; el.querySelector('button.btn, button')?.focus(); }
 function close() { if (!openEl) return; openEl.hidden = true; openEl = null; from?.focus?.(); }
-for (const o of [$('cfgOv'), $('resOv')]) o.addEventListener('click', e => { if (e.target === o) close(); });
+for (const o of [$('cfgOv'), $('resOv'), $('shopOv')]) o.addEventListener('click', e => { if (e.target === o) close(); });
 addEventListener('keydown', e => { if (e.key === 'Escape' && openEl !== $('netOv')) close(); });   // salon en ligne : fermeture volontaire seulement (✕ / Quitter)
 
 // ---- En ligne (V7) : module chargé à la demande, Firebase n'est jamais chargé hors de ce mode ----
@@ -61,6 +67,27 @@ $('cfgOk').addEventListener('click', close);
 $('cfgReset').addEventListener('click', () => {
   rules = normalize(null); write({ rules }); for (const b of list.querySelectorAll('input')) b.checked = false; refresh();
 });
+
+// ---- V9 : boutique de queues (pièces gagnées en fin de partie ; voir core/shop.js) ----
+const swatch = c => `linear-gradient(90deg, ${c.stops.map(([p, k]) => `${k} ${p * 100}%`).join(',')})`;
+function renderShop(msg = '') {
+  if (!st) return;
+  const s = shop.getShop(st), list = $('shopList'), R = shop.REWARD;
+  $('shopInfo').textContent = msg || `${s.coins} 🪙 · victoire +${R.win}, partie à deux sur le même écran +${R.draw}, défaite +${R.lose}. La puissance s'applique contre l'ordinateur et à deux sur le même écran ; en ligne, les queues sont décoratives.`;
+  list.textContent = '';
+  for (const c of shop.CUES) {
+    const own = s.owned.includes(c.id), eq = s.cue === c.id;
+    const row = document.createElement('div'), sw = document.createElement('i'), tx = document.createElement('span'), nm = document.createElement('b'), d = document.createElement('small'), btn = document.createElement('button');
+    row.className = 'cue' + (eq ? ' eq' : ''); sw.style.background = swatch(c);
+    nm.textContent = c.name; d.textContent = c.pow > 1 ? `+${Math.round((c.pow - 1) * 100)} % de puissance` : 'Puissance standard';
+    btn.type = 'button'; btn.className = 'btn' + (own ? ' sec' : ''); btn.textContent = eq ? 'Équipée' : own ? 'Équiper' : `${c.price} 🪙`;
+    btn.disabled = eq || (!own && s.coins < c.price);
+    btn.addEventListener('click', () => { const r = own ? shop.equip(st, c.id) : shop.buy(st, c.id); refresh(); renderShop(r.msg); });
+    tx.append(nm, d); row.append(tx, btn, sw); list.appendChild(row);
+  }
+}
+$('shopBtn').addEventListener('click', () => { renderShop(); open($('shopOv')); });
+$('shopClose').addEventListener('click', close);
 
 // ---- Choix du mode : reprise ou nouvelle partie (confirmation si une sauvegarde serait remplacée) ----
 let target = null;

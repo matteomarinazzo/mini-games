@@ -77,7 +77,7 @@
             "modal_not_ready": "Pas maintenant",
             "success": "Défi du jour complété !",
             "offline_title": "Connexion requise",
-            "offLine_message": "Le défi du jour nécessite une connexion internet."
+            "offline_message": "Le défi du jour nécessite une connexion internet."
         },
         "games": {
             "battleship": {
@@ -243,6 +243,10 @@
             "mystery-page": {
                 "name": "Page Mystère",
                 "description": "Révèle les mots d’un article Wikipédia et devine son titre. Joue en solo ou défie tes amis en multijoueur !"
+            },
+            "tap-to-fly": {
+                "name": "Tap to Fly",
+                "description": "Fais voler ton oiseau et évite les obstacles. Combien de temps tiendras-tu ?"
             }
         },
         "badges": {

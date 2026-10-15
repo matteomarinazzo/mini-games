@@ -8,6 +8,9 @@
  *
  * Offline-safe : AUCUN import Firebase sans vérification isOnline préalable.
  *
+ * Règle : le défi est validé dès qu'une partie du bon jeu remplit la condition,
+ * même si le joueur n'est jamais passé par le bouton « Jouer » de la modal.
+ *
  * Usage depuis un jeu (fin de partie) :
  *   import { checkDailyChallenge } from '../utils/dailyChallenge.js';
  *   await checkDailyChallenge({ score: 3200, gameId: 'layer-pile' });
@@ -15,6 +18,8 @@
 
 import { checkRealConnection } from '../network.js';
 import { addXP } from './xpSystem.js';
+import { reportGamePlayed } from './badges.js';
+import { updateStreak } from '../profilePanel.js';
 
 // ─── CONSTANTE : ne jamais changer après la mise en prod ──────────────────────
 const START_DATE = '2026-05-12';
@@ -106,6 +111,22 @@ function _markTodayDone() {
     localStorage.setItem(KEYS.DONE, JSON.stringify(map));
 }
 
+// ─── HELPERS GÉNÉRIQUES ───────────────────────────────────────────────────────
+function _withTimeout(promise, ms, label = 'timeout') {
+    let id;
+    const timeout = new Promise((_, reject) => {
+        id = setTimeout(() => reject(new Error(label)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(id));
+}
+
+function _tr(key, fallback) {
+    try {
+        const v = window.t ? window.t(key) : key;
+        return (!v || v === key) ? fallback : v;
+    } catch { return fallback; }
+}
+
 // ─── FETCH FIREBASE (RTDB) — OFFLINE-SAFE ────────────────────────────────────
 /**
  * Charge le défi du jour depuis la RTDB.
@@ -129,29 +150,38 @@ export async function fetchTodayChallenge() {
 
     // 3. Vérifier la connexion AVANT tout import Firebase
     const isOnline = await checkRealConnection();
-    if (!isOnline) return null;
+    if (!isOnline) { console.warn('[dailyChallenge] checkRealConnection = false (ping raté ou timeout 3 s)'); return null; }
 
     // 4. Import dynamique Firebase (seulement si en ligne)
     // Utilise les factories de firebaseWrk.js (getRef, getGet) — même pattern que le reste du projet
     try {
-        const { database, firebaseReady, getRef, getGet } = await import('../config/firebase-config.js');
-        await firebaseReady;
+        const fb = await _withTimeout(
+            import('../config/firebase-config.js'), 8000, 'firebase import timeout'
+        );
+        // IMPORTANT : attendre firebaseReady AVANT de lire `database`.
+        // Destructurer l'export avant l'init capturait la valeur null (binding live perdu).
+        await _withTimeout(Promise.resolve(fb.firebaseReady), 8000, 'firebase ready timeout');
 
-        const ref = getRef();
-        const get = getGet();
-        if (!database || !ref || !get) return null;
+        const database = fb.database;
+        const ref = fb.getRef?.();
+        const get = fb.getGet?.();
+        if (!database || !ref || !get) {
+            console.warn('[dailyChallenge] Firebase non initialisé', { database: !!database, ref: !!ref, get: !!get });
+            return null;
+        }
 
         // Lire la config (startDate + total)
         const configSnap = await get(ref(database, 'app_config/challenges'));
-        if (!configSnap.exists()) return null;
+        if (!configSnap.exists()) { console.warn('[dailyChallenge] app_config/challenges introuvable'); return null; }
 
         const { startDate, total } = configSnap.val();
+        if (!startDate || !total) return null;
         const rawIndex = daysBetween(startDate, today);
         const index = ((rawIndex % total) + total) % total; // toujours positif
 
         // Lire le défi à cet index
         const challengeSnap = await get(ref(database, `challenge_templates/${index}`));
-        if (!challengeSnap.exists()) return null;
+        if (!challengeSnap.exists()) { console.warn('[dailyChallenge] challenge_templates/' + index + ' introuvable'); return null; }
 
         _cachedChallenge = { _index: index, ...challengeSnap.val() };
 
@@ -250,12 +280,9 @@ export function evaluateCondition(condition, gameStats) {
 export async function checkDailyChallenge(gameStats) {
     if (isTodayDone()) return false;
 
-    // Vérifier qu'il y a un défi actif pour ce jeu
-    let active = null;
-    try { active = JSON.parse(localStorage.getItem(KEYS.ACTIVE) || 'null'); } catch { }
-    if (!active || active.date !== todayStr() || active.gameId !== gameStats.gameId) return false;
-
-    // Récupérer le défi (depuis cache — pas de nouveau fetch réseau)
+    // Pas besoin d'être passé par le bouton « Jouer » de la modal :
+    // toute partie du bon jeu qui remplit la condition valide le défi.
+    // Récupérer le défi (cache du jour en priorité, sinon fetch si en ligne)
     const challenge = await fetchTodayChallenge();
     if (!challenge || challenge.gameId !== gameStats.gameId) return false;
 
@@ -268,7 +295,7 @@ export async function checkDailyChallenge(gameStats) {
         addXP(challenge.reward.xp);
     }
 
-    localStorage.removeItem(KEYS.ACTIVE);
+    localStorage.removeItem(KEYS.ACTIVE); // nettoyage de l'ancienne clé
     updateChallengeStat();
     _showSuccessToast(challenge);
     return true;
@@ -314,6 +341,29 @@ function _showSuccessToast(challenge) {
 }
 
 // ─── INIT BOUTON HEADER ───────────────────────────────────────────────────────
+let _btnBound = false;
+let _currentChallenge = null;
+
+async function _onBtnClick() {
+    const btn = document.getElementById('dailyChallengeBtn');
+    if (_currentChallenge) { _openModal(_currentChallenge); return; }
+
+    // Pas encore de défi chargé (offline au démarrage, fetch raté…) : on retente
+    const challenge = await fetchTodayChallenge();
+    if (challenge) {
+        _currentChallenge = challenge;
+        if (btn) _updateBtn(btn, challenge);
+        _openModal(challenge);
+    } else {
+        _showOfflineMessage();
+    }
+}
+
+/**
+ * Le bouton n'est JAMAIS masqué : s'il n'y a pas de défi disponible
+ * (offline, Firebase lent ou en erreur), il passe en état « indisponible »
+ * et se recharge tout seul au retour de la connexion ou au prochain clic.
+ */
 export async function initDailyChallenge() {
     _ensureFirstDay();
     updateChallengeStat();
@@ -321,30 +371,53 @@ export async function initDailyChallenge() {
     const btn = document.getElementById('dailyChallengeBtn');
     if (!btn) return;
 
-    // Vérifier la connexion d'abord
-    const isOnline = await checkRealConnection();
+    // Au cas où un ancien code / une ancienne session l'aurait masqué
+    btn.style.display = '';
 
-    if (!isOnline) {
-        // Offline : si cache dispo on l'affiche quand même, sinon message
-        const cached = _getCachedForToday();
-        if (cached) {
-            // On a un cache du jour → afficher le bouton normalement
-            _cachedChallenge = cached;
-            _updateBtn(btn, cached);
-            btn.addEventListener('click', () => _openModal(cached));
-        } else {
-            // Aucun cache → bouton avec message offline
-            _setBtnOffline(btn);
-        }
+    if (!_btnBound) {
+        _btnBound = true;
+        btn.addEventListener('click', _onBtnClick);
+        window.addEventListener('online', () => {
+            if (!_currentChallenge) initDailyChallenge();
+        });
+    }
+
+    // 1. Cache d'abord : affichage immédiat, sans attendre le réseau
+    const cached = _cachedChallenge || _getCachedForToday();
+    if (cached) {
+        _cachedChallenge = cached;
+        _currentChallenge = cached;
+        _updateBtn(btn, cached);
         return;
     }
 
-    // Online : fetch normal
+    // 2. Sinon fetch (gère lui-même offline / timeouts / erreurs)
     const challenge = await fetchTodayChallenge();
-    if (!challenge) { btn.style.display = 'none'; return; }
+    if (challenge) {
+        _currentChallenge = challenge;
+        _updateBtn(btn, challenge);
+    } else {
+        _setBtnOffline(btn);
+        _scheduleRetry(btn);
+    }
+}
 
-    _updateBtn(btn, challenge);
-    btn.addEventListener('click', () => _openModal(challenge));
+// Retente le chargement du défi en arrière-plan (3 s, 8 s, 20 s)
+let _retryCount = 0;
+function _scheduleRetry(btn) {
+    const delays = [3000, 8000, 20000];
+    if (_currentChallenge || _retryCount >= delays.length) return;
+    const delay = delays[_retryCount++];
+    setTimeout(async () => {
+        if (_currentChallenge) return;
+        const challenge = await fetchTodayChallenge();
+        if (challenge) {
+            _currentChallenge = challenge;
+            _updateBtn(btn, challenge);
+        } else {
+            _scheduleRetry(btn);
+        }
+    }, delay);
 }
 
 function _getCachedForToday() {
@@ -356,39 +429,27 @@ function _getCachedForToday() {
 }
 
 function _setBtnOffline(btn) {
-    btn.style.opacity = '0.5';
-    btn.style.cursor = 'default';
-    btn.addEventListener('click', () => {
-        _showOfflineMessage();
-    });
-    const label = btn.querySelector('.challenge-btn-label');
-    if (label) label.textContent = 'Défi du jour';
+    // Marqueur sémantique uniquement (aucun style visuel de désactivation)
+    btn.classList.add('challenge-offline');
+    btn.classList.remove('challenge-done', 'challenge-skipped');
 }
 
 function _showOfflineMessage() {
-    // Petit toast informatif, pas d'erreur
+    document.getElementById('dcOfflineToast')?.remove();
     const toast = document.createElement('div');
-    Object.assign(toast.style, {
-        position: 'fixed', bottom: '80px', right: '20px', zIndex: '9999',
-        background: 'rgba(30,30,50,0.97)',
-        color: '#fff', borderRadius: '16px', padding: '14px 18px',
-        display: 'flex', alignItems: 'center', gap: '12px',
-        boxShadow: '0 8px 32px rgba(0,0,0,.4)',
-        transform: 'translateX(120%)',
-        transition: 'transform .4s cubic-bezier(.16,1,.3,1)',
-        maxWidth: '300px', fontFamily: 'inherit',
-        border: '1px solid rgba(255,255,255,.1)',
-    });
+    toast.id = 'dcOfflineToast';
+    toast.className = 'dc-toast';
+    toast.setAttribute('role', 'status');
     toast.innerHTML = `
-    <div style="font-size:1.5rem;flex-shrink:0">📡</div>
+    <div class="dc-toast-icon">📡</div>
     <div>
-      <div style="font-size:.85rem;font-weight:700;margin-bottom:2px" data-i18n="menu.daily_challenge.offline_title">Connexion requise</div>
-      <div style="font-size:.75rem;opacity:.7" data-i18n="menu.daily_challenge.offLine_message">Le défi du jour nécessite une connexion internet.</div>
+      <div class="dc-toast-title">${_tr('menu.daily_challenge.offline_title', 'Connexion requise')}</div>
+      <div class="dc-toast-text">${_tr('menu.daily_challenge.offline_message', 'Le défi du jour nécessite une connexion internet.')}</div>
     </div>`;
     document.body.appendChild(toast);
-    requestAnimationFrame(() => requestAnimationFrame(() => { toast.style.transform = 'translateX(0)'; }));
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
     setTimeout(() => {
-        toast.style.transform = 'translateX(120%)';
+        toast.classList.remove('show');
         setTimeout(() => toast.remove(), 500);
     }, 3500);
 }
@@ -397,12 +458,13 @@ function _showOfflineMessage() {
 function _updateBtn(btn, challenge) {
     const done = isTodayDone();
     const skipped = isTodaySkipped();
+    btn.style.display = '';
     btn.style.opacity = '';
     btn.style.cursor = '';
+    btn.classList.remove('challenge-offline');
     btn.classList.toggle('challenge-done', done);
     btn.classList.toggle('challenge-skipped', skipped && !done);
-    const label = btn.querySelector('.challenge-btn-label');
-    if (label) label.textContent = done ? 'Défi ✓' : 'Défi du jour';
+    // Le label reste celui du HTML (data-i18n) : le ✓ est ajouté en CSS
 }
 
 // ─── MODAL ────────────────────────────────────────────────────────────────────
@@ -412,178 +474,115 @@ function _openModal(challenge) {
 
     const overlay = document.createElement('div');
     overlay.id = 'challengeModal';
-    Object.assign(overlay.style, {
-        position: 'fixed', inset: '0', zIndex: '2000',
-        background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(6px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
-        animation: 'modal-fadein .25s ease',
-    });
+    overlay.className = 'dc-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
 
     const title = pickLocalizedField(challenge, "title");
     const description = pickLocalizedField(challenge, "description");
+    const xp = challenge.reward?.xp;
+
     overlay.innerHTML = `
-    <div style="background:linear-gradient(160deg,rgba(20,20,40,.98),rgba(8,8,20,.99));
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:26px;
-  padding:30px 26px 26px;
-  max-width:360px;width:100%;
-  box-shadow:0 30px 80px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.04);
-  position:relative;
-  animation:modal-slidein .3s cubic-bezier(.16,1,.3,1);">
-
-  <!-- Close -->
-  <button id="challengeModalClose" style="position:absolute;top:16px;right:16px;
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.12);
-    color:rgba(255,255,255,.5);
-    border-radius:50%;
-    width:32px;height:32px;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    transition:all .15s;">
-    <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round">
-      <line x1="5" y1="5" x2="19" y2="19"></line>
-      <line x1="19" y1="5" x2="5" y2="19"></line>
-    </svg>
-  </button>
-
-  <!-- Title -->
-  <div style="text-align:center;margin-bottom:22px">
-    <div style="font-size:.7rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">
-      ${t('menu.daily_challenge.modal_title')}
-    </div>
-    <div style="font-size:1.3rem;font-weight:800;color:#fff;line-height:1.25">
-      ${title}
-    </div>
-  </div>
-
-  <!-- Game -->
-  <div style="background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:18px;
-    display:flex;align-items:center;gap:12px;">
-
-    <!-- NEW ICON (minimal / clean / not controller) -->
-    <svg width="18" height="18" viewBox="0 0 24 24"
-      stroke="rgba(255,255,255,.75)" stroke-width="2"
-      fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M10 8l6 4-6 4z"></path>
-    </svg>
-
-    <div>
-      <div style="font-size:.65rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px">
-        ${t('menu.daily_challenge.modal_game')}
-      </div>
-      <div style="font-size:.95rem;font-weight:700;color:#fff">
-        ${challenge.gameName}
-      </div>
-    </div>
-  </div>
-
-  <!-- Description -->
-  <div style="background:rgba(255,255,255,.035);
-    border:1px solid rgba(255,255,255,.06);
-    border-left:3px solid rgba(255,255,255,.18);
-    border-radius:10px;
-    padding:13px 14px;
-    margin-bottom:22px;
-    font-size:.9rem;
-    color:rgba(255,255,255,.75);
-    line-height:1.55;">
-    ${description}
-  </div>
-
-  ${challenge.reward?.xp ? `
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;
-    font-size:.82rem;
-    color:rgba(255,210,80,.9);">
-
-    <!-- reward icon -->
-    <svg width="16" height="16" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="2">
-      <polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 16.8 5.5 21 7.5 13.5 2 9 9 9"></polygon>
-    </svg>
-
-    ${t('menu.daily_challenge.modal_reward').replace('{xp}', challenge.reward.xp)}
-  </div>` : ''}
-
-  ${done
-            ? `<div style="display:flex;align-items:center;justify-content:center;gap:10px;
-      padding:14px;
-      background:rgba(67,233,123,.08);
-      border:1px solid rgba(67,233,123,.25);
-      border-radius:14px;
-      color:#43e97b;
-      font-weight:700;
-      font-size:.95rem">
-
-      <svg width="18" height="18" viewBox="0 0 24 24"
-        fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 6L9 17l-5-5"></path>
-      </svg>
-
-      ${t('menu.daily_challenge.success')}
-    </div>`
-            : `<div style="display:flex;flex-direction:column;gap:12px">
-
-      <button id="challengePlayBtn"
-        style="display:flex;align-items:center;justify-content:center;gap:10px;
-        background:linear-gradient(135deg,#6a7cff,#7c4dff);
-        box-shadow:0 10px 30px rgba(100,120,255,.35);
-        color:#fff;
-        border:none;
-        border-radius:16px;
-        padding:15px;
-        font-size:1rem;
-        font-weight:800;
-        cursor:pointer;
-        letter-spacing:.3px;
-        transition:all .15s;">
-
-        <!-- play icon -->
-        <svg width="18" height="18" viewBox="0 0 24 24"
-          fill="currentColor">
-          <path d="M8 5v14l11-7z"></path>
+    <div class="dc-dialog">
+      <button id="challengeModalClose" class="dc-close" type="button" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <line x1="5" y1="5" x2="19" y2="19"></line>
+          <line x1="19" y1="5" x2="5" y2="19"></line>
         </svg>
-
-        ${t('menu.daily_challenge.modal_button')}
       </button>
 
-      <button id="challengeSkipBtn"
-        style="background:rgba(255,255,255,.05);
-        color:rgba(255,255,255,.45);
-        border:1px solid rgba(255,255,255,.08);
-        border-radius:14px;
-        padding:11px;
-        font-size:.82rem;
-        cursor:pointer;
-        transition:opacity .15s;">
-        ${t('menu.daily_challenge.modal_not_ready')}
-      </button>
-    </div>`
-        }
+      <div class="dc-header">
+        <div class="dc-trophy" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+            <path d="M4 22h16" />
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+          </svg>
+        </div>
+        <div class="dc-pill">${t('menu.daily_challenge.modal_title')}</div>
+        <h2 class="dc-title">${title}</h2>
+      </div>
 
+      <div class="dc-game">
+        <div class="dc-game-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+            fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M10 8l6 4-6 4z"></path>
+          </svg>
+        </div>
+        <div class="dc-game-info">
+          <div class="dc-game-label">${t('menu.daily_challenge.modal_game')}</div>
+          <div class="dc-game-name">${challenge.gameName}</div>
+        </div>
+      </div>
+
+      <div class="dc-desc">${description}</div>
+
+      ${xp ? `
+      <div class="dc-reward">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"
+          stroke-width="1.5" stroke-linejoin="round">
+          <polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 16.8 5.5 21 7.5 13.5 2 9 9 9"></polygon>
+        </svg>
+        <span>${t('menu.daily_challenge.modal_reward').replace('{xp}', xp)}</span>
+      </div>` : ''}
+
+      ${done ? `
+      <div class="dc-success">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"></path>
+        </svg>
+        <span>${t('menu.daily_challenge.success')}</span>
+      </div>` : `
+      <div class="dc-actions">
+        <button id="challengePlayBtn" class="dc-btn-play" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+          <span>${t('menu.daily_challenge.modal_button')}</span>
+        </button>
+        <button id="challengeSkipBtn" class="dc-btn-skip" type="button">
+          ${t('menu.daily_challenge.modal_not_ready')}
+        </button>
+      </div>`}
     </div>`;
 
     document.body.appendChild(overlay);
 
-    // Fermeture
-    const close = () => overlay.remove();
+    // Fermeture (croix, clic sur le fond, Échap)
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    const close = () => {
+        document.removeEventListener('keydown', onKey);
+        overlay.remove();
+    };
+    document.addEventListener('keydown', onKey);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     document.getElementById('challengeModalClose')?.addEventListener('click', close);
 
-    // Jouer → stocker le défi actif et rediriger
-    document.getElementById('challengePlayBtn')?.addEventListener('click', () => {
-        localStorage.setItem(KEYS.ACTIVE, JSON.stringify({
-            date: todayStr(),
-            gameId: challenge.gameId,
-            condition: challenge.condition,
-        }));
+    // Jouer → compte comme un lancement de jeu (streak / stats / badges), puis redirection.
+    // Le défi n'a plus besoin d'être « activé » : il se valide à la fin d'une partie du bon jeu.
+    document.getElementById('challengePlayBtn')?.addEventListener('click', async (e) => {
+        const playBtn = e.currentTarget;
+        if (playBtn.disabled) return;
+        playBtn.disabled = true;
+
+        try {
+            // Les compteurs sont écrits tout de suite ; on laisse juste un court délai
+            // pour que les badges éventuels soient enregistrés avant de quitter la page.
+            await Promise.race([
+                reportGamePlayed(challenge.gameId),
+                new Promise(r => setTimeout(r, 600)),
+            ]);
+        } catch (err) {
+            console.warn('[dailyChallenge] reportGamePlayed a échoué :', err);
+        }
+
         close();
+        updateStreak();
         window.location.href = challenge.gamePath;
     });
 

@@ -38,7 +38,6 @@
         "random_drawing": "🎲 Tirage...",
         "random_challenge": "DÉFI",
         "random_question": "🎯 Tu me tentes ?",
-        "footer_made_with": "Made with ❤️ by You | © 2026 Mini Games | Version :",
         "footer_about": "À propos",
         "footer_contact": "Contact",
         "settings": "Paramètres",
@@ -377,7 +376,7 @@
         "contact_btn": "Envoyer un email",
         "privacy_title": "Confidentialité",
         "privacy_p": "Nous respectons votre vie privée. Pour en savoir plus, consultez notre politique de confidentialité.",
-        "footer": "Made with ❤️ by You | © 2026 Mini Games | Version :"
+        "footer": "Made with ❤️ in Switzerland · © 2026 Mini Games · Version :"
     },
     "privacy": {
         "button": "Confidentialité"

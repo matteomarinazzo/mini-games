@@ -9,7 +9,7 @@ export async function checkRealConnection() {
         return false;
     }
 
-    const pingUrl = new URL("./index.html", window.location.href);
+    const pingUrl = new URL(window.location.href);
     pingUrl.searchParams.set("ping", Date.now().toString());
 
     const controller = new AbortController();

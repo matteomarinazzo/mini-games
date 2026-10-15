@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.36.2026-10-14.0";
+const CACHE_NAME = "mini-games-cache-v1.36.2026-10-15.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -507,6 +507,8 @@ const ASSETS_TO_CACHE = [
     'games/billard/js/core/save.js',
     'games/billard/js/core/sync.js',
     'games/billard/js/core/ui.js',
+    'games/billard/js/core/spin.js',
+    'games/billard/js/core/rematch.js',
 
     // Game: Mystery Page
     'games/mystery-page/index.html',

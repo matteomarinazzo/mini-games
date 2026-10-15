@@ -10,19 +10,19 @@
     <link rel="stylesheet" href="css/game.css" />
     <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
 
-  <!-- Script Google Adsense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
-    crossorigin="anonymous"></script>
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-QYX3ZK4KB2');
-  </script>
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
 </head>
 
 <body class="wc-body rank-only">
@@ -35,7 +35,6 @@
         <div class="wc-timer" id="wTimer">--:--</div>
         <div class="wc-actions">
             <button class="btn btn-outline wc-sm" id="backBtn" hidden>← Retour</button>
-            <button class="btn btn-outline wc-sm" id="rankBtn" hidden>🏆</button>
             <button class="btn btn-outline wc-sm wc-danger" id="giveUpBtn" hidden>Abandonner</button>
         </div>
     </header>
@@ -49,15 +48,19 @@
         </div>
 
         <section class="wc-rank" id="rankPanel">
-            <h2>Classement</h2>
-            <p class="wc-note" id="rankNote"></p>
-            <ol class="wc-rank-list" id="rankList"></ol>
-            <div class="wc-rank-actions">
-                <button class="btn btn-secondary" id="genRetryBtn" hidden>Relancer le tirage</button>
-                <button class="btn btn-primary" id="replayBtn" hidden>Rejouer</button>
-                <p class="wc-note" id="waitLeader" hidden>En attente du créateur pour la prochaine manche…</p>
-                <button class="btn btn-outline" id="closeRankBtn" hidden>Retour à la page</button>
-                <button class="btn btn-outline wc-leave" id="quitBtn">Quitter</button>
+            <div class="wc-rank-card">
+                <div class="wc-rank-emoji" id="rankEmoji">🏆</div>
+                <h2 class="wc-rank-title" id="rankTitle">Classement</h2>
+                <p class="wc-note wc-rank-note" id="rankNote"></p>
+                <div class="wc-rank-route" id="rankRoute" hidden></div>
+                <ol class="wc-rank-list" id="rankList"></ol>
+                <div class="wc-rank-actions">
+                    <button class="btn btn-secondary" id="genRetryBtn" hidden>Relancer le tirage</button>
+                    <button class="btn btn-primary" id="replayBtn" hidden>Rejouer</button>
+                    <p class="wc-note wc-rank-note" id="waitLeader" hidden>En attente du créateur pour la prochaine
+                        manche…</p>
+                    <button class="btn btn-outline wc-leave" id="quitBtn">Quitter</button>
+                </div>
             </div>
         </section>
     </main>

@@ -5,7 +5,7 @@ import {
   TABLE, BALL_R, POCKETS, HEAD_SPOT, createWorld, shoot, update, isMoving, stopAll, rayCast, isValidCuePlacement,
 } from './core/physics.js';
 import { createUI, ballColor, isStripe } from './core/ui.js';
-import { createInput, viewRect } from './core/input.js';
+import { createInput, viewRect, toView } from './core/input.js';
 import { ID, rollBy } from './core/roll.js';
 import { fillRules } from './core/help.js';
 import { snapshot, restore, writeGame } from './core/save.js';
@@ -13,6 +13,8 @@ import { getRules, normalize } from './core/config.js';
 import { parseFrame, parseLive, makeActGate, makeFrameGate, makeTurnGate, encodeFrame, encodeSnap, decodeSnap, restoreFrom, cleanName } from './core/sync.js';
 import * as cpu from './core/cpu.js';
 import * as rules from './core/rules.js';
+import { SPIN0, clampSpin, roundSpin, spinLabel } from './core/spin.js';
+import { RM_READY, rmGet, rmSet, rmOk, rmView } from './core/rematch.js';
 
 const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d'), stage = $('stage');
@@ -47,6 +49,7 @@ const MIN_POWER = 0.05, MAX_SHOT_TIME = 30;
 let paused = false, state = 'aiming', world, aim = 0, power = 0, chargeSource = null;
 let cpuPlan = null;      // plan de l'ordinateur pour le tour en cours (jamais sauvegardé : un tour interrompu est rejoué proprement)
 let ghost = null, shotTime = 0, pocketed = [], g, shot = null, timeLeft = rules.TURN_TIME, dirty = false, last = performance.now(), gate = 0;
+let spin = { ...SPIN0 };   // V8 : point d'effet choisi (disque unité), remis au centre à chaque tir
 const fx = [];    // chutes de la blanche (animation seule) ; pocketed = [{ n, by, a }] (a = animation en cours ou null)
 
 const store = (() => { try { return window.localStorage; } catch { return null; } })();
@@ -76,14 +79,16 @@ function startTurn(msg, t) {
 }
 
 // r = partie restaurée (save.js) ou undefined = nouvelle partie. Réinitialise TOUT (entrées, pause, animations).
-function newGame(r) {
+function newGame(r, first = 0) {
   input.reset(); paused = false; ui.setPaused(false); last = performance.now();
   world = r ? r.world : createWorld(mode.id); g = r ? r.g : rules.createGame(mode.id, ONLINE ? roomOpts : (store ? getRules(store) : null), mode.cpu);   // règles figées pour toute la partie
+  if (!r && first) g.cur = first;                       // V8 : en ligne, la mise en jeu alterne à chaque manche
+  setSpin(SPIN0);
   aim = r ? r.aim : 0; chargeSource = null; shotTime = 0; ghost = null; shot = null; dirty = !!r; gate = 0;
   pocketed = r ? r.pocketed.map(e => ({ ...e, a: null })) : []; fx.length = 0; ori.clear(); pv.clear();
   ui.setCancelling(false); ui.hideEnd(); setPower(0);
   if (r && g.over) {
-    refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); return;
+    refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); renderRm(); return;
   }
   startTurn(r ? 'Partie reprise' : '', r?.timeLeft);
   if (r) togglePause(true, 'Partie reprise');           // une partie restaurée démarre en pause : reprise volontaire
@@ -109,7 +114,8 @@ function onPocket(b) {
 function applyResult(r) {
   ghost = null;
   if (g.over) {
-    refreshPlayers(); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); save();
+    rmBits = 0; rmMine = null; rmSince = 0; setSpin(SPIN0);   // V8 : nouveaux votes de revanche
+    refreshPlayers(); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); renderRm(); save();
     if (isHost()) { pub(''); net?.setEnded(ROOM); }
   } else startTurn(r.msg);
 }
@@ -140,17 +146,18 @@ const handlers = {
     if (state !== 'charging') return;
     chargeSource = null; setPower(0); ui.setCancelling(false); setState('aiming');
   },
-  fire() {
+  fire(sp) {
     if (state !== 'charging') return;
     const p = power;
     chargeSource = null; ui.setCancelling(false); setPower(0);
     if (p < MIN_POWER) { setState('aiming'); return; }
     aim = rules.clampAim(aim, g.fwd);
-    if (isGuest()) { sendShot(aim, p); return; }          // invité : seule l'intention part ; l'hôte simule et valide
+    const s = sp ?? (cpuActive() ? SPIN0 : { ...spin }); setSpin(SPIN0);   // V8 : effet figé au tir, point recentré pour le suivant
+    if (isGuest()) { sendShot(aim, p, s); return; }          // invité : seule l'intention part ; l'hôte simule et valide
     save();                                              // état d'avant le tir (positions + temps restant) : base de reprise
     g.fwd = null; g.zone = null;                         // la contrainte de tir ne vaut que pour le 1er coup après placement
     shot = { before: remaining(), pocketed: [], cue: false, first: null, pk: {}, cx: world.cue.x, cx0: world.cue.x };
-    shoot(world, aim, p); ui.setInfo('');
+    shoot(world, aim, p, s); ui.setInfo('');
     shotTime = 0; dirty = true;
     setState('ballsMoving'); streamStart();
   },
@@ -230,7 +237,10 @@ function closeModal() {
   modal.hidden = true; modal = null;
   if (resumeAfter) togglePause(false);
 }
-function askNew() { if (!dirty || g.over) newGame(); else openModal($('confirmOv')); }
+function askNew() {
+  if (ONLINE) { if (g?.over) voteRematch(renderRm()?.vote ?? 1); return; }       // V8 : en ligne, « Rejouer » = vote de revanche (pas de remise à zéro unilatérale)
+  if (!dirty || g.over) newGame(); else openModal($('confirmOv'));
+}
 $('rulesBtn').addEventListener('click', () => { fillRules($('rulesTitle'), $('rulesBody'), mode.id, g.opts, mode.cpu, ONLINE); openModal($('rulesOv')); });
 $('rulesClose').addEventListener('click', closeModal);
 $('confirmNo').addEventListener('click', closeModal);
@@ -428,6 +438,7 @@ const HB_MS = 5000, STALE_MS = 20000, GRACE_MS = 90000, FRAME_DT = 1 / 12;
 let net = null, seat = 0, uid = null, peerUid = null, roomOpts = null, seq = 0, netReady = false, connected = true, fatalShown = false;
 let awaiting = 0, peerVal = null, peerSeenAt = 0, peerOffline = false, offlineSince = 0, bgHost = false, noteMsg = '', noteUntil = 0;
 let frames = [], playT = 0, pendingFrame = null, frameK = 0, sendAcc = 0, liveSent = '', lastPub = null, actId = 0;
+let round = 0, rmBits = 0, rmSince = 0, rmMine = null, peerLeft = false, roomGone = false;   // V8 : manche, votes de revanche (rematch.js)
 const unsubs = [], timers = [], actGate = makeActGate(), frameGate = makeFrameGate(), turnGate = makeTurnGate();
 const isHost = () => ONLINE && seat === 0, isGuest = () => ONLINE && seat === 1;
 const netLocked = () => ONLINE && (!netReady || !!awaiting || !g || g.cur !== seat);   // pas mon tour / pas d'état validé / action en attente de l'hôte
@@ -453,7 +464,7 @@ function renderWarn() {
 function pub(msg = '') {                                     // appelé à chaque début de tour, placement validé et fin de partie
   if (!isHost() || !net) return;
   seq++;
-  lastPub = net.publish(ROOM, { seq, snap: encodeSnap(snapshot({ g, aim, timeLeft, world, pocketed })), msg: String(msg || '').slice(0, 120) });
+  lastPub = net.publish(ROOM, { seq, snap: encodeSnap(snapshot({ g, aim, timeLeft, world, pocketed })), msg: String(msg || '').slice(0, 120), rd: round, rm: rmBits, ai: actGate.last() });
 }
 function streamStart() {
   frameK = 0; sendAcc = 0;
@@ -466,9 +477,14 @@ function streamTick(dt) {
 // Intention de l'invité : appliquée une seule fois (id), au bon tour (seq), à son tour de jouer, via les mêmes actions que le clavier/la souris.
 function onAct(v) {
   const a = actGate(v, seq);
-  if (!a || !g || g.over || g.cur !== 1) return;
+  if (!a || !g) return;
+  if (a.type === 'rematch') {                                   // V8 : vote de l'invité (valable pour la manche en cours seulement)
+    if (g.over && a.rd === round && !peerLeft) { rmBits = rmSet(rmBits, 1, a.v); pub(''); renderRm(); tryRematch(); }
+    return;
+  }
+  if (g.over || g.cur !== 1) return;
   if (a.type === 'place' && state === 'placingCueBall') { raw.movePlacement(a.x, a.y); if (ghost?.valid) raw.confirmPlacement(); }
-  else if (a.type === 'shot' && state === 'aiming') { raw.setAim(a.aim); raw.beginCharge('net'); raw.setPower(a.power); raw.fire(); }
+  else if (a.type === 'shot' && state === 'aiming') { raw.setAim(a.aim); raw.beginCharge('net'); raw.setPower(a.power); raw.fire({ x: a.sx, y: a.sy }); }
 }
 function endOnline(w, reason) {                              // hôte : fin de partie décidée hors règles (abandon, déconnexion prolongée)
   if (!isHost() || !g || g.over) return;
@@ -483,12 +499,14 @@ function onTurnDoc(v) {
   const d = turnGate(v); if (!d) return;
   const r = restoreFrom(decodeSnap(d.snap), mode.id);           // validation complète V6 (billes, groupes, options, zone, coups…)
   if (!r) { note('État reçu invalide : ignoré.'); return; }
+  if (d.rd !== round) { round = d.rd; ori.clear(); fx.length = 0; pocketed = []; pv.clear(); rmMine = null; rmSince = 0; ui.hideEnd(); setSpin(SPIN0); }   // V8 : nouvelle manche
+  rmBits = d.rm; if (rmMine && rmGet(rmBits, seat) === rmMine.v) rmMine = null;
   const old = pocketed;
   seq = d.seq; awaiting = 0; frames.length = 0; netReady = true;
   world = r.world; g = r.g; aim = r.aim; shot = null; ghost = null; shotTime = 0; pv.clear();
   pocketed = r.pocketed.map((e, k) => { const o = old.find(x => x.n === e.n); if (o?.a) o.a.slot = k; return { n: e.n, by: e.by, a: o ? o.a : null }; });
   chargeSource = null; setPower(0); ui.setCancelling(false); input.reset();
-  if (g.over) { refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.setCpu(''); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); return; }
+  if (g.over) { refreshPlayers(); ui.setInfo(''); ui.setTime(0); ui.setCpu(''); ui.showEnd(winTitle(g.winner), g.reason); setState('gameOver'); renderRm(); return; }
   startTurn(d.msg, r.timeLeft);
   if (pendingFrame) { const f = pendingFrame; pendingFrame = null; onFrame(f); }
 }
@@ -524,8 +542,9 @@ function playback(dt) {                                          // interpolatio
     bl.x = a.b[2 * i] + (nb.b[2 * i] - a.b[2 * i]) * k; bl.y = a.b[2 * i + 1] + (nb.b[2 * i + 1] - a.b[2 * i + 1]) * k;
   });
 }
-function sendShot(a, p) {
-  net.act(ROOM, uid, { id: nextActId(), seq, type: 'shot', aim: a, power: p });
+function sendShot(a, p, s = SPIN0) {
+  const q = roundSpin(s);
+  net.act(ROOM, uid, { id: nextActId(), seq, type: 'shot', aim: a, power: p, sx: q.x, sy: q.y });
   awaiting = performance.now(); setState('ballsMoving');         // en attente de la 1re image de l'hôte ; sinon retour automatique (netTick)
 }
 
@@ -534,15 +553,15 @@ function onLive(v) {                                             // joueur dista
   const l = parseLive(v); if (!l || !g) return;
   if (isGuest()) { bgHost = l.bg; if (l.tl !== undefined && state !== 'ballsMoving' && !g.over) { timeLeft = l.tl; ui.setTime(timeLeft); } }
   if (g.cur === seat || g.over) return;
-  if (state === 'aiming' || state === 'charging') { if (l.a !== undefined) aim = rules.clampAim(l.a, g.fwd); setPower(l.p ?? 0); }
+  if (state === 'aiming' || state === 'charging') { if (l.a !== undefined) aim = rules.clampAim(l.a, g.fwd); setPower(l.p ?? 0); setSpin({ x: l.sx ?? 0, y: l.sy ?? 0 }); }
   else if (state === 'placingCueBall' && l.gx !== undefined && l.gy !== undefined) raw.movePlacement(l.gx, l.gy);
 }
 function liveTick() {
-  if (!net || !g || !netReady || !connected) return;
+  if (!net || !g || !netReady || !connected || (document.hidden && !isHost())) return;     // V8 : un invité en arrière-plan n'écrit rien
   const l = {};
   if (isHost()) { l.tl = Math.ceil(timeLeft); if (document.hidden) l.bg = 1; }
   if (!g.over && g.cur === seat && !awaiting) {
-    if (state === 'aiming' || state === 'charging') { l.a = Math.round(aim * 1000) / 1000; l.p = Math.round(power * 100) / 100; }
+    if (state === 'aiming' || state === 'charging') { l.a = Math.round(aim * 1000) / 1000; l.p = Math.round(power * 100) / 100; const q = roundSpin(spin, 20); l.sx = q.x; l.sy = q.y; }
     else if (state === 'placingCueBall' && ghost) { l.gx = Math.round(ghost.x); l.gy = Math.round(ghost.y); }
   }
   const s = JSON.stringify(l); if (s === liveSent) return;
@@ -560,7 +579,7 @@ function netTick() {                                             // 1 fois / s
     if (g && !g.over && g.cur === seat) { if (state === 'ballsMoving' && !frames.length) setState(g.hand ? 'placingCueBall' : 'aiming'); note('Action non confirmée par l\'hôte : réessaie.'); }
   }
   if (!connected) peerSeenAt = now;                              // pas de jugement pendant ma propre coupure
-  renderWarn();
+  renderWarn(); renderRm(); tryRematch();
 }
 
 /* ---- Entrée / sortie ---- */
@@ -573,19 +592,20 @@ function startNet(room) {
   const base = `rooms/${net.idOf(ROOM)}`, P = `${base}/players/${peerUid}`;
   net.setErrorHandler(e => note('Écriture Firebase refusée (' + (e?.code || e?.message || 'erreur') + ').', 8000));
   peerSeenAt = performance.now();
-  unsubs.push(net.watch('.info/connected', v => { const c = v === true; if (c && !connected) peerSeenAt = performance.now(); connected = c; renderWarn(); }));
+  unsubs.push(net.watch('.info/connected', v => { const c = v === true; if (c && !connected) { peerSeenAt = performance.now(); setTimeout(resync, 300); } connected = c; renderWarn(); }));
   unsubs.push(net.watch(`${P}/lastSeen`, onPeerSeen));
   net.beat(ROOM, uid);
+  if (isGuest()) net.markLeft(ROOM, uid, false);                  // V8 : retour dans le salon : efface un ancien « parti »
   timers.push(setInterval(() => net.beat(ROOM, uid), HB_MS), setInterval(netTick, 1000), setInterval(liveTick, 150));
   if (isHost()) {
     unsubs.push(net.watch(`${P}/act`, onAct), net.watch(`${P}/live`, onLive),
-      net.watch(`${P}/left`, v => { if (v === true && g && !g.over) endOnline(0, `${NAMES[1]} a quitté la partie`); }));
+      net.watch(`${P}/left`, v => { peerLeft = v === true; if (peerLeft && g && !g.over) endOnline(0, `${NAMES[1]} a quitté la partie`); else renderRm(); }));
     const gm = room.game, r = gm && Number.isSafeInteger(gm.seq) ? restoreFrom(decodeSnap(gm.snap), mode.id) : null;
-    if (r) { seq = gm.seq; newGame(r); } else newGame();           // reprise de l'hôte : dernier état validé ; un tir interrompu est à rejouer
+    if (r) { seq = gm.seq; round = Number.isSafeInteger(gm.rd) ? gm.rd : 0; rmBits = rmOk(gm.rm) ? gm.rm : 0; actGate.seed(gm.ai); newGame(r); } else newGame();   // V8 : manche, votes et dernier id consommé (jamais de tir rejoué)           // reprise de l'hôte : dernier état validé ; un tir interrompu est à rejouer
     netReady = true;
   } else {
     unsubs.push(net.watch(`${base}/game`, onTurnDoc), net.watch(`${base}/mv`, onFrame), net.watch(`${base}/live`, onLive),
-      net.watch(`${base}/state`, v => { if (v === null && g && !g.over) fatal(Object.assign(new Error('Le salon a été fermé par l\'hôte.'), { gone: true })); }));
+      net.watch(`${base}/state`, v => { if (v !== null) return; if (g && !g.over) fatal(Object.assign(new Error('Le salon a été fermé par l\'hôte.'), { gone: true })); else { roomGone = true; renderRm(); note('Le salon a été fermé par l\'hôte.', 8000); } }));
     newGame();                                                     // état provisoire verrouillé jusqu'au premier document de l'hôte
   }
 }
@@ -615,7 +635,7 @@ async function leave() {                                           // départ vo
       if (g && !g.over) endOnline(1, `${NAMES[0]} a quitté la partie`);   // le résultat est publié avant la fermeture du salon
       await Promise.race([lastPub ?? sleep(0), sleep(1500)]);
       await Promise.race([net.removeRoom(ROOM), sleep(2500)]);
-    } else if (isGuest() && g && !g.over) await Promise.race([net.markLeft(ROOM, uid), sleep(2000)]);
+    } else if (isGuest() && g) await Promise.race([net.markLeft(ROOM, uid), sleep(2000)]);   // V8 : aussi après la fin (revanche refusée)
   } catch { }
   try { localStorage.removeItem('billard_room'); } catch { }
   location.href = './index.html';
@@ -627,11 +647,69 @@ document.addEventListener('click', e => {                          // tout lien 
 $('leaveYes').addEventListener('click', leave);
 $('leaveNo').addEventListener('click', () => { $('leaveOv').hidden = true; });
 
+/* ============================ V8 : effet sur la blanche, revanche en ligne, resynchronisation ============================ */
+let spinOff = true, spinId = null, spinTap = 0;
+function setSpin(s) {
+  spin = clampSpin(s.x, s.y);
+  $('spinDot').style.left = 50 + spin.x * 38 + '%'; $('spinDot').style.top = 50 - spin.y * 38 + '%';     // le point reste dans le disque (rayon 38 % + demi-point 11 % = 49 %)
+}
+const canSpin = () => !paused && !!g && !g.over && !cpuActive() && !netLocked() && (state === 'aiming' || state === 'charging');
+function syncSpinUI() { const off = !canSpin(); if (off !== spinOff) { spinOff = off; $('spin').classList.toggle('off', off); if (off) spinId = null; } }
+{
+  const ball = $('spinBall');
+  const from = e => {          // position du pointeur → point d'effet ; viewRect / toView : repère logique, valable aussi en rotation forcée
+    const r = viewRect(ball), v = toView(e.clientX, e.clientY);
+    setSpin({ x: (v.x - r.left - r.width / 2) / (r.width * .38), y: -(v.y - r.top - r.height / 2) / (r.height * .38) });
+  };
+  ball.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    if (spinId !== null || !canSpin() || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const t = performance.now();
+    if (t - spinTap < 320) { spinTap = 0; setSpin(SPIN0); return; }          // double clic / double tape : recentrer
+    spinTap = t; spinId = e.pointerId; try { ball.setPointerCapture(e.pointerId); } catch { } from(e);
+  });
+  ball.addEventListener('pointermove', e => { if (e.pointerId === spinId && canSpin()) from(e); });
+  for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) ball.addEventListener(t, e => { if (e.pointerId === spinId) spinId = null; });
+}
+
+// Revanche (en ligne). Votes : rmBits (rematch.js). L'hôte est seul à relancer la manche, quand les deux ont accepté et que l'invité est présent.
+function renderRm() {
+  const box = $('endRm'), btn = $('endRestart'), no = $('endDecline');
+  if (!ONLINE || !g || !g.over) { box.hidden = true; no.hidden = true; return null; }
+  const mine = rmMine && performance.now() - rmMine.at < 4000 ? rmMine.v : rmGet(rmBits, seat);     // vote local affiché sans attendre l'écho de l'hôte
+  const v = rmView(rmSet(rmBits, seat, mine), seat, { peer: peerName(), peerOffline, peerLeft, roomGone, waited: rmSince ? performance.now() - rmSince : 0 });
+  box.textContent = v.text; box.hidden = !v.text; btn.textContent = v.btn; btn.disabled = !v.canVote || !netReady; no.hidden = !v.showDecline;
+  return v;
+}
+function voteRematch(val) {
+  if (!ONLINE || !g?.over || !netReady || roomGone || peerLeft) return;
+  rmSince = val === 1 ? performance.now() : 0;
+  if (isHost()) { rmBits = rmSet(rmBits, 0, val); pub(''); }
+  else { rmMine = { v: val, at: performance.now() }; net.act(ROOM, uid, { id: nextActId(), seq, type: 'rematch', rd: round, v: val }); }
+  renderRm(); tryRematch();
+}
+function tryRematch() {
+  if (!isHost() || !g?.over || rmBits !== RM_READY || peerOffline || peerLeft || !connected || roomGone) return;
+  round++; rmBits = 0; rmMine = null; rmSince = 0;
+  net.setPlaying(ROOM);
+  newGame(undefined, round % 2);          // billes, règles de la room, chrono, messages : tout est recréé ; publié (rd + rm = 0) par startTurn
+}
+$('endDecline').addEventListener('click', () => voteRematch(2));
+
+// Resynchronisation (retour d'onglet, reconnexion) : battement immédiat, aperçu renvoyé, et l'invité relit le dernier état de l'hôte
+// (le filtre seq ignore un état déjà appliqué : aucune action ni état en double).
+function resync() {
+  if (!ONLINE || !net || !netReady) return;
+  liveSent = ''; net.beat(ROOM, uid);
+  if (isGuest()) net.peek(`rooms/${net.idOf(ROOM)}/game`).then(onTurnDoc).catch(() => { });
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) resync(); });
+
 /* ============================ Boucle ============================ */
 const MAXDT = 0.05;
 function frame(now) {
   const dt = Math.min((now - last) / 1000, MAXDT);
-  last = now;
+  last = now; syncSpinUI();
   if (world && !paused) {
     if (state === 'aiming' || state === 'charging' || state === 'placingCueBall') {
       if (ONLINE) {      // seul l'hôte sanctionne le temps écoulé ; chrono suspendu si ma connexion ou celle de l'adversaire est perdue

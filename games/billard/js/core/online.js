@@ -5,9 +5,11 @@
 import { database, auth, firebaseReady, getServerTimestamp, getRef, getOnValue, getSet, getUpdate } from '../../../../js/config/firebase-config.js';
 import { createRoom, joinRoom, getRoom, deleteRoom } from '../../../../js/firebaseWrk.js';
 import { MODES } from './modes.js';
-import { PREFIX, CODE_RE, newCode, cleanName } from './sync.js';
+import { PREFIX, CODE_RE, newCode, cleanName, normCode } from './sync.js';
 
 const fail = (message, gone = false) => Object.assign(new Error(message), { gone });
+export const diag = (...a) => console.info('[billard en ligne]', ...a);     // diagnostic : jamais d'identifiant d'utilisateur ni de nom
+const ROOM_TTL = 6 * 3600e3;                                                  // un salon encore « waiting » après 6 h est considéré expiré
 export const idOf = code => PREFIX + code;
 const ref = p => getRef()(database, p);
 const put = (p, v) => getSet()(ref(p), v);
@@ -40,24 +42,51 @@ export async function createLobby(mode, opts, name) {
   throw fail('Impossible de créer le salon (connexion ou Firebase). Réessaie.');
 }
 
-export async function joinLobby(raw, name) {
-  const code = String(raw || '').trim().toUpperCase();
-  if (!CODE_RE.test(code)) throw fail('Code invalide : 6 caractères (lettres et chiffres, sans I, O, 0, 1).');
+// Lecture unique qui distingue : null = salon inexistant ; erreur avec .code = lecture refusée ; erreur sans code = réseau (délai).
+export function peek(path, ms = 8000) {
+  return new Promise((res, rej) => {
+    let done = false, off = null;
+    const t = setTimeout(() => fin(rej, fail('Réseau lent ou indisponible : le salon n\'a pas répondu à temps. Réessaie.')), ms);
+    const fin = (f, v) => { if (done) return; done = true; clearTimeout(t); try { off?.(); } catch { } f(v); };
+    off = getOnValue()(ref(path), s => fin(res, s.val()), e => fin(rej, Object.assign(fail('Lecture du salon refusée (' + (e?.code || 'erreur') + ').'), { code: e?.code || 'denied' })));
+    if (done) try { off?.(); } catch { }
+  });
+}
+const hint = code => {
+  if (!code) return 'Saisis le code à 6 caractères du salon.';
+  if (code.length !== 6) return `Code invalide : ${code.length} caractère(s) saisi(s), 6 attendus.`;
+  const bad = [...new Set(code.match(/[IO01]/g) || [])];
+  return bad.length ? `Code invalide : il ne contient jamais I, O, 0 ni 1 (trouvé : ${bad.join(' ')}). Vérifie la dictée.` : 'Code invalide.';
+};
+
+// resume = true : retour volontaire dans son propre salon (bouton « Reprendre »). Sinon, ouvrir SON propre code depuis le même navigateur est signalé
+// (même compte anonyme Firebase partagé entre onglets : l'« invité » serait l'hôte lui-même).
+export async function joinLobby(raw, name, resume = false) {
+  const code = normCode(raw);                                                       // espaces, retours à la ligne, tirets, minuscules : tolérés
+  if (!CODE_RE.test(code)) throw fail(hint(code));
   const uid = await ready();
-  const room = await getRoom(idOf(code));
-  if (!room || room.game !== 'billard') throw fail('Aucun salon avec ce code (ou connexion indisponible).', true);
-  const ps = room.players || {};
-  if (ps[uid]) return { code, uid, room };                                          // retour d'un joueur déjà inscrit (actualisation, reconnexion)
+  let room;
+  try { room = await peek(rp(code)); }
+  catch (e) { diag('lecture directe échouée :', e.code || 'réseau'); if (!e.code) throw e; room = await getRoom(idOf(code)); }   // lecture refusée : repli sur firebaseWrk
+  const ps = room?.players || {};
+  diag('rejoindre', { code, trouvé: !!room, état: room?.state, joueurs: Object.keys(ps).length, déjàInscrit: !!ps[uid], hôteCeNavigateur: room?.leaderId === uid });
+  if (!room || room.game !== 'billard') throw fail('Aucun salon avec ce code : vérifie-le ou demande à l\'hôte d\'en créer un nouveau.', true);
+  if (ps[uid]) {                                                                    // retour d'un joueur déjà inscrit (actualisation, reconnexion)
+    if (room.leaderId === uid && !resume) throw fail('Ce salon a été créé depuis ce navigateur (même compte anonyme) : ouvre le code depuis un autre appareil, ou utilise « Reprendre le salon ».');
+    return { code, uid, room };
+  }
+  if (room.state === 'waiting' && Number.isFinite(room.createdAt) && Date.now() - room.createdAt > ROOM_TTL) throw fail('Ce salon a expiré (créé il y a plus de 6 h). Demande un nouveau code à l\'hôte.', true);
+  if (room.state === 'ended') throw fail('Cette partie est terminée.', true);
   if (room.state !== 'waiting') throw fail('Cette partie a déjà commencé.');
   if (Object.keys(ps).length >= 2) throw fail('Ce salon est complet.');
   const r = await joinRoom(idOf(code), player(uid, name));
-  if (r !== true) throw fail(typeof r === 'string' ? r.replace(/^Erreur[^:]*:\s*/, '') : 'Impossible de rejoindre le salon.');
+  if (r !== true) { diag('joinRoom refusé :', r); throw fail(typeof r === 'string' ? r.replace(/^Erreur[^:]*:\s*/, '') : 'Impossible de rejoindre le salon.'); }
   return { code, uid, room };
 }
 
 // Entrée dans la partie (game.js) : le salon doit être lancé et le joueur doit figurer dans `seats` (fixé au lancement par l'hôte).
 export async function enter(raw) {
-  const code = String(raw || '').toUpperCase();
+  const code = normCode(raw);
   if (!CODE_RE.test(code)) throw fail('Code de salon invalide.', true);
   const uid = await ready();
   const room = await getRoom(idOf(code));
@@ -76,6 +105,7 @@ export const startRoom = (code, hostUid, guestUid) =>
 export async function leaveLobby(code, uid, host) { if (host) await deleteRoom(idOf(code)); else await put(`rooms/${idOf(code)}/players/${uid}`, null); }
 export const removeRoom = code => deleteRoom(idOf(code));
 export const setEnded = code => getUpdate()(ref(`rooms/${idOf(code)}`), { state: 'ended' }).catch(werr);
+export const setPlaying = code => getUpdate()(ref(`rooms/${idOf(code)}`), { state: 'playing' }).catch(werr);     // V8 : revanche dans la même room
 
 // Lecture : renvoie la fonction de désabonnement. cb reçoit null si le nœud n'existe pas / plus.
 export const watch = (path, cb) => getOnValue()(ref(path), s => cb(s.val()), e => console.warn('[billard en ligne] lecture refusée', path, e));
@@ -87,4 +117,4 @@ export const publish = (code, doc) => put(`${rp(code)}/game`, doc).catch(werr); 
 export const frame = (code, f) => { put(`${rp(code)}/mv`, f).catch(werr); };                           // hôte : image de billes
 export const live = (code, uid, host, l) => { put(host ? `${rp(code)}/live` : `${rp(code)}/players/${uid}/live`, l).catch(() => { }); };
 export const act = (code, uid, a) => put(`${rp(code)}/players/${uid}/act`, a).catch(werr);           // invité : intention
-export const markLeft = (code, uid) => put(`${rp(code)}/players/${uid}/left`, true).catch(() => { });
+export const markLeft = (code, uid, v = true) => put(`${rp(code)}/players/${uid}/left`, v ? true : null).catch(() => { });   // v = false : efface (retour dans le salon)

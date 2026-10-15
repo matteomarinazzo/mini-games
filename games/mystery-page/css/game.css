@@ -490,3 +490,11 @@
 .rank-list .nm { font-weight: 700; color: var(--ui-text); overflow-wrap: anywhere; }
 .rank-list .dt { grid-column: 2; font-size: 13px; color: var(--ui-pale); font-variant-numeric: tabular-nums; }
 .rank-actions { display: flex; flex-direction: column; gap: 12px; }
+
+/* Abandonner : discret au repos, rouge une fois armé (second appui = confirmation) — comme Labyrinthe 3D */
+.btn-sky.danger { color: #ffb3c4; border-color: rgba(239, 71, 111, .35); }
+.btn-sky.danger:hover { background: rgba(239, 71, 111, .16); }
+.btn-sky.danger.confirm {
+    color: #fff; background: linear-gradient(135deg, #c1274d, #8f1636); border-color: transparent;
+    box-shadow: 0 6px 18px rgba(239, 71, 111, .35);
+}

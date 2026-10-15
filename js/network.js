@@ -1,6 +1,6 @@
 /**
- * Vérifie la connexion au serveur en testant l'index.html
- * du dossier courant.
+ * Vérifie si le serveur qui héberge la page répond.
+ * La requête reste sur la même origine que la page courante.
  *
  * @returns {Promise<boolean>}
  */
@@ -9,7 +9,7 @@ export async function checkRealConnection() {
         return false;
     }
 
-    const pingUrl = new URL("https://mini-games.ch/index.html");
+    const pingUrl = new URL("./index.html", window.location.href);
     pingUrl.searchParams.set("ping", Date.now().toString());
 
     const controller = new AbortController();
@@ -22,10 +22,8 @@ export async function checkRealConnection() {
             signal: controller.signal
         });
 
-        // Un statut HTTP en erreur ou la réponse hors ligne du Service Worker
-        // signifie que le serveur n'est pas joignable correctement.
         return response.ok && !response.headers.has("X-Offline");
-    } catch (error) {
+    } catch {
         return false;
     } finally {
         clearTimeout(timeoutId);

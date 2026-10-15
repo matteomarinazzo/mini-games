@@ -33,15 +33,16 @@ let startedRound = 0, cur = null, stack = [], trail = [];   // trail = toutes le
 const prev = {};            // statuts précédents (toasts)
 const cache = new Map();
 const busy = { leave: false, replay: false, giveup: false };
+const openPaths = new Set();   // joueurs dont le parcours est déplié dans le classement (conservé entre deux rendus)
 
 // ═══ DOM ═══
 const $ = id => document.getElementById(id);
 const wStart = $('wStart'), wTarget = $('wTarget'), wTimer = $('wTimer');
-const backBtn = $('backBtn'), rankBtn = $('rankBtn'), giveUpBtn = $('giveUpBtn');
+const backBtn = $('backBtn'), giveUpBtn = $('giveUpBtn');
 const reader = $('reader'), loader = $('loader'), loaderText = $('loaderText'), loaderRetry = $('loaderRetry');
-const rankNote = $('rankNote'), rankList = $('rankList');
+const rankNote = $('rankNote'), rankList = $('rankList'), rankEmoji = $('rankEmoji'), rankTitle = $('rankTitle'), rankRoute = $('rankRoute');
 const genRetryBtn = $('genRetryBtn'), replayBtn = $('replayBtn'), waitLeader = $('waitLeader');
-const closeRankBtn = $('closeRankBtn'), quitBtn = $('quitBtn'), toastEl = $('toast');
+const quitBtn = $('quitBtn'), toastEl = $('toast');
 
 // ═══ HELPERS ═══
 const gameId = () => `${GAME_PREFIX}${code}`;
@@ -178,6 +179,21 @@ async function loadPage(title) {
 const BAD_NS = /^(fichier|file|image|catégorie|category|spécial|special|aide|help|wikipédia|wikipedia|portail|projet|modèle|template|discussion|talk|utilisateur|user|média|media|module|mediawiki|brouillon|draft|référence)(\s+\S+)?$/i;
 const isArticle = t => !t.includes(':') || !BAD_NS.test(t.split(':')[0]);
 
+// Titre de l'article visé par un href, quel que soit son format (/wiki/X, ./X, URL absolue, /w/index.php?title=X).
+// null si ce n'est pas un article existant de fr.wikipedia.org.
+const WIKI_BASE = 'https://fr.wikipedia.org/wiki/';
+function articleTitle(h) {
+    try {
+        const u = new URL(h, WIKI_BASE);
+        if (u.hostname !== 'fr.wikipedia.org' || u.searchParams.get('redlink') === '1') return null;
+        let t = null;
+        if (u.pathname.startsWith('/wiki/')) t = decodeURIComponent(u.pathname.slice(6));
+        else if (u.pathname === '/w/index.php' && u.searchParams.get('title') && !u.searchParams.has('action')) t = u.searchParams.get('title');
+        t = t && t.replace(/_/g, ' ');
+        return t && isArticle(t) ? t : null;
+    } catch (e) { return null; }
+}
+
 function show(pg) {
     const doc = new DOMParser().parseFromString(pg.html, 'text/html');
     doc.querySelectorAll('script,style,link,iframe,object,embed,form,input,button,.mw-editsection,.toc,.navbox,.navbox-container,.bandeau-container,.bandeau-portail,.ambox,sup.reference,.reference,.references,.mw-references-wrap,.reflist,.mw-empty-elt,.printfooter,table.metadata').forEach(n => n.remove());
@@ -187,12 +203,11 @@ function show(pg) {
     });
     doc.body.querySelectorAll('a').forEach(a => {
         const h = a.getAttribute('href') || '';
-        let t = null;
         if (h.startsWith('#')) a.dataset.a = h.slice(1);
-        else if (h.startsWith('/wiki/') && !a.classList.contains('new')) {
-            try { t = decodeURIComponent(h.slice(6).split('#')[0]).replace(/_/g, ' '); } catch (e) { /* lien invalide */ }
-            if (t && isArticle(t)) a.dataset.t = t; else a.classList.add('wc-dead');
-        } else a.classList.add('wc-dead');
+        else {
+            const t = a.classList.contains('new') ? null : articleTitle(h);
+            if (t) a.dataset.t = t; else a.classList.add('wc-dead');
+        }
         a.removeAttribute('href');
         a.removeAttribute('target');
     });
@@ -247,8 +262,6 @@ function openRound(title) {
 }
 
 backBtn.addEventListener('click', () => { if (stack.length && !navBusy) { const t = stack.pop(); go(t, false); } });
-rankBtn.addEventListener('click', () => document.body.classList.toggle('rank-open'));
-closeRankBtn.addEventListener('click', () => document.body.classList.remove('rank-open'));
 
 // ═══ ÉCRITURES ═══
 function setMe(p, won = false) {
@@ -290,10 +303,12 @@ async function generate() {
 genRetryBtn.addEventListener('click', () => { genErr = ''; render(); generate(); });
 
 // ═══ FIN DE MANCHE ═══
+// Le premier joueur à atteindre la page cible gagne : la manche s'arrête pour tout le monde (les autres ont perdu).
 function checkEnd(el) {
     if (ending) return;
     let reason = null;
-    if (el >= ROUND_MS) reason = 'timeout';
+    if (Object.values(data.players).some(p => p.status === 'found')) reason = 'winner';
+    else if (el >= ROUND_MS) reason = 'timeout';
     else if (el > 3000 && !Object.entries(data.players).some(([u, p]) => p.status === 'searching' && !isOffline(p, u))) reason = 'all_done';
     if (reason) endRound(reason);
 }
@@ -353,39 +368,75 @@ quitBtn.addEventListener('click', async () => {
 });
 
 // ═══ AFFICHAGE ═══
+const mk = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+// Gagnant = le joueur « found » avec le finishedAt le plus petit (null tant que personne n'a trouvé)
+const winnerUid = d => Object.entries(d.players || {})
+    .filter(([, p]) => p.status === 'found')
+    .sort((a, b) => (a[1].finishedAt || 0) - (b[1].finishedAt || 0))[0]?.[0] || null;
+
 function detail(p, uid, d, withPath) {
     const pg = !withPath && p.page ? ` · ${p.page}` : '';
     if (p.status === 'found') return `⏱ ${fmt(p.finishedAt - d.roundStartedAt)}`;
-    if (p.status === 'gave_up') return `Abandon${pg}`;
+    if (p.status === 'gave_up') return `🏳️ Abandon${pg}`;
     if (p.status === 'waiting_next') return 'Prochaine manche';
     if (!d.startPage) return 'En attente…';
-    return `${isOffline(p, uid) ? 'Déconnecté' : d.state === 'round_result' ? 'Temps écoulé' : '🔎 En recherche'}${pg}`;
+    if (isOffline(p, uid)) return `Déconnecté${pg}`;
+    if (d.state === 'round_result') return `${d.endReason === 'timeout' ? '⏰ Temps écoulé' : '❌ Perdu'}${pg}`;
+    return `🔎 En recherche${pg}`;
+}
+
+// [emoji, titre, message] de l'en-tête du classement
+function rankHead(d, me) {
+    const target = d.targetPage?.title || '';
+    if (d.state === 'round_result') {
+        const win = winnerUid(d), w = win && d.players[win];
+        if (w) {
+            const t = fmt(w.finishedAt - d.roundStartedAt);
+            if (SOLO) return ['🎉', 'Page trouvée !', `Tu as atteint « ${target} » en ${t}.`];
+            if (win === myUID) return ['🏆', 'Tu as gagné !', `Tu es le premier à avoir atteint « ${target} » (${t}). Les autres joueurs ont perdu.`];
+            return ['🏁', `${w.name || 'Un joueur'} gagne !`, `Premier à avoir atteint « ${target} » (${t}). Tu as perdu cette manche.`];
+        }
+        if (d.endReason === 'timeout') return ['⏰', 'Temps écoulé !', SOLO ? `Tu n'as pas trouvé « ${target} ».` : `Personne n'a trouvé « ${target} ».`];
+        return ['🏳️', 'Manche terminée', SOLO ? `Tu n'as pas trouvé « ${target} ».` : `Personne n'a trouvé « ${target} ».`];
+    }
+    if (genErr) return ['⚠️', 'Tirage impossible', `⚠️ ${genErr}`];
+    if (!d.startPage) return ['🔎', 'Tirage des articles', 'Tirage des articles en cours…'];
+    if (me.status === 'found') return ['🎉', 'Bravo !', 'Tu as trouvé la page !'];
+    if (me.status === 'gave_up') return ['🏳️', 'Abandon', 'Tu as abandonné cette manche. Classement en direct :'];
+    if (me.status === 'waiting_next') return ['⏳', 'Manche en cours', 'Une manche est en cours : tu participeras à la prochaine.'];
+    return ['🏆', 'Classement', ''];
 }
 
 function renderRank(d) {
+    const done = d.state === 'round_result';
+    const win = done ? winnerUid(d) : null;
     const order = { found: 0, searching: 1, gave_up: 2, waiting_next: 3, waiting: 3 };
     const rows = sortedPlayers(d).sort((a, b) => (order[a[1].status] ?? 3) - (order[b[1].status] ?? 3)
         || (a[1].status === 'found' ? a[1].finishedAt - b[1].finishedAt : 0));
     let n = 0;
     rankList.replaceChildren(...rows.map(([uid, p]) => {
-        const li = document.createElement('li');
-        li.className = [uid === myUID ? 'me' : '', p.status === 'found' ? 'found' : '', isOffline(p, uid) ? 'off' : ''].join(' ').trim();
-        const rk = document.createElement('span');
-        rk.textContent = p.status === 'found' ? (['🥇', '🥈', '🥉'][n++] || `${n}.`) : '·';
-        const nm = document.createElement('span');
-        nm.className = 'nm';
-        nm.textContent = `${uid === d.leaderId && !SOLO ? '👑 ' : ''}${p.name || 'Joueur'}${uid === myUID && !SOLO ? ' (toi)' : ''}`;
-        const dt = document.createElement('span');
-        dt.className = 'dt';
-        // Parcours complet : pour tous en fin de manche, pour soi pendant la manche (jamais celui des autres en direct)
-        const steps = d.state === 'round_result' || uid === myUID ? (p.path ? p.path.split('|') : (p.page ? [p.page] : [])) : [];
-        dt.textContent = detail(p, uid, d, steps.length > 0);
-        li.append(rk, nm, dt);
+        const li = mk('li');
+        li.className = [
+            uid === myUID ? 'me' : '', p.status === 'found' ? 'found' : '', uid === win ? 'win' : '',
+            p.status === 'gave_up' ? 'gave' : '', done && p.status === 'searching' ? 'lost' : '', isOffline(p, uid) ? 'off' : ''
+        ].filter(Boolean).join(' ');
+        const rk = mk('span', 'rk', p.status === 'found' ? (['🥇', '🥈', '🥉'][n++] || `${n}.`) : p.status === 'gave_up' ? '🏳️' : done && p.status === 'searching' ? '❌' : '·');
+        const body = mk('div', 'body');
+        const nm = mk('span', 'nm', `${uid === d.leaderId && !SOLO ? '👑 ' : ''}${p.name || 'Joueur'}${uid === myUID && !SOLO ? ' (toi)' : ''}`);
+        // Parcours complet : pour tous en fin de manche (y compris perdants et abandons), pour soi pendant la manche
+        const steps = done || uid === myUID ? (p.path ? p.path.split('|') : (p.page ? [p.page] : [])) : [];
+        const dt = mk('span', 'dt', detail(p, uid, d, steps.length > 0));
+        body.append(nm, dt);
+        li.append(rk, body);
         if (steps.length) {
-            const pt = document.createElement('span');
-            pt.className = 'pt';
-            pt.textContent = steps.join(' → ');
-            li.append(pt);
+            const det = mk('details', 'pt');
+            det.open = openPaths.has(uid);
+            det.addEventListener('toggle', () => { if (det.open) openPaths.add(uid); else openPaths.delete(uid); });
+            const st = mk('div', 'wc-steps');
+            steps.forEach((s, i) => st.append(mk('span', 'st' + (i === steps.length - 1 ? ' last' : ''), s)));
+            det.append(mk('summary', '', `Parcours · ${steps.length} page${steps.length > 1 ? 's' : ''}`), st);
+            li.append(det);
         }
         return li;
     }));
@@ -398,18 +449,16 @@ function render() {
     wStart.textContent = d.startPage?.title || '…';
     wTarget.textContent = d.targetPage?.title || '…';
     document.body.classList.toggle('rank-only', !active);
-    if (!active) document.body.classList.remove('rank-open');
-    backBtn.hidden = giveUpBtn.hidden = rankBtn.hidden = closeRankBtn.hidden = !active;
+    backBtn.hidden = giveUpBtn.hidden = !active;
     if (!active) setLoader('');
 
-    let note = '';
-    if (genErr) note = `⚠️ ${genErr}`;
-    else if (done) note = d.endReason === 'timeout' ? '⏰ Temps écoulé ! Classement final.' : '🏁 Manche terminée ! Classement final.';
-    else if (!d.startPage) note = 'Tirage des articles en cours…';
-    else if (me.status === 'found') note = '🎉 Tu as trouvé la page ! Classement en direct :';
-    else if (me.status === 'gave_up') note = 'Tu as abandonné cette manche. Classement en direct :';
-    else if (me.status === 'waiting_next') note = '⏳ Une manche est en cours : tu participeras à la prochaine.';
+    const [emoji, title, note] = rankHead(d, me);
+    rankEmoji.textContent = emoji;
+    rankTitle.textContent = title;
     rankNote.textContent = note;
+    rankNote.hidden = !note;
+    rankRoute.hidden = !d.startPage;
+    if (d.startPage) rankRoute.replaceChildren(mk('span', 'rt from', d.startPage.title), mk('span', 'ra', '→'), mk('span', 'rt to', d.targetPage?.title || '…'));
     genRetryBtn.hidden = !(genErr && (SOLO || d.leaderId === myUID));
     replayBtn.hidden = !(done && (SOLO || d.leaderId === myUID));
     waitLeader.hidden = !(done && !SOLO && d.leaderId !== myUID);

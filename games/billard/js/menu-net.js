@@ -1,5 +1,6 @@
 // menu-net.js — parcours « en ligne » du menu : créer / rejoindre un salon, salle d'attente, lancement. Chargé à la demande par menu.js.
 import { MODES } from './core/modes.js';
+import { normCode } from './core/sync.js';
 import { RULES, isAvailable, normalize, getRules, readPrefs, writePrefs } from './core/config.js';
 
 const $ = id => document.getElementById(id);
@@ -56,24 +57,30 @@ async function create() {
     remember(code); openLobby(code, uid, true); say('');
   } catch (e) { say(e.message); } finally { busy(false); }
 }
-async function join(code) {
+async function join(code, resume = false) {
   say('Connexion au salon…', true); busy(true);
   try {
     net ??= await import('./core/online.js');
     localStorage.setItem('mg_player_name', nameVal());
-    const r = await net.joinLobby(code, nameVal());
+    const r = await net.joinLobby(code, nameVal(), resume);
     remember(r.code);
     if (r.room.state !== 'waiting') { location.href = `game.html?mode=${safeMode(r.room.config?.mode)}&room=${r.code}`; return; }   // partie lancée : retour direct
     openLobby(r.code, r.uid, r.room.leaderId === r.uid); say('');
-  } catch (e) { if (e.gone) forget(); say(e.message); $('netResume').hidden = !saved(); } finally { busy(false); }
+  } catch (e) { console.warn('[billard en ligne] rejoindre : échec', e?.code || '', e?.message); if (e.gone) forget(); say(e.message); $('netResume').hidden = !saved(); } finally { busy(false); }
 }
 $('netCreate').addEventListener('click', create);
 $('netJoin').addEventListener('click', () => join($('netCode').value));
+// V8 : le champ accepte un collage « sale » (espace, saut de ligne, minuscules) puis le ramène à 6 caractères (l'ancien maxlength=6 tronquait le collage).
+$('netCode').addEventListener('input', e => { const v = normCode(e.target.value).slice(0, 6); if (v !== e.target.value) e.target.value = v; });
 $('netCode').addEventListener('keydown', e => { if (e.key === 'Enter') join($('netCode').value); });
-$('netResume').addEventListener('click', () => join(saved()));
+$('netResume').addEventListener('click', () => join(saved(), true));
 $('netLeave').addEventListener('click', async () => { await leave(); view(false); show(mode); });
 $('netCopy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(lobby.code); say('Code copié.', true); } catch { say('Copie impossible : recopie le code à la main.'); }
+  try { await navigator.clipboard.writeText(lobby.code); say('Code copié.', true); return; } catch { }
+  try {                                                                            // repli (page non sécurisée / navigateur ancien) : sélection + commande de copie
+    const r = document.createRange(); r.selectNodeContents($('netCodeShown')); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    say(document.execCommand('copy') ? 'Code copié.' : 'Copie impossible : le code est sélectionné, copie-le à la main.', true);
+  } catch { say('Copie impossible : recopie le code à la main.'); }
 });
 $('netStart').addEventListener('click', async () => {
   const room = lobby?.room, guest = room && Object.keys(room.players || {}).find(i => i !== room.leaderId);

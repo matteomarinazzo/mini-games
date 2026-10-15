@@ -121,7 +121,7 @@ const hideLoader = () => { $('loader').hidden = true; };
 function setInputs(on) { ['guessInput', 'guessBtn', 'hintBtn', 'pauseBtn'].forEach(id => { $(id).disabled = !on; }); }
 
 function resetRound() {
-    g.token++; g.running = false; g.over = false; g.paused = false; g.tries = 0; g.hints = 0; g.elapsed = 0; g.letters = false; g.tried = []; g.runId++; pending = null; g.countdown = false; g.page = null; g.title = '';
+    g.token++; g.running = false; g.over = false; g.paused = false; g.tries = 0; g.hints = 0; g.elapsed = 0; g.letters = false; g.tried = []; g.runId++; pending = null; g.countdown = false; g.page = null; g.title = ''; $('giveUpBtn').hidden = false; resetGiveUp();
     cancelAnimationFrame(g.raf); setInputs(false);
     $('timer').textContent = fmt(0); closeOverlays(); $('reader').classList.remove('veiled');
     g.revealedKeys = new Set(); updateStats(); say('');
@@ -268,6 +268,7 @@ function pauseGame(openModal = true) {
         return;
     }
     if (!g.running || g.paused || g.countdown) return;
+    resetGiveUp();
     g.paused = true;
     $('reader').classList.add('veiled');
     $('guessInput').blur();
@@ -287,6 +288,44 @@ $('pauseBtn').addEventListener('click', () => pauseGame());
 $('resumeBtn').addEventListener('click', resumeGame);
 $('restartPauseBtn').addEventListener('click', restart);
 $('quitPauseBtn').addEventListener('click', quit);
+// ═══ ABANDON : révèle la page complète ═══
+let giveUpArmed = false, giveUpTimer = 0;
+const GIVEUP_CONFIRM_MS = 3000;      // délai pour confirmer « Abandonner » (second appui)
+function resetGiveUp() {
+    giveUpArmed = false; clearTimeout(giveUpTimer);
+    const b = $('giveUpBtn'); if (b) { b.classList.remove('confirm'); b.textContent = 'Abandonner'; }
+}
+$('giveUpBtn').addEventListener('click', () => {
+    if (!giveUpArmed) {
+        giveUpArmed = true; $('giveUpBtn').classList.add('confirm'); $('giveUpBtn').textContent = 'Confirmer l\'abandon ?';
+        giveUpTimer = setTimeout(resetGiveUp, GIVEUP_CONFIRM_MS);
+        return;
+    }
+    giveUp();
+});
+function giveUp() {
+    resetGiveUp();
+    if (!g.running || g.over) return;
+    g.running = false; g.over = true; g.paused = false; g.countdown = false;
+    cancelAnimationFrame(g.raf); setInputs(false); $('pauseBtn').disabled = false; clearGame();
+    closeOverlays(); $('giveUpBtn').hidden = true;
+    $('reader').classList.remove('veiled');
+    revealAll();
+    const r = { time: isMulti ? Math.max(1, Math.round(serverNow() - startAt)) : Math.round(g.elapsed), tries: g.tries, words: g.revealedKeys.size, hints: g.hints };
+    $('timer').textContent = fmt(r.time);
+    say(`🏳️ Abandon : c'était « ${g.title} »`, 'warn');
+    if (isMulti) {            // la manche continue pour les autres ; classement via le bouton pause
+        lostHandled = true;
+        publishLoss(r);
+        return;
+    }
+    setText('goEmoji', '🏳️'); setText('goTitle', 'Abandon');
+    setText('goPage', g.title); setText('goDuration', fmt(r.time));
+    setText('goTries', r.tries); setText('goWords', r.words); setText('goHints', r.hints);
+    setText('goBest', cache.record ? fmt(cache.record.time) : '—');
+    setText('goMessage', ''); setText('goWorldStatus', '');
+    setOpen('gameoverOverlay', true);
+}
 function restart() { clearGame(); resetRound(); loadAndStart(null, 'solo'); }
 function quit() { isMulti ? leaveRoom() : (location.href = MENU_URL); }
 if (isMulti) $('restartPauseBtn').hidden = true;     // la manche suivante est lancée par le créateur
@@ -308,7 +347,7 @@ function revealAll() {
 function win() {
     g.running = false; g.over = true; g.paused = false; cancelAnimationFrame(g.raf); setInputs(false); $('pauseBtn').disabled = false; clearGame();
     const r = { time: isMulti ? Math.max(1, Math.round(serverNow() - startAt)) : Math.round(g.elapsed), tries: g.tries, words: g.revealedKeys.size, hints: g.hints };
-    revealAll();
+    revealAll(); $('giveUpBtn').hidden = true;
     $('timer').textContent = fmt(r.time);
     say(`🎉 C'était « ${g.title} » !`, 'ok');
     if (isMulti) {
@@ -501,6 +540,11 @@ function onRoom(data) {
         return;
     }
     if (started) return;
+    if (parseRes(me).has) {      // abandon déjà enregistré pour cette manche (page rechargée)
+        started = true; lostHandled = true; g.over = true;
+        if (!rankShown) { rankShown = true; hideLoader(); openRank(); }
+        return;
+    }
     if (!data.startPage) {
         showLoader('Tirage de la page mystère…');
         if (data.leaderId === myUID && !drawing) publishDraw();
@@ -521,7 +565,7 @@ function endAsLoser(data) {
         g.running = false; g.over = true; g.paused = false; g.countdown = false;
         cancelAnimationFrame(g.raf); setInputs(false); $('pauseBtn').disabled = false; clearGame();
         $('reader').classList.remove('veiled');
-        revealAll();
+        revealAll(); $('giveUpBtn').hidden = true;
         if (best?.r.time) $('timer').textContent = fmt(best.r.time);
         say(`😕 ${best?.p.name || 'Un joueur'} a trouvé « ${g.title} » !`, 'bad');
         publishLoss({ tries: g.tries, words: g.revealedKeys.size, hints: g.hints });
@@ -592,6 +636,7 @@ function renderRank(data) {
         dt.textContent = r.found ? (r.time ? `${fmt(r.time)} · ${stats}` : 'Page trouvée')
             : waiting ? 'Rejoint la prochaine manche'
             : over ? (r.has ? `Perdu · ${stats}` : 'Perdu')
+            : r.has ? `Abandon · ${stats}`
             : isOff(p) ? 'Déconnecté' : 'Cherche…';
         li.append(rk, nm, dt); return li;
     }));

@@ -79,6 +79,10 @@
       <span id="powerPct">0 %</span>
     </div>
     <button id="confirmBtn" class="btn" type="button" hidden>✔ Placer</button>
+    <!-- V8 : effet sur la blanche (point de contact, vue de derrière la queue : haut = suivi, bas = rétro, côtés = effet latéral) -->
+    <div id="spin" class="off" title="Effet sur la blanche (double-clic / double-tape = centrer)">
+      <div id="spinBall" role="img" aria-label="Effet sur la blanche"><i id="spinDot"></i></div>
+    </div>
 
     <div class="ov" id="pauseOv" hidden>
       <div class="modal">
@@ -96,7 +100,9 @@
         <div class="big">🏆</div>
         <h2 id="endTitle"></h2>
         <p id="endReason"></p>
+        <p id="endRm" role="status" hidden></p>
         <div class="stack"><button class="btn" id="endRestart" type="button">Rejouer</button>
+          <button class="btn sec" id="endDecline" type="button" hidden>Refuser la revanche</button>
           <a class="btn sec" href="./index.html">Menu</a>
         </div>
       </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.36.2026-10-15.0";
+const CACHE_NAME = "mini-games-cache-v1.37.2026-10-15.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -98,6 +98,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/culturequiz.webp',
     'assets/logos/billard.webp',
     'assets/logos/mystery-page.webp',
+    'assets/logos/tap-to-fly.webp',
 
     // About
     'about/about.html',
@@ -509,6 +510,7 @@ const ASSETS_TO_CACHE = [
     'games/billard/js/core/ui.js',
     'games/billard/js/core/spin.js',
     'games/billard/js/core/rematch.js',
+    'games/billard/js/core/shop.js',
 
     // Game: Mystery Page
     'games/mystery-page/index.html',
@@ -519,6 +521,11 @@ const ASSETS_TO_CACHE = [
     'games/mystery-page/js/game.js',
     'games/mystery-page/js/core/topics.js',
     'games/mystery-page/js/core/wikipedia.js',
+
+    // Game: Tap to Fly
+    'games/tap-to-fly/index.html',
+    'games/tap-to-fly/css/game.css',
+    'games/tap-to-fly/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

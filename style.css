@@ -1774,23 +1774,16 @@ body.no-scroll {
   background: rgba(67, 233, 123, 0.25);
 }
 
-/* État : ignoré */
-.daily-challenge-btn.challenge-skipped {
-  opacity: .55;
+.daily-challenge-btn.challenge-done .challenge-btn-label::after {
+  content: ' ✓';
 }
 
-/* État : offline (grisé, pas de hover lift) */
+/* États « ignoré » et « indisponible » : le bouton garde son apparence normale
+   (il reste cliquable, un clic retente le chargement du défi) */
+.daily-challenge-btn.challenge-skipped,
 .daily-challenge-btn.challenge-offline {
-  opacity: .45;
-  cursor: default;
-  pointer-events: auto;
-  /* on garde les clics pour le toast */
-}
-
-.daily-challenge-btn.challenge-offline:hover {
-  transform: none;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 1;
+  cursor: pointer;
 }
 
 /* ── STAT PROFIL ─────────────────────────────────────────── */
@@ -1840,14 +1833,298 @@ body.no-scroll {
   }
 }
 
-/* Hover boutons dans la modal */
-#challengePlayBtn:hover {
-  transform: scale(1.02) !important;
-  opacity: .92 !important;
+/* ── MODAL DÉFI DU JOUR (même langage visuel que la roulette) ─────────── */
+.dc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 10, 25, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: modal-fadein 0.25s ease both;
 }
 
-#challengeSkipBtn:hover {
-  opacity: .75 !important;
+.dc-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: linear-gradient(135deg, rgba(30, 25, 55, 0.95), rgba(15, 12, 35, 0.95));
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 32px 26px 26px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6), 0 0 35px rgba(240, 147, 251, 0.25);
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  animation: modal-slidein 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dc-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dc-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+.dc-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.dc-trophy {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffd43b;
+  background: rgba(255, 212, 59, 0.12);
+  border: 1.5px solid rgba(255, 212, 59, 0.35);
+  box-shadow: 0 0 24px rgba(255, 212, 59, 0.25);
+}
+
+.dc-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 12px;
+  border-radius: 50px;
+  background: rgba(240, 147, 251, 0.2);
+  border: 1px solid rgba(240, 147, 251, 0.4);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.dc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.dc-game {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
+}
+
+.dc-game-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+}
+
+.dc-game-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dc-game-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.dc-desc {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+}
+
+.dc-reward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffd43b;
+  background: rgba(255, 212, 59, 0.1);
+  border: 1px solid rgba(255, 212, 59, 0.3);
+  border-radius: 50px;
+}
+
+.dc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dc-btn-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px;
+  border: none;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--secondary) 55%, var(--accent));
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  transition: var(--transition);
+}
+
+.dc-btn-play:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 36px rgba(240, 147, 251, 0.4);
+}
+
+.dc-btn-play:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.dc-btn-skip {
+  padding: 11px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dc-btn-skip:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dc-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #43e97b;
+  background: rgba(67, 233, 123, 0.1);
+  border: 1px solid rgba(67, 233, 123, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 0 24px rgba(67, 233, 123, 0.12);
+}
+
+/* Toast « connexion requise » */
+.dc-toast {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 300px;
+  padding: 14px 18px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, rgba(30, 25, 55, 0.97), rgba(15, 12, 35, 0.97));
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dc-toast.show {
+  transform: translateX(0);
+}
+
+.dc-toast-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.dc-toast-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.dc-toast-text {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+  .dc-dialog {
+    padding: 28px 20px 22px;
+    border-radius: 22px;
+  }
+
+  .dc-title {
+    font-size: 1.4rem;
+  }
+
+  .dc-toast {
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .dc-overlay,
+  .dc-dialog {
+    animation: none;
+  }
 }
 
 /* =============================================

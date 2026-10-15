@@ -1,7 +1,7 @@
 // cpu.js — IA légère (module pur, testable sous Node). Elle ne modifie JAMAIS le monde ni le résultat d'un coup : elle propose
 // seulement (aim, power) ; le tir passe ensuite par la physique et les règles normales (game.js). Méthode : « bille fantôme » —
 // pour chaque bille légale et chaque poche, point d'impact de la blanche, trajets dégagés, angle de coupe, score ; léger bruit d'angle.
-import { BALL_R as R, POCKETS, TABLE, HEAD_SPOT, V_MIN, V_MAX, isValidCuePlacement } from './physics.js';
+import { BALL_R as R, POCKETS, TABLE, HEAD_SPOT, V_MIN, V_MAX, isValidCuePlacement, createWorld, shoot, update, isMoving } from './physics.js';
 import { legalFirst, requiredPocket, clampAim, legalAim, ZONE } from './rules.js';
 
 export const SIGMA = 0.003;                 // écart-type du bruit d'angle (rad) ≈ 0,17° : ~45 % des tirs visés sont empochés (mesuré en simulation)
@@ -41,6 +41,7 @@ export function bestShot(world, g, rem, cx, cy) {
 
 // Tir de l'ordinateur : { aim, power, planned } (planned = true si un empochage est visé, false = repli « toucher la bonne bille »).
 export function planShot(world, g, rem, rng = Math.random, sigma = SIGMA) {
+  if (g.mode === 'carom') return caromShot(world, rng, sigma);
   const c = world.cue, s = bestShot(world, g, rem, c.x, c.y);
   let aim, power, planned = !!s;
   if (s) { aim = s.aim; power = powerFor(s.D); }
@@ -67,4 +68,19 @@ export function placeCue(world, g, rem) {
     if (!best || sc > best.sc) best = { x, y, sc };
   }
   return best || { x: g.zone === 'R' ? ZONE.R : HEAD_SPOT.x, y: HEAD_SPOT.y, sc: 0 };
+}
+
+// V9 — carambole : l'ordinateur simule des tirs (copie du monde, même physique) et choisit au hasard un angle qui touche les deux billes.
+function caromShot(world, rng, sigma) {
+  const good = [], pw = [0.45, 0.7];
+  for (let i = 0; i < 240; i++) for (const p of pw) {
+    const a = i / 240 * 2 * Math.PI, w = createWorld('carom');
+    w.balls.forEach((b, k) => { b.x = world.balls[k].x; b.y = world.balls[k].y; });
+    shoot(w, a, p);
+    for (let n = 0; n < 500 && isMoving(w); n++) update(w, 1 / 60);
+    if (w.cue.hits.includes(1) && w.cue.hits.includes(3)) good.push({ aim: a, power: p });
+  }
+  if (good.length) { const s = good[Math.floor(rng() * good.length)]; return { aim: s.aim + gauss(rng) * sigma, power: s.power, planned: true }; }
+  const t = world.balls[1], c = world.cue;
+  return { aim: Math.atan2(t.y - c.y, t.x - c.x) + gauss(rng) * sigma, power: 0.6, planned: false };
 }

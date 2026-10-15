@@ -3,6 +3,7 @@ export const MODES = {
   '8ball': { label: '8-ball', balls: 15 },
   '9ball': { label: '9-ball', balls: 9 },
   '10ball': { label: '10-ball', balls: 10 },
+  'carom': { label: 'Carambole', balls: 3 },
 };
 export const DEFAULT_MODE = '8ball';
 

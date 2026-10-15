@@ -38,7 +38,6 @@
         "random_drawing": "🎲 Ziehen...",
         "random_challenge": "HERAUSFORDERUNG",
         "random_question": "🎯 Probiers mal!",
-        "footer_made_with": "Made with ❤️ by You | © 2026 Mini Games | Version:",
         "footer_about": "Über uns",
         "footer_contact": "Kontakt",
         "settings": "Einstellungen",
@@ -378,7 +377,7 @@
         "contact_btn": "E-Mail senden",
         "privacy_title": "Datenschutz",
         "privacy_p": "Wir respektieren Ihre Privatsphäre. Um mehr zu erfahren, lesen Sie unsere Datenschutzerklärung.",
-        "footer": "Made with ❤️ by You | © 2026 Mini Games | Version:"
+        "footer": "Made with ❤️ in Switzerland · © 2026 Mini Games · Version :"
     },
     "privacy": {
         "button": "Datenschutz"

@@ -1,219 +1,267 @@
-<!DOCTYPE html>
-<html lang="fr">
+<p><a href="#en">English</a> · <a href="#fr">Français</a> · <a href="#de">Deutsch</a> · <a
+        href="https://mini-games.ch/">mini-games.ch</a></p>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Politique de confidentialité – Mini‑Games</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            line-height: 1.6;
-            color: #333;
-        }
+<!-- ENGLISH -->
+<h1 id="en">Privacy Policy – Mini-Games</h1>
+<p><strong>Last updated: 15 October 2026</strong></p>
+<p>Mini-Games (<a href="https://mini-games.ch/">mini-games.ch</a>) is a free mini-games website. This policy explains
+    what data is processed, by whom, and what you can do about it.</p>
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
+<h2>1. Who is responsible</h2>
+<p>Publisher: Matteo, editor of mini-games.ch<br>
+    Email: <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a><br>
+    Hosting: Infomaniak, Switzerland</p>
 
-        h2 {
-            margin-top: 30px;
-            font-size: 20px;
-        }
-
-        p {
-            margin-bottom: 15px;
-        }
-
-        ul {
-            margin-left: 20px;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- ENGLISH VERSION -->
-    <h1>Privacy Policy – Mini-Games</h1>
-    <p><strong>Last updated: May 2026</strong></p>
-
-    <p>Mini-Games (mini-games.ch) respects the privacy of its users. This policy explains what data is collected, how it
-        is used, and what rights you have.</p>
-
-    <h2>1. Data Collection</h2>
-    <p>Mini-Games does not collect any personally identifiable data. No registration, user accounts, or personal
-        information are required.</p>
-
-    <h2>2. Technical Data</h2>
-    <p>Certain non-personal data may be collected automatically:</p>
+<<h2>2. Data we process</h2>
+    <p>No account is required to play. We do not ask for your name or email address.</p>
+    <p>Some data is still processed:</p>
     <ul>
-        <li>device type</li>
-        <li>browser version</li>
-        <li>system language</li>
-        <li>anonymous usage statistics</li>
+        <li>an anonymous save identifier, stored in your browser</li>
+        <li>game progress stored in your browser and on Firebase (Google): stats, XP, level, theme, language, and play
+            time</li>
+        <li>technical data needed to deliver the pages</li>
+        <li>audience statistics, via Google Analytics</li>
+        <li>advertising data, via Google AdSense, when ads are served</li>
     </ul>
-    <p>This data is used solely to ensure the website functions correctly and to improve the user experience.</p>
+    <p>This identifier and the data linked to it can be personal data, even without your name. We do not sell this data.
+    </p>
 
-    <h2>3. Cookies</h2>
-    <p>Mini-Games uses technical cookies for the games to function. In addition, third-party cookies may be placed by
-        our advertising partners to deliver relevant ads and measure advertising performance.</p>
+    <h2>3. Saves</h2>
+    <p>Progress is saved in your browser and copied to Firebase, so it is not lost if you clear the browser or change
+        device, when the same save can be restored.</p>
+    <p>Clearing site data in the browser removes only the local copy. It does not delete the copy stored on Firebase.
+    </p>
 
-    <h2>4. Advertisements</h2>
-    <p>To keep our services free, Mini-Games displays advertisements provided by third-party networks, such as Adsterra.
-        These networks may collect and use non-identifiable data (such as your IP address or your device's advertising
-        identifier, such as AAID or IDFA) to personalize ads.</p>
-
-    <h2>5. Data Sharing</h2>
-    <p>We do not sell your data. However, non-personal technical information (Advertising ID, device type) is shared
-        with our advertising partners (Adsterra) to enable the operation and measurement of advertising campaigns.</p>
-
-    <h2>6. Security</h2>
-    <p>We implement technical measures to protect the site and the anonymous data collected.</p>
-
-    <h2>7. Third-Party Services</h2>
-    <p>Mini-Games may use technical services such as:</p>
+    <h2>4. Cookies</h2>
+    <p>The site uses:</p>
     <ul>
-        <li>web hosting</li>
-        <li>anonymized performance tools</li>
+        <li>technical storage, so the games and your settings keep working</li>
+        <li>Google Analytics cookies, to measure visits</li>
+        <li>Google advertising cookies, when Google AdSense serves or measures ads</li>
+    </ul>
+
+    <h2>5. Advertising</h2>
+    <p>To keep the games free, Mini-Games may display ads served by Google AdSense.</p>
+    <p>Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or
+        other websites.</p>
+    <p>Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to
+        this
+        site and/or other sites on the Internet.</p>
+    <p>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com/"
+            target="_blank" rel="noopener noreferrer">Google Ads Settings</a>. You can also visit <a
+            href="https://www.aboutads.info/" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.</p>
+    <p>More information: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google
+            Privacy Policy</a> and <a href="https://policies.google.com/technologies/ads" target="_blank"
+            rel="noopener noreferrer">How Google uses advertising cookies</a>.</p>
+    <p>Where the law requires it, a consent choice is shown before non-essential advertising or analytics cookies are
+        used.
+    </p>
+
+    <h2>6. Audience statistics</h2>
+    <p>Google Analytics may collect pages viewed, device type, browser, language, and IP address or approximate
+        location.
+        This is used to understand how the site is used and to improve it.</p>
+    <p>You can opt out with the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank"
+            rel="noopener noreferrer">Google Analytics opt-out add-on</a>.</p>
+
+    <h2>7. Sharing</h2>
+    <p>We do not sell your data. Data may be processed by:</p>
+    <ul>
+        <li>Infomaniak, to host the website</li>
+        <li>Google Firebase, to store game saves</li>
+        <li>Google, for Analytics and AdSense. For these services, Google acts as an independent controller</li>
     </ul>
 
     <h2>8. Children</h2>
-    <p>Mini-Games is intended for a general audience. No personal data is collected from children.</p>
+    <p>Mini-Games is intended for a general audience. It is not directed at children under 13. We do not ask players for
+        their name or email address.</p>
 
-    <h2>9. Contact</h2>
-    <p>For any questions regarding this policy:<br>
-        <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>
+    <h2>9. Your rights</h2>
+    <p>Under the Swiss Federal Act on Data Protection and, where it applies, the GDPR, you may request access,
+        correction, or deletion of the save linked to your identifier, and you may object to certain processing.</p>
+    <p>To request deletion of the Firebase copy, email <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>.
     </p>
 
-    <h2>10. Changes</h2>
-    <p>This policy may be updated. The most recent version is always available on this page.</p>
+    <h2>10. Security and changes</h2>
+    <p>We use reasonable technical measures to protect the site. No website is risk-free.</p>
+    <p>This policy may be updated. The current version is always this page.</p>
 
     <hr style="margin: 50px 0; border: 0; border-top: 2px solid #eee;">
 
-    <h1>Politique de confidentialité – Mini‑Games</h1>
-    <p><strong>Dernière mise à jour : mai 2026</strong></p>
+    <!-- FRANÇAIS -->
+    <h1 id="fr">Politique de confidentialité – Mini-Games</h1>
+    <p><strong>Dernière mise à jour : 15 octobre 2026</strong></p>
+    <p>Mini-Games (<a href="https://mini-games.ch/">mini-games.ch</a>) est un site de mini-jeux gratuits. Cette
+        politique
+        explique quelles données sont traitées, par qui, et ce que vous pouvez faire.</p>
 
-    <p>Mini‑Games (mini-games.ch) respecte la vie privée de ses utilisateurs.
-        Cette politique explique quelles données sont collectées, comment elles sont utilisées et quels droits vous
-        avez.</p>
+    <h2>1. Responsable</h2>
+    <p>Éditeur : Matteo, éditeur de mini-games.ch<br>
+        E-mail : <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a><br>
+        Hébergement : Infomaniak, Suisse</p>
 
-    <h2>1. Données collectées</h2>
-    <p>Mini‑Games ne collecte aucune donnée personnelle identifiable. Aucune inscription, aucun compte utilisateur et
-        aucune information personnelle ne sont demandés.</p>
-
-    <h2>2. Données techniques</h2>
-    <p>Certaines données non personnelles peuvent être collectées automatiquement :</p>
+    <h2>2. Données traitées</h2>
+    <p>Aucun compte n'est nécessaire pour jouer. Nous ne demandons ni nom ni adresse e-mail.</p>
+    <p>Certaines données sont toutefois traitées :</p>
     <ul>
-        <li>type d’appareil</li>
-        <li>version du navigateur</li>
-        <li>langue du système</li>
-        <li>statistiques d’utilisation anonymes</li>
+        <li>un identifiant de sauvegarde anonyme, enregistré dans votre navigateur</li>
+        <li>la progression de jeu, enregistrée dans votre navigateur et sur Firebase (Google) : statistiques, XP,
+            niveau, thème, langue et temps de jeu</li>
+        <li>les données techniques nécessaires à l'affichage des pages</li>
+        <li>des statistiques d'audience, via Google Analytics</li>
+        <li>des données publicitaires, via Google AdSense, lorsque des annonces sont diffusées</li>
     </ul>
-    <p>Ces données sont utilisées uniquement pour assurer le bon fonctionnement du site et améliorer l’expérience
-        utilisateur.</p>
+    <p>Cet identifiant et les données qui y sont liées peuvent constituer des données personnelles, même sans votre nom.
+        Nous ne vendons pas ces données.</p>
 
-    <h2>3. Cookies</h2>
-    <p>Mini‑Games utilise des cookies techniques pour le fonctionnement des jeux. En plus de ceux-ci, des cookies de
-        tiers peuvent être déposés par nos partenaires publicitaires pour diffuser des annonces pertinentes et mesurer
-        les performances publicitaires.</p>
+    <h2>3. Sauvegardes</h2>
+    <p>La progression est enregistrée dans votre navigateur et copiée sur Firebase, afin qu'elle ne soit pas perdue si
+        vous videz le navigateur ou changez d'appareil, lorsque la même sauvegarde peut être restaurée.</p>
+    <p>Effacer les données du site dans le navigateur ne supprime que la copie locale. Cela ne supprime pas la copie
+        stockée sur Firebase.</p>
 
-    <h2>4. Publicités</h2>
-    <p>Pour maintenir la gratuité de nos services, Mini‑Games affiche des publicités fournies par des régies tierces,
-        telles qu'Adsterra. Ces régies peuvent collecter et utiliser des données non identifiables (comme votre adresse
-        IP ou l'identifiant publicitaire de votre appareil, tel que l'AAID ou l'IDFA) pour personnaliser les annonces.
-    </p>
-
-    <h2>5. Partage de données</h2>
-    <p>Nous ne vendons pas vos données. Cependant, des informations techniques non personnelles (ID publicitaire, type
-        d'appareil) sont partagées avec nos partenaires publicitaires (Adsterra) pour permettre le bon fonctionnement et
-        la mesure des campagnes publicitaires.</p>
-
-    <h2>6. Sécurité</h2>
-    <p>Nous mettons en place des mesures techniques pour protéger le site et les données anonymes collectées.</p>
-
-    <h2>7. Services tiers</h2>
-    <p>Mini‑Games peut utiliser des services techniques tels que :</p>
+    <h2>4. Cookies</h2>
+    <p>Le site utilise :</p>
     <ul>
-        <li>hébergement web</li>
-        <li>outils de performance anonymisés</li>
+        <li>un stockage technique, pour que les jeux et vos réglages continuent de fonctionner</li>
+        <li>des cookies Google Analytics, pour mesurer les visites</li>
+        <li>des cookies publicitaires Google, lorsque Google AdSense diffuse ou mesure des annonces</li>
     </ul>
-    <p>Ces services respectent les réglementations en vigueur.</p>
+
+    <h2>5. Publicité</h2>
+    <p>Pour garder les jeux gratuits, Mini-Games peut afficher des annonces diffusées par Google AdSense.</p>
+    <p>Des fournisseurs tiers, y compris Google, utilisent des cookies pour diffuser des annonces en fonction des
+        visites
+        précédentes de l'utilisateur sur ce site ou sur d'autres sites.</p>
+    <p>L'utilisation de cookies publicitaires par Google permet à Google et à ses partenaires de diffuser des annonces
+        auprès des utilisateurs en fonction de leur visite sur ce site et/ou sur d'autres sites Internet.</p>
+    <p>Vous pouvez refuser la publicité personnalisée dans les <a href="https://adssettings.google.com/" target="_blank"
+            rel="noopener noreferrer">paramètres des annonces Google</a>. Vous pouvez aussi consulter <a
+            href="https://www.aboutads.info/" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.</p>
+    <p>Plus d'informations : <a href="https://policies.google.com/privacy?hl=fr" target="_blank"
+            rel="noopener noreferrer">Règles de confidentialité de Google</a> et <a
+            href="https://policies.google.com/technologies/ads?hl=fr" target="_blank" rel="noopener noreferrer">comment
+            Google utilise les cookies publicitaires</a>.</p>
+    <p>Lorsque la loi l'exige, un choix de consentement est affiché avant l'utilisation de cookies publicitaires ou
+        statistiques non essentiels.</p>
+
+    <h2>6. Statistiques d'audience</h2>
+    <p>Google Analytics peut collecter les pages consultées, le type d'appareil, le navigateur, la langue, ainsi que
+        l'adresse IP ou une localisation approximative. Ces informations servent à comprendre l'usage du site et à
+        l'améliorer.</p>
+    <p>Vous pouvez vous opposer à cette mesure avec le <a href="https://tools.google.com/dlpage/gaoptout?hl=fr"
+            target="_blank" rel="noopener noreferrer">module de désactivation Google Analytics</a>.</p>
+
+    <h2>7. Partage</h2>
+    <p>Nous ne vendons pas vos données. Des données peuvent être traitées par :</p>
+    <ul>
+        <li>Infomaniak, pour héberger le site</li>
+        <li>Google Firebase, pour stocker les sauvegardes de jeu</li>
+        <li>Google, pour Analytics et AdSense. Pour ces services, Google agit comme responsable de traitement
+            indépendant</li>
+    </ul>
 
     <h2>8. Enfants</h2>
-    <p>Mini‑Games est destiné à un public général. Aucune donnée personnelle n’est collectée auprès des enfants.</p>
+    <p>Mini-Games s'adresse à un public général. Le site n'est pas spécifiquement destiné aux enfants de moins de 13
+        ans.
+        Nous ne demandons ni nom ni adresse e-mail pour jouer.</p>
 
-    <h2>9. Contact</h2>
-    <p>Pour toute question concernant cette politique :<br>
-        <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>
-    </p>
+    <h2>9. Vos droits</h2>
+    <p>Selon la loi fédérale suisse sur la protection des données et, lorsqu'il s'applique, le RGPD, vous pouvez
+        demander l'accès, la rectification ou l'effacement de la sauvegarde liée à votre identifiant, et vous opposer à
+        certains traitements.</p>
+    <p>Pour demander la suppression de la copie Firebase : <a
+            href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>.</p>
 
-    <h2>10. Modifications</h2>
-    <p>Cette politique peut être mise à jour. La version la plus récente est toujours disponible sur cette page.</p>
+    <h2>10. Sécurité et modifications</h2>
+    <p>Nous prenons des mesures techniques raisonnables pour protéger le site. Aucun site n'est exempt de risque.</p>
+    <p>Cette politique peut être mise à jour. La version en vigueur est toujours cette page.</p>
 
     <hr style="margin: 50px 0; border: 0; border-top: 2px solid #eee;">
 
-    <!-- GERMAN VERSION -->
-    <h1>Datenschutzerklärung – Mini-Games</h1>
-    <p><strong>Zuletzt aktualisiert: Mai 2026</strong></p>
+    <!-- DEUTSCH -->
+    <h1 id="de">Datenschutzerklärung – Mini-Games</h1>
+    <p><strong>Zuletzt aktualisiert: 15. Oktober 2026</strong></p>
+    <p>Mini-Games (<a href="https://mini-games.ch/">mini-games.ch</a>) ist eine Website mit kostenlosen Minispielen.
+        Diese
+        Erklärung beschreibt, welche Daten bearbeitet werden, durch wen, und was Sie tun können.</p>
 
-    <p>Mini-Games (mini-games.ch) respektiert die Privatsphäre seiner Nutzer. Diese Richtlinie erklärt, welche Daten
-        gesammelt werden, wie sie verwendet werden und welche Rechte Sie haben.</p>
+    <h2>1. Verantwortlicher</h2>
+    <p>Herausgeber: Matteo, Herausgeber von mini-games.ch<br>
+        E-Mail: <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a><br>
+        Hosting: Infomaniak, Schweiz</p>
 
-    <h2>1. Datenerhebung</h2>
-    <p>Mini-Games sammelt keine personenbezogenen Daten. Es werden keine Registrierungen, Benutzerkonten oder
-        persönlichen Informationen abgefragt.</p>
-
-    <h2>2. Technische Daten</h2>
-    <p>Bestimmte nicht-personenbezogene Daten können automatisch erfasst werden:</p>
+    <h2>2. Bearbeitete Daten</h2>
+    <p>Zum Spielen ist kein Konto nötig. Wir fragen weder Name noch E-Mail-Adresse ab.</p>
+    <p>Einige Daten werden dennoch bearbeitet:</p>
     <ul>
-        <li>Gerätetyp</li>
-        <li>Browserversion</li>
-        <li>Systemsprache</li>
-        <li>anonyme Nutzungsstatistiken</li>
+        <li>eine anonyme Speicherkennung im Browser</li>
+        <li>Spielfortschritt im Browser und auf Firebase (Google): Statistiken, XP, Stufe, Design, Sprache und Spielzeit
+        </li>
+        <li>technische Daten, die für die Auslieferung der Seiten nötig sind</li>
+        <li>Nutzungsstatistiken über Google Analytics</li>
+        <li>Werbedaten über Google AdSense, wenn Anzeigen ausgeliefert werden</li>
     </ul>
-    <p>Diese Daten werden ausschließlich verwendet, um das ordnungsgemäße Funktionieren der Website zu gewährleisten und
-        das Benutzererlebnis zu verbessern.</p>
+    <p>Diese Kennung und die damit verknüpften Daten können Personendaten sein, auch ohne Ihren Namen. Wir verkaufen
+        diese Daten nicht.</p>
 
-    <h2>3. Cookies</h2>
-    <p>Mini-Games verwendet technische Cookies für das Funktionieren der Spiele. Zusätzlich können Cookies von
-        Drittanbietern durch unsere Werbepartner gesetzt werden, um relevante Anzeigen zu schalten und die Werbeleitung
-        zu messen.</p>
+    <h2>3. Spielstände</h2>
+    <p>Der Fortschritt wird im Browser gespeichert und auf Firebase kopiert, damit er nicht verloren geht, wenn Sie den
+        Browser leeren oder das Gerät wechseln, sofern derselbe Spielstand wiederhergestellt werden kann.</p>
+    <p>Das Löschen der Website-Daten im Browser entfernt nur die lokale Kopie. Die auf Firebase gespeicherte Kopie wird
+        dadurch nicht gelöscht.</p>
 
-    <h2>4. Werbung</h2>
-    <p>Um unsere Dienste kostenlos anzubieten, zeigt Mini-Games Werbung von Drittanbietern wie Adsterra an. Diese
-        Netzwerke können nicht identifizierbare Daten (wie Ihre IP-Adresse oder die Werbe-ID Ihres Geräts, z. B. AAID
-        oder IDFA) sammeln und verwenden, um Anzeigen zu personalisieren.</p>
-
-    <h2>5. Datenweitergabe</h2>
-    <p>Wir verkaufen Ihre Daten nicht. Technische, nicht-personenbezogene Informationen (Werbe-ID, Gerätetyp) werden
-        jedoch an unsere Werbepartner (Adsterra) weitergegeben, um den Betrieb und die Messung von Werbekampagnen zu
-        ermöglichen.</p>
-
-    <h2>6. Sicherheit</h2>
-    <p>Wir setzen technische Maßnahmen ein, um die Website und die gesammelten anonymen Daten zu schützen.</p>
-
-    <h2>7. Drittanbieter-Dienste</h2>
-    <p>Mini-Games kann technische Dienste nutzen wie:</p>
+    <h2>4. Cookies</h2>
+    <p>Die Website verwendet:</p>
     <ul>
-        <li>Webhosting</li>
-        <li>anonymisierte Performance-Tools</li>
+        <li>technischen Speicher, damit die Spiele und Ihre Einstellungen funktionieren</li>
+        <li>Google-Analytics-Cookies zur Besuchsmessung</li>
+        <li>Google-Werbe-Cookies, wenn Google AdSense Anzeigen ausliefert oder misst</li>
+    </ul>
+
+    <h2>5. Werbung</h2>
+    <p>Damit die Spiele kostenlos bleiben, kann Mini-Games Anzeigen von Google AdSense einblenden.</p>
+    <p>Drittanbieter, einschliesslich Google, verwenden Cookies, um Anzeigen auf Grundlage früherer Besuche dieser
+        Website
+        oder anderer Websites auszuliefern.</p>
+    <p>Die Verwendung von Werbe-Cookies durch Google ermöglicht es Google und seinen Partnern, Nutzern Anzeigen auf
+        Grundlage ihres Besuchs auf dieser Website und/oder anderen Websites im Internet anzuzeigen.</p>
+    <p>Personalisierte Werbung können Sie in den <a href="https://adssettings.google.com/" target="_blank"
+            rel="noopener noreferrer">Google-Anzeigeneinstellungen</a> deaktivieren. Weitere Informationen: <a
+            href="https://www.aboutads.info/" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.</p>
+    <p>Mehr dazu: <a href="https://policies.google.com/privacy?hl=de" target="_blank"
+            rel="noopener noreferrer">Datenschutzerklärung von Google</a> und <a
+            href="https://policies.google.com/technologies/ads?hl=de" target="_blank" rel="noopener noreferrer">wie
+            Google
+            Werbe-Cookies verwendet</a>.</p>
+    <p>Wo es das Gesetz verlangt, wird eine Einwilligung angezeigt, bevor nicht erforderliche Werbe- oder
+        Statistik-Cookies
+        verwendet werden.</p>
+
+    <h2>6. Nutzungsstatistiken</h2>
+    <p>Google Analytics kann aufgerufene Seiten, Gerätetyp, Browser, Sprache sowie IP-Adresse oder ungefähren Standort
+        erfassen. Das dient dazu, die Nutzung der Website zu verstehen und sie zu verbessern.</p>
+    <p>Widerspruch ist mit dem <a href="https://tools.google.com/dlpage/gaoptout?hl=de" target="_blank"
+            rel="noopener noreferrer">Browser-Add-on zur Deaktivierung von Google Analytics</a> möglich.</p>
+
+    <h2>7. Weitergabe</h2>
+    <p>Wir verkaufen Ihre Daten nicht. Daten können bearbeitet werden durch:</p>
+    <ul>
+        <li>Infomaniak, zum Hosten der Website</li>
+        <li>Google Firebase, zum Speichern der Spielstände</li>
+        <li>Google, für Analytics und AdSense. Bei diesen Diensten handelt Google als unabhängiger Verantwortlicher</li>
     </ul>
 
     <h2>8. Kinder</h2>
-    <p>Mini-Games ist für ein allgemeines Publikum bestimmt. Es werden keine personenbezogenen Daten von Kindern
-        gesammelt.</p>
+    <p>Mini-Games richtet sich an ein allgemeines Publikum. Die Website ist nicht speziell an Kinder unter 13 Jahren
+        gerichtet. Wir fragen zum Spielen weder Name noch E-Mail-Adresse ab.</p>
 
-    <h2>9. Kontakt</h2>
-    <p>Bei Fragen zu dieser Richtlinie:<br>
-        <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>
-    </p>
+    <h2>9. Ihre Rechte</h2>
+    <p>Nach dem schweizerischen Datenschutzgesetz und, soweit anwendbar, der DSGVO können Sie Auskunft, Berichtigung
+        oder Löschung des mit Ihrer Kennung verknüpften Spielstands verlangen und bestimmten Bearbeitungen
+        widersprechen.</p>
+    <p>Für die Löschung der Firebase-Kopie: <a href="mailto:contact@mini-games.ch">contact@mini-games.ch</a>.</p>
 
-    <h2>10. Änderungen</h2>
-    <p>Diese Richtlinie kann aktualisiert werden. Die aktuellste Version ist immer auf dieser Seite verfügbar.</p>
-
-</body>
-
-</html>
+    <h2>10. Sicherheit und Änderungen</h2>
+    <p>Wir treffen angemessene technische Massnahmen zum Schutz der Website. Keine Website ist frei von Risiken.</p>
+    <p>Diese Erklärung kann aktualisiert werden. Die aktuelle Fassung ist immer diese Seite.</p>

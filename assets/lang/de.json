@@ -247,6 +247,14 @@
             "tap-to-fly": {
                 "name": "Tap to Fly",
                 "description": "Lass deinen Vogel fliegen und weiche Hindernissen aus. Wie lange wirst du durchhalten?"
+            },
+            "2048": {
+                "name": "2048",
+                "description": "Schiebe die Platten, kombiniere Zweierpotenzen und ziele auf den höchsten Wert, bevor das Spielfeld gesperrt ist."
+            },
+            "connected": {
+                "name": "Verbunden",
+                "description": "Verbinde jedes Punktepaar, ohne die Wege zu kreuzen, und fülle das gesamte Spielfeld. Je größer, desto schwieriger."
             }
         },
         "badges": {

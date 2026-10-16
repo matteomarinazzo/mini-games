@@ -178,6 +178,38 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "2048": {
+      "path": "./games/2048/index.html",
+      "name": "2048",
+      "emoji": "2️⃣",
+      "description": "Fais glisser les tuiles, fusionne les puissances de 2 et vise la plus haute valeur avant que la grille se bloque.",
+      "tags": [
+        "logic",
+        "puzzle",
+        "reflexion",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "connected": {
+      "path": "./games/connected/index.html",
+      "name": "Relié",
+      "emoji": "🔗",
+      "description": "Relie chaque paire de points sans croiser les chemins et remplis toute la grille. Plus c’est grand, plus c’est serré.",
+      "tags": [
+        "logic",
+        "puzzle",
+        "reflexion",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "sudoku": {
       "path": "./games/sudoku/index.html",
       "name": "Sudoku",

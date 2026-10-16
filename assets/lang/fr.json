@@ -246,6 +246,14 @@
             "tap-to-fly": {
                 "name": "Tap to Fly",
                 "description": "Fais voler ton oiseau et évite les obstacles. Combien de temps tiendras-tu ?"
+            },
+            "2048": {
+                "name": "2048",
+                "description": "Fais glisser les tuiles, fusionne les puissances de 2 et vise la plus haute valeur avant que la grille se bloque."
+            },
+            "connected": {
+                "name": "Relié",
+                "description": "Relie chaque paire de points sans croiser les chemins et remplis toute la grille. Plus c’est grand, plus c’est serré."
             }
         },
         "badges": {

@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.37.2026-10-16",
-    "lastUpdate": "2026-10-16",
+    "currentVersion": "1.38.2026-10-17",
+    "lastUpdate": "2026-10-17",
     "history": [
+        {
+            "version": "1.38.2026-10-17",
+            "date": "2026-10-17",
+            "changes": [
+                "Ajout du jeu 2048",
+                "Ajout du jeu Relié"
+            ]
+        },
         {
             "version": "1.37.2026-10-16",
             "date": "2026-10-16",

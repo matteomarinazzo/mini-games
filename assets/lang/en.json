@@ -247,6 +247,14 @@
             "tap-to-fly": {
                 "name": "Tap to Fly",
                 "description": "Let your bird fly and avoid obstacles. How long will you last?"
+            },
+            "2048": {
+                "name": "2048",
+                "description": "Slide tiles, combine powers of 2, and aim for the highest value before the grid locks."
+            },
+            "connected": {
+                "name": "Connected",
+                "description": "Connect each pair of dots without crossing the paths and fill the entire grid. The bigger it gets, the tighter it gets."
             }
         },
         "badges": {

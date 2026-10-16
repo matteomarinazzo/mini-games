@@ -22,6 +22,19 @@ function sections(id) {
     ['🔄 Déroulement', [COMMUN[0], 'Pas de poches. Tu marques : tu rejoues. Sinon le tour passe, sans faute ni blanche en main (temps écoulé : le tour passe aussi).']],
     ['🏆 Fin de partie', ['Le premier joueur à 10 points gagne la partie.']],
   ];
+  if (id === 'snooker') return [
+    ['🎯 Objectif', ['Marque plus de points que l\'adversaire : rouge = 1, jaune 2, verte 3, marron 4, bleue 5, rose 6, noire 7. 15 rouges, 6 couleurs.']],
+    ['🔄 Déroulement', [COMMUN[0],
+      'Le Joueur 1 place la blanche dans le « D » (demi-cercle de gauche) et joue. Tant qu\'il empoche, il rejoue.',
+      'Rouges d\'abord : touche d\'abord une rouge et empoche-la (1 pt par rouge). Ensuite tu joues une couleur de ton choix : la première couleur touchée doit être celle que tu empoches. Elle est replacée sur sa mouche et tu retournes aux rouges.',
+      'Quand il n\'y a plus de rouge : une dernière couleur au choix (replacée), puis dans l\'ordre jaune, verte, marron, bleue, rose, noire. Ces couleurs restent au fond.',
+      'Rien d\'empoché, sans faute : le tour passe, la blanche reste où elle est.']],
+    ['⚠️ Fautes', ['Faute : blanche empochée, aucune bille touchée, mauvaise première bille (couleur au lieu d\'une rouge, rouge au lieu d\'une couleur, mauvaise couleur dans la séquence), mauvaise bille empochée, ou temps écoulé.',
+      'L\'adversaire reçoit 4 points, ou la valeur de la bille la plus chère touchée ou empochée si elle dépasse 4 (max 7). Les couleurs empochées par faute sont replacées ; les rouges restent au fond.',
+      'Blanche empochée : l\'adversaire la place dans le D. Sinon il joue la blanche là où elle est. Le fautif ne rejoue pas.']],
+    ['🏆 Fin de partie', ['La partie s\'arrête quand la noire est empochée : le meilleur score gagne.', 'Égalité : la noire est replacée et l\'adversaire de celui qui l\'a empochée joue ; la première noire empochée départage.',
+      'La partie s\'arrête aussi quand les points restants sur la table ne permettent plus de rattraper l\'écart.']],
+  ];
   const N = id === '9ball' ? 9 : 10;
   return [
     ['🎯 Objectif', [`Empoche les billes dans l'ordre et gagne en empochant la ${N}.`]],
@@ -35,6 +48,8 @@ const COMMANDES = ['PC : vise avec la souris ; clic maintenu puis recule la sour
   'Mobile : glisse sur la table pour viser ; règle la puissance avec la jauge à droite et relâche pour tirer (relâcher loin de la jauge annule).',
   'Trait de visée rouge avec ✕ : la première bille touchée serait illégale. Trait blanc : tir légal, ou bande touchée en premier (non évalué).',
   'Effet : la petite bille à gauche de la table représente la blanche vue de derrière. Place le point (glisser ; double-clic / double-tape = centrer) : haut = suivi, bas = rétro, côtés = effet latéral. Il est remis au centre après chaque tir.'];
+const SIMPLIF_SN = ['Pas de couleur annoncée : la première couleur touchée est la couleur choisie. Pas de bille libre (« snooker »), pas de règle de la bille touchée deux fois, pas de remise en place du coup fautif, pas de concession.',
+  'Billes plus petites et poches plus serrées qu\'au pool. Anneau bleu / orange sur le plateau : Joueur 1 / Joueur 2. Effets : voir ci-dessus ; options de règles personnalisées indisponibles.'];
 const SIMPLIF = ['Pas de règle « bande après contact », pas de poche annoncée, pas de casse spéciale ; les billes empochées par erreur restent au fond. Anneau bleu / orange sur le plateau : Joueur 1 / Joueur 2.',
   'Effets : le suivi / rétro agit au 1er contact de la blanche avec une bille, l\'effet latéral quand elle touche une bande ; l\'effet s\'estompe avec le temps. Pas de massé, pas de déviation de la queue, pas d\'effet transmis à la bille touchée.'];
 
@@ -56,7 +71,7 @@ function custom(modeId, opts, cpu, online) {
 export function fillRules(title, body, modeId, opts, cpu, online) {
   title.textContent = 'Règles · ' + (MODES[modeId]?.label ?? '');
   body.textContent = '';
-  for (const [h, items] of [custom(modeId, opts, cpu, online), ...sections(modeId), ['⌨️ Commandes', COMMANDES], ['ℹ️ Simplifications', SIMPLIF]]) {
+  for (const [h, items] of [custom(modeId, opts, cpu, online), ...sections(modeId), ['⌨️ Commandes', COMMANDES], ['ℹ️ Simplifications', modeId === 'snooker' ? SIMPLIF_SN : SIMPLIF]]) {
     const s = document.createElement('section'), t = document.createElement('h3'), ul = document.createElement('ul');
     t.textContent = h;
     for (const it of items) { const li = document.createElement('li'); li.textContent = it; ul.appendChild(li); }

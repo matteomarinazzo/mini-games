@@ -22,7 +22,7 @@ export function snapshot({ g, aim, timeLeft, world, pocketed }) {
   return {
     v: VERSION, t: Date.now(),
     g: { mode: g.mode, cur: g.cur, groups: [...g.groups], hand: g.hand, over: g.over, winner: g.winner, reason: g.reason,
-      opts: { ...g.opts }, zone: g.zone, fwd: g.fwd, sh: g.sh, ref: [...g.ref], cpu: !!g.cpu, pts: [...(g.pts || [0, 0])] },
+      opts: { ...g.opts }, zone: g.zone, fwd: g.fwd, sh: g.sh, ref: [...g.ref], cpu: !!g.cpu, pts: [...(g.pts || [0, 0])], sn: g.sn ? { ...g.sn } : null },
     state: g.over ? 'gameOver' : g.hand ? 'placingCueBall' : 'aiming',
     aim, timeLeft,
     balls: world.balls.map(b => ({ n: b.n, x: b.x, y: b.y, out: b.out })),
@@ -52,12 +52,14 @@ export function restore(st, modeId, slot = modeId) {
     const p = Array.isArray(s.pocketed) ? s.pocketed : [];
     if (p.length !== out.size || p.some(e => !e || !out.delete(e.n) || (e.by !== 0 && e.by !== 1))) return null;
     if (world.cue.out && !q.hand && !q.over) return null;                     // blanche sortie sans droit de placement
-    const side = x => x === null || x === 'L' || x === 'R', sh = q.sh ?? 1, ref = q.ref ?? [null, null], cpu = !!q.cpu;
+    const side = x => x === null || x === 'L' || x === 'R' || x === 'D', sh = q.sh ?? 1, ref = q.ref ?? [null, null], cpu = !!q.cpu;
     if (!side(q.zone ?? null) || !side(q.fwd ?? null) || (sh !== 1 && sh !== 2) || cpu !== slot.endsWith(':cpu')) return null;
     if (!Array.isArray(ref) || ref.length !== 2 || ref.some(x => x !== null && !(Number.isInteger(x) && x >= 0 && x < 6))) return null;
-    const pts = q.pts ?? [0, 0]; if (!Array.isArray(pts) || pts.length !== 2 || pts.some(x => !Number.isInteger(x) || x < 0 || x > 99)) return null;
+    const pts = q.pts ?? [0, 0]; if (!Array.isArray(pts) || pts.length !== 2 || pts.some(x => !Number.isInteger(x) || x < 0 || x > 999)) return null;
+    let sn = null;
+    if (modeId === 'snooker') { const z = q.sn; if (!z || !['red', 'colour', 'seq'].includes(z.ph) || !Number.isInteger(z.nx) || z.nx < 16 || z.nx > 21 || !Number.isInteger(z.rd) || z.rd < 0 || z.rd > 15) return null; sn = { ph: z.ph, nx: z.nx, rd: z.rd }; }
     const g = { mode: modeId, cur: q.cur, groups: [...q.groups], hand: q.hand, over: q.over, winner: q.winner, reason: String(q.reason ?? '').slice(0, 160),
-      opts: normalize(q.opts, modeId), zone: q.hand ? q.zone ?? null : null, fwd: q.fwd ?? null, sh, ref: [...ref], cpu, pts: [...pts] };
+      opts: normalize(q.opts, modeId), zone: q.hand ? q.zone ?? null : null, fwd: q.fwd ?? null, sh, ref: [...ref], cpu, pts: [...pts], sn };
     return { world, g, aim: s.aim, timeLeft: Math.min(30, Math.max(1, s.timeLeft)), pocketed: p.map(e => ({ n: e.n, by: e.by })) };
   } catch { return null; }
 }

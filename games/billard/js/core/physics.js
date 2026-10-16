@@ -2,16 +2,29 @@
 // Repère : origine = coin haut-gauche du tapis, x vers la droite, y vers le bas, unités de table (voir README_V0.md).
 
 export const TABLE = { W: 1000, H: 500 };
-export const BALL_R = 13;
+export let BALL_R = 13;   // V10 : 10 en snooker (setTable)
 export const HEAD_SPOT = { x: TABLE.W / 4, y: TABLE.H / 2 };
 export const FOOT_SPOT = { x: TABLE.W * 0.75, y: TABLE.H / 2 };
 
 // Poches : source unique pour le dessin (r = rayon visuel) et la physique (cap = rayon de capture du CENTRE d'une bille).
-export const POCKETS = [
-  { x: 0, y: 0, r: 30, cap: 36 }, { x: TABLE.W, y: 0, r: 30, cap: 36 },
-  { x: 0, y: TABLE.H, r: 30, cap: 36 }, { x: TABLE.W, y: TABLE.H, r: 30, cap: 36 },
-  { x: TABLE.W / 2, y: -6, r: 26, cap: 30 }, { x: TABLE.W / 2, y: TABLE.H + 6, r: 26, cap: 30 },
+const POOL_POCKETS = [      // V10 : tailles réalistes (bille = 26 : ouverture ≈ 2 billes aux coins, ≈ 2,2 au milieu)
+  { x: 0, y: 0, r: 24, cap: 29 }, { x: TABLE.W, y: 0, r: 24, cap: 29 },
+  { x: 0, y: TABLE.H, r: 24, cap: 29 }, { x: TABLE.W, y: TABLE.H, r: 24, cap: 29 },
+  { x: TABLE.W / 2, y: -6, r: 20, cap: 24 }, { x: TABLE.W / 2, y: TABLE.H + 6, r: 20, cap: 24 },
 ];
+// V10 snooker : billes plus petites (R = 10) et poches plus serrées. Le mode est fixé par la page : setTable(modeId) est appelé au chargement.
+const SNK_POCKETS = [
+  { x: 0, y: 0, r: 19, cap: 21 }, { x: TABLE.W, y: 0, r: 19, cap: 21 },
+  { x: 0, y: TABLE.H, r: 19, cap: 21 }, { x: TABLE.W, y: TABLE.H, r: 19, cap: 21 },
+  { x: TABLE.W / 2, y: -5, r: 16, cap: 19.5 }, { x: TABLE.W / 2, y: TABLE.H + 5, r: 16, cap: 19.5 },
+];
+export const POCKETS = POOL_POCKETS.slice();
+export const D_R = 84;   // rayon du « D » (demi-cercle de la ligne de départ, x = W/4)
+export const SN_SPOTS = { 16: [TABLE.W / 4, TABLE.H / 2 + D_R], 17: [TABLE.W / 4, TABLE.H / 2 - D_R], 18: [TABLE.W / 4, TABLE.H / 2], 19: [TABLE.W / 2, TABLE.H / 2], 20: [TABLE.W * 0.75, TABLE.H / 2], 21: [TABLE.W * 0.909, TABLE.H / 2] };
+export function setTable(modeId) {
+  BALL_R = modeId === 'snooker' ? 10 : 13;
+  POCKETS.splice(0, POCKETS.length, ...(modeId === 'snooker' ? SNK_POCKETS : POOL_POCKETS));
+}
 
 // Vitesses en unités/s. La puissance (0..1) est convertie linéairement entre V_MIN et V_MAX.
 export const V_MIN = 150;
@@ -36,6 +49,14 @@ const ROWS = {
 const makeBall = (n, x, y) => ({ n, x, y, vx: 0, vy: 0, out: false });
 
 export function createWorld(modeId) {
+  setTable(modeId);
+  if (modeId === 'snooker') {   // V10 : blanche (0, dans le D), 15 rouges (1-15) en triangle contre la rose, 6 couleurs (16-21) sur leurs mouches
+    const R = BALL_R, d = 2 * R + 0.6, dx = d * Math.sqrt(3) / 2, sb = [makeBall(0, 215, TABLE.H / 2)];
+    let n = 1;
+    for (let r = 0; r < 5; r++) for (let k = 0; k <= r; k++) sb.push(makeBall(n++, SN_SPOTS[20][0] + d + r * dx, TABLE.H / 2 + (k - r / 2) * d));
+    for (let m = 16; m <= 21; m++) sb.push(makeBall(m, SN_SPOTS[m][0], SN_SPOTS[m][1]));
+    return { balls: sb, cue: sb[0], acc: 0 };
+  }
   if (modeId === 'carom') { const cb = [makeBall(0, HEAD_SPOT.x, HEAD_SPOT.y), makeBall(1, FOOT_SPOT.x, FOOT_SPOT.y), makeBall(3, HEAD_SPOT.x, HEAD_SPOT.y + 110)]; return { balls: cb, cue: cb[0], acc: 0, nop: true }; }   // V9 : blanche + jaune (1) + rouge (3)
   const rows = ROWS[modeId] || ROWS['8ball'];
   const d = 2 * BALL_R + 0.6;               // léger jeu entre billes : aucune surimpression au départ
@@ -56,6 +77,17 @@ export function shoot(world, angle, power, spin, mult = 1) {
   c.first = null; c.hits = []; c.dx = Math.cos(angle); c.dy = Math.sin(angle);
   c.vx = c.dx * v; c.vy = c.dy * v;
   c.sx = sx; c.sy = sy; c.spinDone = false;
+}
+
+// V10 : replace une couleur empochée sur sa mouche ; occupée : mouche libre de plus forte valeur ; sinon au plus près vers la bande du haut (droite).
+export function respot(world, n) {
+  const b = world.balls.find(x => x.n === n); if (!b) return;
+  const free = (x, y) => !world.balls.some(o => o !== b && !o.out && Math.hypot(o.x - x, o.y - y) < 2 * BALL_R + 0.5);
+  let p = free(...SN_SPOTS[n]) ? SN_SPOTS[n] : null;
+  for (let m = 21; m >= 16 && !p; m--) if (free(...SN_SPOTS[m])) p = SN_SPOTS[m];
+  if (!p) { const [sx, sy] = SN_SPOTS[n]; for (let x = sx; x <= TABLE.W - BALL_R && !p; x++) if (free(x, sy)) p = [x, sy]; for (let x = sx; x >= BALL_R && !p; x--) if (free(x, sy)) p = [x, sy]; }
+  if (!p) p = SN_SPOTS[n];
+  b.x = p[0]; b.y = p[1]; b.vx = b.vy = 0; b.out = false;
 }
 
 export const isMoving = world => world.balls.some(b => !b.out && (b.vx !== 0 || b.vy !== 0));

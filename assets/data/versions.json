@@ -1,13 +1,22 @@
 {
-    "currentVersion": "1.37.2026-10-15",
-    "lastUpdate": "2026-10-15",
+    "currentVersion": "1.37.2026-10-16",
+    "lastUpdate": "2026-10-16",
     "history": [
+        {
+            "version": "1.37.2026-10-16",
+            "date": "2026-10-16",
+            "changes": [
+                "Billard V10 - Snooker + corrections taille poches et canva queue",
+                "Billard V11 - Amélioration effet 3D + corrections et canva queue dehors la table",
+                "Amélioration du bouton 'défi du jeu'"
+            ]
+        },
         {
             "version": "1.37.2026-10-15",
             "date": "2026-10-15",
             "changes": [
                 "Ajout du jeu Tap to Fly",
-                "Billard V9 - Carambole + shop",
+                "Billard V9 - Carambole + shop ",
                 "Amélioration du bouton 'défi du jeu'"
             ]
         },

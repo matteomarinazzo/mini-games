@@ -2,7 +2,7 @@
 // seulement (aim, power) ; le tir passe ensuite par la physique et les règles normales (game.js). Méthode : « bille fantôme » —
 // pour chaque bille légale et chaque poche, point d'impact de la blanche, trajets dégagés, angle de coupe, score ; léger bruit d'angle.
 import { BALL_R as R, POCKETS, TABLE, HEAD_SPOT, V_MIN, V_MAX, isValidCuePlacement, createWorld, shoot, update, isMoving } from './physics.js';
-import { legalFirst, requiredPocket, clampAim, legalAim, ZONE } from './rules.js';
+import { legalFirst, requiredPocket, clampAim, legalAim, ZONE, cueZoneOk, SNV } from './rules.js';
 
 export const SIGMA = 0.003;                 // écart-type du bruit d'angle (rad) ≈ 0,17° : ~45 % des tirs visés sont empochés (mesuré en simulation)
 const MIN_CUT = 0.3;                        // cos de l'angle de coupe minimal (≈ 72° max)
@@ -32,7 +32,7 @@ export function bestShot(world, g, rem, cx, cy) {
       const cut = ux * dx + uy * dy; if (cut < MIN_CUT) continue;
       const aim = Math.atan2(uy, ux); if (!legalAim(aim, g.fwd)) continue;
       if (blocked(balls, cx, cy, gx, gy, [cue, t]) || blocked(balls, t.x, t.y, P.x, P.y, [cue, t])) continue;
-      const D = dc + dp, score = cut * cut * 1000 / (1 + D / 400);
+      const D = dc + dp, score = cut * cut * 1000 / (1 + D / 400) * (g.mode === 'snooker' && t.n > 15 ? 1 + 0.08 * SNV(t.n) : 1);
       if (!best || score > best.score) best = { score, aim, D, n: t.n };
     }
   }
@@ -40,7 +40,7 @@ export function bestShot(world, g, rem, cx, cy) {
 }
 
 // Tir de l'ordinateur : { aim, power, planned } (planned = true si un empochage est visé, false = repli « toucher la bonne bille »).
-export function planShot(world, g, rem, rng = Math.random, sigma = SIGMA) {
+export function planShot(world, g, rem, rng = Math.random, sigma = g.mode === 'snooker' ? SIGMA * 0.5 : SIGMA) {
   if (g.mode === 'carom') return caromShot(world, rng, sigma);
   const c = world.cue, s = bestShot(world, g, rem, c.x, c.y);
   let aim, power, planned = !!s;
@@ -53,17 +53,17 @@ export function planShot(world, g, rem, rng = Math.random, sigma = SIGMA) {
       if (d < bd) { bd = d; bt = b; }
     }
     aim = bt ? Math.atan2(bt.y - c.y, bt.x - c.x) : 0;
-    power = rem.length === world.balls.length - 1 ? 0.95 : 0.5;          // casse : plein pouvoir
+    power = g.mode === 'snooker' ? 0.4 : rem.length === world.balls.length - 1 ? 0.95 : 0.5;          // casse : plein pouvoir
   }
   return { aim: clampAim(aim + gauss(rng) * sigma, g.fwd), power, planned };
 }
 
 // Placement de la blanche en main : balaie la zone autorisée (grille de 30) et garde la position au meilleur tir.
 export function placeCue(world, g, rem) {
-  const x0 = g.zone === 'R' ? ZONE.R : R + 4, x1 = g.zone === 'L' ? ZONE.L : TABLE.W - R - 4;
+  const x0 = g.zone === 'R' ? ZONE.R : R + 4, x1 = g.zone === 'L' ? ZONE.L : g.zone === 'D' ? HEAD_SPOT.x : TABLE.W - R - 4, st = g.zone === 'D' ? 10 : 30;
   let best = null;
-  for (let x = x0; x <= x1; x += 30) for (let y = R + 4; y <= TABLE.H - R - 4; y += 30) {
-    if (!isValidCuePlacement(world, x, y)) continue;
+  for (let x = x0; x <= x1; x += st) for (let y = R + 4; y <= TABLE.H - R - 4; y += st) {
+    if (!isValidCuePlacement(world, x, y) || !cueZoneOk(g, x, y)) continue;
     const s = bestShot(world, g, rem, x, y), sc = s ? s.score : 0;
     if (!best || sc > best.sc) best = { x, y, sc };
   }

@@ -2,7 +2,7 @@
 import { readPrefs, writePrefs } from './config.js';
 const mk = (id, name, price, pow, s, b, t, a) => ({
   id, name, price, pow, s, b, t, a,
-  stops: [[0, t], [.03, t], [.03, '#e8d9b0'], [.06, '#e8d9b0'], [.06, s], [.6, s], [.6, a], [.65, a], [.65, b], [1, b]]
+  stops: [[0, t], [.014, t], [.014, '#e8d9b0'], [.028, '#e8d9b0'], [.028, s], [.6, s], [.6, a], [.65, a], [.65, b], [1, b]]
 });   // pointe, virole, fût, anneau, talon
 export const CUES = [
   mk('std', 'Classique', 0, 1, '#e2b574', '#3a2410', '#6aa8ff', '#3a2410'),

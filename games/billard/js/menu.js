@@ -13,6 +13,7 @@ const slot = id => id + (opp === 'cpu' ? ':cpu' : '');
 const href = (id, extra = '') => `game.html?mode=${id}${opp === 'cpu' ? '&opp=cpu' : ''}${extra}`;
 // V9 : carambole + boutique de queues, injectées ici (index.html inchangé)
 if (!document.querySelector('.mode[data-mode="carom"]')) $('modes').insertAdjacentHTML('beforeend', '<a class="mode" data-mode="carom" href="game.html?mode=carom"><b>Carambole</b><span>Touche les deux autres billes, premier à 10 points.</span></a>');
+if (!document.querySelector('.mode[data-mode="snooker"]')) $('modes').insertAdjacentHTML('beforeend', '<a class="mode" data-mode="snooker" href="game.html?mode=snooker"><b>Snooker</b><span>Rouges et couleurs, le plus de points gagne.</span></a>');
 $('cfgBtn').insertAdjacentHTML('afterend', '<button class="cfg" id="shopBtn" type="button">🏪 Boutique de queues <small id="shopCoins"></small></button>');
 document.body.insertAdjacentHTML('beforeend', '<div class="ov" id="shopOv" hidden><div class="modal" role="dialog" aria-labelledby="shopTitle"><button class="x" id="shopClose" type="button" aria-label="Fermer">✕</button><h2 id="shopTitle">Boutique de queues</h2><p id="shopInfo"></p><div id="shopList"></div></div></div>');
 const modes = [...document.querySelectorAll('.mode')];

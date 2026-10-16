@@ -49,7 +49,7 @@ export function parseFrame(f, nBalls) {
   if (!f || typeof f !== 'object' || !Number.isSafeInteger(f.n) || f.n < 0 || !Number.isSafeInteger(f.k) || f.k < 0 || !num(f.t, 0, 600)) return null;
   if (!Array.isArray(f.b) || f.b.length !== 2 * nBalls || !f.b.every(v => num(v, -50, TABLE.W + 50))) return null;
   const o = f.o === undefined ? [] : f.o;
-  if (!Array.isArray(o) || o.length > nBalls || o.some(n => !Number.isInteger(n) || n < 1 || n > 15)) return null;
+  if (!Array.isArray(o) || o.length > nBalls || o.some(n => !Number.isInteger(n) || n < 1 || n > 21)) return null;
   return { n: f.n, k: f.k, t: f.t, b: f.b, o: [...new Set(o)], c: f.c === 1 };
 }
 

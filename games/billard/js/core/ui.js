@@ -2,8 +2,11 @@
 // Ne contient aucune logique de jeu : game.js l'appelle, et les boutons renvoient des callbacks.
 
 export const BALL_COLORS = ['#ffffff', '#f5c400', '#1f4ed8', '#d62828', '#6a2c91', '#f77f00', '#1b7f3b', '#7b1e1e', '#161616'];
-export const ballColor = n => BALL_COLORS[n <= 8 ? n : n - 8];
-export const isStripe = n => n >= 9;
+let SN = false;   // V10 : snooker (rouges 1-15, couleurs 16-21, pas de numéros ni de rayées)
+export const setSnooker = v => { SN = !!v; };
+const SNC = ['#f7d11e', '#1e8a3c', '#7b4a21', '#1f5fd6', '#f06fa0', '#151515'];
+export const ballColor = n => (SN ? (n <= 15 ? '#c8102e' : SNC[n - 16]) : BALL_COLORS[n <= 8 ? n : n - 8]);
+export const isStripe = n => !SN && n >= 9;
 
 const $ = id => document.getElementById(id);
 
@@ -84,7 +87,7 @@ export function createUI({ onConfirm, onRestart, onPause, names = ['Joueur 1', '
         el.classList.toggle('on', i === cur);
         const s = el.lastElementChild, f = infos[i]; s.textContent = f.text;
         for (const n of f.balls) {
-          const c = document.createElement('i'); c.textContent = n; c.style.setProperty('--c', ballColor(n));
+          const c = document.createElement('i'); c.textContent = SN ? '' : n; c.style.setProperty('--c', ballColor(n));
           c.className = (isStripe(n) ? 'stripe ' : '') + (n === f.next ? 'next' : ''); s.appendChild(c);
         }
       });

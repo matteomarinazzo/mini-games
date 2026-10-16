@@ -4,6 +4,7 @@ export const MODES = {
   '9ball': { label: '9-ball', balls: 9 },
   '10ball': { label: '10-ball', balls: 10 },
   'carom': { label: 'Carambole', balls: 3 },
+  'snooker': { label: 'Snooker', balls: 21 },   // V10 : billes 1-15 = rouges, 16 jaune, 17 verte, 18 marron, 19 bleue, 20 rose, 21 noire
 };
 export const DEFAULT_MODE = '8ball';
 

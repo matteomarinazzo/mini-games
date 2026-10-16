@@ -2,9 +2,9 @@
 // Base V4 : pause, infos par joueur, visée rouge. Simulation → physics.js · commandes → input.js · HTML → ui.js.
 import { parseMode } from './core/modes.js';
 import {
-  TABLE, BALL_R, POCKETS, HEAD_SPOT, createWorld, shoot, update, isMoving, stopAll, rayCast, isValidCuePlacement,
+  TABLE, BALL_R, POCKETS, HEAD_SPOT, createWorld, shoot, update, isMoving, stopAll, rayCast, isValidCuePlacement, setTable, respot, SN_SPOTS, D_R,
 } from './core/physics.js';
-import { createUI, ballColor, isStripe } from './core/ui.js';
+import { createUI, ballColor, isStripe, setSnooker } from './core/ui.js';
 import { createInput, viewRect, toView } from './core/input.js';
 import { ID, rollBy } from './core/roll.js';
 import { fillRules } from './core/help.js';
@@ -18,7 +18,12 @@ import { RM_READY, rmGet, rmSet, rmOk, rmView } from './core/rematch.js';
 import * as shop from './core/shop.js';
 
 const $ = id => document.getElementById(id);
-const cv = $('cv'), ctx = cv.getContext('2d'), stage = $('stage');
+const cv = $('cv'), stage = $('stage');
+let ctx = cv.getContext('2d');
+// V11 : calque de la queue, plus grand que la table (marge MG en unités de table) : la queue reste visible hors du cadre. Sans événements souris.
+const MG = 400, ov = document.createElement('canvas'), ovx = ov.getContext('2d');
+ov.style.cssText = 'position:absolute;pointer-events:none;z-index:5';
+cv.after(ov);
 
 // Repère logique : origine = coin haut-gauche du tapis ; rail de T.R autour ; plateau des billes empochées sous la table.
 const TRAY_H = 46;
@@ -29,6 +34,7 @@ const slotX = k => -T.R + 26 + k * 25;                                          
 const FALL = 0.22, ROLL_V = 850, WAIT = 0.12, GAP = 0.35;                              // durées/vitesses de l'animation (s, unités/s)
 
 const mode = parseMode(location.search);
+const SNK = mode.id === 'snooker'; setTable(mode.id); setSnooker(SNK);   // V10 : billes, poches et couleurs propres au snooker
 const ROOM = (new URLSearchParams(location.search).get('room') || '').toUpperCase(), ONLINE = ROOM !== '';   // V7 : ?room=CODE = partie en ligne
 if (ONLINE) mode.cpu = false;
 const NAMES = mode.cpu ? ['Joueur 1', 'Ordinateur'] : ['Joueur 1', 'Joueur 2'];
@@ -69,7 +75,7 @@ const remaining = () => world.balls.filter(b => !b.out && b.n > 0).map(b => b.n)
 const refreshPlayers = () => { const r = remaining(); ui.setPlayers(g.cur, [0, 1].map(i => ({ text: rules.info(g, i, r), ...rules.targets(g, i, r) }))); };
 
 function startTurn(msg, t) {
-  cpuPlan = null; ui.setCpu('');
+  cpuPlan = null; ui.setCpu(''); if (ONLINE) setSpin(SPIN0);   // V11 : effet recentré à chaque tour (le sien comme l'aperçu de l'adversaire)
   timeLeft = t ?? rules.TURN_TIME; ui.setTime(timeLeft); ui.setInfo(msg || ''); refreshPlayers();
   if (world.cue.out) g.hand = true;                       // sécurité : blanche empochée = placement obligatoire
   if (g.hand) {
@@ -114,8 +120,13 @@ function onPocket(b) {
   } else shot.pocketed.push(b.n);
 }
 
+function doRespot(list) {   // V10 : couleurs replacées sur leur mouche et retirées du plateau
+  for (const n of [...list].sort((a, b) => b - a)) { respot(world, n); const i = pocketed.findIndex(e => e.n === n); if (i >= 0) pocketed.splice(i, 1); ori.delete(n); pv.delete(n); }
+  pocketed.forEach((e, k) => { if (e.a) e.a.slot = k; });
+}
 function applyResult(r) {
   ghost = null;
+  if (r.respot?.length && !g.over) doRespot(r.respot);
   if (g.over) {
     rmBits = 0; rmMine = null; rmSince = 0; setSpin(SPIN0);   // V8 : nouveaux votes de revanche
     refreshPlayers(); ui.showEnd(winTitle(g.winner), g.reason + reward()); setState('gameOver'); renderRm(); save();
@@ -177,7 +188,7 @@ const handlers = {
     const cl = (v, max) => Math.min(max + T.R, Math.max(-T.R, v));
     const px = g.zone === 'L' ? Math.min(x, rules.ZONE.L) : g.zone === 'R' ? Math.max(x, rules.ZONE.R) : x;   // zone imposée (cueSide)
     const gx = cl(px, T.W), gy = cl(y, T.H);
-    ghost = { x: gx, y: gy, valid: isValidCuePlacement(world, px, y) && rules.cueZoneOk(g, px) };
+    ghost = { x: gx, y: gy, valid: isValidCuePlacement(world, px, y) && rules.cueZoneOk(g, px, y) };
     ui.setPlacementValid(ghost.valid);
   },
   confirmPlacement() {
@@ -305,15 +316,27 @@ function diamond(g, x, y) { g.save(); g.translate(x, y); g.rotate(Math.PI / 4); 
 function drawTable(g) {
   const WH = LH - TRAY_H;                             // hauteur du cadre en bois (hors plateau)
   g.clearRect(0, 0, LW, LH);
-  rr(g, 0, 0, LW, WH, 36); g.fillStyle = '#5b3a1f'; g.fill();
+  rr(g, 0, 0, LW, WH, 36); { const w = g.createLinearGradient(0, 0, 0, WH); w.addColorStop(0, '#94623a'); w.addColorStop(.5, '#5b3a1f'); w.addColorStop(1, '#2e1c0c'); g.fillStyle = w; g.fill(); }   // V11 : relief
   rr(g, 5, 5, LW - 10, WH - 10, 32); g.strokeStyle = '#7a5230'; g.lineWidth = 3; g.stroke();
-  const c = T.CUSHION;
-  rr(g, T.R - c, T.R - c, T.W + 2 * c, T.H + 2 * c, 10); g.fillStyle = '#0b5a3a'; g.fill();
-  g.fillStyle = '#0f7a4d'; g.fillRect(T.R, T.R, T.W, T.H);
+  const c = T.CUSHION, X0 = T.R, Y0 = T.R;
+  rr(g, X0 - c - 3, Y0 - c - 3, T.W + 2 * c + 6, T.H + 2 * c + 6, 12); g.fillStyle = '#1e1208'; g.fill();   // V11 : gorge entre bois et bande
+  rr(g, X0 - c, Y0 - c, T.W + 2 * c, T.H + 2 * c, 10);
+  { const k = g.createLinearGradient(0, Y0 - c, 0, Y0 + T.H + c); k.addColorStop(0, SNK ? '#14683a' : '#13845a'); k.addColorStop(1, SNK ? '#0a4a22' : '#0b5a3a'); g.fillStyle = k; g.fill(); }
+  g.fillStyle = SNK ? '#1b6b34' : '#0f7a4d'; g.fillRect(X0, Y0, T.W, T.H);   // V10 : tapis vert snooker
+  { const v = g.createRadialGradient(X0 + T.W / 2, Y0 + T.H / 2, T.H * .25, X0 + T.W / 2, Y0 + T.H / 2, T.W * .62); v.addColorStop(0, 'rgba(255,255,255,.08)'); v.addColorStop(1, 'rgba(0,0,0,.3)'); g.fillStyle = v; g.fillRect(X0, Y0, T.W, T.H); }
+  const sd = 9;   // ombre de contact douce le long des bandes
+  for (const [x0, y0, x1, y1, rx, ry, rw, rh] of [[X0, Y0, X0, Y0 + sd, X0, Y0, T.W, sd], [X0, Y0 + T.H, X0, Y0 + T.H - sd, X0, Y0 + T.H - sd, T.W, sd], [X0, Y0, X0 + sd, Y0, X0, Y0, sd, T.H], [X0 + T.W, Y0, X0 + T.W - sd, Y0, X0 + T.W - sd, Y0, sd, T.H]]) {
+    const s = g.createLinearGradient(x0, y0, x1, y1); s.addColorStop(0, 'rgba(0,0,0,.38)'); s.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = s; g.fillRect(rx, ry, rw, rh);
+  }
+  { const e = g.createLinearGradient(0, Y0 - c, 0, Y0 + T.H + c); e.addColorStop(0, 'rgba(255,255,255,.3)'); e.addColorStop(.5, 'rgba(255,255,255,.04)'); e.addColorStop(1, 'rgba(0,0,0,.4)');
+    rr(g, X0 - c + 1, Y0 - c + 1, T.W + 2 * c - 2, T.H + 2 * c - 2, 9); g.lineWidth = 2; g.strokeStyle = e; g.stroke(); }   // arête arrondie de la bande
   g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 2;
   g.beginPath(); g.moveTo(T.R + T.W / 4, T.R); g.lineTo(T.R + T.W / 4, T.R + T.H); g.stroke();
   g.fillStyle = 'rgba(255,255,255,.35)';
-  for (const fx of [.25, .75]) { g.beginPath(); g.arc(T.R + T.W * fx, T.R + T.H / 2, 4, 0, 7); g.fill(); }
+  if (SNK) {   // ligne de départ (ci-dessus), D et mouches des couleurs
+    g.beginPath(); g.arc(T.R + T.W / 4, T.R + T.H / 2, D_R, Math.PI / 2, Math.PI * 1.5); g.stroke();
+    for (const [sx, sy] of Object.values(SN_SPOTS)) { g.beginPath(); g.arc(T.R + sx, T.R + sy, 3, 0, 7); g.fill(); }
+  } else for (const fx of [.25, .75]) { g.beginPath(); g.arc(T.R + T.W * fx, T.R + T.H / 2, 4, 0, 7); g.fill(); }
   g.fillStyle = '#050505';
   if (mode.id !== 'carom') for (const p of POCKETS) { g.beginPath(); g.arc(T.R + p.x, T.R + p.y, p.r, 0, 7); g.fill(); }
   g.fillStyle = '#e8d9b0';
@@ -323,7 +346,7 @@ function drawTable(g) {
   rr(g, 0, WH + 4, LW, TRAY_H - 4, 14); g.fillStyle = '#16221b'; g.fill();
   rr(g, 8, WH + 9, LW - 16, TRAY_H - 14, 10); g.fillStyle = '#08120d'; g.fill();
   g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 1.5;
-  for (let k = 0; k < 15; k++) { g.beginPath(); g.arc(T.R + slotX(k), T.R + TRAY_Y, TR - 1, 0, 7); g.stroke(); }
+  for (let k = 0; k < 22; k++) { g.beginPath(); g.arc(T.R + slotX(k), T.R + TRAY_Y, TR - 1, 0, 7); g.stroke(); }
 }
 
 const SPOTS = [[0, 0, -1], [0, 0, 1], [1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];   // marques de la blanche (local)
@@ -333,7 +356,7 @@ const SPOTS = [[0, 0, -1], [0, 0, 1], [1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 
 function drawBall(b, alpha = 1, s = 1) {
   const R = BALL_R, n = b.n, O = ori.get(n) || ID(), col = ballColor(n), stripe = isStripe(n);
   ctx.save(); ctx.translate(b.x, b.y); ctx.scale(s, s); ctx.globalAlpha = alpha;
-  ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.arc(2, 3, R, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(3, 5, R * 1.02, R * .92, 0, 0, 7); ctx.fill();
   ctx.save(); ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.clip();
   ctx.fillStyle = n === 0 || stripe ? '#f6f4ee' : col; ctx.fillRect(-R, -R, 2 * R, 2 * R);
   if (stripe) {
@@ -347,7 +370,8 @@ function drawBall(b, alpha = 1, s = 1) {
       }
     }
   }
-  if (n > 0 && mode.id !== 'carom') {
+  { const gr = ctx.createRadialGradient(-R * .3, -R * .35, R * .05, 0, 0, R); gr.addColorStop(0, 'rgba(255,255,255,.5)'); gr.addColorStop(.4, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.4)'); ctx.fillStyle = gr; ctx.fillRect(-R, -R, 2 * R, 2 * R); }   // V10 : billes de snooker (reflet)
+  if (n > 0 && mode.id !== 'carom' && !SNK) {
     for (const sg of [-1, 1]) {                                  // sg = -1 : pastille avant (0,0,-1) ; 1 : arrière
       if (sg * O[8] > -.05) continue;                            // face cachée ou sur la tranche
       ctx.save();
@@ -372,24 +396,32 @@ function drawBall(b, alpha = 1, s = 1) {
 }
 
 const PULL_VISUAL = 110;
-function drawAim() {
+function drawAim(part) {   // 'line' : trait de visée (sous les billes) · 'cue' : queue (par-dessus les billes)
   const c = world.cue, dx = Math.cos(aim), dy = Math.sin(aim);
   const hit = rayCast(world, c.x, c.y, aim);
   ctx.save();
   // Rouge si la 1re bille touchée en ligne droite est illégale. Bande en premier : légalité indéterminable → blanc.
   const bad = !!hit.ball && !rules.legalFirst(g, hit.ball.n, remaining());
-  ctx.setLineDash([9, 9]); ctx.strokeStyle = bad ? '#ff4d4d' : 'rgba(255,255,255,.55)'; ctx.lineWidth = bad ? 3 : 2;
-  ctx.beginPath(); ctx.moveTo(c.x + dx * BALL_R, c.y + dy * BALL_R); ctx.lineTo(hit.x, hit.y); ctx.stroke();
-  ctx.setLineDash([]); ctx.beginPath(); ctx.arc(hit.x, hit.y, BALL_R, 0, 7); ctx.stroke();
-  if (bad) { ctx.beginPath(); ctx.moveTo(hit.x - 6, hit.y - 6); ctx.lineTo(hit.x + 6, hit.y + 6); ctx.moveTo(hit.x + 6, hit.y - 6); ctx.lineTo(hit.x - 6, hit.y + 6); ctx.stroke(); }
+  if (part !== 'cue') {
+    ctx.setLineDash([9, 9]); ctx.strokeStyle = bad ? '#ff4d4d' : 'rgba(255,255,255,.55)'; ctx.lineWidth = bad ? 3 : 2;
+    ctx.beginPath(); ctx.moveTo(c.x + dx * BALL_R, c.y + dy * BALL_R); ctx.lineTo(hit.x, hit.y); ctx.stroke();
+    ctx.setLineDash([]); ctx.beginPath(); ctx.arc(hit.x, hit.y, BALL_R, 0, 7); ctx.stroke();
+    if (bad) { ctx.beginPath(); ctx.moveTo(hit.x - 6, hit.y - 6); ctx.lineTo(hit.x + 6, hit.y + 6); ctx.moveTo(hit.x + 6, hit.y - 6); ctx.lineTo(hit.x - 6, hit.y + 6); ctx.stroke(); }
+  }
+  if (part === 'line') { ctx.restore(); return; }
   const gap = BALL_R + 6 + power * PULL_VISUAL, len = 380, nx = -dy, ny = dx;
   const tx = c.x - dx * gap, ty = c.y - dy * gap, bx = c.x - dx * (gap + len), by = c.y - dy * (gap + len);
   const sk = mode.cpu && g.cur === 1 ? shop.CUES[0] : skin0, gr = ctx.createLinearGradient(tx, ty, bx, by);
   for (const [p, c2] of sk.stops) gr.addColorStop(p, c2);
-  ctx.fillStyle = gr;
-  ctx.beginPath();
-  ctx.moveTo(tx + nx * 2.4, ty + ny * 2.4); ctx.lineTo(bx + nx * 6, by + ny * 6);
-  ctx.lineTo(bx - nx * 6, by - ny * 6); ctx.lineTo(tx - nx * 2.4, ty - ny * 2.4); ctx.closePath(); ctx.fill();
+  const th = Math.atan2(-dy, dx * -1), fl = Math.cos(th) >= 0 ? 1 : -1;   // repère local : x = de la pointe vers le talon
+  const poly = () => { ctx.beginPath(); ctx.moveTo(0, -2.4); ctx.lineTo(len, -6); ctx.arc(len, 0, 6, -Math.PI / 2, Math.PI / 2); ctx.lineTo(0, 2.4); ctx.arc(0, 0, 2.4, Math.PI / 2, Math.PI * 1.5); ctx.closePath(); };   // V11 : bouts arrondis
+  ctx.save(); ctx.translate(tx, ty); ctx.rotate(th);
+  const g2 = ctx.createLinearGradient(0, 0, len, 0); for (const [p, c2] of sk.stops) g2.addColorStop(p, c2);
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 7; ctx.shadowOffsetX = 3; ctx.shadowOffsetY = 5; ctx.fillStyle = g2; poly(); ctx.fill(); ctx.restore();
+  ctx.save(); poly(); ctx.clip();   // volume cylindrique : reflet côté haut, ombre côté bas
+  const sh = ctx.createLinearGradient(0, -6 * fl, 0, 6 * fl);
+  sh.addColorStop(0, 'rgba(0,0,0,.35)'); sh.addColorStop(.25, 'rgba(255,255,255,.4)'); sh.addColorStop(.45, 'rgba(255,255,255,.05)'); sh.addColorStop(1, 'rgba(0,0,0,.5)');
+  ctx.fillStyle = sh; ctx.fillRect(-4, -8, len + 14, 16); ctx.restore();
   ctx.restore();
 }
 
@@ -419,11 +451,14 @@ function drawFall(a) {                  // la bille glisse vers le centre de la 
 
 function render() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cv.width, cv.height);   // la couche de table est transparente hors du cadre (coins arrondis) : sans effacement, la queue y laisserait une traînée
   ctx.drawImage(layer, 0, 0);
   const sx = cv.width / LW, sy = cv.height / LH;
   ctx.setTransform(sx, 0, 0, sy, T.R * sx, T.R * sy);
   const cueIn = !world.cue.out;
-  if (state === 'placingCueBall' && g.zone) {            // zone interdite ombrée (cueSide) + limite au 3e losange
+  if (state === 'placingCueBall' && g.zone === 'D') {   // V10 : blanche en main dans le D
+    ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.beginPath(); ctx.arc(HEAD_SPOT.x, HEAD_SPOT.y, D_R, Math.PI / 2, Math.PI * 1.5); ctx.closePath(); ctx.fill();
+  } else if (state === 'placingCueBall' && g.zone) {            // zone interdite ombrée (cueSide) + limite au 3e losange
     const zx = g.zone === 'L' ? rules.ZONE.L : 0, zw = g.zone === 'L' ? T.W - rules.ZONE.L : rules.ZONE.R;
     ctx.fillStyle = 'rgba(0,0,0,.38)'; ctx.fillRect(zx, 0, zw, T.H);
     ctx.strokeStyle = '#ffdc00'; ctx.lineWidth = 2; ctx.setLineDash([8, 8]); ctx.beginPath();
@@ -431,9 +466,16 @@ function render() {
   }
   const bt = state === 'gameOver' ? null : rules.blackTarget(g, remaining());       // poche imposée pour la 8 (blackOpp)
   if (bt !== null) { const q = POCKETS[bt]; ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(q.x, q.y, q.r + 6, 0, 7); ctx.stroke(); }
-  if (cueIn && (state === 'aiming' || state === 'charging')) drawAim();
+  const aimOn = cueIn && (state === 'aiming' || state === 'charging');
+  if (aimOn) drawAim('line');
   for (const b of world.balls) if (!b.out && b !== world.cue) drawBall(b);
   if (cueIn && state !== 'placingCueBall') drawBall(world.cue);
+  ovx.setTransform(1, 0, 0, 1, 0, 0); ovx.clearRect(0, 0, ov.width, ov.height);
+  if (aimOn) {                                            // la queue passe AU-DESSUS des billes, sur le calque élargi
+    const k = ov.width / (LW + 2 * MG), main = ctx;
+    ctx = ovx; ctx.setTransform(k, 0, 0, k, (MG + T.R) * k, (MG + T.R) * k);
+    try { drawAim('cue'); } finally { ctx = main; }
+  }
   if (state === 'placingCueBall') drawGhost();
   drawTrayAndFx();
 }
@@ -751,6 +793,10 @@ function resize() {
   cv.style.width = LW * s + 'px'; cv.style.height = LH * s + 'px';
   cv.width = Math.round(LW * s * dpr); cv.height = Math.round(LH * s * dpr);
   layer.width = cv.width; layer.height = cv.height;
+  const ok = Math.min(dpr, 2) * s;
+  ov.style.width = (LW + 2 * MG) * s + 'px'; ov.style.height = (LH + 2 * MG) * s + 'px';
+  ov.style.left = cv.offsetLeft - MG * s + 'px'; ov.style.top = cv.offsetTop - MG * s + 'px';
+  ov.width = Math.round((LW + 2 * MG) * ok); ov.height = Math.round((LH + 2 * MG) * ok);
   const lg = layer.getContext('2d');
   lg.setTransform(cv.width / LW, 0, 0, cv.height / LH, 0, 0);
   drawTable(lg);

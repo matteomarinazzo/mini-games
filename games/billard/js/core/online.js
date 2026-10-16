@@ -85,18 +85,30 @@ export async function joinLobby(raw, name, resume = false) {
 }
 
 // Entrée dans la partie (game.js) : le salon doit être lancé et le joueur doit figurer dans `seats` (fixé au lancement par l'hôte).
+// V11 : « Salon indisponible » intermittent = lecture transitoire (cache vide juste après la redirection, ping lent, état pas encore propagé).
+// Les échecs non définitifs sont donc retentés (6 essais) ; seuls « pas dans ce salon » et « configuration invalide » sont immédiats.
 export async function enter(raw) {
   const code = normCode(raw);
   if (!CODE_RE.test(code)) throw fail('Code de salon invalide.', true);
-  const uid = await ready();
-  const room = await getRoom(idOf(code));
-  if (!room || room.game !== 'billard') throw fail('Ce salon n\'existe plus (fermé par l\'hôte).', true);
-  if (!room.config || !Object.hasOwn(MODES, room.config.mode)) throw fail('Salon invalide (configuration absente).', true);
+  let uid, last;
+  for (let i = 0; i < 6; i++) {
+    try { uid ??= await ready(); return await enterOnce(code, uid); }
+    catch (e) { last = e; if (e.final) throw e; await new Promise(r => setTimeout(r, 700)); }
+  }
+  throw last;
+}
+async function enterOnce(code, uid) {
+  let room = null, why = '';
+  try { room = await peek(rp(code)); if (!room) why = 'absent'; }              // V11 diagnostic : distingue « absent » / « lecture refusée » / réseau
+  catch (e) { why = e.code ? 'refusé:' + e.code : 'réseau'; diag('enter : lecture directe', why); }
+  if (!room) room = await getRoom(idOf(code)).catch(() => null);
+  if (!room || room.game !== 'billard') throw fail(`Salon indisponible (${why || 'données invalides'}) : ${room ? 'ce n\'est pas une partie de billard.' : why === 'absent' ? 'il n\'existe plus (fermé par l\'hôte ?).' : why.startsWith('refusé') ? 'lecture refusée par Firebase.' : 'réseau lent.'}`, why === 'absent');
+  if (!room.config || !Object.hasOwn(MODES, room.config.mode)) throw Object.assign(fail('Salon invalide (configuration absente).', true), { final: true });
   if (room.state === 'waiting') throw fail('La partie n\'a pas encore été lancée par l\'hôte.');
   const s = room.seats;
   if (!s || typeof s.a !== 'string' || typeof s.b !== 'string' || room.leaderId !== s.a) throw fail('Salon invalide (joueurs absents).', true);
   const seat = uid === s.a ? 0 : uid === s.b ? 1 : -1;
-  if (seat < 0) throw fail('Tu ne fais pas partie de ce salon (partie déjà lancée à deux joueurs).', true);
+  if (seat < 0) throw Object.assign(fail('Tu ne fais pas partie de ce salon (partie déjà lancée à deux joueurs).', true), { final: true });
   return { uid, seat, room, code };
 }
 

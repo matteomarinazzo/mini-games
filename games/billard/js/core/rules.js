@@ -3,7 +3,7 @@
 // shot = { before: [n…], pocketed: [n…] (ordre d'empochage), cue: bool, first: n|null, pk?: {n: indexPoche}, side?: 'L'|'R' }
 // Retour : { keep, foul, over?, msg }. Les fautes donnent le tour ET la blanche en main (g.hand) à l'adversaire.
 // Options V6 (g.opts, figées à la création) : cueSide (g.zone / g.fwd), twoShots (g.sh = coups restants dans la visite), blackOpp (g.ref).
-import { TABLE } from './physics.js';
+import { TABLE, D_R } from './physics.js';
 import { normalize } from './config.js';
 
 export const TURN_TIME = 30;
@@ -20,7 +20,7 @@ export const POCKET_NAME = ['haut-gauche', 'haut-droite', 'bas-gauche', 'bas-dro
 // Zone de replacement : jusqu'au 3e losange (x = 3/8 de la longueur) côté gauche ; symétrique (5/8) côté droit.
 export const ZONE = { L: TABLE.W * 3 / 8, R: TABLE.W * 5 / 8 };
 const MINC = Math.sin(3 * Math.PI / 180);        // composante minimale vers l'avant : ≈ 3° d'écart avec la verticale
-export const cueZoneOk = (g, x) => !g.zone || (g.zone === 'L' ? x <= ZONE.L : x >= ZONE.R);
+export const cueZoneOk = (g, x, y) => !g.zone || (g.zone === 'D' ? x <= TABLE.W / 4 && Math.hypot(x - TABLE.W / 4, y - TABLE.H / 2) <= D_R : g.zone === 'L' ? x <= ZONE.L : x >= ZONE.R);   // V10 : 'D' = snooker
 export const legalAim = (a, fwd) => !fwd || Math.cos(a) * (fwd === 'R' ? 1 : -1) >= MINC - 1e-9;
 export function clampAim(a, fwd) {
   if (legalAim(a, fwd)) return a;
@@ -29,8 +29,9 @@ export function clampAim(a, fwd) {
 }
 
 export const createGame = (mode, opts, cpu = false) => ({
-  mode, cur: 0, groups: [null, null], hand: false, over: false, winner: null, reason: '',
-  opts: normalize(opts, mode), zone: null, fwd: null, sh: 1, ref: [null, null], cpu: !!cpu, pts: [0, 0],
+  mode, cur: 0, groups: [null, null], hand: mode === 'snooker', over: false, winner: null, reason: '',
+  opts: normalize(opts, mode), zone: mode === 'snooker' ? 'D' : null, fwd: null, sh: 1, ref: [null, null], cpu: !!cpu, pts: [0, 0],
+  sn: mode === 'snooker' ? { ph: 'red', nx: 16, rd: 15 } : null,   // V10 : ph = bille visée (red | colour | seq), nx = couleur à empocher en séquence, rd = rouges restantes
 });
 
 // s = coup évalué (faute de coup) ; absent = temps écoulé. twoShots : faute SANS blanche empochée → 2 coups, SANS blanche en main ;
@@ -45,11 +46,12 @@ const pass = (g, foul, msg, s) => {
 const end = (g, w, reason) => { g.over = true; g.winner = w; g.reason = reason; g.hand = false; g.sh = 1; return { keep: false, foul: false, over: true, msg: reason }; };
 const keep = (g, msg) => { g.sh = 1; return { keep: true, foul: false, msg }; };   // bille légale empochée : le 2e coup éventuel est perdu
 
-export const timeout = g => g.mode === 'carom' ? pass(g, false, `Temps écoulé : tour de ${nm(g, g.cur)} perdu`) : pass(g, true, `Temps écoulé : faute de ${nm(g, g.cur)}`);   // faute simple : jamais de 2 coups
+export const timeout = g => g.mode === 'snooker' ? evSn(g, { timeout: true, pocketed: [], before: [] }) : g.mode === 'carom' ? pass(g, false, `Temps écoulé : tour de ${nm(g, g.cur)} perdu`) : pass(g, true, `Temps écoulé : faute de ${nm(g, g.cur)}`);   // faute simple : jamais de 2 coups
 
 // Une bille n est-elle légale comme PREMIER contact du joueur courant ? before = billes sur la table (hors blanche).
 export function legalFirst(g, n, before) {
   if (g.mode === 'carom') return true;
+  if (g.mode === 'snooker') return g.sn.ph === 'red' ? n <= 15 : g.sn.ph === 'colour' ? n > 15 : n === g.sn.nx;
   if (g.mode === '8ball') {
     const gr = g.groups[g.cur];
     return !gr ? n !== 8 : before.some(m => groupOf(m) === gr) ? groupOf(n) === gr : n === 8;
@@ -64,6 +66,7 @@ function foulReason(g, s) {
 }
 
 function ev(g, s) {
+  if (g.mode === 'snooker') return evSn(g, s);
   const me = g.cur, op = 1 - me, who = nm(g, me), foul = foulReason(g, s);
   if (g.mode === 'carom') {   // V9 : un point si la blanche touche les deux autres billes ; sinon le tour passe (ni faute ni blanche en main)
     if (s.hits?.includes(1) && s.hits.includes(3)) { g.pts[me]++; return g.pts[me] >= CAROM_TARGET ? end(g, me, `${who} atteint ${CAROM_TARGET} points`) : keep(g, `${who} : ${g.pts[me]} point${g.pts[me] > 1 ? 's' : ''}`); }
@@ -97,6 +100,49 @@ function ev(g, s) {
   return mine ? keep(g, msg) : pass(g, false, msg);
 }
 
+/* ---- V10 : snooker. Voir help.js pour le texte des règles. pts = points ; fautes : min. 4 (ou valeur de la bille la plus chère concernée) ---- */
+export const SNV = n => (n <= 15 ? 1 : n - 14);
+const snName = n => (n <= 15 ? 'rouge' : ['jaune', 'verte', 'marron', 'bleue', 'rose', 'noire'][n - 16]);
+const snFin = g => {   // plus assez de points sur la table pour rattraper : manche terminée
+  const sn = g.sn; if (sn.ph !== 'seq') return null;
+  let rest = 0; for (let k = sn.nx; k <= 21; k++) rest += SNV(k);
+  const d = g.pts[0] - g.pts[1];
+  return Math.abs(d) > rest ? end(g, d > 0 ? 0 : 1, `Manche terminée : ${g.pts[0]} – ${g.pts[1]}`) : null;
+};
+function evSn(g, s) {
+  const me = g.cur, op = 1 - me, who = nm(g, me), sn = g.sn, p = s.pocketed, first = s.first ?? null;
+  const reds = p.filter(n => n <= 15).length, cols = p.filter(n => n > 15);
+  let foul = '';
+  if (s.timeout) foul = 'temps écoulé';
+  else if (s.cue) foul = 'blanche empochée';
+  else if (first === null) foul = 'aucune bille touchée';
+  else if (!legalFirst(g, first, s.before)) foul = 'mauvaise bille touchée';
+  else if (sn.ph === 'red' ? cols.length : sn.ph === 'colour' ? reds || cols.length > 1 || (cols.length && cols[0] !== first) : p.some(n => n !== sn.nx)) foul = 'mauvaise bille empochée';
+  sn.rd -= reds;
+  if (foul) {   // les couleurs empochées sont replacées ; les rouges restent au fond ; blanche empochée : placement dans le D, sinon on joue d'où elle est
+    const v = Math.max(4, sn.ph === 'seq' ? SNV(sn.nx) : 1, first === null ? 0 : SNV(first), ...p.map(SNV));
+    g.pts[op] += v; sn.ph = sn.ph === 'seq' ? 'seq' : sn.rd ? 'red' : sn.ph === 'red' ? 'colour' : 'seq';
+    g.cur = op; g.hand = !!s.cue; g.zone = s.cue ? 'D' : null; g.fwd = null; g.sh = 1;
+    return snFin(g) || { keep: false, foul: true, msg: `Faute ${who} : ${foul} (+${v} pour ${nm(g, op)})`, respot: cols };
+  }
+  let add = 0, kp = false, respot = [];
+  if (sn.ph === 'red') { if (reds) { add = reds; sn.ph = 'colour'; kp = true; } }
+  else if (sn.ph === 'colour') { if (cols.length) { add = SNV(cols[0]); respot = cols; kp = true; } sn.ph = sn.rd ? 'red' : 'seq'; }
+  else if (p.length) { add = SNV(sn.nx); sn.nx++; kp = true; }
+  g.pts[me] += add;
+  if (sn.ph === 'seq' && sn.nx > 21) {   // noire empochée : fin ; égalité = noire replacée, l'adversaire joue
+    const d = g.pts[0] - g.pts[1];
+    if (d) return end(g, d > 0 ? 0 : 1, `${who} empoche la noire : ${g.pts[0]} – ${g.pts[1]}`);
+    sn.nx = 21; g.cur = op; g.sh = 1; g.hand = false; g.zone = null;
+    return { keep: false, foul: false, msg: 'Égalité : la noire est replacée', respot: [21] };
+  }
+  const f = snFin(g); if (f) return f;
+  g.sh = 1;
+  if (kp) return { keep: true, foul: false, msg: `${who} : ${g.pts[me]} pts`, respot };
+  g.cur = op; g.hand = false; g.zone = null; g.fwd = null;
+  return { keep: false, foul: false, msg: '', respot };
+}
+
 // Poche de référence (blackOpp) : celle où est entrée la dernière bille de chaque groupe, quel que soit le joueur qui l'a empochée.
 function trackRef(g, s) {
   if (!s.pk) return;
@@ -125,6 +171,7 @@ export const requiredPocket = (g, rem) => blackTarget(g, rem);
 
 // Texte d'information affiché sous le nom d'un joueur. rem = billes restantes sur la table.
 export function info(g, i, rem) {
+  if (g.mode === 'snooker') return `${g.pts[i]} pts` + (i === g.cur && !g.over ? ' · ' + (g.sn.ph === 'red' ? 'rouge' : g.sn.ph === 'colour' ? 'couleur' : snName(g.sn.nx)) : '');
   const x = i === g.cur && g.sh === 2 && !g.over ? ' · 2 coups' : '';
   if (g.mode === 'carom') return `${g.pts[i]} / ${CAROM_TARGET} pts`;
   if (g.mode === '8ball') {
@@ -139,6 +186,7 @@ export function info(g, i, rem) {
 // Billes à afficher dans le panneau du joueur i : { balls, next }. 8-ball : billes restantes de son groupe (ou la 8).
 // 9/10-ball : billes en jeu, affichées pour le joueur actif seulement ; next = bille à viser en premier.
 export function targets(g, i, rem) {
+  if (g.mode === 'snooker') { const sn = g.sn; return i !== g.cur || g.over ? { balls: [], next: null } : sn.ph === 'red' ? { balls: [1], next: null } : sn.ph === 'colour' ? { balls: [16, 17, 18, 19, 20, 21], next: null } : { balls: [sn.nx], next: sn.nx }; }
   if (g.mode === 'carom') return { balls: [], next: null };
   if (g.mode === '8ball') {
     const gr = g.groups[i];

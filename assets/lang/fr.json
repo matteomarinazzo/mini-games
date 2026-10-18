@@ -258,6 +258,22 @@
             "mindplay-wire": {
                 "name": "Mindplay : Fils",
                 "description": "Mémorise les règles et coupe les bons fils. Jusqu’où ira ta mémoire ?"
+            },
+            "nonogram": {
+                "name": "Nonogram",
+                "description": "Les chiffres révèlent un dessin caché. Noircis les bonnes cases : trois erreurs, et c’est perdu."
+            },
+            "mindplay-trail": {
+                "name": "Mindplay : Trajet",
+                "description": "Mémorise le trajet sur le grillage, puis refais-le. Jusqu’où ira ta mémoire ?"
+            },
+            "fruit-cutter": {
+                "name": "Coupe-Fruits",
+                "description": "Coupe les fruits d'un trait, enchaîne les combos et évite les bombes. Trois vies, puis c'est fini !"
+            },
+            "untie": {
+                "name": "Untie",
+                "description": "Dénoue les cordes : glisse une extrémité vers un piton libre jusqu’à ce que plus rien ne se croise."
             }
         },
         "badges": {
@@ -275,6 +291,7 @@
             "random": "DÉFI"
         },
         "categories": {
+            "random": "🎲 Hasard",
             "action": "⚡ Action & Réflexes",
             "adventure": "🧭 Aventure & Exploration",
             "puzzle": "🧩 Casse-tête & Logique",

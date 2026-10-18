@@ -259,6 +259,22 @@
             "mindplay-wire": {
                 "name": "Mindplay: Kabel",
                 "description": "Merke dir die Reihenfolge der Kabel und durchtrenne sie richtig. Wie weit reicht dein Gedächtnis?"
+            },
+            "nonogram": {
+                "name": "Nonogram",
+                "description": "Die Zahlen enthüllen ein verstecktes Bild. Male die richtigen Kästchen aus: Drei Fehler und es ist vorbei."
+            },
+            "mindplay-trail": {
+                "name": "Mindplay: Trai",
+                "description": "Merke dir den Weg auf dem Raster und wiederhole ihn. Wie weit reicht dein Gedächtnis?"
+            },
+            "fruit-cutter": {
+                "name": "Obstschneider",
+                "description": "Schneide die Früchte in einem Zug, reihe die Combos aneinander und weiche den Bomben aus. Drei Leben, dann ist es vorbei!"
+            },
+            "untie": {
+                "name": "Untie",
+                "description": "Löse die Knoten: Ziehe ein Ende zu einem freien Stift, bis nichts mehr überkreuzt ist."
             }
         },
         "badges": {
@@ -276,6 +292,7 @@
             "random": "MUT"
         },
         "categories": {
+            "random": "🎲 MUT",
             "action": "⚡ Action & Reflexe",
             "adventure": "🧭 Abenteuer & Erkundung",
             "puzzle": "🧩 Rätsel & Logik",

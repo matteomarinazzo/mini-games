@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.39.2026-10-18.0";
+const CACHE_NAME = "mini-games-cache-v1.40.2026-10-18.2";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -102,6 +102,9 @@ const ASSETS_TO_CACHE = [
     'assets/logos/2048.webp',
     'assets/logos/connected.webp',
     'assets/logos/mindplay-wire.webp',
+    'assets/logos/nonogram.webp',
+    'assets/logos/mindplay-trail.webp',
+    'assets/logos/fruit-cutter.webp',
 
     // About
     'about/about.html',
@@ -544,6 +547,21 @@ const ASSETS_TO_CACHE = [
     'games/mindplay-wire/index.html',
     'games/mindplay-wire/css/game.css',
     'games/mindplay-wire/js/game.js',
+
+    // Game: nonogram
+    'games/nonogram/index.html',
+    'games/nonogram/css/game.css',
+    'games/nonogram/js/game.js',
+
+    // Game: Mindplay: Trail
+    'games/mindplay-trail/index.html',
+    'games/mindplay-trail/css/game.css',
+    'games/mindplay-trail/js/game.js',
+
+    // Game: fruit-cutter
+    'games/fruit-cutter/index.html',
+    'games/fruit-cutter/css/game.css',
+    'games/fruit-cutter/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

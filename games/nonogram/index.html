@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nonogram – Jeu de puzzle logique | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Nonogram sur Mini‑Games. Mémorisez les cases qui s'allument sur la grille, retrouvez-les sans la moindre erreur et grimpez de niveau !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/nonogram/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Nonogram – Jeu de puzzle logique | Mini‑Games">
+    <meta property="og:description" content="Noircissez la grille d'après les chiffres, 3 erreurs maximum !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/nonogram/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/nonogram.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Nonogram – Jeu de puzzle logique | Mini‑Games">
+    <meta name="twitter:description" content="Noircissez la grille d'après les chiffres, 3 erreurs maximum !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/nonogram.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Nonogram",
+      "url": "https://mini-games.ch/games/nonogram/",
+      "description": "Puzzle logique : noircissez les cases de la grille d'après les chiffres des lignes et des colonnes, avec 3 erreurs maximum.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Logic Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🧩</div>
+            <h2 class="start-title">Nonogram</h2>
+            <button class="btn-sky" data-d="e">Facile</button>
+            <button class="btn-sky" data-d="m">Moyen</button>
+            <button class="btn-sky" data-d="h">Difficile</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Nouvelle partie</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">🎉</div>
+            <div class="gameover-title" id="goTitle">Bravo !</div>
+            <div class="pname" id="goName"></div>
+            <div class="prev" id="goPrev"></div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer</button>
+            <button class="btn-sky secondary" id="goSizeBtn">Changer de taille</button>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu"><svg width="20" height="20"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg></a>
+        </div>
+        <div class="hud-center">
+            <span id="lives"></span>
+            <span id="time">0:00</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="pauseBtn" title="Pause"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg></button>
+        </div>
+    </div>
+
+    <main id="stage">
+        <div id="puz" role="group" aria-label="Grille de nonogram"></div>
+    </main>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,542 @@
+/* ── Nonogram – game.css ──
+   Identité visuelle commune aux jeux Mini-Games. */
+
+:root {
+    --ui-bg: rgba(2, 10, 24, .90);
+    --ui-border: rgba(80, 190, 240, .22);
+    --ui-text: #e0f4ff;
+    --ui-pale: #8dc8e8;
+    --ui-accent: #5bc8f5;
+    --ui-danger: #ef476f;
+    --text-dim: #8dc8e8;
+    --lit-1: #fff8c4;
+    --lit-2: #ffd84d;
+    --lit-3: #f59e0b;
+    --ok-1: #b9ffd9;
+    --ok-2: #3fe08f;
+    --ok-3: #0f9d58;
+    --transition: all .4s cubic-bezier(.4, 0, .2, 1);
+    --font: 'Fredoka', 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: var(--font);
+    background: radial-gradient(ellipse at 50% 35%, #0b2442 0%, #04122a 55%, #020a18 100%);
+    color: var(--ui-text);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+/* ─── HUD ─── */
+.hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 52px;
+    background: var(--ui-bg);
+    border-bottom: 1px solid var(--ui-border);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+}
+
+.hud-left,
+.hud-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 80px;
+}
+
+.hud-right {
+    justify-content: flex-end;
+}
+
+.hud-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.score-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--ui-pale);
+    letter-spacing: .6px;
+}
+
+.score-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ui-accent);
+    line-height: 1;
+    transition: color .2s;
+    font-variant-numeric: tabular-nums;
+}
+
+.score-value.level-up {
+    color: var(--lit-2);
+}
+
+/* ─── ICON BUTTONS ─── */
+.icon-btn {
+    background: rgba(91, 200, 245, .12);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.icon-btn:hover {
+    background: rgba(91, 200, 245, .25);
+}
+
+.icon-btn svg {
+    pointer-events: none;
+}
+
+/* ─── OVERLAYS ─── */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(1, 6, 18, .87);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.overlay.open {
+    display: flex;
+}
+
+.modal {
+    position: relative;
+    background: linear-gradient(160deg, #0a1f3a, #030f22);
+    border: 1px solid var(--ui-border);
+    border-radius: 22px;
+    padding: 30px 26px;
+    max-width: 380px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .7);
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--ui-pale);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.modal h2 {
+    font-size: 22px;
+    color: var(--ui-accent);
+    margin-bottom: 18px;
+}
+
+.modal h3 {
+    font-size: 15px;
+    color: var(--ui-accent);
+    margin: 14px 0 6px;
+}
+
+.modal section {
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+}
+
+.modal ul {
+    padding-left: 18px;
+}
+
+.modal li {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 4px;
+    color: var(--ui-pale);
+}
+
+.modal li strong {
+    color: var(--ui-text);
+}
+
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#pauseOverlay .modal h2 {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+}
+
+/* Écran de démarrage */
+.start-modal {
+    text-align: center;
+}
+
+.start-title {
+    font-size: 30px !important;
+    letter-spacing: 1px;
+    margin-bottom: 12px !important;
+}
+
+.start-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ui-pale);
+    margin-bottom: 10px;
+}
+
+.start-text strong {
+    color: var(--ui-text);
+}
+
+.start-keys {
+    font-size: 12px;
+    color: var(--ui-pale);
+    opacity: .7;
+    margin-bottom: 22px;
+}
+
+.gameover-emoji {
+    font-size: 56px;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.gameover-title {
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.final-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, .05);
+    border-radius: 10px;
+}
+
+.stat-val {
+    font-weight: 700;
+    color: var(--ui-accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.go-world {
+    margin: -4px 0 16px;
+    min-height: 16px;
+}
+
+/* ─── BUTTONS ─── */
+.btn-sky {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #0077b6, #023e8a);
+    box-shadow: 0 6px 18px rgba(0, 119, 182, .4);
+    transition: var(--transition);
+}
+
+.btn-sky:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+}
+
+.btn-sky:active {
+    transform: translateY(0);
+}
+
+.btn-sky:disabled {
+    opacity: .6;
+    cursor: default;
+}
+
+.btn-sky.secondary {
+    background: rgba(255, 255, 255, .07);
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.btn-sky.secondary:hover {
+    background: rgba(255, 255, 255, .14);
+}
+
+/* ─── SCROLLBAR ─── */
+.modal::-webkit-scrollbar {
+    width: 5px;
+}
+
+.modal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .2);
+    border-radius: 3px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background: var(--ui-accent);
+}
+
+
+.hud-center {
+    flex-direction: row;
+    gap: 16px
+}
+
+#lives i {
+    font-style: normal;
+    color: var(--ui-danger);
+    font-size: 22px;
+    margin: 0 2px;
+    transition: opacity .3s
+}
+
+#lives i.lost {
+    opacity: .2
+}
+
+#time {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ui-accent);
+    font-variant-numeric: tabular-nums
+}
+
+#stage {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px))
+}
+
+#puz {
+    --c: 36px;
+    display: grid;
+    background: rgba(2, 10, 24, .55);
+    border: 1px solid var(--ui-border);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .55), inset 0 0 30px rgba(91, 200, 245, .06)
+}
+
+#puz.shake {
+    animation: shake .35s
+}
+
+.cc,
+.rc {
+    display: flex;
+    color: var(--ui-text);
+    font-weight: 700;
+    font-size: calc(var(--c)*.58);
+    letter-spacing: .02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: opacity .3s
+}
+
+.cc {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: calc(var(--c)*.1);
+    padding-bottom: calc(var(--c)*.12)
+}
+
+.rc {
+    justify-content: flex-end;
+    align-items: center;
+    gap: calc(var(--c)*.22);
+    padding-right: calc(var(--c)*.22)
+}
+
+.done {
+    opacity: .35
+}
+
+.done span {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px
+}
+
+.cell {
+    width: var(--c);
+    height: var(--c);
+    padding: 0;
+    border: 1px solid rgba(80, 190, 240, .18);
+    background: rgba(255, 255, 255, .04);
+    cursor: pointer;
+    transition: background .15s
+}
+
+.cell.r5 {
+    border-right: 2px solid rgba(80, 190, 240, .5)
+}
+
+.cell.b5 {
+    border-bottom: 2px solid rgba(80, 190, 240, .5)
+}
+
+.cell.on,
+.cell.on.r5,
+.cell.on.b5 {
+    background: #33a6df;
+    border: 1px solid rgba(2, 10, 24, .55);
+    box-shadow: none;
+    animation: fill .25s ease
+}
+
+.cell.bad {
+    animation: bad .5s
+}
+
+.pname {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ui-accent);
+    margin-bottom: 14px
+}
+
+.prev {
+    display: grid;
+    grid-template-columns: repeat(var(--w), 1fr);
+    gap: 0;
+    width: min(56vw, 190px);
+    margin: 0 auto 20px
+}
+
+.prev i {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, .07)
+}
+
+.prev i.on {
+    background: #33a6df
+}
+
+.start-modal .btn-sky+.btn-sky,
+.modal .btn-sky+.btn-sky {
+    margin-top: 12px
+}
+
+.overlay.open .modal {
+    animation: popIn .25s ease
+}
+
+@keyframes fill {
+    from {
+        transform: scale(.4)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+@keyframes bad {
+
+    0%,
+    100% {
+        background: rgba(255, 255, 255, .04)
+    }
+
+    30%,
+    60% {
+        background: var(--ui-danger)
+    }
+}
+
+@keyframes shake {
+
+    20%,
+    60% {
+        transform: translateX(-5px)
+    }
+
+    40%,
+    80% {
+        transform: translateX(5px)
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(.85);
+        opacity: 0
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1
+    }
+}

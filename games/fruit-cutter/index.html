@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Coupe-Fruits – Jeu d'arcade gratuit en ligne | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Coupe-Fruits sur Mini‑Games. Tranchez les fruits d'un geste, enchaînez les combos et évitez les bombes. Battez le record mondial !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/fruit-cutter/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Coupe-Fruits – Jeu d'arcade gratuit en ligne | Mini‑Games">
+    <meta property="og:description" content="Tranchez les fruits, évitez les bombes et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/fruit-cutter/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/fruit-cutter.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Coupe-Fruits – Jeu d'arcade gratuit en ligne | Mini‑Games">
+    <meta name="twitter:description" content="Tranchez les fruits, évitez les bombes et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/fruit-cutter.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Coupe-Fruits",
+      "url": "https://mini-games.ch/games/fruit-cutter/",
+      "description": "Jeu d'arcade : tranchez les fruits lancés en l'air d'un geste du doigt ou de la souris, enchaînez les combos et évitez les bombes.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Arcade Game", "Casual Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🍉</div>
+            <h2 class="start-title">Coupe-Fruits</h2>
+            <p class="start-text"><strong>Tranche</strong> les fruits d'un trait et <strong>évite les
+                    bombes</strong>.<br>
+                Enchaîne les <strong>combos</strong> pour marquer gros.</p>
+            <p class="start-keys">Glisse au doigt ou à la souris · Échap pour la pause</p>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="startRulesBtn">📖 Règles du jeu</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de Coupe-Fruits</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Marque un maximum de <strong>points</strong> en tranchant les fruits lancés en l'air.</li>
+                    <li>La partie dure tant qu'il te reste des <strong>vies</strong> et que tu n'as pas touché de
+                        <strong>bombe</strong>.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>🍉 Trancher</h3>
+                <ul>
+                    <li><strong>Glisse</strong> sans relâcher pour tracer un trait : tout fruit touché est coupé, même
+                        en descente.</li>
+                    <li>Chaque fruit rapporte <strong>10 points</strong>.</li>
+                    <li><strong>Combo</strong> : N fruits coupés d'affilée rapportent 10 × N × N points
+                        (2 fruits = 40, 3 fruits = 90…). La série s'arrête quand tu relâches, quand le
+                        <strong>premier fruit coupé</strong> a quitté l'écran, ou quand tu rates un fruit. Les points
+                        sont alors validés.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>💣 Dangers</h3>
+                <ul>
+                    <li>Une <strong>bombe</strong> dans ton trait termine la partie immédiatement, même s'il te reste
+                        des vies. Les points du combo en cours sont validés.</li>
+                    <li>Un fruit qui <strong>tombe hors de l'écran</strong> sans être coupé te coûte
+                        <strong>1 vie</strong> et arrête ton combo. Tu en as <strong>3</strong>.
+                    </li>
+                    <li>Plus tu avances, plus les fruits sont <strong>rapides</strong> et plus il y a de
+                        <strong>bombes</strong>.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>🏆 Records</h3>
+                <ul>
+                    <li>Classement selon les <strong>points</strong>, puis la <strong>durée la plus courte</strong> à
+                        points égaux.</li>
+                    <li>Le chrono ne compte pas le temps en <strong>pause</strong>.</li>
+                    <li>Ta partie est <strong>sauvegardée</strong> : tu peux recharger la page. Le jeu fonctionne aussi
+                        <strong>hors ligne</strong>.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>⌨️ Commandes</h3>
+                <ul>
+                    <li><strong>Glisser</strong> (doigt ou souris) – Trancher</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">💥</div>
+            <div class="gameover-title" id="goTitle">Partie terminée</div>
+            <div class="final-stats">
+                <div class="stat-row">
+                    <span>Score</span>
+                    <span class="stat-val" id="goScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Durée</span>
+                    <span class="stat-val" id="goDuration">0:00,0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Record</span>
+                    <span class="stat-val" id="goBest">—</span>
+                </div>
+            </div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card">
+                        <span class="rc-label">Points</span>
+                        <span class="rc-value" id="recPersonalScore">—</span>
+                        <span class="rc-label">Temps</span>
+                        <span class="rc-value" id="recPersonalTime">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard">
+                        <span class="rc-label">Points</span>
+                        <span class="rc-value" id="recGlobalScore">—</span>
+                        <span class="rc-label">Temps</span>
+                        <span class="rc-value" id="recGlobalTime">—</span>
+                    </div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label">Score</span>
+            <span class="score-value" id="scoreValue">0</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <main id="stage">
+        <canvas id="game" aria-label="Zone de jeu : glisse pour trancher les fruits"></canvas>
+        <div class="stat-bar">
+            <div class="stat-chip"><span class="chip-label">Record mondial</span><span class="chip-value"
+                    id="worldVal">—</span></div>
+            <div class="stat-chip"><span class="chip-label">Vies</span><span class="chip-value" id="livesVal"></span>
+            </div>
+            <div class="stat-chip"><span class="chip-label">Durée</span><span class="chip-value"
+                    id="timeVal">0:00</span></div>
+        </div>
+    </main>
+
+    <!-- 🏆 Popup Record 🏆 -->
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

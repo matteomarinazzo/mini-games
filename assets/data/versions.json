@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.39.2026-10-18",
+    "currentVersion": "1.40.2026-10-18",
     "lastUpdate": "2026-10-18",
     "history": [
+        {
+            "version": "1.40.2026-10-18",
+            "date": "2026-10-18",
+            "changes": [
+                "Ajout du jeu Nonogram",
+                "Ajout du jeu Mindplay : Trajet",
+                "Ajout du jeu Coupe-Fruits"
+            ]
+        },
         {
             "version": "1.39.2026-10-18",
             "date": "2026-10-18",

@@ -271,10 +271,6 @@
             "fruit-cutter": {
                 "name": "Obstschneider",
                 "description": "Schneide die Früchte in einem Zug, reihe die Combos aneinander und weiche den Bomben aus. Drei Leben, dann ist es vorbei!"
-            },
-            "untie": {
-                "name": "Untie",
-                "description": "Löse die Knoten: Ziehe ein Ende zu einem freien Stift, bis nichts mehr überkreuzt ist."
             }
         },
         "badges": {

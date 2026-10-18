@@ -271,10 +271,6 @@
             "fruit-cutter": {
                 "name": "Fruit-Cutter",
                 "description": "Slice fruits in one go, chain combos, and avoid bombs. Three lives, then it's over!"
-            },
-            "untie": {
-                "name": "Untie",
-                "description": "Untangle the ropes: slide one end to a free peg until nothing crosses."
             }
         },
         "badges": {

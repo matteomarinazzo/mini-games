@@ -259,6 +259,18 @@
             "mindplay-wire": {
                 "name": "Mindplay : Wire",
                 "description": "Remember the order of the wires and cut them correctly. How far will your memory go?"
+            },
+            "nonogram": {
+                "name": "Nonogram",
+                "description": "The numbers reveal a hidden picture. Fill in the correct boxes: three mistakes, and it's over."
+            },
+            "mindplay-trail": {
+                "name": "Mindplay: Trail",
+                "description": "Remember the path on the grid, then recreate it. How far will your memory go?"
+            },
+            "fruit-cutter": {
+                "name": "Fruit-Cutter",
+                "description": "Slice fruits in one go, chain combos, and avoid bombs. Three lives, then it's over!"
             }
         },
         "badges": {
@@ -276,6 +288,7 @@
             "random": "CHALLENGE"
         },
         "categories": {
+            "random": "🎲 Random",
             "action": "⚡ Action & Reflexes",
             "adventure": "🧭 Adventure & Exploration",
             "puzzle": "🧩 Puzzles & Logic",

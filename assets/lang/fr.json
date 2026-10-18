@@ -254,6 +254,10 @@
             "connected": {
                 "name": "Relié",
                 "description": "Relie chaque paire de points sans croiser les chemins et remplis toute la grille. Plus c’est grand, plus c’est serré."
+            },
+            "mindplay-wire": {
+                "name": "Mindplay : Fils",
+                "description": "Mémorise les règles et coupe les bons fils. Jusqu’où ira ta mémoire ?"
             }
         },
         "badges": {

@@ -255,6 +255,10 @@
             "connected": {
                 "name": "Verbunden",
                 "description": "Verbinde jedes Punktepaar, ohne die Wege zu kreuzen, und fülle das gesamte Spielfeld. Je größer, desto schwieriger."
+            },
+            "mindplay-wire": {
+                "name": "Mindplay: Kabel",
+                "description": "Merke dir die Reihenfolge der Kabel und durchtrenne sie richtig. Wie weit reicht dein Gedächtnis?"
             }
         },
         "badges": {

@@ -367,6 +367,20 @@
       "badgeText": "Mémoire",
       "rating": "0",
       "stars": "☆☆☆☆☆"
+    },
+    "mindplay-wire": {
+      "path": "./games/mindplay-wire/index.html",
+      "name": "Coupe le fil",
+      "emoji": "✂️",
+      "description": "Retiens les règles et coupe les bons fils. Une erreur, et tout recommence.",
+      "tags": [
+        "memory",
+        "solo"
+      ],
+      "badge": "memory",
+      "badgeText": "Mémoire",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
     }
   },
   "multiplayer": {

@@ -255,6 +255,10 @@
             "connected": {
                 "name": "Connected",
                 "description": "Connect each pair of dots without crossing the paths and fill the entire grid. The bigger it gets, the tighter it gets."
+            },
+            "mindplay-wire": {
+                "name": "Mindplay : Wire",
+                "description": "Remember the order of the wires and cut them correctly. How far will your memory go?"
             }
         },
         "badges": {

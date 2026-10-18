@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.38.2026-10-17.5";
+const CACHE_NAME = "mini-games-cache-v1.39.2026-10-18.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -101,6 +101,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/tap-to-fly.webp',
     'assets/logos/2048.webp',
     'assets/logos/connected.webp',
+    'assets/logos/mindplay-wire.webp',
 
     // About
     'about/about.html',
@@ -538,6 +539,11 @@ const ASSETS_TO_CACHE = [
     'games/connected/index.html',
     'games/connected/css/game.css',
     'games/connected/js/game.js',
+
+    // Game: Mindplay: Wire
+    'games/mindplay-wire/index.html',
+    'games/mindplay-wire/css/game.css',
+    'games/mindplay-wire/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

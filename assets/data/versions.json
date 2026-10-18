@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.38.2026-10-17",
-    "lastUpdate": "2026-10-17",
+    "currentVersion": "1.39.2026-10-18",
+    "lastUpdate": "2026-10-18",
     "history": [
+        {
+            "version": "1.39.2026-10-18",
+            "date": "2026-10-18",
+            "changes": [
+                "Ajout du jeu Mindplay : Fils"
+            ]
+        },
         {
             "version": "1.38.2026-10-17",
             "date": "2026-10-17",

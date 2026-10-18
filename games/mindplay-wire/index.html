@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mindplay : Fils – Jeu de règles et de mémoire | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Mindplay : Fils sur Mini‑Games. Une nouvelle règle à chaque niveau : retenez-les toutes, coupez les bons fils avant la fin du temps et grimpez de niveau !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/mindplay-wire/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Mindplay : Fils – Jeu de règles et de mémoire | Mini‑Games">
+    <meta property="og:description"
+        content="Retenez les règles, coupez les bons fils et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/mindplay-wire/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/mindplay-wire.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mindplay : Fils – Jeu de règles et de mémoire | Mini‑Games">
+    <meta name="twitter:description"
+        content="Retenez les règles, coupez les bons fils et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/mindplay-wire.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Mindplay : Fils",
+      "url": "https://mini-games.ch/games/mindplay-wire/",
+      "description": "Jeu de règles et de mémoire : une nouvelle règle apparaît à chaque niveau, retenez-les toutes et coupez les bons fils avant la fin du temps.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Memory Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">✂️</div>
+            <h2 class="start-title">Mindplay : Fils</h2>
+            <p class="start-text">Une <strong>nouvelle règle</strong> apparaît à chaque niveau.<br>
+                Certaines sont <strong>permanentes</strong> : <strong>retiens-les</strong>, puis coupe les bons fils <strong>avant la fin du temps</strong>.</p>
+            <p class="start-keys">Clic ou toucher</p>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+            <br><br>
+            <button class="btn-sky secondary" id="startRulesBtn">📖 Règles du jeu</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose">✕</button>
+            <h2>📖 Règles de Mindplay : Fils</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Atteins le <strong>niveau le plus élevé</strong> possible.</li>
+                    <li>Une seule <strong>mauvaise coupe</strong> ou un temps écoulé avec des fils manquants et la partie est <strong>terminée</strong>.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>✂️ Déroulement d'un niveau</h3>
+                <ul>
+                    <li>Tu ne vois que la <strong>nouvelle règle</strong>. Coupe les fils en les touchant, dans <strong>n'importe quel ordre</strong>. Tu as <strong><span class="js-timer">15</span> secondes</strong>.</li>
+                    <li>Dès que tous les bons fils sont coupés, le niveau suivant démarre. Si <strong>aucun fil</strong> ne doit être coupé, attends la fin du temps.</li>
+                    <li>À chaque niveau, tous les fils reviennent intacts.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📜 Types de règles</h3>
+                <ul>
+                    <li><strong>Ponctuelle</strong> : « Coupe les fils rouges. » ne vaut que pour ce niveau.</li>
+                    <li><strong>Permanente</strong> : « Coupe toujours… » ou « Ne coupe jamais… » vaut <strong>à chaque niveau</strong>, dès maintenant.</li>
+                    <li><strong>Oubli</strong> : « Oublie toutes les règles sur… » supprime les règles permanentes de cette cible (ce fil ou cette couleur) et ces fils sont aussi <strong>exclus des autres règles permanentes</strong>.</li>
+                    <li>Entre règles permanentes, <strong>la plus récente l'emporte</strong> sur chaque fil.</li>
+                    <li>Une règle <strong>permanente l'emporte sur une ponctuelle</strong> : tant que « Ne coupe jamais les bleus » est en vigueur, on ne coupe pas les bleus. Oublie-la d'abord.</li>
+                    <li>Les fils se lisent de <strong>gauche à droite</strong>. Le compteur <strong>Perma.</strong> indique combien de règles permanentes sont actives.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📈 Niveaux</h3>
+                <ul>
+                    <li>Tu commences avec <strong class="js-start-wires">4</strong> fils, puis <strong>1 de plus tous les <span class="js-add-every">3</span> niveaux</strong>, jusqu'à <strong class="js-max-wires">8</strong>.</li>
+                    <li>Les fils ajoutés arrivent à droite ; les autres ne bougent jamais.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🏆 Records</h3>
+                <ul>
+                    <li>Le score est le <strong>niveau atteint</strong>. En cas d'égalité avec le record mondial, le plus ancien reste.</li>
+                    <li>Le jeu fonctionne aussi <strong>hors ligne</strong> : ton record personnel est conservé.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="restartPauseBtn">Recommencer</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="gameoverOverlay">
+        <div class="modal">
+            <div class="gameover-emoji" id="goEmoji">💥</div>
+            <div class="gameover-title" id="goTitle">Boum !</div>
+            <div class="final-stats">
+                <div class="stat-row"><span>Niveau atteint</span><span class="stat-val" id="goLevel">1</span></div>
+                <div class="stat-row"><span>Meilleur niveau</span><span class="stat-val" id="goBest">—</span></div>
+            </div>
+            <div class="connection-status go-world" id="goWorldStatus"></div>
+            <button class="btn-sky" id="goRestartBtn">Rejouer (niveau 1)</button>
+            <br><br>
+            <button class="btn-sky secondary" id="goMenuBtn">Menu</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+            <section class="records-section">
+                <h3>👤 Mon Record</h3>
+                <div class="record-grid">
+                    <div class="record-card"><span class="rc-label">Niveau</span><span class="rc-value" id="recPersonalLevel">—</span></div>
+                </div>
+            </section>
+            <section class="records-section">
+                <h3>🌍 Record Mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global" id="recGlobalCard"><span class="rc-label">Niveau</span><span class="rc-value" id="recGlobalLevel">—</span></div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg></a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg></button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label">Niveau</span>
+            <span class="score-value" id="levelValue">1</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg></button>
+            <button class="icon-btn" id="pauseBtn" title="Pause"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg></button>
+        </div>
+    </div>
+
+    <main id="stage">
+        <div class="board" id="board">
+            <div class="stat-bar">
+                <div class="stat-chip"><span class="chip-label">Meilleur</span><span class="chip-value" id="bestVal">—</span></div>
+                <div class="stat-chip"><span class="chip-label">Perma.</span><span class="chip-value" id="wiresVal">0</span></div>
+                <div class="stat-chip"><span class="chip-label">Temps</span><span class="chip-value" id="timeVal">15.0 s</span></div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-tag" id="ruleTag">Règle</div>
+                <div class="rule-text" id="ruleText"></div>
+            </div>
+            <div class="timer"><div class="timer-fill" id="timerFill"></div></div>
+            <div class="status-line" id="statusLine" aria-live="polite">Prépare-toi…</div>
+            <div class="box">
+                <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
+                <svg id="wires" viewBox="0 0 400 250" role="group" aria-label="Fils à couper"></svg>
+            </div>
+        </div>
+    </main>
+
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau Record !</h2>
+            <p>Vous avez battu le record mondial. Laissez un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Votre message..." maxlength="50">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

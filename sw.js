@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.40.2026-10-18.2";
+const CACHE_NAME = "mini-games-cache-v1.41.2026-10-19.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -105,6 +105,8 @@ const ASSETS_TO_CACHE = [
     'assets/logos/nonogram.webp',
     'assets/logos/mindplay-trail.webp',
     'assets/logos/fruit-cutter.webp',
+    'assets/logos/hangman.webp',
+    'assets/logos/beatfall.webp',
 
     // About
     'about/about.html',
@@ -548,7 +550,7 @@ const ASSETS_TO_CACHE = [
     'games/mindplay-wire/css/game.css',
     'games/mindplay-wire/js/game.js',
 
-    // Game: nonogram
+    // Game: Nonogram
     'games/nonogram/index.html',
     'games/nonogram/css/game.css',
     'games/nonogram/js/game.js',
@@ -558,10 +560,30 @@ const ASSETS_TO_CACHE = [
     'games/mindplay-trail/css/game.css',
     'games/mindplay-trail/js/game.js',
 
-    // Game: fruit-cutter
+    // Game: Fruit-cutter
     'games/fruit-cutter/index.html',
     'games/fruit-cutter/css/game.css',
     'games/fruit-cutter/js/game.js',
+
+    // Game: Hangman
+    'games/hangman/index.html',
+    'games/hangman/game.html',
+    'games/hangman/css/menu.css',
+    'games/hangman/css/game.css',
+    'games/hangman/js/menu.js',
+    'games/hangman/js/game.js',
+    'games/hangman/js/core/words.js',
+    'games/hangman/js/core/lang.js',
+
+    // Game: Beatfall
+    'games/beatfall/index.html',
+    'games/beatfall/game.html',
+    'games/beatfall/css/menu.css',
+    'games/beatfall/css/game.css',
+    'games/beatfall/js/menu.js',
+    'games/beatfall/js/game.js',
+    'games/beatfall/js/core/audio.js',
+    'games/beatfall/js/core/patterns.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

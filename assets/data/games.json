@@ -96,6 +96,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "beatfall": {
+      "path": "./games/beatfall/index.html",
+      "name": "Beatfall",
+      "emoji": "🎵",
+      "description": "Les notes tombent sur quatre colonnes : tape au bon moment, tiens les notes longues et enchaîne les parfaits. Quatre musiques, trois vies, et ça accélère.",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "music",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "layer-pile": {
       "path": "./games/layer-pile/index.html",
       "name": "Layer Pile",
@@ -268,6 +284,22 @@
         "logic",
         "puzzle",
         "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "hangman": {
+      "path": "./games/hangman/index.html",
+      "name": "Pendu",
+      "emoji": "🪢",
+      "description": "Devine le mot lettre par lettre avant que le dessin ne soit complet. Seul, ou à tour de rôle avec un ami.",
+      "tags": [
+        "vocabulary",
+        "puzzle",
+        "solo",
+        "multiplayer"
       ],
       "badge": "brain",
       "badgeText": "Casse-tête",

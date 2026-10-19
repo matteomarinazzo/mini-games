@@ -271,6 +271,14 @@
             "fruit-cutter": {
                 "name": "Obstschneider",
                 "description": "Schneide die Früchte in einem Zug, reihe die Combos aneinander und weiche den Bomben aus. Drei Leben, dann ist es vorbei!"
+            },
+            "hangman": {
+                "name": "Galgenmännchen",
+                "description": "Errate das Wort Buchstabe für Buchstabe, bevor die Zeichnung vollständig ist. Alleine, oder abwechselnd mit einem Freund."
+            },
+            "beatfall": {
+                "name": "Beatfall",
+                "description": "Die Noten fallen auf vier Spalten: tippe im richtigen Moment, halte die langen Noten und reihe die Perfekten aneinander. Vier Musikstücke, drei Leben, und es wird schneller."
             }
         },
         "badges": {
@@ -341,7 +349,8 @@
             "shapes": "🔷 Formen",
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
-            "2d": "📏 2D"
+            "2d": "📏 2D",
+            "music": "🎵 Musik"
         }
     },
     "about": {
@@ -843,6 +852,103 @@
             "waiting_label": "Verbinde…",
             "waiting_sub": "Warte auf den Gegner",
             "connection_lost": "Instabile Verbindung, bitte erneut versuchen."
+        }
+    },
+    "hangman": {
+        "meta": {
+            "title": "Galgenmännchen – Errate das Wort | Mini‑Games",
+            "game_title": "Spiel läuft – Galgenmännchen | Mini‑Games",
+            "description": "Galgenmännchen: Errate das Wort Buchstabe für Buchstabe vor dem 10. Fehler. Solo offline oder zu zweit online auf Mini‑Games."
+        },
+        "menu": {
+            "home": "Startseite",
+            "title": "Galgenmännchen",
+            "subtitle": "Errate das Wort Buchstabe für Buchstabe vor dem 10. Fehler!",
+            "tab_solo": "Solo spielen",
+            "tab_multi": "Mehrspieler spielen",
+            "rules_title": "Wie wird gespielt?",
+            "rule_1": "Ein zufälliges <strong>deutsches Wort</strong> wird gezogen: ein Feld pro Buchstabe.",
+            "rule_2": "Wähle Buchstaben: höchstens <strong>10 Fehler</strong>, bevor der Galgenmann vollständig ist.",
+            "rule_3": "Offline? Der Solo-Modus funktioniert ohne Verbindung.",
+            "solo_btn": "Solo starten",
+            "name_label": "Dein Spitzname",
+            "name_placeholder": "Gib deinen Spitznamen ein...",
+            "create_title": "Spiel erstellen",
+            "create_desc": "Du erhältst einen Code, den du mit einem Freund teilen kannst (2 Spieler).",
+            "create_btn": "Raum erstellen",
+            "creating": "Wird erstellt…",
+            "or": "oder",
+            "join_title": "Spiel beitreten",
+            "join_desc": "Gib den Raumcode ein",
+            "code_placeholder": "Raumcode...",
+            "join_btn": "Beitreten",
+            "offline_multi": "Mehrspieler nicht verfügbar (Verbindung erforderlich).",
+            "create_error": "Fehler beim Erstellen des Raums.",
+            "code_invalid": "Ungültiger Code (6 Zeichen)",
+            "searching": "Suche…",
+            "not_found": "❌ Raum nicht gefunden",
+            "room_full": "❌ Raum ist voll",
+            "join_failed": "❌ Beitritt nicht möglich",
+            "left_room": "Du hast den Raum verlassen.",
+            "room_closed": "Der Raum wurde geschlossen."
+        },
+        "room": {
+            "title": "Warteraum",
+            "code_label": "Raumcode",
+            "copy": "📋 Kopieren",
+            "copied": "✅ Kopiert!",
+            "copy_failed": "Kopieren nicht möglich",
+            "hint": "Das Spiel startet, sobald der 2. Spieler beitritt.",
+            "leave": "Raum verlassen",
+            "you": "(du)",
+            "player": "Spieler"
+        },
+        "game": {
+            "menu_title": "Spielmenü",
+            "rules_title": "Spielregeln",
+            "pause_title": "Pause",
+            "gallows": "Galgenmännchen",
+            "errors": "Fehler",
+            "loading": "Wird geladen…",
+            "retry": "Erneut versuchen",
+            "pick_title": "Wähle ein Wort",
+            "pick_title_for": "Wähle ein Wort für {other}",
+            "pick_placeholder": "Buchstaben, Leerzeichen, Bindestriche",
+            "pick_aria": "Zu erratendes Wort",
+            "validate": "Bestätigen",
+            "quit": "Beenden",
+            "close": "Schließen",
+            "rules_heading": "Regeln",
+            "rule_1": "Errate das Wort <strong>Buchstabe für Buchstabe</strong>: ein Feld pro Buchstabe.",
+            "rule_2": "Höchstens <strong>10 Fehler</strong>: beim 10. ist der Galgenmann vollständig und du hast verloren.",
+            "rule_3": "Umlaute und Akzente werden mit dem Grundbuchstaben aufgedeckt: <strong>A</strong> deckt auch ä auf, <strong>S</strong> auch ß.",
+            "rule_4": "Leerzeichen und Bindestriche sind schon sichtbar.",
+            "rule_5": "Im Mehrspielermodus wechseln die Rollen: Ein Spieler wählt ein Wort, der andere errät es.",
+            "pause": "Pause",
+            "resume": "Fortsetzen",
+            "new_game": "Neues Spiel",
+            "continue": "Weiter",
+            "err_chars": "Nur Buchstaben, Leerzeichen und Bindestriche.",
+            "err_min": "Mindestens 2 Buchstaben.",
+            "err_max": "Höchstens {max} Zeichen.",
+            "err_latin": "Nur lateinische Buchstaben.",
+            "sync_error": "Synchronisierung fehlgeschlagen, versuche es erneut.",
+            "connecting": "Verbindung zum Raum…",
+            "connect_failed": "Verbindung zum Raum nicht möglich.",
+            "absent": " (abwesend)",
+            "info_wait": "Warte auf den anderen Spieler… Code: {code}",
+            "info_pick_done": "{other}{off} wartet auf dein nächstes Wort.",
+            "info_pick": "Du bist dran: Wähle ein Wort für {other}{off}.",
+            "info_idle": "{other}{off} wählt ein Wort…",
+            "info_play": "Du errätst das Wort von {other}{off}.",
+            "info_watch_done": "{other}{off} wählt das nächste Wort…",
+            "info_watch": "{other}{off} errät dein Wort.",
+            "win_solo": "🎉 Gewonnen!",
+            "lose_solo": "💀 Verloren! Das Wort war „{word}“",
+            "win_guesser": "🎉 Gewonnen! Es war „{word}“",
+            "lose_guesser": "💀 Verloren! Es war „{word}“",
+            "win_other_found": "😕 {other} hat „{word}“ erraten",
+            "win_other_failed": "🎉 {other} hat „{word}“ nicht erraten"
         }
     }
 }

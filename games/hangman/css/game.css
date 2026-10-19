@@ -1,0 +1,670 @@
+/* Pendu — game.css (base : menu.css) */
+.hg-body {
+    height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.hg-hud {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: calc(8px + env(safe-area-inset-top)) 14px 8px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--ink-muted);
+}
+
+.hg-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+}
+
+.hg-sm svg {
+    pointer-events: none;
+}
+
+.hg-errs {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--neon-guess);
+    font-variant-numeric: tabular-nums;
+}
+
+.hg-errs.bad {
+    color: var(--rose);
+}
+
+.hg-info {
+    flex: none;
+    min-height: 2.2em;
+    padding: 6px 16px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--chalk-dim);
+    background: var(--ink-mid);
+    border-bottom: 1px solid var(--ink-muted);
+    overflow-wrap: anywhere;
+}
+
+.hg-main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 0;
+}
+
+.hg-draw {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#gallows {
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    stroke: var(--chalk);
+}
+
+#gallows .ground {
+    stroke: var(--chalk-dim);
+}
+
+#gallows [data-s] {
+    opacity: 0;
+    transition: opacity .25s;
+}
+
+#gallows [data-s].on {
+    opacity: 1;
+}
+
+#gallows.dead [data-s].on {
+    stroke: var(--rose);
+}
+
+#gallows.dead .ground,
+#gallows.dead [data-s="1"],
+#gallows.dead [data-s="2"],
+#gallows.dead [data-s="3"],
+#gallows.dead [data-s="4"] {
+    stroke: var(--chalk);
+}
+
+.hg-board {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+    max-width: 760px;
+    width: 100%;
+    min-height: 2.4em;
+}
+
+.hg-wd {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.hg-c {
+    width: clamp(22px, 7vw, 34px);
+    height: clamp(32px, 9vw, 44px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(18px, 5.4vw, 28px);
+    font-weight: 700;
+    color: var(--chalk);
+    border-bottom: 3px solid var(--chalk-dim);
+}
+
+.hg-c.fix {
+    border-bottom-color: transparent;
+    color: var(--chalk-dim);
+    width: clamp(14px, 4vw, 20px);
+}
+
+.hg-c.miss {
+    color: var(--rose);
+}
+
+.hg-c.hit {
+    color: var(--neon-win);
+}
+
+.hg-msg {
+    flex: none;
+    min-height: 1.6em;
+    font-weight: 700;
+    text-align: center;
+    color: var(--chalk);
+    overflow-wrap: anywhere;
+    padding: 0 8px;
+}
+
+.hg-msg.ok {
+    color: var(--neon-win);
+}
+
+.hg-msg.bad {
+    color: var(--rose);
+}
+
+.hg-msg.warn {
+    color: var(--neon-warn);
+}
+
+.hg-bottom {
+    flex: none;
+    padding: 8px 8px calc(10px + env(safe-area-inset-bottom));
+    background: var(--ink-mid);
+    border-top: 1px solid var(--ink-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hg-kb {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hg-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.hg-k {
+    flex: 1 1 0;
+    max-width: 46px;
+    height: clamp(40px, 6.4dvh, 52px);
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--ink-muted);
+    background: var(--ink-soft);
+    color: var(--chalk);
+    font-size: 18px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.hg-k:active:not(:disabled) {
+    transform: scale(.94);
+}
+
+.hg-k:disabled {
+    cursor: default;
+    opacity: .4;
+}
+
+.hg-k.ok {
+    background: rgba(163, 245, 58, .2);
+    border-color: var(--neon-win);
+    color: var(--neon-win);
+    opacity: 1;
+}
+
+.hg-k.ko {
+    background: rgba(245, 66, 90, .18);
+    border-color: var(--rose);
+    color: var(--rose);
+    opacity: 1;
+}
+
+.hg-kb.off .hg-k:not(.ok):not(.ko) {
+    opacity: .3;
+}
+
+.hg-set {
+    display: flex;
+    gap: 8px;
+}
+
+.hg-set input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    font-size: 16px;
+    color: var(--chalk);
+    background: var(--ink-soft);
+    border: 2px solid var(--ink-muted);
+    border-radius: var(--r-sm);
+    outline: none;
+}
+
+.hg-set input:focus-visible {
+    border-color: var(--neon-guess);
+    box-shadow: var(--glow-guess);
+}
+
+.hg-newbtn {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+}
+
+.mp-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(11, 13, 18, 0.88);
+    color: var(--chalk);
+    text-align: center;
+    padding: 24px;
+}
+
+@media (max-height: 560px) {
+    .hg-draw {
+        min-height: 90px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #gallows [data-s] {
+        transition: none;
+    }
+}
+
+/* Modales (même style que les autres jeux) */
+:root {
+    --ui-border: rgba(80, 190, 240, .22);
+    --ui-text: #e0f4ff;
+    --ui-pale: #8dc8e8;
+    --ui-accent: #5bc8f5;
+    --transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    --font: 'Fredoka', 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+.cq-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(1, 6, 18, .87);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.cq-overlay.open {
+    display: flex;
+}
+
+.cq-modal {
+    position: relative;
+    background: linear-gradient(160deg, #0a1f3a, #030f22);
+    border: 1px solid var(--ui-border);
+    border-radius: 22px;
+    padding: 28px 24px;
+    max-width: 380px;
+    width: 100%;
+    max-height: 90dvh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .7);
+}
+
+.cq-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--ui-pale);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.cq-modal-close:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.cq-modal h2 {
+    font-size: 22px;
+    color: var(--ui-accent);
+    margin-bottom: 18px;
+}
+
+.cq-modal ul {
+    padding-left: 18px;
+}
+
+.cq-modal li {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 6px;
+    color: var(--ui-pale);
+}
+
+.cq-modal li strong {
+    color: var(--ui-text);
+}
+
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#pauseOverlay .cq-modal h2 {
+    text-align: center;
+    margin: 10px 0 28px;
+    letter-spacing: 1px;
+}
+
+.btn-sky {
+    width: 100%;
+    min-height: 52px;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #0077b6, #023e8a);
+    box-shadow: 0 6px 18px rgba(0, 119, 182, .4);
+    transition: var(--transition);
+    touch-action: manipulation;
+}
+
+.btn-sky:hover {
+    filter: brightness(1.12);
+}
+
+.btn-sky.secondary {
+    background: rgba(255, 255, 255, .07);
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.btn-sky.secondary:hover {
+    background: rgba(255, 255, 255, .14);
+}
+
+/* ── Thème Tap to Fly ── */
+.hg-body {
+    font-family: var(--font);
+    background: radial-gradient(ellipse at 50% 35%, #0b2442 0%, #04122a 55%, #020a18 100%);
+    color: var(--ui-text);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hg-body::before {
+    display: none;
+}
+
+.hud {
+    flex: none;
+    height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+    background: rgba(2, 10, 24, .90);
+    border-bottom: 1px solid var(--ui-border);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+}
+
+.hud-left,
+.hud-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 88px;
+}
+
+.hud-right {
+    justify-content: flex-end;
+}
+
+.hud-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.score-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--ui-pale);
+    letter-spacing: .6px;
+}
+
+.score-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ui-accent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: color .2s;
+}
+
+.score-value.bad {
+    color: var(--ui-danger);
+}
+
+.icon-btn {
+    background: rgba(91, 200, 245, .12);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.icon-btn:hover {
+    background: rgba(91, 200, 245, .25);
+}
+
+.icon-btn svg {
+    pointer-events: none;
+}
+
+.hg-info {
+    background: rgba(2, 10, 24, .6);
+    border-bottom: 1px solid var(--ui-border);
+    color: var(--ui-pale);
+}
+
+.hg-info:empty {
+    display: none;
+}
+
+.hg-bottom {
+    background: rgba(2, 10, 24, .90);
+    border-top: 1px solid var(--ui-border);
+}
+
+.hg-k {
+    border-radius: 10px;
+    border: 1px solid var(--ui-border);
+    background: rgba(91, 200, 245, .1);
+    color: var(--ui-text);
+    font-family: var(--font);
+}
+
+.hg-k.ok {
+    background: rgba(63, 224, 143, .2);
+    border-color: #3fe08f;
+    color: #b9ffd9;
+}
+
+.hg-k.ko {
+    background: rgba(239, 71, 111, .2);
+    border-color: var(--ui-danger);
+    color: #ffb3c4;
+}
+
+.hg-set input {
+    border: 1px solid var(--ui-border);
+    background: rgba(255, 255, 255, .05);
+    color: #fff;
+    border-radius: 12px;
+    font-family: var(--font);
+}
+
+.hg-set input:focus-visible {
+    border-color: var(--ui-accent);
+    box-shadow: none;
+}
+
+.hg-go {
+    width: auto;
+    min-height: 46px;
+    padding: 0 22px;
+    font-size: 16px;
+}
+
+.hg-c {
+    color: var(--ui-text);
+    border-bottom-color: var(--ui-pale);
+    font-family: var(--font);
+}
+
+.hg-c.hit {
+    color: #3fe08f;
+}
+
+.hg-c.miss {
+    color: var(--ui-danger);
+}
+
+.hg-msg {
+    font-family: var(--font);
+}
+
+.cq-modal h2 {
+    margin-bottom: 18px;
+}
+
+.gameover-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+}
+
+.gameover-title.ok {
+    color: #3fe08f;
+}
+
+.gameover-title.bad {
+    color: var(--ui-danger);
+}
+
+.end-draw {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.end-draw svg {
+    height: 150px;
+    width: auto;
+    stroke: var(--ui-text);
+}
+
+.end-draw svg .ground {
+    stroke: var(--ui-pale);
+}
+
+.end-draw svg [data-s] {
+    opacity: 0;
+}
+
+.end-draw svg [data-s].on {
+    opacity: 1;
+}
+
+.end-draw svg.dead path,
+.end-draw svg.dead circle {
+    stroke: var(--ui-danger);
+}
+
+.end-modal .hg-board {
+    margin: 0 auto 18px;
+}
+
+.end-modal .pause-menu {
+    margin-top: 0;
+}
+
+.pick-modal h2 {
+    text-align: center;
+    margin-bottom: 16px;
+    overflow-wrap: anywhere;
+}
+
+.pick-modal .hg-set {
+    flex-direction: column;
+    gap: 0;
+}
+
+.pick-modal .hg-set input {
+    width: 100%;
+    flex: none;
+    min-height: 50px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.pick-modal .hg-set .btn-sky {
+    width: 100%;
+}
+
+.set-err {
+    color: var(--ui-danger);
+    font-size: 13px;
+    min-height: 1.6em;
+    margin: 6px 0 4px;
+    text-align: center;
+}
+
+.pick-modal .pause-menu {
+    margin-top: 12px;
+}

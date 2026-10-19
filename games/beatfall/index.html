@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Beatfall – Jeu de rythme gratuit en ligne | Mini‑Games</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow">
+    <meta name="description"
+        content="Jouez gratuitement à Beatfall sur Mini‑Games : 4 colonnes, des notes qui tombent en musique, tenez les notes longues et battez le record mondial.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/beatfall/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Beatfall – Jeu de rythme gratuit en ligne | Mini‑Games">
+    <meta property="og:description" content="Appuyez en rythme, tenez les notes longues et battez le record mondial !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/beatfall/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/beatfall.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Beatfall – Jeu de rythme gratuit en ligne | Mini‑Games">
+    <meta name="twitter:description" content="Appuyez en rythme, tenez les notes longues et battez le record mondial !">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/beatfall.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context":"https://schema.org",
+        "@type":"VideoGame",
+        "name":"Beatfall",
+        "url":"https://mini-games.ch/games/beatfall/",
+        "description":"Jeu de rythme à 4 colonnes : appuyez au bon moment, tenez les notes longues, la piste accélère à chaque boucle.",
+        "applicationCategory":"Game",
+        "operatingSystem":"Any",
+        "genre":["Music","Rhythm","Singleplayer"],
+        "inLanguage":"fr",
+        "publisher":{
+            "@type":"Organization",
+            "name":"Mini‑Games"
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="container main-menu">
+        <header class="header">
+            <h1>Beatfall</h1>
+            <p class="subtitle">Choisis ta musique. La piste accélère à chaque boucle.</p>
+        </header>
+        <div class="cards" id="cards"></div>
+    </div>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

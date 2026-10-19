@@ -1,0 +1,22 @@
+* { box-sizing: border-box }
+:root { --line: rgba(80, 190, 240, .28); --accent: #5bc8f5; --txt: #e0f4ff; --pale: #8dc8e8 }
+body.menu-body { margin: 0; min-height: 100vh; display: flex; background: radial-gradient(ellipse at 50% 20%, #12335a, #061327 70%); color: #fff; font-family: system-ui, sans-serif }
+.home-button { position: fixed; top: 12px; left: 12px; color: #fff; text-decoration: none; display: flex; gap: 6px; align-items: center; background: #0004; padding: 8px 12px; border-radius: 10px }
+.container { margin: auto; text-align: center; padding: 64px 20px 24px; max-width: 640px; width: 100% }
+h1 { font-size: clamp(28px, 6vw, 44px); margin: 0 0 6px }
+.subtitle { opacity: .85; margin: 0 0 24px }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px }
+@media (max-width:480px) { .cards { grid-template-columns: 1fr } }
+.card { --c: #b5d8ff; display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: linear-gradient(160deg, #0a1f3a, #030f22); border: 1px solid var(--line); border-top: 4px solid var(--c); text-align: left }
+.card.brume { --c: #b5d8ff } .card.elan { --c: #ffd8a8 } .card.fil { --c: #ffb3c7 } .card.pulsar { --c: #b8f0c8 }
+.card h2 { margin: 0; font-size: 22px; color: var(--c) }
+.mood { align-self: flex-start; padding: 2px 10px; border-radius: 999px; background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--c); font-size: 13px; font-weight: 700 }
+.card p { margin: 0; color: var(--pale); font-size: 14px }
+.recs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.recs div { padding: 8px; border-radius: 10px; background: rgba(255, 255, 255, .06); display: flex; flex-direction: column }
+.recs small { color: var(--pale); font-size: 11px }
+.recs b { font-size: 20px; font-variant-numeric: tabular-nums }
+.btn { display: block; width: 100%; min-height: 44px; padding: 12px 18px; border-radius: 14px; font: 700 16px system-ui, sans-serif; color: #fff; text-align: center; text-decoration: none; background: linear-gradient(135deg, #0077b6, #023e8a); box-shadow: 0 6px 18px rgba(0, 119, 182, .4); transition: filter .2s, transform .1s }
+.btn:hover { filter: brightness(1.12) } .btn:active { transform: scale(.97) }
+.btn.sec { background: rgba(255, 255, 255, .07); box-shadow: none; border: 1px solid rgba(255, 255, 255, .14) }
+.btn:focus-visible, .home-button:focus-visible { outline: 3px solid #ffdc00; outline-offset: 2px }

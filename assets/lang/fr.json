@@ -270,6 +270,14 @@
             "fruit-cutter": {
                 "name": "Coupe-Fruits",
                 "description": "Coupe les fruits d'un trait, enchaîne les combos et évite les bombes. Trois vies, puis c'est fini !"
+            },
+            "hangman": {
+                "name": "Pendu",
+                "description": "Devine le mot lettre par lettre avant que le dessin ne soit complet. Seul, ou à tour de rôle avec un ami."
+            },
+            "beatfall": {
+                "name": "Beatfall",
+                "description": "Les notes tombent sur quatre colonnes : tape au bon moment, tiens les notes longues et enchaîne les parfaits. Quatre musiques, trois vies, et ça accélère."
             }
         },
         "badges": {
@@ -340,7 +348,8 @@
             "shapes": "🔷 Formes",
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
-            "2d": "📏 2D"
+            "2d": "📏 2D",
+            "music": "🎵 Musique"
         }
     },
     "about": {
@@ -842,6 +851,103 @@
             "waiting_label": "Connexion…",
             "waiting_sub": "En attente de l'adversaire",
             "connection_lost": "Connexion instable, réessayez."
+        }
+    },
+    "hangman": {
+        "meta": {
+            "title": "Pendu – Devine le mot | Mini‑Games",
+            "game_title": "Partie en cours – Pendu | Mini‑Games",
+            "description": "Jeu du pendu : devine le mot lettre par lettre avant la 10e erreur. Solo hors ligne ou à deux en ligne sur Mini‑Games."
+        },
+        "menu": {
+            "home": "Accueil",
+            "title": "Pendu",
+            "subtitle": "Devine le mot lettre par lettre avant la 10e erreur !",
+            "tab_solo": "Jouer en solo",
+            "tab_multi": "Jouer en multijoueur",
+            "rules_title": "Comment jouer ?",
+            "rule_1": "Un <strong>mot français</strong> est tiré au hasard : une case par lettre.",
+            "rule_2": "Choisis des lettres : <strong>10 erreurs</strong> maximum avant que le pendu soit complet.",
+            "rule_3": "Hors ligne ? Le solo fonctionne sans connexion.",
+            "solo_btn": "Jouer en Solo",
+            "name_label": "Votre pseudo",
+            "name_placeholder": "Entrez votre pseudo...",
+            "create_title": "Créer une partie",
+            "create_desc": "Tu obtiens un code à partager avec un ami (2 joueurs).",
+            "create_btn": "Créer la salle",
+            "creating": "Création…",
+            "or": "ou",
+            "join_title": "Rejoindre une partie",
+            "join_desc": "Entrez le code de la salle",
+            "code_placeholder": "Code salle...",
+            "join_btn": "Rejoindre",
+            "offline_multi": "Multijoueur indisponible (connexion requise).",
+            "create_error": "Erreur lors de la création de la salle.",
+            "code_invalid": "Code invalide (6 caractères)",
+            "searching": "Recherche…",
+            "not_found": "❌ Salle introuvable",
+            "room_full": "❌ Salle pleine",
+            "join_failed": "❌ Impossible de rejoindre",
+            "left_room": "Tu as quitté la salle.",
+            "room_closed": "La salle a été fermée."
+        },
+        "room": {
+            "title": "Salle d'attente",
+            "code_label": "Code de la salle",
+            "copy": "📋 Copier",
+            "copied": "✅ Copié !",
+            "copy_failed": "Copie impossible",
+            "hint": "La partie démarre dès que le 2e joueur arrive.",
+            "leave": "Quitter la salle",
+            "you": "(toi)",
+            "player": "Joueur"
+        },
+        "game": {
+            "menu_title": "Menu du jeu",
+            "rules_title": "Règles du jeu",
+            "pause_title": "Pause",
+            "gallows": "Pendu",
+            "errors": "Erreurs",
+            "loading": "Chargement…",
+            "retry": "Réessayer",
+            "pick_title": "Choisis un mot",
+            "pick_title_for": "Choisis un mot pour {other}",
+            "pick_placeholder": "Lettres, espaces, tirets",
+            "pick_aria": "Mot à faire deviner",
+            "validate": "Valider",
+            "quit": "Quitter",
+            "close": "Fermer",
+            "rules_heading": "Règles",
+            "rule_1": "Devine le mot <strong>lettre par lettre</strong> : une case par lettre.",
+            "rule_2": "<strong>10 erreurs</strong> maximum : à la 10<sup>e</sup>, le pendu est complet, c'est perdu.",
+            "rule_3": "Les accents sont révélés avec la lettre : <strong>E</strong> dévoile aussi é, è, ê, ë.",
+            "rule_4": "Espaces et tirets sont déjà affichés.",
+            "rule_5": "En multijoueur, les rôles s'alternent : un joueur choisit un mot, l'autre le devine.",
+            "pause": "Pause",
+            "resume": "Reprendre",
+            "new_game": "Nouvelle partie",
+            "continue": "Continuer",
+            "err_chars": "Lettres, espaces et tirets uniquement.",
+            "err_min": "Au moins 2 lettres.",
+            "err_max": "{max} caractères maximum.",
+            "err_latin": "Lettres latines uniquement.",
+            "sync_error": "Synchronisation impossible, réessaie.",
+            "connecting": "Connexion à la salle…",
+            "connect_failed": "Connexion à la salle impossible.",
+            "absent": " (absent)",
+            "info_wait": "En attente de l'autre joueur… Code : {code}",
+            "info_pick_done": "{other}{off} attend ton prochain mot.",
+            "info_pick": "À toi : choisis un mot pour {other}{off}.",
+            "info_idle": "{other}{off} choisit un mot…",
+            "info_play": "Tu devines le mot de {other}{off}.",
+            "info_watch_done": "{other}{off} choisit le prochain mot…",
+            "info_watch": "{other}{off} devine ton mot.",
+            "win_solo": "🎉 Gagné !",
+            "lose_solo": "💀 Perdu ! Le mot était « {word} »",
+            "win_guesser": "🎉 Gagné ! C'était « {word} »",
+            "lose_guesser": "💀 Perdu ! C'était « {word} »",
+            "win_other_found": "😕 {other} a trouvé « {word} »",
+            "win_other_failed": "🎉 {other} n'a pas trouvé « {word} »"
         }
     }
 }

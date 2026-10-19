@@ -271,6 +271,14 @@
             "fruit-cutter": {
                 "name": "Fruit-Cutter",
                 "description": "Slice fruits in one go, chain combos, and avoid bombs. Three lives, then it's over!"
+            },
+            "hangman": {
+                "name": "Hangman",
+                "description": "Guess the word letter by letter before the drawing is complete. Alone, or in turns with a friend."
+            },
+            "beatfall": {
+                "name": "Beatfall",
+                "description": "The notes fall on four columns: tap at the right moment, hold the long notes and chain the perfects. Four music tracks, three lives, and it speeds up."
             }
         },
         "badges": {
@@ -341,7 +349,8 @@
             "shapes": "🔷 Shapes",
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
-            "2d": "📏 2D"
+            "2d": "📏 2D",
+            "music": "🎵 Music"
         }
     },
     "about": {
@@ -843,6 +852,103 @@
             "waiting_label": "Connecting…",
             "waiting_sub": "Waiting for the opponent",
             "connection_lost": "Unstable connection, please retry."
+        }
+    },
+    "hangman": {
+        "meta": {
+            "title": "Hangman – Guess the word | Mini‑Games",
+            "game_title": "Game in progress – Hangman | Mini‑Games",
+            "description": "Hangman game: guess the word letter by letter before the 10th mistake. Play solo offline or with a friend online on Mini‑Games."
+        },
+        "menu": {
+            "home": "Home",
+            "title": "Hangman",
+            "subtitle": "Guess the word letter by letter before the 10th mistake!",
+            "tab_solo": "Play solo",
+            "tab_multi": "Play multiplayer",
+            "rules_title": "How to play?",
+            "rule_1": "A random <strong>English word</strong> is picked: one box per letter.",
+            "rule_2": "Pick letters: <strong>10 mistakes</strong> at most before the hangman is complete.",
+            "rule_3": "Offline? Solo mode works without a connection.",
+            "solo_btn": "Play Solo",
+            "name_label": "Your nickname",
+            "name_placeholder": "Enter your nickname...",
+            "create_title": "Create a game",
+            "create_desc": "You get a code to share with a friend (2 players).",
+            "create_btn": "Create room",
+            "creating": "Creating…",
+            "or": "or",
+            "join_title": "Join a game",
+            "join_desc": "Enter the room code",
+            "code_placeholder": "Room code...",
+            "join_btn": "Join",
+            "offline_multi": "Multiplayer unavailable (connection required).",
+            "create_error": "Error while creating the room.",
+            "code_invalid": "Invalid code (6 characters)",
+            "searching": "Searching…",
+            "not_found": "❌ Room not found",
+            "room_full": "❌ Room is full",
+            "join_failed": "❌ Could not join",
+            "left_room": "You left the room.",
+            "room_closed": "The room has been closed."
+        },
+        "room": {
+            "title": "Waiting room",
+            "code_label": "Room code",
+            "copy": "📋 Copy",
+            "copied": "✅ Copied!",
+            "copy_failed": "Copy failed",
+            "hint": "The game starts as soon as the 2nd player arrives.",
+            "leave": "Leave room",
+            "you": "(you)",
+            "player": "Player"
+        },
+        "game": {
+            "menu_title": "Game menu",
+            "rules_title": "Game rules",
+            "pause_title": "Pause",
+            "gallows": "Hangman",
+            "errors": "Mistakes",
+            "loading": "Loading…",
+            "retry": "Retry",
+            "pick_title": "Pick a word",
+            "pick_title_for": "Pick a word for {other}",
+            "pick_placeholder": "Letters, spaces, hyphens",
+            "pick_aria": "Word to guess",
+            "validate": "Confirm",
+            "quit": "Quit",
+            "close": "Close",
+            "rules_heading": "Rules",
+            "rule_1": "Guess the word <strong>letter by letter</strong>: one box per letter.",
+            "rule_2": "<strong>10 mistakes</strong> at most: on the 10th, the hangman is complete and you lose.",
+            "rule_3": "Accented letters are revealed with their base letter: <strong>E</strong> also reveals é, è, ê, ë.",
+            "rule_4": "Spaces and hyphens are already shown.",
+            "rule_5": "In multiplayer, roles alternate: one player picks a word, the other guesses it.",
+            "pause": "Pause",
+            "resume": "Resume",
+            "new_game": "New game",
+            "continue": "Continue",
+            "err_chars": "Letters, spaces and hyphens only.",
+            "err_min": "At least 2 letters.",
+            "err_max": "{max} characters maximum.",
+            "err_latin": "Latin letters only.",
+            "sync_error": "Sync failed, please try again.",
+            "connecting": "Connecting to the room…",
+            "connect_failed": "Could not connect to the room.",
+            "absent": " (away)",
+            "info_wait": "Waiting for the other player… Code: {code}",
+            "info_pick_done": "{other}{off} is waiting for your next word.",
+            "info_pick": "Your turn: pick a word for {other}{off}.",
+            "info_idle": "{other}{off} is picking a word…",
+            "info_play": "You are guessing {other}{off}'s word.",
+            "info_watch_done": "{other}{off} is picking the next word…",
+            "info_watch": "{other}{off} is guessing your word.",
+            "win_solo": "🎉 You won!",
+            "lose_solo": "💀 You lost! The word was “{word}”",
+            "win_guesser": "🎉 You won! It was “{word}”",
+            "lose_guesser": "💀 You lost! It was “{word}”",
+            "win_other_found": "😕 {other} found “{word}”",
+            "win_other_failed": "🎉 {other} didn't find “{word}”"
         }
     }
 }

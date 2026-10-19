@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr" class="i18n-pending">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Partie en cours – Pendu | Mini‑Games</title>
+    <style>
+        .i18n-pending body {
+            opacity: 0;
+        }
+    </style>
+    <script>setTimeout(function () { document.documentElement.classList.remove("i18n-pending"); }, 3000);</script>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+    <script src="../../js/utils/i18n.js"></script>
+</head>
+
+<body class="hg-body">
+    <div class="hud">
+        <div class="hud-left">
+            <button class="icon-btn" id="menuBtn" title="Menu du jeu" aria-label="Menu du jeu"
+                data-i18n-title="hangman.game.menu_title" data-i18n-aria="hangman.game.menu_title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu" aria-label="Règles"
+                data-i18n-title="hangman.game.rules_title" data-i18n-aria="hangman.game.rules_title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label" data-i18n="hangman.game.errors">Erreurs</span>
+            <span class="score-value" id="errs" aria-live="polite">0 / 10</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="pauseBtn" title="Pause" aria-label="Pause"
+                data-i18n-title="hangman.game.pause_title" data-i18n-aria="hangman.game.pause_title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="hg-info" id="info"></div>
+
+    <main class="hg-main">
+        <div class="hg-draw">
+            <svg id="gallows" viewBox="0 0 160 180" role="img" aria-label="Pendu" data-i18n-aria="hangman.game.gallows">
+                <g fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="ground" d="M10 172H150" />
+                    <path data-s="1" d="M40 172V15" />
+                    <path data-s="2" d="M40 15H115" />
+                    <path data-s="3" d="M40 47L72 15" />
+                    <path data-s="4" d="M115 15V35" />
+                    <circle data-s="5" cx="115" cy="47" r="12" />
+                    <path data-s="6" d="M115 59V108" />
+                    <path data-s="7" d="M115 108L100 140" />
+                    <path data-s="8" d="M115 108L130 140" />
+                    <path data-s="9" d="M115 72L98 96" />
+                    <path data-s="10" d="M115 72L132 96" />
+                </g>
+            </svg>
+        </div>
+        <div class="hg-board" id="board" aria-live="polite"></div>
+        <div class="hg-msg" id="msg"></div>
+    </main>
+
+    <footer class="hg-bottom">
+        <div class="hg-kb" id="kb"></div>
+    </footer>
+
+    <div class="mp-loader" id="loader" hidden>
+        <span id="loaderText" data-i18n="hangman.game.loading">Chargement…</span>
+        <button class="btn-sky hg-go" id="loaderRetry" hidden data-i18n="hangman.game.retry">Réessayer</button>
+    </div>
+
+    <div class="cq-overlay" id="pickOverlay">
+        <div class="cq-modal pick-modal">
+            <h2 id="pickTitle" data-i18n="hangman.game.pick_title">Choisis un mot</h2>
+            <form class="hg-set" id="setForm" autocomplete="off">
+                <input type="text" id="setInput" maxlength="30" placeholder="Lettres, espaces, tirets"
+                    data-i18n-placeholder="hangman.game.pick_placeholder" aria-label="Mot à faire deviner"
+                    data-i18n-aria="hangman.game.pick_aria" autocomplete="off" autocapitalize="off" autocorrect="off"
+                    spellcheck="false" enterkeyhint="send" />
+                <div class="set-err" id="setErr" aria-live="polite"></div>
+                <button class="btn-sky" type="submit" data-i18n="hangman.game.validate">Valider</button>
+            </form>
+            <div class="pause-menu"><button class="btn-sky secondary" id="pickQuitBtn"
+                    data-i18n="hangman.game.quit">Quitter</button></div>
+        </div>
+    </div>
+
+    <div class="cq-overlay" id="rulesOverlay">
+        <div class="cq-modal">
+            <button class="cq-modal-close" id="rulesClose" aria-label="Fermer"
+                data-i18n-aria="hangman.game.close">✕</button>
+            <h2 data-i18n="hangman.game.rules_heading">Règles</h2>
+            <ul>
+                <li data-i18n="hangman.game.rule_1">Devine le mot <strong>lettre par lettre</strong> : une case par
+                    lettre.</li>
+                <li data-i18n="hangman.game.rule_2"><strong>10 erreurs</strong> maximum : à la 10<sup>e</sup>, le pendu
+                    est complet, c'est perdu.</li>
+                <li data-i18n="hangman.game.rule_3">Les accents sont révélés avec la lettre : <strong>E</strong> dévoile
+                    aussi é, è, ê, ë.</li>
+                <li data-i18n="hangman.game.rule_4">Espaces et tirets sont déjà affichés.</li>
+                <li data-i18n="hangman.game.rule_5">En multijoueur, les rôles s'alternent : un joueur choisit un mot,
+                    l'autre le devine.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="cq-overlay" id="pauseOverlay">
+        <div class="cq-modal">
+            <h2 data-i18n="hangman.game.pause">Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn" data-i18n="hangman.game.resume">Reprendre</button>
+                <button class="btn-sky secondary" id="quitBtn" data-i18n="hangman.game.quit">Quitter</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cq-overlay" id="endOverlay">
+        <div class="cq-modal end-modal">
+            <div class="gameover-title" id="endTitle"></div>
+            <div class="end-draw" id="endDraw"></div>
+            <div class="hg-board" id="endBoard"></div>
+            <div class="pause-menu">
+                <button class="btn-sky" id="endNewBtn" data-i18n="hangman.game.new_game">Nouvelle partie</button>
+                <button class="btn-sky secondary" id="endQuitBtn" data-i18n="hangman.game.quit">Quitter</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

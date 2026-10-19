@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.40.2026-10-18",
-    "lastUpdate": "2026-10-18",
+    "currentVersion": "1.41.2026-10-19",
+    "lastUpdate": "2026-10-19",
     "history": [
+        {
+            "version": "1.41.2026-10-19",
+            "date": "2026-10-19",
+            "changes": [
+                "Ajout du jeu Pendu",
+                "Ajout du jeu Beatfall"
+            ]
+        },
         {
             "version": "1.40.2026-10-18",
             "date": "2026-10-18",

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr" class="i18n-pending">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pendu – Devine le mot | Mini‑Games</title>
+    <style>
+        .i18n-pending body {
+            opacity: 0;
+        }
+    </style>
+    <script>setTimeout(function () { document.documentElement.classList.remove("i18n-pending"); }, 3000);</script>
+    <script src="../../js/utils/i18n.js"></script>
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Jeu du pendu en français : devine le mot lettre par lettre avant la 10e erreur. Solo hors ligne ou à deux en ligne sur Mini‑Games.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/hangman/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pendu – Devine le mot | Mini‑Games">
+    <meta property="og:description" content="Devine le mot lettre par lettre avant la 10e erreur. Solo ou à deux.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/hangman/index.html">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/hangman.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pendu – Devine le mot | Mini‑Games">
+    <meta name="twitter:description" content="Devine le mot lettre par lettre avant la 10e erreur. Solo ou à deux.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/hangman.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Pendu – Devine le mot",
+      "url": "https://mini-games.ch/games/hangman/",
+      "description": "Jeu du pendu en français : devinez le mot lettre par lettre avant la 10e erreur. Solo ou multijoueur à deux.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Word Game", "Puzzle", "Multiplayer", "Fun", "Classic", "Educational", "Solo"],
+      "inLanguage": "fr",
+      "publisher": { 
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span data-i18n="hangman.menu.home">Accueil</span>
+    </a>
+    <div class="bg-animation">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+        <div class="blob-3"></div>
+    </div>
+
+    <div class="container main-menu gs-menu" id="mainMenu">
+        <header class="header animate-up">
+            <div class="logo">
+                <span class="logo-icon">🪢</span>
+                <h1 data-i18n="hangman.menu.title">Pendu</h1>
+            </div>
+            <p class="subtitle" data-i18n="hangman.menu.subtitle">Devine le mot lettre par lettre avant la 10e erreur !
+            </p>
+        </header>
+
+        <section class="gs-tabs animate-up">
+            <button class="gs-tab active" id="tabSolo" data-tab="solo"><span>👤</span> <span
+                    data-i18n="hangman.menu.tab_solo">Jouer en solo</span></button>
+            <button class="gs-tab" id="tabMulti" data-tab="multi"><span>👥</span> <span
+                    data-i18n="hangman.menu.tab_multi">Jouer en multijoueur</span></button>
+        </section>
+
+        <section class="gs-options animate-up-2" id="soloOptions">
+            <div class="wc-rules">
+                <h3 data-i18n="hangman.menu.rules_title">Comment jouer ?</h3>
+                <ol>
+                    <li data-i18n="hangman.menu.rule_1">Un <strong>mot français</strong> est tiré au hasard : une case
+                        par lettre.</li>
+                    <li data-i18n="hangman.menu.rule_2">Choisis des lettres : <strong>10 erreurs</strong> maximum avant
+                        que le pendu soit complet.</li>
+                    <li data-i18n="hangman.menu.rule_3">Hors ligne ? Le solo fonctionne sans connexion.</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary gs-start-btn" id="soloStartBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+                <span data-i18n="hangman.menu.solo_btn">Jouer en Solo</span>
+            </button>
+        </section>
+
+        <section class="gs-options animate-up-2" id="multiOptions" style="display:none">
+            <div class="gs-name-row">
+                <label class="gq-option-label" for="playerNameInput" data-i18n="hangman.menu.name_label">Votre
+                    pseudo</label>
+                <input type="text" id="playerNameInput" placeholder="Entrez votre pseudo..."
+                    data-i18n-placeholder="hangman.menu.name_placeholder" maxlength="15" class="gs-name-input"
+                    autocomplete="nickname" />
+            </div>
+
+            <div class="gs-multi-actions">
+                <div class="gs-multi-card" id="createSection">
+                    <div class="gs-multi-icon">🏠</div>
+                    <h3 data-i18n="hangman.menu.create_title">Créer une partie</h3>
+                    <p data-i18n="hangman.menu.create_desc">Tu obtiens un code à partager avec un ami (2 joueurs).</p>
+                    <button class="btn btn-primary" id="createRoomBtn" data-i18n="hangman.menu.create_btn">Créer la
+                        salle</button>
+                    <p class="gs-status" id="createStatus"></p>
+                </div>
+
+                <div class="gs-divider" data-i18n="hangman.menu.or">ou</div>
+
+                <div class="gs-multi-card" id="joinSection">
+                    <div class="gs-multi-icon">🚪</div>
+                    <h3 data-i18n="hangman.menu.join_title">Rejoindre une partie</h3>
+                    <p data-i18n="hangman.menu.join_desc">Entrez le code de la salle</p>
+                    <div class="gs-join-row">
+                        <input type="text" id="roomCodeInput" placeholder="Code salle..."
+                            data-i18n-placeholder="hangman.menu.code_placeholder" maxlength="6" class="gs-room-input"
+                            autocomplete="off" autocapitalize="characters" />
+                        <button class="btn btn-secondary" id="joinRoomBtn"
+                            data-i18n="hangman.menu.join_btn">Rejoindre</button>
+                    </div>
+                    <p class="gs-status" id="joinStatus"></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="overlay" id="waitingOverlay" style="display:none">
+        <div class="popup gs-waiting-popup">
+            <h2 data-i18n="hangman.room.title">Salle d'attente</h2>
+            <div class="gs-room-code-display">
+                <span class="gs-room-label" data-i18n="hangman.room.code_label">Code de la salle</span>
+                <div class="gs-room-code" id="displayRoomCode">—</div>
+                <button class="btn btn-outline gs-copy-btn" id="copyCodeBtn" data-i18n="hangman.room.copy">📋
+                    Copier</button>
+            </div>
+            <div class="gs-waiting-players" id="waitingPlayers"></div>
+            <p class="gs-waiting-hint" id="waitingHint" data-i18n="hangman.room.hint">La partie démarre dès que le 2e
+                joueur arrive.</p>
+            <p class="gs-status" id="waitingStatus"></p>
+            <button class="btn btn-outline gs-leave-btn" id="leaveRoomBtn" data-i18n="hangman.room.leave">Quitter la
+                salle</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

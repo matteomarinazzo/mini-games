@@ -839,6 +839,10 @@
   transition-delay: 0.54s;
 }
 
+.timeline-item:nth-child(6) {
+  transition-delay: 0.66s;
+}
+
 /* Ligne verticale */
 .timeline-item:not(:last-child)::after {
   content: '';

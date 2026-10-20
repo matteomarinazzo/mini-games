@@ -112,6 +112,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "orbit": {
+      "path": "./games/orbit/index.html",
+      "name": "Orbit",
+      "emoji": "🪐",
+      "description": "Un point tourne autour d'un noyau. Change d'anneau pour éviter les arcs, tiens le plus longtemps possible. Trois vies, et ça accélère.",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "survival",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "layer-pile": {
       "path": "./games/layer-pile/index.html",
       "name": "Layer Pile",

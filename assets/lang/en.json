@@ -279,6 +279,10 @@
             "beatfall": {
                 "name": "Beatfall",
                 "description": "The notes fall on four columns: tap at the right moment, hold the long notes and chain the perfects. Four music tracks, three lives, and it speeds up."
+            },
+            "orbit": {
+                "name": "Orbit",
+                "description": "A point rotates around a core. Change the ring to avoid the arcs, hold on as long as possible. Three lives, and it speeds up."
             }
         },
         "badges": {
@@ -387,12 +391,18 @@
         "milestone_4_tag1": "25+ Mini-Games",
         "milestone_4_tag2": "3D Engine & Simulations",
         "milestone_4_tag3": "Hybrid Gameplay",
-        "milestone_5_badge": "Phase 5 • Vision",
-        "milestone_5_title": "Looking Ahead",
-        "milestone_5_desc": "Mini Games never stops evolving! We continue crafting fresh game concepts, refining mobile performance, and developing exciting new competitive and co-op modes. The adventure is just beginning.",
-        "milestone_5_tag1": "Upcoming Games",
-        "milestone_5_tag2": "Competitive Modes",
-        "milestone_5_tag3": "Continuous Innovation",
+        "milestone_5_badge": "Phase 5 • Golden Era",
+        "milestone_5_title": "The 50-Game Milestone & Diversification",
+        "milestone_5_desc": "A historic milestone is reached as the platform celebrates hitting <strong>50 free games</strong>! Massive genre diversification with the <strong>Mindplay</strong> brain-training collection, realistic 3D physics and multiplayer in <strong>Billiards</strong> (Snooker & Carom), trivia challenges (CultureQuiz, Mystery Page), and dynamic arcade & rhythm hits (Beatfall, Fruit Slicer, 2048, Orbit).",
+        "milestone_5_tag1": "50 Mini-Games",
+        "milestone_5_tag2": "Mindplay Suite",
+        "milestone_5_tag3": "3D Billiards & Trivia",
+        "milestone_6_badge": "Phase 6 • Vision",
+        "milestone_6_title": "Looking Ahead",
+        "milestone_6_desc": "Mini Games never stops evolving! We continue crafting fresh game concepts, refining mobile performance, and developing exciting new competitive and co-op modes. The adventure is just beginning.",
+        "milestone_6_tag1": "Upcoming Games",
+        "milestone_6_tag2": "Competitive Modes",
+        "milestone_6_tag3": "Continuous Innovation",
         "tech_title": "Technologies",
         "tech_intro": "All our games are built with modern web technologies to ensure optimal performance on all devices.",
         "tech_js": "High-performance game logic",

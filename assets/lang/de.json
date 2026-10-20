@@ -279,6 +279,10 @@
             "beatfall": {
                 "name": "Beatfall",
                 "description": "Die Noten fallen auf vier Spalten: tippe im richtigen Moment, halte die langen Noten und reihe die Perfekten aneinander. Vier Musikstücke, drei Leben, und es wird schneller."
+            },
+            "orbit": {
+                "name": "Orbit",
+                "description": "Ein Punkt dreht sich um einen Kern. Wechsle den Ring, um den Bögen auszuweichen, halte dich so lange wie möglich. Drei Leben, und es wird schneller."
             }
         },
         "badges": {
@@ -387,12 +391,18 @@
         "milestone_4_tag1": "25+ Mini-Spiele",
         "milestone_4_tag2": "3D-Engine & Simulationen",
         "milestone_4_tag3": "Hybrides Gameplay",
-        "milestone_5_badge": "Phase 5 • Zukunft",
-        "milestone_5_title": "Blick in die Zukunft",
-        "milestone_5_desc": "Mini Games entwickelt sich unermüdlich weiter! Wir arbeiten an neuen Spielkonzepten, optimieren die Performance auf allen Geräten und bereiten neue kompetitive und kooperative Spielmodi vor. Die Reise hat gerade erst begonnen.",
-        "milestone_5_tag1": "Neue Spiele in Arbeit",
-        "milestone_5_tag2": "Kompetitive Modi",
-        "milestone_5_tag3": "Ständige Innovation",
+        "milestone_5_badge": "Phase 5 • Blütezeit",
+        "milestone_5_title": "Der 50-Spiele-Meilenstein & Vielfalt",
+        "milestone_5_desc": "Ein historischer Meilenstein ist erreicht: Die Plattform knackt offiziell die Marke von <strong>50 kostenlosen Spielen</strong>! Bedeutende Genre-Erweiterungen mit der Gehirnjogging-Reihe <strong>Mindplay</strong>, realistischer 3D-Physik und Mehrspieler im <strong>Billard</strong> (Snooker & Karambolage), Quiz-Herausforderungen (CultureQuiz, Page Mystère) sowie dynamischer Arcade- und Rhythmus-Action (Beatfall, Fruchtschneider, 2048, Orbit).",
+        "milestone_5_tag1": "50 Mini-Spiele",
+        "milestone_5_tag2": "Mindplay-Reihe",
+        "milestone_5_tag3": "3D-Billard & Wissen",
+        "milestone_6_badge": "Phase 6 • Zukunft",
+        "milestone_6_title": "Blick in die Zukunft",
+        "milestone_6_desc": "Mini Games entwickelt sich unermüdlich weiter! Wir arbeiten an neuen Spielkonzepten, optimieren die Performance auf allen Geräten und bereiten neue kompetitive und kooperative Spielmodi vor. Die Reise hat gerade erst begonnen.",
+        "milestone_6_tag1": "Neue Spiele in Arbeit",
+        "milestone_6_tag2": "Kompetitive Modi",
+        "milestone_6_tag3": "Ständige Innovation",
         "tech_title": "Technologien",
         "tech_intro": "Alle unsere Spiele werden mit modernen Webtechnologien entwickelt, um optimale Leistung auf allen Geräten zu gewährleisten.",
         "tech_js": "Leistungsstarke Spiellogik",

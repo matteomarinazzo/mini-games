@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.41.2026-10-19",
-    "lastUpdate": "2026-10-19",
+    "currentVersion": "1.42.2026-10-20",
+    "lastUpdate": "2026-10-20",
     "history": [
+        {
+            "version": "1.42.2026-10-20",
+            "date": "2026-10-20",
+            "changes": [
+                "Ajout du jeu Orbit",
+                "Mise à jour de la page about.html"
+            ]
+        },
         {
             "version": "1.41.2026-10-19",
             "date": "2026-10-19",

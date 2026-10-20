@@ -131,7 +131,7 @@ function animateValue(obj, start, end, duration) {
  */
 function getGamesAvailableCount() {
   const count = localStorage.getItem("gamesAvailableCount");
-  return count ? parseInt(count) : 0;
+  return count ? parseInt(count) : 50;
 }
 
 async function displayAppVersion() {

@@ -278,6 +278,10 @@
             "beatfall": {
                 "name": "Beatfall",
                 "description": "Les notes tombent sur quatre colonnes : tape au bon moment, tiens les notes longues et enchaîne les parfaits. Quatre musiques, trois vies, et ça accélère."
+            },
+            "orbit": {
+                "name": "Orbit",
+                "description": "Un point tourne autour d'un noyau. Change d'anneau pour éviter les arcs, tiens le plus longtemps possible. Trois vies, et ça accélère."
             }
         },
         "badges": {
@@ -386,12 +390,18 @@
         "milestone_4_tag1": "25+ Mini-Jeux",
         "milestone_4_tag2": "Moteur 3D & Simulations",
         "milestone_4_tag3": "Gameplay Hybride",
-        "milestone_5_badge": "Phase 5 • Vision",
-        "milestone_5_title": "Cap sur l'Avenir",
-        "milestone_5_desc": "Mini Games ne cesse d'innover ! Nous continuons à développer de nouveaux concepts de jeux originaux, à perfectionner les performances mobiles et à préparer de nouveaux modes compétitifs et coopératifs. L'aventure ne fait que commencer.",
-        "milestone_5_tag1": "Nouveaux Jeux en Route",
-        "milestone_5_tag2": "Modes Compétitifs",
-        "milestone_5_tag3": "Innovation Continue",
+        "milestone_5_badge": "Phase 5 • L'Âge d'Or",
+        "milestone_5_title": "Le Cap des 50 Jeux & Diversification",
+        "milestone_5_desc": "La plateforme franchit une étape historique en atteignant <strong>50 jeux gratuits</strong> ! Une diversification majeure s'opère avec la collection d'entraînement cérébral <strong>Mindplay</strong>, la physique 3D et le multijoueur du <strong>Billard</strong> (Snooker & Carambole), des défis de culture générale (CultureQuiz, Page Mystère) et une nouvelle vague arcade et rythme (Beatfall, Coupe-Fruits, 2048, Orbit).",
+        "milestone_5_tag1": "50 Mini-Jeux",
+        "milestone_5_tag2": "Suite Mindplay",
+        "milestone_5_tag3": "Billard 3D & Culture",
+        "milestone_6_badge": "Phase 6 • Vision",
+        "milestone_6_title": "Cap sur l'Avenir",
+        "milestone_6_desc": "Mini Games ne cesse d'innover ! Nous continuons à développer de nouveaux concepts de jeux originaux, à perfectionner les performances mobiles et à préparer de nouveaux modes compétitifs et coopératifs. L'aventure ne fait que commencer.",
+        "milestone_6_tag1": "Nouveaux Jeux en Route",
+        "milestone_6_tag2": "Modes Compétitifs",
+        "milestone_6_tag3": "Innovation Continue",
         "tech_title": "Technologies",
         "tech_intro": "Tous nos jeux sont développés avec des technologies web modernes pour garantir des performances optimales sur tous les appareils.",
         "tech_js": "Logique de jeu performante",

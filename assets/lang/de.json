@@ -283,6 +283,10 @@
             "orbit": {
                 "name": "Orbit",
                 "description": "Ein Punkt dreht sich um einen Kern. Wechsle den Ring, um den Bögen auszuweichen, halte dich so lange wie möglich. Drei Leben, und es wird schneller."
+            },
+            "skyjo": {
+                "name": "Skyjo",
+                "description": "Entdecke die Karten, tausche sie clever und beende die Runde mit den niedrigsten Punktzahlen. Klassisch oder Crazy, alleine gegen die KI oder mit bis zu 8 Freunden!"
             }
         },
         "badges": {
@@ -354,7 +358,8 @@
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
             "2d": "📏 2D",
-            "music": "🎵 Musik"
+            "music": "🎵 Musik",
+            "cards": "🃏 Karten"
         }
     },
     "about": {

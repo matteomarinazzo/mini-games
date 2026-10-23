@@ -526,6 +526,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "skyjo": {
+      "path": "./games/skyjo/index.html",
+      "name": "Skyjo",
+      "emoji": "🃏",
+      "description": "Révèle tes cartes, échange-les malin et finis avec le moins de points. Classique ou Crazy, seul contre l'IA ou entre amis jusqu'à 8 joueurs !",
+      "tags": [
+        "cards",
+        "strategy",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "strategy",
+      "badgeText": "Stratégie",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "morpion": {
       "path": "./games/morpion/index.html",
       "name": "Morpion",

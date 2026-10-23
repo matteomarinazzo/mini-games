@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Skyjo – Le moins de points gagne | Mini‑Games</title>
+    <meta name="robots" content="index, follow">
+
+    <meta name="description"
+        content="Skyjo en solo contre 1 à 7 adversaires IA ou en ligne jusqu'à 8 joueurs : mode Classique ou Crazy. Retournez et échangez vos cartes pour finir avec le moins de points !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/skyjo/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Skyjo – Le moins de points gagne | Mini‑Games">
+    <meta property="og:description"
+        content="Jeu de cartes Skyjo en ligne : solo contre l'IA ou multijoueur jusqu'à 8. Mode Classique ou Crazy. Qui finira avec le moins de points ?">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/skyjo/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/skyjo.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Skyjo – Le moins de points gagne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Jeu de cartes Skyjo en ligne : solo contre l'IA ou multijoueur jusqu'à 8. Mode Classique ou Crazy.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/skyjo.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Skyjo – Le moins de points gagne",
+      "url": "https://mini-games.ch/games/skyjo/",
+      "description": "Jeu de cartes Skyjo : retournez vos cartes, échangez-les intelligemment et finissez avec le moins de points possible. Solo contre l'IA ou multijoueur jusqu'à 8 en mode Classique ou Crazy.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Card Game", "Strategy", "Singleplayer", "Multiplayer"],
+      "inLanguage": "fr",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="sm">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <main class="box">
+        <div class="title-wrap">
+            <h1>Skyjo</h1>
+        </div>
+        <p class="sub">Le moins de points gagne.</p>
+
+        <input class="fld" id="name" maxlength="15" placeholder="Votre pseudo" autocomplete="nickname"
+            aria-label="Pseudo" style="margin-bottom:16px;">
+
+        <div class="tabs">
+            <button class="on" id="tSolo" type="button">Solo</button>
+            <button id="tMulti" type="button">Multijoueur</button>
+        </div>
+
+        <!-- Section Solo -->
+        <section id="solo">
+            <div class="mode-toggle">
+                <span class="mode-label">Mode de jeu</span>
+                <div class="mode-sw" role="radiogroup" aria-label="Mode de jeu solo">
+                    <button class="mode-btn on" id="sClassic" type="button" role="radio"
+                        aria-checked="true">Classique</button>
+                    <button class="mode-btn" id="sCrazy" type="button" role="radio" aria-checked="false">Crazy</button>
+                </div>
+            </div>
+
+            <h2 id="lbl">Nombre de joueurs</h2>
+            <div class="nums" id="nums" role="radiogroup" aria-labelledby="lbl"></div>
+            <button class="play" id="playBtn" type="button">Jouer</button>
+        </section>
+
+        <!-- Section Multijoueur -->
+        <section id="multi" hidden>
+            <div class="mode-toggle">
+                <span class="mode-label">Mode pour les nouvelles rooms</span>
+                <div class="mode-sw" role="radiogroup" aria-label="Mode de jeu multijoueur">
+                    <button class="mode-btn on" id="mClassic" type="button" role="radio"
+                        aria-checked="true">Classique</button>
+                    <button class="mode-btn" id="mCrazy" type="button" role="radio" aria-checked="false">Crazy</button>
+                </div>
+            </div>
+
+            <button class="play" id="createBtn" type="button">Créer une room</button>
+            <p class="or">ou</p>
+            <div class="jr">
+                <input class="fld" id="code" maxlength="6" placeholder="CODE" autocomplete="off"
+                    autocapitalize="characters" aria-label="Code de la room">
+                <button class="play" id="joinBtn" type="button">Rejoindre</button>
+            </div>
+            <button class="play sec" id="resumeBtn" type="button" hidden>Reprendre la partie en cours</button>
+            <p class="st" id="st" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <!-- Modal Salle d'attente Multi -->
+    <div class="ov" id="wait" hidden>
+        <div class="box">
+            <h2>Salle d'attente</h2>
+            <div class="room-mode-tag" id="wmode">Mode Classique</div>
+            <div class="code" id="wcode">—</div>
+            <button class="play sec" id="copyBtn" type="button" style="margin:0 0 14px">Copier le code</button>
+            <div class="chips" id="chips"></div>
+            <p class="hint" id="whint"></p>
+            <button class="play" id="startBtn" type="button" hidden>Lancer la partie</button>
+            <button class="play sec" id="leaveBtn" type="button">Quitter la room</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

@@ -2,12 +2,13 @@
     box-sizing: border-box
 }
 
+/* [NEW] Variables posées par themes.js (applyTheme) : --bg, --accent, --done. Valeurs par défaut = monde 1. */
 body.menu-body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     /* on garde flex */
-    background: #996b07;
+    background: var(--bg, #996b07);
     color: #fff;
     font-family: system-ui, sans-serif;
 }
@@ -56,7 +57,7 @@ h1 {
     display: block;
     padding: 16px 0;
     border-radius: 12px;
-    background: #feb854;
+    background: var(--accent, #feb854);
     color: #222;
     font-weight: 700;
     text-decoration: none;
@@ -64,7 +65,7 @@ h1 {
 }
 
 .lv.done {
-    background: #8fd18f
+    background: var(--done, #8fd18f)
 }
 
 .lv.locked {
@@ -107,7 +108,7 @@ h1 {
     padding: 0;
     border: 0;
     border-radius: 12px;
-    background: #feb854;
+    background: var(--accent, #feb854);
     color: #222;
     font-size: 30px;
     font-weight: 700;
@@ -140,7 +141,7 @@ h1 {
         width: var(--rw);
         height: var(--rh);
         overflow: hidden;
-        background: #996b07;
+        background: var(--bg, #996b07);
         /* même couleur que le fond, plus de beige */
     }
 

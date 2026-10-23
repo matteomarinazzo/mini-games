@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.43.2026-10-20.0";
+const CACHE_NAME = "mini-games-cache-v1.43.2026-10-23.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -108,6 +108,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/hangman.webp',
     'assets/logos/beatfall.webp',
     'assets/logos/orbit.webp',
+    'assets/logos/skyjo.webp',
 
     // About
     'about/about.html',
@@ -590,6 +591,19 @@ const ASSETS_TO_CACHE = [
     'games/orbit/index.html',
     'games/orbit/css/game.css',
     'games/orbit/js/game.js',
+
+    // Game: Skyjo
+    'games/skyjo/index.html',
+    'games/skyjo/game.html',
+    'games/skyjo/css/menu.css',
+    'games/skyjo/css/game.css',
+    'games/skyjo/js/menu.js',
+    'games/skyjo/js/game.js',
+    'games/skyjo/js/cards.js',
+    'games/skyjo/js/net.js',
+    'games/skyjo/js/core/ai.js',
+    'games/skyjo/js/core/rng.js',
+    'games/skyjo/js/core/rules.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

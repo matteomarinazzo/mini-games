@@ -282,6 +282,10 @@
             "orbit": {
                 "name": "Orbit",
                 "description": "Un point tourne autour d'un noyau. Change d'anneau pour éviter les arcs, tiens le plus longtemps possible. Trois vies, et ça accélère."
+            },
+            "skyjo": {
+                "name": "Skyjo",
+                "description": "Révèle tes cartes, échange-les intelligemment et finis avec le moins de points. Classique ou Crazy, seul contre l'IA ou entre amis jusqu'à 8 joueurs !"
             }
         },
         "badges": {
@@ -353,7 +357,8 @@
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
             "2d": "📏 2D",
-            "music": "🎵 Musique"
+            "music": "🎵 Musique",
+            "cards": "🃏 Cartes"
         }
     },
     "about": {

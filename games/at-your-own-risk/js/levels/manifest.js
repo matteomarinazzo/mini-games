@@ -4,7 +4,8 @@
 // Pour ajouter un monde : une ligne ici + ses fichiers levelN.js. Rien d'autre à modifier.
 const CONFIG = [
     { id: 'world1', name: 'Monde 1', levels: 20, released: true },
-    { id: 'world2', name: 'Monde 2', levels: 20, released: false },
+    { id: 'world2', name: 'Monde 2', levels: 4, released: true }, // [V3] 4 niveaux (21-24) ; passer à 20 au fil des versions
+    { id: 'world3', name: 'Monde 3', levels: 20, released: false },
 ];
 
 let n = 1;

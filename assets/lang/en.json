@@ -283,6 +283,10 @@
             "orbit": {
                 "name": "Orbit",
                 "description": "A point rotates around a core. Change the ring to avoid the arcs, hold on as long as possible. Three lives, and it speeds up."
+            },
+            "skyjo": {
+                "name": "Skyjo",
+                "description": "Reveal your cards, exchange them cleverly and finish with the lowest score. Classic or Crazy, alone against the AI or with up to 8 friends!"
             }
         },
         "badges": {
@@ -354,7 +358,8 @@
             "quiz": "📚 Quiz",
             "sports": "🏆 Sports",
             "2d": "📏 2D",
-            "music": "🎵 Music"
+            "music": "🎵 Music",
+            "cards": "🃏 Cards"
         }
     },
     "about": {

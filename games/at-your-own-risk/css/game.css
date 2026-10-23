@@ -3,11 +3,12 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* [NEW] --bg posé par themes.js (applyTheme) ; défaut = monde 1 */
 html,
 body {
     margin: 0;
     height: 100%;
-    background: #996b07;
+    background: var(--bg, #996b07);
     overflow: hidden;
     touch-action: none;
     user-select: none;
@@ -27,7 +28,7 @@ body {
 #cv {
     width: min(100vw, calc(100vh*4/3));
     height: min(100vh, calc(100vw*3/4));
-    background: #996b07
+    background: var(--bg, #996b07)
 }
 
 .hud {
@@ -79,7 +80,7 @@ body {
     padding: 14px 28px;
     border: 0;
     border-radius: 12px;
-    background: #feb854;
+    background: var(--accent, #feb854);
     color: #222;
     font-weight: 700;
     cursor: pointer

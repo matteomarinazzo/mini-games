@@ -1,5 +1,6 @@
 import { WORLDS, COUNT, worldOf } from './levels/manifest.js';
 import { isDone, unlocked, getTries, worldDone } from './progress.js';
+import { applyTheme } from './themes.js'; // [NEW]
 
 const $ = id => document.getElementById(id), box = $('levels');
 const SOON = 'Coming soon';
@@ -15,6 +16,7 @@ let w = asked >= 1 && asked <= WORLDS.length ? asked - 1 : Math.max(0, worldOf(n
 
 function render() {
   const W = WORLDS[w];
+  applyTheme(w); // [NEW] data-world + variables CSS du monde affiché
   $('worldName').textContent = W.name;
   $('worlds').hidden = WORLDS.length < 2;
   $('prevWorld').disabled = w === 0;

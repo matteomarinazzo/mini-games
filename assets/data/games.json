@@ -162,6 +162,21 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "endless-hall": {
+      "path": "./games/endless-hall/index.html",
+      "name": "Couloir Sans Fin",
+      "emoji": "🚪",
+      "description": "Avance dans un couloir d'hôtel et repère ce qui cloche. Si tout est normal, passe la ligne. Sinon, reviens en arrière. Huit couloirs sans erreur.",
+      "tags": [
+        "exploration",
+        "observation",
+        "solo"
+      ],
+      "badge": "adventure",
+      "badgeText": "Aventure",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "lostBelow": {
       "path": "./games/lostBelow/index.html",
       "name": "Lost Below",

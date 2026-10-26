@@ -287,6 +287,10 @@
             "skyjo": {
                 "name": "Skyjo",
                 "description": "Reveal your cards, exchange them cleverly and finish with the lowest score. Classic or Crazy, alone against the AI or with up to 8 friends!"
+            },
+            "endless-hall": {
+                "name": "Endless Hall",
+                "description": "Walk a hotel corridor and spot what is wrong. If nothing is, cross the line. If something is, turn back. Eight halls, no mistakes."
             }
         },
         "badges": {
@@ -965,5 +969,29 @@
             "win_other_found": "😕 {other} found “{word}”",
             "win_other_failed": "🎉 {other} didn't find “{word}”"
         }
+    },
+    "feedback": {
+        "title": "Your opinion matters to us!",
+        "subtitle": "Already {min}+ minute(s) of playtime. Share your experience to help us improve the platform!",
+        "score_default": "Choose a rating",
+        "score_1": "1/5 — Needs improvement 😕",
+        "score_2": "2/5 — Fair 😐",
+        "score_3": "3/5 — Good 🙂",
+        "score_4": "4/5 — Very good! 😄",
+        "score_5": "5/5 — Masterpiece! 🤩",
+        "label_message": "Your message or suggestion",
+        "placeholder": "Tell us what you like, your suggestions or ideas for new features...",
+        "error_required": "Please select a rating and enter your message.",
+        "btn_submit": "Send my feedback",
+        "btn_submitting": "Sending...",
+        "btn_later": "Remind me later",
+        "btn_later_title": "Reminder in {min} minute(s) of playtime",
+        "btn_never": "Don't ask again",
+        "btn_never_title": "Don't show this request again",
+        "saved": "Saved...",
+        "close_aria": "Close",
+        "star_aria": "{n} star(s)",
+        "success_title": "Thank you for your feedback!",
+        "success_desc": "Your review and suggestions have been sent. Thanks to you, the platform gets better every day!"
     }
 }

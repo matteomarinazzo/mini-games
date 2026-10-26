@@ -90,9 +90,7 @@ function removeCols(s, seat, ev) {
     for (let c = 0; c < 4; c++) {
         const a = g[c], b = g[c + 4], d = g[c + 8];
         if (colMatches(a, b, d)) {
-            // La carte du haut (a) va sur la pile de défausse
             s.discard.push(a);
-            // Les deux autres cartes restent définitivement hors jeu
             s.removed.push(b, d);
             ev.push({ t: 'col', seat, c, v: a.v, top: a, mid: b, bot: d });
             g[c] = g[c + 4] = g[c + 8] = null;
@@ -156,16 +154,83 @@ function endRound(s, ev) {
     ev.push({ t: 'roundEnd' });
 }
 
-function finish(s, ev) {
-    removeCols(s, s.cur, ev);
+// ── Chaîne jokers : appelées mutuellement de façon récursive ─────────────────
+
+/**
+ * Révèle la carte à idx si elle est cachée, émet l'événement flip,
+ * puis déclenche en chaîne son effet joker (si mode crazy).
+ * N'incrémente PAS p.rev : c'est la responsabilité de l'appelant
+ * pour les retournements initiés par le joueur.
+ */
+function revealAndChain(s, idx, ev) {
+    const p = s.players[s.cur];
+    const c = p.grid[idx];
+    if (!c || c.up) return;                         // déjà visible ou absente
+    c.up = true;
+    ev.push({ t: 'flip', seat: s.cur, idx, v: c.v, joker: c.joker, card: c });
+    if (s.mode === 'crazy' && c.joker) {
+        applyJokerEffect(s, idx, c.joker, ev);      // déclenche l'effet en cascade
+    }
+}
+
+/**
+ * Applique l'effet d'un joker DÉJÀ RÉVÉLÉ à l'index idx.
+ * Gère les chaînes : column → révèle les autres → si joker → relance applyJokerEffect.
+ *
+ * En phase 'reveal' : target décrémente p.rev (force un retournement de plus).
+ * En phase 'play'   : target incrémente s.turn.pendingTargets.
+ */
+function applyJokerEffect(s, idx, jokerType, ev) {
+    const p = s.players[s.cur];
+
+    if (jokerType === 'column') {
+        // Révèle les deux autres cartes de la colonne + chaîne leurs éventuels effets
+        const col = idx % 4;
+        for (const j of [col, col + 4, col + 8]) {
+            revealAndChain(s, j, ev);
+        }
+        removeCols(s, s.cur, ev);
+
+    } else if (jokerType === 'chameleon') {
+        removeCols(s, s.cur, ev);
+
+    } else if (jokerType === 'target') {
+        removeCols(s, s.cur, ev);
+        if (p.grid.some(k => k && !k.up)) {
+            if (s.phase === 'reveal') {
+                // Force le joueur à retourner une carte de plus
+                p.rev = Math.max(0, p.rev - 1);
+            } else {
+                // Ajoute une cible pendante : le joueur devra choisir une carte à retourner
+                s.turn.pendingTargets = (s.turn.pendingTargets || 0) + 1;
+            }
+        }
+    }
+}
+
+/**
+ * Clôture un tour : passe en targetFlip s'il reste des cibles pendantes,
+ * sinon appelle endTurn.
+ */
+function resolveAndEnd(s, ev) {
+    removeCols(s, s.cur, ev);      // passe final (idempotent)
+    const pendingT = s.turn.pendingTargets || 0;
+    const p = s.players[s.cur];
+    if (pendingT > 0 && p.grid.some(k => k && !k.up)) {
+        s.turn = { stage: 'targetFlip', pendingTargets: pendingT };
+        return;
+    }
     endTurn(s, ev);
 }
+
+// ── Action principale ─────────────────────────────────────────────────────────
 
 /** Applique une action. Muté in place. Retourne {ok, events}. */
 export function apply(s, a) {
     const ev = [], p = s.players[s.cur], t = s.turn;
     const cell = i => (Number.isInteger(i) && i >= 0 && i < 12 ? p.grid[i] : null);
 
+    // ── Phase de révélation initiale ─────────────────────────────────────────
     if (s.phase === 'reveal') {
         const c = cell(a.idx);
         if (a.type !== 'flip' || !c || c.up) return { ok: false };
@@ -173,28 +238,12 @@ export function apply(s, a) {
         p.rev++;
         ev.push({ t: 'flip', seat: s.cur, idx: a.idx, v: c.v, joker: c.joker, card: c });
 
-        // En Mode Crazy : les cartes spéciales révélées au départ déclenchent leur effet !
+        // Effets jokers en cascade (peuvent modifier p.rev via target)
         if (s.mode === 'crazy' && c.joker) {
-            if (c.joker === 'column') {
-                const col = a.idx % 4;
-                for (const j of [col, col + 4, col + 8]) {
-                    if (p.grid[j] && !p.grid[j].up) {
-                        p.grid[j].up = true;
-                        ev.push({ t: 'flip', seat: s.cur, idx: j, v: p.grid[j].v, joker: p.grid[j].joker, card: p.grid[j] });
-                    }
-                }
-                removeCols(s, s.cur, ev);
-            } else if (c.joker === 'chameleon') {
-                removeCols(s, s.cur, ev);
-            } else if (c.joker === 'target') {
-                // Cible : exige de retourner une carte cachée de plus
-                removeCols(s, s.cur, ev);
-                if (p.grid.some(k => k && !k.up)) {
-                    p.rev = Math.max(0, p.rev - 1);
-                }
-            }
+            applyJokerEffect(s, a.idx, c.joker, ev);
         }
 
+        // Passage au joueur suivant dès que les 2 retournements requis sont faits
         if (p.rev >= 2 || !p.grid.some(k => k && !k.up)) {
             if (s.cur < s.n - 1) s.cur++;
             else startPlay(s);
@@ -202,19 +251,22 @@ export function apply(s, a) {
         return { ok: true, events: ev };
     }
 
+    // ── Phase de jeu ─────────────────────────────────────────────────────────
     if (s.phase !== 'play') return { ok: false };
     const st = t.stage;
 
     if (a.type === 'draw' && st === 'start') {
         ensureDeck(s);
         if (!s.deck.length) return { ok: false };
-        s.turn = { stage: 'holdDraw', drawn: s.deck.pop(), src: 'draw' };
+        s.turn = { stage: 'holdDraw', drawn: s.deck.pop(), src: 'draw', pendingTargets: 0 };
         ev.push({ t: 'draw', seat: s.cur, v: s.turn.drawn.v, joker: s.turn.drawn.joker, card: s.turn.drawn });
+
     } else if (a.type === 'takeDiscard' && st === 'start') {
         if (!s.discard.length) return { ok: false };
         const v = s.discard.pop();
-        s.turn = { stage: 'holdDiscard', drawn: v, src: 'discard' };
+        s.turn = { stage: 'holdDiscard', drawn: v, src: 'discard', pendingTargets: 0 };
         ev.push({ t: 'take', seat: s.cur, v: v.v ?? v, joker: v.joker, card: v });
+
     } else if (a.type === 'swap' && (st === 'holdDraw' || st === 'holdDiscard')) {
         const c = cell(a.idx);
         if (!c) return { ok: false };
@@ -224,71 +276,41 @@ export function apply(s, a) {
         s.discard.push(c);
         ev.push({ t: 'swap', seat: s.cur, idx: a.idx, out: c, in: placed, src: t.src });
 
-        // Effets Mode Crazy si le joker est posé pendant son tour
+        // Réinitialise les cibles pendantes pour ce tour
+        s.turn = { stage: 'resolving', pendingTargets: 0 };
+
+        // Déclenche l'effet si la carte posée est un joker
         if (s.mode === 'crazy' && placed.joker) {
-            if (placed.joker === 'column') {
-                const col = a.idx % 4;
-                for (const j of [col, col + 4, col + 8]) {
-                    if (p.grid[j] && !p.grid[j].up) {
-                        p.grid[j].up = true;
-                        ev.push({ t: 'flip', seat: s.cur, idx: j, v: p.grid[j].v, joker: p.grid[j].joker, card: p.grid[j] });
-                    }
-                }
-                finish(s, ev);
-                return { ok: true, events: ev };
-            } else if (placed.joker === 'target') {
-                removeCols(s, s.cur, ev);
-                const hid = p.grid.map((card, i) => (card && !card.up ? i : -1)).filter(i => i >= 0);
-                if (hid.length > 0) {
-                    s.turn = { stage: 'targetFlip' };
-                    return { ok: true, events: ev };
-                }
-                finish(s, ev);
-                return { ok: true, events: ev };
-            }
+            applyJokerEffect(s, a.idx, placed.joker, ev);
         }
-        finish(s, ev);
+
+        resolveAndEnd(s, ev);
+
     } else if (a.type === 'discard' && st === 'holdDraw') {
         if (!p.grid.some(c => c && !c.up)) return { ok: false };
         s.discard.push(t.drawn);
         ev.push({ t: 'discard', seat: s.cur, v: t.drawn });
-        s.turn = { stage: 'mustFlip' };
+        s.turn = { stage: 'mustFlip', pendingTargets: 0 };
+
     } else if (a.type === 'flip' && st === 'mustFlip') {
         const c = cell(a.idx);
         if (!c || c.up) return { ok: false };
-        c.up = true;
-        ev.push({ t: 'flip', seat: s.cur, idx: a.idx, v: c.v, joker: c.joker, card: c });
 
-        // Effets Mode Crazy si le joker est retourné pendant son tour
-        if (s.mode === 'crazy' && c.joker) {
-            if (c.joker === 'column') {
-                const col = a.idx % 4;
-                for (const j of [col, col + 4, col + 8]) {
-                    if (p.grid[j] && !p.grid[j].up) {
-                        p.grid[j].up = true;
-                        ev.push({ t: 'flip', seat: s.cur, idx: j, v: p.grid[j].v, joker: p.grid[j].joker, card: p.grid[j] });
-                    }
-                }
-                finish(s, ev);
-                return { ok: true, events: ev };
-            } else if (c.joker === 'target') {
-                removeCols(s, s.cur, ev);
-                const hid = p.grid.map((card, i) => (card && !card.up ? i : -1)).filter(i => i >= 0);
-                if (hid.length > 0) {
-                    s.turn = { stage: 'targetFlip' };
-                    return { ok: true, events: ev };
-                }
-                finish(s, ev);
-                return { ok: true, events: ev };
-            }
-        }
-        finish(s, ev);
+        // pendingTargets déjà initialisé à 0 à l'entrée de mustFlip
+        revealAndChain(s, a.idx, ev);   // révèle + effets jokers en cascade
+        resolveAndEnd(s, ev);
+
     } else if (a.type === 'flip' && st === 'targetFlip') {
         const c = cell(a.idx);
         if (!c || c.up) return { ok: false };
-        c.up = true;
-        ev.push({ t: 'flip', seat: s.cur, idx: a.idx, v: c.v, joker: c.joker, card: c });
-        finish(s, ev);
+
+        // Décrémente d'un la cible consommée par ce retournement
+        const pending = Math.max(0, (t.pendingTargets || 1) - 1);
+        s.turn = { stage: 'targetFlip', pendingTargets: pending };
+
+        revealAndChain(s, a.idx, ev);   // révèle + effets jokers en cascade (peut ajouter des pendingTargets)
+        resolveAndEnd(s, ev);
+
     } else {
         return { ok: false };
     }
@@ -316,15 +338,15 @@ export function legalActions(s) {
     return L;
 }
 
-/** Vue d'un joueur : cartes cachées masquées. */
+/** Vue d'un joueur : cartes cachées masquées pour les adversaires. */
 export function viewFor(s, seat) {
     return {
         n: s.n, me: seat, cur: s.cur, phase: s.phase, stage: s.turn.stage, mode: s.mode,
         drawn: s.turn.drawn ? { ...s.turn.drawn } : null,
         discard: s.discard.slice(), removed: s.removed.slice(), deckCount: s.deck.length,
         canDraw: s.deck.length > 0 || s.discard.length > 1, closer: s.closer, totals: s.totals.slice(),
-        players: s.players.map(p => ({
-            grid: p.grid.map(c => (c ? (c.up ? { up: true, v: c.v, joker: c.joker || null } : { up: false }) : null))
+        players: s.players.map((p, i) => ({
+            grid: p.grid.map(c => (c ? (c.up || i === seat ? { up: true, v: c.v, joker: c.joker || null } : { up: false }) : null))
         }))
     };
 }

@@ -9,7 +9,7 @@
  * Aucune fonctionnalité retirée vs les 3 anciens fichiers.
  */
 
-import { initFullscreenSystem } from "../../../../js/fullScreen.js";
+import { glyphHTML } from "../ui/glyph.js";
 import { standard3x3AI } from "../ai/standard3x3AI.js";
 import { big5x5AI } from "../ai/big5x5AI.js";
 import { ultimateAI } from "../ai/ultimateAI.js";
@@ -86,7 +86,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const saved = JSON.parse(localStorage.getItem("morpionGameConfig"));
     if (saved?.scores) gameConfig.scores = saved.scores;
 
-    initFullscreenSystem();
     initSymbolDisplays();
     updateScoreUI();
 
@@ -95,7 +94,18 @@ window.addEventListener("DOMContentLoaded", () => {
     } else {
         buildClassicBoard();
     }
+    updateTurnDisplay();
 });
+
+/* Pause (modale du HUD) : l'IA ne joue pas pendant la pause, elle reprend à la sortie */
+let paused = false;
+export function setPaused(v) {
+    paused = v;
+    if (!paused) {
+        if (gameType === "ultimate") AIToPlayUltimate();
+        else AIToPlayClassic();
+    }
+}
 
 /* =============================================
    AFFICHAGE DES SYMBOLES JOUEURS
@@ -106,12 +116,7 @@ function initSymbolDisplays() {
     ["player1", "player2"].forEach(key => {
         const el = document.getElementById(`${key}SymbolDisplay`);
         if (!el) return;
-        const p = players[key];
-        if (p.isCustom && p.customImage) {
-            el.innerHTML = `<img src="${p.customImage}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">`;
-        } else {
-            el.textContent = p.symbol;
-        }
+        el.innerHTML = glyphHTML(players[key], key === "player1" ? 1 : 2);
     });
 }
 
@@ -163,7 +168,7 @@ function handleClassicClick(cellIndex) {
     const playerTurn = gameConfig.playerTurn || 1;
     const p = players[`player${playerTurn}`];
 
-    placeSymbolInCell(cell, p);
+    placeSymbolInCell(cell, p, playerTurn);
     cell.setAttribute("isOccupied", "true");
     gameConfig.boardState[cellIndex] = playerTurn;
 
@@ -171,12 +176,8 @@ function handleClassicClick(cellIndex) {
     AIToPlayClassic();
 }
 
-function placeSymbolInCell(cell, player) {
-    if (player.isCustom && player.customImage) {
-        cell.innerHTML = `<img src="${player.customImage}" style="width:80%;height:80%;object-fit:contain;border-radius:6px;">`;
-    } else {
-        cell.textContent = player.symbol;
-    }
+function placeSymbolInCell(cell, player, n) {
+    cell.innerHTML = glyphHTML(player, n);
 }
 
 /* =============================================
@@ -226,6 +227,7 @@ function AIToPlayClassic() {
     if (gameConfig.playerTurn !== 2) return;
 
     setTimeout(() => {
+        if (paused || gameConfig.playerTurn !== 2) return;
         let move = null;
         if (gameType === "standard3x3") {
             move = standard3x3AI(difficulty, MODE_CONFIG.standard3x3.winPatterns);
@@ -350,12 +352,8 @@ function isValidUltimateMove(gi, ci) {
 }
 
 function displayUltimateSymbol(cell, player) {
-    const p = players[`player${player}`];
-    if (p.isCustom && p.customImage) {
-        cell.innerHTML = `<img src="${p.customImage}" style="width:100%;height:100%;object-fit:contain;">`;
-    } else {
-        cell.textContent = p.symbol;
-    }
+    cell.innerHTML = glyphHTML(players[`player${player}`], player);
+    cell.dataset.p = player; // lu par ultimateAI.getStateFromDOM
 }
 
 /* =============================================
@@ -438,12 +436,13 @@ function AIToPlayUltimate() {
     if (ultimateState.currentPlayer !== 2) return;
 
     setTimeout(() => {
+        if (paused || ultimateState.currentPlayer !== 2) return;
         const mv = ultimateAI(difficulty);
         if (!mv) return;
         if (isValidUltimateMove(mv.gridIndex, mv.cellIndex)) {
             handleUltimateClick(mv.gridIndex, mv.cellIndex);
         }
-    }, 500);
+    }, difficulty === "expert" ? 150 : 500);
 }
 
 /* =============================================
@@ -510,11 +509,7 @@ function announceWinner(winner) {
     if (textEl) textEl.textContent = `🎉 Joueur ${winner} gagne !`;
 
     if (symEl) {
-        if (p.isCustom && p.customImage) {
-            symEl.innerHTML = `<img src="${p.customImage}" style="width:44px;height:44px;object-fit:contain;border-radius:8px;">`;
-        } else {
-            symEl.textContent = p.symbol;
-        }
+        symEl.innerHTML = glyphHTML(p, winner);
     }
 
     overlay.classList.add("show");
@@ -569,6 +564,7 @@ function updateTurnDisplay() {
     const current = gameType === "ultimate"
         ? ultimateState.currentPlayer
         : gameConfig.playerTurn;
+    document.documentElement.dataset.turn = current; // couleur de la grille active (CSS)
 
     const p1Turn = document.getElementById("player1Turn");
     const p2Turn = document.getElementById("player2Turn");

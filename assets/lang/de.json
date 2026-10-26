@@ -287,6 +287,10 @@
             "skyjo": {
                 "name": "Skyjo",
                 "description": "Entdecke die Karten, tausche sie clever und beende die Runde mit den niedrigsten Punktzahlen. Klassisch oder Crazy, alleine gegen die KI oder mit bis zu 8 Freunden!"
+            },
+            "endless-hall": {
+                "name": "Endloser Flur",
+                "description": "Gehe einen Hotelflur entlang und entdecke, was nicht stimmt. Wenn alles normal ist, gehe über die Linie. Sonst gehe zurück. Acht Korridore ohne Fehler."
             }
         },
         "badges": {
@@ -965,5 +969,29 @@
             "win_other_found": "😕 {other} hat „{word}“ erraten",
             "win_other_failed": "🎉 {other} hat „{word}“ nicht erraten"
         }
+    },
+    "feedback": {
+        "title": "Deine Meinung ist uns wichtig!",
+        "subtitle": "Bereits {min}+ Spielminute(n). Teile deine Erfahrung, um uns zu helfen, die Plattform zu verbessern!",
+        "score_default": "Wähle eine Bewertung",
+        "score_1": "1/5 — Verbesserungsbedürftig 😕",
+        "score_2": "2/5 — Ausreichend 😐",
+        "score_3": "3/5 — Gut 🙂",
+        "score_4": "4/5 — Sehr gut! 😄",
+        "score_5": "5/5 — Meisterwerk! 🤩",
+        "label_message": "Deine Nachricht oder dein Vorschlag",
+        "placeholder": "Sag uns, was dir gefällt, deine Anmerkungen oder Ideen für Neues...",
+        "error_required": "Bitte wähle eine Bewertung und gib deine Nachricht ein.",
+        "btn_submit": "Mein Feedback senden",
+        "btn_submitting": "Wird gesendet...",
+        "btn_later": "Später erinnern",
+        "btn_later_title": "Erinnerung in {min} Spielminute(n)",
+        "btn_never": "Nicht mehr fragen",
+        "btn_never_title": "Diese Anfrage nicht mehr anzeigen",
+        "saved": "Gespeichert...",
+        "close_aria": "Schließen",
+        "star_aria": "{n} Stern(e)",
+        "success_title": "Vielen Dank für dein Feedback!",
+        "success_desc": "Deine Bewertung und Vorschläge wurden erfolgreich übermittelt. Dank dir wird die Plattform jeden Tag besser!"
     }
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.43.2026-10-23.0";
+const CACHE_NAME = "mini-games-cache-v1.44.2026-10-26.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -41,6 +41,7 @@ const ASSETS_TO_CACHE = [
     'js/utils/dailyChallenge.js',
     'js/utils/xpSystem.js',
     'js/utils/secretManager.js',
+    'js/utils/feedback.js',
 
     // Assets data
     'assets/data/games.json',
@@ -57,6 +58,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/logo-512.png',
     'assets/logos/logo-192.png',
     'assets/logos/favicon.png',
+    'https://mini-games.ch/assets/logos/favicon.png?v=2',
 
     'assets/logos/ball-sort.webp',
     'assets/logos/casino.webp',
@@ -109,6 +111,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/beatfall.webp',
     'assets/logos/orbit.webp',
     'assets/logos/skyjo.webp',
+    'assets/logos/endless-hall.webp',
 
     // About
     'about/about.html',
@@ -163,12 +166,13 @@ const ASSETS_TO_CACHE = [
     'games/morpion/js/ctrl/mainCtrl.js',
     'games/morpion/js/ctrl/gameCtrl.js',
     'games/morpion/js/ctrl/symbolsChoiceCtrl.js',
+    'games/morpion/js/ctrl/shared-config.js',
     'games/morpion/js/ai/standard3x3AI.js',
     'games/morpion/js/ai/big5x5AI.js',
     'games/morpion/js/ai/ultimateAI.js',
+    'games/morpion/js/ui/glyph.js',
     'games/morpion/js/ui/menuInGame.js',
     'games/morpion/js/ui/menuParams.js',
-    'games/morpion/js/utils/shared-config.js',
 
     // Game: Block Puzzle
     'games/block-puzzle/index.html',
@@ -604,6 +608,18 @@ const ASSETS_TO_CACHE = [
     'games/skyjo/js/core/ai.js',
     'games/skyjo/js/core/rng.js',
     'games/skyjo/js/core/rules.js',
+
+    // Game: Endless Hall
+    'games/endless-hall/index.html',
+    'games/endless-hall/css/game.css',
+    'games/endless-hall/js/game.js',
+    'games/endless-hall/js/core/data.js',
+    'games/endless-hall/js/core/player.js',
+    'games/endless-hall/js/core/raycast.js',
+    'games/endless-hall/js/core/records.js',
+    'games/endless-hall/js/core/save.js',
+    'games/endless-hall/js/core/textures.js',
+    'games/endless-hall/js/core/world.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

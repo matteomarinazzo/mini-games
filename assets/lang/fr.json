@@ -286,6 +286,10 @@
             "skyjo": {
                 "name": "Skyjo",
                 "description": "Révèle tes cartes, échange-les intelligemment et finis avec le moins de points. Classique ou Crazy, seul contre l'IA ou entre amis jusqu'à 8 joueurs !"
+            },
+            "endless-hall": {
+                "name": "Couloir Sans Fin",
+                "description": "Avance dans un couloir d'hôtel et repère ce qui cloche. Si tout est normal, passe la ligne. Sinon, reviens en arrière. Huit couloirs sans erreur."
             }
         },
         "badges": {
@@ -964,5 +968,29 @@
             "win_other_found": "😕 {other} a trouvé « {word} »",
             "win_other_failed": "🎉 {other} n'a pas trouvé « {word} »"
         }
+    },
+    "feedback": {
+        "title": "Votre avis compte pour nous !",
+        "subtitle": "Déjà {min}+ minute(s) de jeu cumulée(s). Partagez votre expérience pour nous aider à améliorer la plateforme !",
+        "score_default": "Choisissez une note",
+        "score_1": "1/5 — À améliorer 😕",
+        "score_2": "2/5 — Passable 😐",
+        "score_3": "3/5 — Bien 🙂",
+        "score_4": "4/5 — Très bien ! 😄",
+        "score_5": "5/5 — Chef-d'œuvre ! 🤩",
+        "label_message": "Votre message ou suggestion",
+        "placeholder": "Dites-nous ce qui vous plaît, vos remarques ou vos idées de nouveautés...",
+        "error_required": "Veuillez sélectionner une note et saisir votre message.",
+        "btn_submit": "Envoyer mon avis",
+        "btn_submitting": "Envoi en cours...",
+        "btn_later": "Me le rappeler plus tard",
+        "btn_later_title": "Rappel dans {min} minute(s) de jeu",
+        "btn_never": "Ne plus me demander",
+        "btn_never_title": "Ne plus afficher cette demande",
+        "saved": "Enregistré...",
+        "close_aria": "Fermer",
+        "star_aria": "{n} étoile(s)",
+        "success_title": "Merci pour votre retour !",
+        "success_desc": "Votre avis et vos suggestions ont bien été envoyés. Grâce à vous, la plateforme s'améliore chaque jour !"
     }
 }

@@ -1,7 +1,17 @@
 {
-    "currentVersion": "1.43.2026-10-23",
-    "lastUpdate": "2026-10-23",
+    "currentVersion": "1.44.2026-10-26",
+    "lastUpdate": "2026-10-26",
     "history": [
+        {
+            "version": "1.44.2026-10-26",
+            "date": "2026-10-26",
+            "changes": [
+                "Ajout du jeu Endless Hall",
+                "Refonte du jeu Morpion",
+                "Ajout d'une modal pour recueillir des feedbacks",
+                "Correction des règles des Jokers du Skyjo"
+            ]
+        },
         {
             "version": "1.43.2026-10-23",
             "date": "2026-10-23",

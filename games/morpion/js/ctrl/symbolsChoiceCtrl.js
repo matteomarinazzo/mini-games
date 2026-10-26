@@ -1,3 +1,5 @@
+import { glyphHTML, glyphKind } from "../ui/glyph.js";
+
 // État du jeu
 const gameState = {
   player1: { symbol: null, isCustom: false, customImage: null },
@@ -110,6 +112,12 @@ document.querySelectorAll('input[name="gameType"]').forEach((radio) => {
   });
 });
 
+// X et O dessinés en SVG dans la grille de choix (les autres symboles restent des emoji)
+document.querySelectorAll(".symbol-option").forEach((o) => {
+  if (glyphKind(o.dataset.symbol))
+    o.innerHTML = glyphHTML({ symbol: o.dataset.symbol }, o.closest(".player1") ? 1 : 2);
+});
+
 // Sélection des symboles
 document.querySelectorAll(".symbol-option").forEach((option) => {
   option.addEventListener("click", function () {
@@ -175,7 +183,7 @@ function selectSymbol(player, symbol, isCustom = false, customImage = null) {
     if (isCustom && customImage) {
       preview.innerHTML = `<img src="${customImage}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px;">`;
     } else {
-      preview.textContent = symbol;
+      preview.innerHTML = glyphHTML({ symbol }, player === "player1" ? 1 : 2);
     }
   }
 
@@ -252,19 +260,16 @@ function setupCustomImage(player, playerNum) {
   // Drag & Drop
   customDiv.addEventListener("dragover", (e) => {
     e.preventDefault();
-    customDiv.style.borderColor = "#667eea";
-    customDiv.style.background = "#f8f9fa";
+    customDiv.classList.add("drag");
   });
 
   customDiv.addEventListener("dragleave", () => {
-    customDiv.style.borderColor = "#dfe6e9";
-    customDiv.style.background = "white";
+    customDiv.classList.remove("drag");
   });
 
   customDiv.addEventListener("drop", (e) => {
     e.preventDefault();
-    customDiv.style.borderColor = "#dfe6e9";
-    customDiv.style.background = "white";
+    customDiv.classList.remove("drag");
 
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {

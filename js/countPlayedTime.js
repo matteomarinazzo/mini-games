@@ -3,6 +3,7 @@ import { checkRealConnection } from "./network.js";
 import { notifyHeartbeat, notifyNewPlayer } from "./utils/webhooks.js";
 import { reportPlayTime } from "./utils/badges.js";
 import { updateStreak } from "./profilePanel.js";
+import { checkFeedbackTrigger } from "./utils/feedback.js";
 
 console.log("🕒 Compteur de temps initialisé");
 
@@ -30,10 +31,13 @@ async function incrementTime() {
         // 1. Incrémenter le temps local du joueur (toujours, online ou non)
         const totalMin = incrementLocalTime();
 
-        // 2. Notifier le système de badges (vérifie les conditions de temps)
+        // 2. Vérifier si le modal de feedback doit être affiché (10 min de jeu)
+        checkFeedbackTrigger();
+
+        // 3. Notifier le système de badges (vérifie les conditions de temps)
         reportPlayTime(totalMin);
 
-        // 3. Sync Firebase si en ligne
+        // 4. Sync Firebase si en ligne
         const isOnline = await checkRealConnection();
 
         if (isOnline) {
@@ -106,6 +110,11 @@ document.addEventListener("visibilitychange", () => {
 });
 
 if (!document.hidden) startCounter();
+
+// Vérification différée après le chargement de la page (3s)
+setTimeout(() => {
+    checkFeedbackTrigger();
+}, 3000);
 
 // ─── ORIENTATION ──────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {

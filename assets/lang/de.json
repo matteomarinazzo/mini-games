@@ -291,6 +291,10 @@
             "endless-hall": {
                 "name": "Endloser Flur",
                 "description": "Gehe einen Hotelflur entlang und entdecke, was nicht stimmt. Wenn alles normal ist, gehe über die Linie. Sonst gehe zurück. Acht Korridore ohne Fehler."
+            },
+            "balloon-rise": {
+                "name": "Balloon Rise",
+                "description": "Stößt Piques, Balken und Murmeln weg, bevor sie deinen Ballon platzen lassen."
             }
         },
         "badges": {

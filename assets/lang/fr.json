@@ -290,6 +290,10 @@
             "endless-hall": {
                 "name": "Couloir Sans Fin",
                 "description": "Avance dans un couloir d'hôtel et repère ce qui cloche. Si tout est normal, passe la ligne. Sinon, reviens en arrière. Huit couloirs sans erreur."
+            },
+            "balloon-rise": {
+                "name": "Balloon Rise",
+                "description": "Écarte les piques, barres et billes avant qu'ils n'éclatent ton ballon."
             }
         },
         "badges": {

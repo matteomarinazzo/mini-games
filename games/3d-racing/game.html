@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>3D Racing – Serra Nova | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, nofollow">
+
+    <script>(function(){var r=document.documentElement,m=matchMedia('(pointer:coarse)'),f=function(){r.classList.toggle('rot',m.matches&&innerHeight>innerWidth)};f();addEventListener('resize',f);addEventListener('orientationchange',f)})()</script>
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+    <canvas id="gameCanvas" aria-label="Vue 3D du circuit Serra Nova"></canvas>
+    <div class="cockpit" id="cockpit" data-kind="gt" hidden aria-hidden="true">
+        <div class="cockpit-glass"></div>
+        <div class="cockpit-pillar left"></div>
+        <div class="cockpit-pillar right"></div>
+        <div class="cockpit-mirror"></div>
+        <div class="cockpit-halo"></div>
+        <i class="cp-wheel l"></i><i class="cp-wheel r"></i>
+        <div class="dashboard">
+            <div class="cluster">
+                <div class="shiftbar" id="shiftBar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="cl-main">
+                    <div class="cl-gear" id="dashGear">1</div>
+                    <div class="cl-speed"><b id="dashSpeed">0</b><span>km/h</span></div>
+                    <div class="cl-rpm"><b id="dashRpm">0</b><span>tr/min</span></div>
+                </div>
+                <div class="cl-row"><span>Tour<b id="dashLap">–</b></span><span>Pos.<b id="dashPos">–</b></span><span>Temps<b id="dashTime">–</b></span></div>
+            </div>
+            <div class="dial"><div class="needle" id="needle"></div><b>RPM</b></div>
+            <div class="dash-info">
+                <div><span>Meilleur</span><b id="dashBest">–</b></div>
+                <div><span>Pénalités</span><b id="dashPen">0 s</b></div>
+                <div class="pedbars"><div><i id="pThr"></i></div><div class="b"><i id="pBrk"></i></div></div>
+            </div>
+        </div>
+        <div class="wheel" id="wheel">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+                <g class="wr"><circle cx="100" cy="100" r="86" fill="none" stroke="#101216" stroke-width="20"/><circle cx="100" cy="100" r="96" fill="none" stroke="#3a4048" stroke-width="2"/><rect x="95" y="3" width="10" height="24" rx="2" fill="#ff4d3d"/><rect x="16" y="92" width="168" height="16" rx="8" fill="#171a1f"/><rect x="92" y="100" width="16" height="74" rx="6" fill="#171a1f"/><circle cx="100" cy="100" r="30" fill="#1f232a" stroke="#4a515a" stroke-width="3"/><text class="wg" x="100" y="111" text-anchor="middle" font-size="30" font-weight="700" fill="#b5ffda">1</text><ellipse cx="14" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/><ellipse cx="186" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/></g>
+                <g class="wf"><rect x="4" y="68" width="30" height="92" rx="14" fill="#1d2127"/><rect x="166" y="68" width="30" height="92" rx="14" fill="#1d2127"/><path d="M34 52Q34 36 54 34H146Q166 36 166 52L176 138Q178 170 150 172H50Q22 170 24 138Z" fill="#14171c" stroke="#3a4048" stroke-width="3"/><rect x="95" y="28" width="10" height="10" fill="#ff4d3d"/><rect x="58" y="52" width="84" height="58" rx="6" fill="#06141a" stroke="#4a515a" stroke-width="2"/><text class="wg" x="100" y="97" text-anchor="middle" font-size="42" font-weight="700" fill="#b5ffda">1</text><circle cx="64" cy="132" r="9" fill="#e5352b"/><circle cx="100" cy="137" r="9" fill="#f2d03b"/><circle cx="136" cy="132" r="9" fill="#3ccf5a"/><circle cx="76" cy="154" r="6" fill="#4a90e2"/><circle cx="124" cy="154" r="6" fill="#ff9d2e"/><ellipse cx="19" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/><ellipse cx="181" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/></g>
+            </svg>
+        </div>
+    </div>
+    <button class="exit" id="pauseBtn" type="button" title="Pause" aria-label="Pause">❚❚</button>
+    <div class="msg" id="ctxLost" hidden>Contexte graphique perdu… restauration en cours.</div>
+    <div class="msg" id="noGl" hidden>WebGL2 n'est pas disponible sur cet appareil.</div>
+    <div class="hud" id="hud">
+        <div class="hud-track"><span>Circuit</span><b>Serra Nova</b></div>
+        <div class="hud-speed"><b id="hSpd">0</b><small>km/h</small><em id="hGear">1</em></div>
+        <div class="hud-rpm"><i id="hRpm"></i></div>
+        <div class="hud-grid">
+            <div class="chip"><span>Position</span><b id="hPos">–</b></div>
+            <div class="chip"><span>Tour</span><b id="hLap">–</b></div>
+            <div class="chip wide"><span>Tour en cours</span><b id="hTime">–</b></div>
+            <div class="chip"><span>Meilleur</span><b id="hBest">–</b></div>
+            <div class="chip"><span>Pénalités</span><b id="hPenalty">0 s</b></div>
+        </div>
+    </div>
+    <div class="board" id="board" aria-label="Classement"></div>
+    <canvas class="map" id="map" aria-label="Plan du circuit"></canvas>
+    <canvas class="dmg" id="dmg" width="104" height="168" aria-label="État de la voiture"></canvas>
+    <div class="lights" id="lightsWrap">
+        <div id="lights"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="banner" id="banner" aria-live="polite"></div>
+    <div class="results" id="results" hidden>
+        <div class="rcard">
+            <h2 id="resTitle"></h2>
+            <p id="resSub"></p>
+            <div class="rscroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pl.</th>
+                            <th>N°</th>
+                            <th>Pilote</th>
+                            <th>Départ</th>
+                            <th>Meilleur tour</th>
+                            <th>Écart</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resBody"></tbody>
+                </table>
+            </div>
+            <div class="rbtns"><button class="btn" id="again" type="button">Recommencer</button><a class="btn alt"
+                    href="index.html">Menu</a></div>
+        </div>
+    </div>
+    <div class="results" id="pause" hidden>
+        <div class="rcard">
+            <h2>Pause</h2>
+            <div class="rbtns pcol"><button class="btn" id="resume" type="button">Reprendre</button><button
+                    class="btn alt" id="setBtn" type="button">Paramètres</button>
+                <div id="setPanel" hidden>
+                    <label class="tg"><input type="checkbox" id="sLine"> Ligne idéale</label>
+                    <label class="tg"><input type="checkbox" id="sBrake"> Zone de freinage</label>
+                    <label class="tg"><input type="checkbox" id="sMap"> Minimap</label>
+                    <label class="tg"><input type="checkbox" id="sPenalties"> Pénalités</label>
+                    <div class="view-picker"><span>Point de vue</span>
+                        <div><button type="button" id="viewPrev" aria-label="Point de vue précédent">◀</button><b
+                                id="viewName">3e personne</b><button type="button" id="viewNext"
+                                aria-label="Point de vue suivant">▶</button></div>
+                    </div>
+                </div>
+                <button class="btn alt" id="restart" type="button">Recommencer</button><a class="btn alt"
+                    href="index.html">Quitter vers le menu</a>
+            </div>
+        </div>
+    </div>
+    <div class="pads" id="pads">
+        <div class="steer" id="steerZone"><span>◀ Braquer ▶</span></div>
+        <div class="pedals">
+            <button class="pedal brake" id="brakeBtn" aria-label="Frein">Frein</button>
+            <button class="pedal gas" id="accelBtn" aria-label="Accélérateur">Gaz</button>
+        </div>
+    </div>
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

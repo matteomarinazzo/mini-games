@@ -128,6 +128,23 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "balloon-rise": {
+      "path": "./games/balloon-rise/index.html",
+      "name": "Balloon Rise",
+      "emoji": "🎈",
+      "description": "Écarte piques, barres et billes avant qu'ils n'éclatent ton ballon.",
+      "tags": [
+        "arcade",
+        "reflexes",
+        "survival",
+        "skill",
+        "solo"
+      ],
+      "badge": "action",
+      "badgeText": "Action",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "layer-pile": {
       "path": "./games/layer-pile/index.html",
       "name": "Layer Pile",
@@ -828,6 +845,23 @@
       ],
       "badge": "fun",
       "badgeText": "Fun !",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    }
+  },
+  "test": {
+    "3d-racing": {
+      "path": "./games/3d-racing/index.html",
+      "name": "3d-racing",
+      "emoji": "🚗",
+      "description": "Conduis ta voiture et évite les obstacles.",
+      "tags": [
+        "arcade",
+        "racing",
+        "solo"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }

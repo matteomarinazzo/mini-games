@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.44.2026-10-26.0";
+const CACHE_NAME = "mini-games-cache-v1.45.2026-10-27.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -112,6 +112,8 @@ const ASSETS_TO_CACHE = [
     'assets/logos/orbit.webp',
     'assets/logos/skyjo.webp',
     'assets/logos/endless-hall.webp',
+    'assets/logos/balloon-rise.webp',
+    'assets/logos/3d-racing.webp',
 
     // About
     'about/about.html',
@@ -620,6 +622,11 @@ const ASSETS_TO_CACHE = [
     'games/endless-hall/js/core/save.js',
     'games/endless-hall/js/core/textures.js',
     'games/endless-hall/js/core/world.js',
+
+    // Game: Balloon Rise
+    'games/balloon-rise/index.html',
+    'games/balloon-rise/css/game.css',
+    'games/balloon-rise/js/game.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>3D Racing – Course de simulation en 3D | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <script>(function () { var r = document.documentElement, m = matchMedia('(pointer:coarse)'), f = function () { r.classList.toggle('rot', m.matches && innerHeight > innerWidth) }; f(); addEventListener('resize', f); addEventListener('orientationchange', f) })()</script>
+    <link rel="stylesheet" href="css/menu.css">
+    <style>
+        .tk-trace { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: start }
+        .tk-alt { padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .1) }
+        @media (max-width: 700px) { .tk-trace { grid-template-columns: 1fr } }
+    </style>
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/3d-racing/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="3D Racing – Course de simulation en 3D | Mini‑Games">
+    <meta property="og:description"
+        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/3d-racing/">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="3D Racing – Course de simulation en 3D | Mini‑Games">
+    <meta name="twitter:description"
+        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "3D Racing",
+      "url": "https://mini-games.ch/games/3d-racing/",
+      "description": "Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Racing Game", "Simulation Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+    <a class="hm" id="hm" href="#home" aria-label="Accueil" title="Accueil" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 11.5 12 4l9 7.5" />
+            <path d="M5.5 10v10h4.5v-6h4v6h4.5V10" />
+        </svg>
+    </a>
+    <section class="scr on" id="home">
+        <div class="wrap hero">
+            <div class="emoji">🏁</div>
+            <h1>3D Racing</h1>
+            <p class="circuit">Serra Nova</p>
+            <div class="modes">
+                <button class="mode primary" id="btnSolo" type="button"
+                    data-go="circuits"><i>🏎️</i><span><b>Solo</b><small>Course contre l'IA</small></span></button>
+                <button class="mode" id="btnMulti" type="button"
+                    data-go="circuits"><i>🌐</i><b>Multijoueur</b><small>Entre amis, avec un code</small></button>
+                <button class="mode" id="btnClm" type="button" data-go="circuits"><i>⏱️</i><b>Contre la
+                        montre</b><small>Bats ton record</small></button>
+                <button class="mode" id="btnDesign" type="button"><i>🛠️</i><b>Concevoir une voiture</b><small>Type,
+                        couleur, performances</small></button>
+                <button class="mode" id="btnTrack" type="button"><i>🛣️</i><b>Concevoir un circuit</b><small>Tracé,
+                        relief, décor</small></button>
+            </div>
+            <div class="links">
+                <button class="btn alt" id="rulesBtn" type="button" data-go="rules">📖 Règles</button>
+                <button class="btn alt" id="recordsBtn" type="button" data-go="records">🏆 Records</button>
+            </div>
+            <a class="back" href="../../index.html">‹ Retour aux jeux</a>
+        </div>
+    </section>
+    <div class="room-overlay" id="roomOverlay" hidden>
+        <div class="room-card">
+            <h2>Salle d’attente</h2>
+            <div class="room-code-wrap">
+                <p class="room-code" id="roomCodeLabel">------</p>
+                <button class="btn-copy" id="copyRoomCode" type="button">📋 Copier</button>
+            </div>
+            <p class="room-note" id="roomNote"></p>
+            <div class="room-grid" id="hostSettings">
+                <label>Qualifications
+                    <select class="theme-select" id="roomQualifying">
+                        <option value="false">Sans qualification</option>
+                        <option value="true">Un tour de qualification</option>
+                    </select>
+                </label>
+                <label>IA en plus <output id="roomAiValue">0</output>
+                    <input type="range" id="roomAi" min="0" max="18" step="1" value="0">
+                </label>
+                <label>Tours <output id="roomLapsValue">3</output>
+                    <input type="range" id="roomLaps" min="1" max="20" step="1" value="3">
+                </label>
+                <label>Difficulté de l'IA
+                    <select class="theme-select" id="roomDiff"></select>
+                </label>
+            </div>
+            <div class="guest-waiting" id="guestWaiting" hidden>
+                <p>En attente que le créateur lance la course…</p>
+            </div>
+            <div class="room-players" id="roomPlayers"></div>
+            <div class="room-buttons">
+                <button class="btn" id="startRoom" type="button" hidden>Lancer la course</button>
+                <button class="btn alt" id="leaveRoom" type="button">Quitter</button>
+            </div>
+        </div>
+    </div>
+    <section class="scr" id="circuits">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>Circuit</h2>
+        </header>
+        <div class="wrap wide">
+            <div class="seg" role="tablist"><button class="segb on" id="tabCStock" type="button" role="tab">🏁 Circuits
+                    <em id="cntCStock">0</em></button><button class="segb" id="tabCMine" type="button" role="tab">⭐ Mes
+                    circuits <em id="cntCMine">0</em></button></div>
+            <div class="grid" id="cgrid"></div>
+            <div id="tmine" hidden><button class="btn" id="newTrack" type="button" style="margin-bottom:14px">＋ Créer un
+                    circuit</button>
+                <div class="grid" id="tgrid"></div>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="cars">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>Voiture</h2>
+        </header>
+        <div class="wrap wide">
+            <div class="seg" role="tablist"><button class="segb on" id="tabStock" type="button" role="tab">🚗 Voitures
+                    <em id="cntStock">0</em></button><button class="segb" id="tabMine" type="button" role="tab">⭐ Mes
+                    voitures <em id="cntMine">0</em></button></div>
+            <div class="grid" id="vgrid"></div>
+            <div id="mine" hidden><button class="btn" id="newCar" type="button" style="margin-bottom:14px">＋ Créer une
+                    voiture</button>
+                <div class="grid" id="mgrid"></div>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="designer">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>Conception</h2>
+        </header>
+        <div class="wrap wide dz">
+            <aside class="panel dz-prev"><canvas id="dzCanvas" width="300" height="220"></canvas>
+                <div class="rec" id="dzStats"></div>
+            </aside>
+            <div class="dz-main">
+                <div class="panel">
+                    <h3 class="sec">Identité</h3>
+                    <div class="form">
+                        <div class="lbl">Nom<input class="theme-input" id="dzName" maxlength="16"></div>
+                        <div class="lbl">Carrosserie<div class="chips" id="dzKind"></div>
+                        </div>
+                        <div class="color-row">
+                            <div class="lbl">Couleur<input type="color" id="dzColor"></div>
+                            <div class="lbl">Bande<input type="color" id="dzAccent"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Moteur</h3>
+                    <div class="form" id="dzSliders"></div>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Châssis</h3>
+                    <div class="form" id="dzSliders2"></div>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Essai</h3>
+                    <div class="lbl">Circuit de test<select class="theme-select" id="dzCircuit"></select></div>
+                </div>
+                <div class="dz-bar">
+                    <button class="btn" id="dzSave" type="button">💾 Enregistrer</button>
+                    <button class="btn alt" id="dzTest" type="button">▶ Tester</button>
+                    <button class="btn alt" id="dzDel" type="button" hidden>🗑</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="tdesigner">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>Conception de circuit</h2>
+        </header>
+        <div class="wrap wide dz">
+            <aside class="panel dz-prev">
+                <h3 class="sec">Validation</h3>
+                <div class="chk" id="tkChk"></div><canvas id="tkProf"></canvas>
+                <div class="rec" id="tkStats"></div>
+            </aside>
+            <div class="dz-main">
+                <div class="panel">
+                    <h3 class="sec">Tracé</h3>
+                    <div class="tk-trace">
+                        <div>
+                            <div class="tk-tools"><button class="bk" id="tkZi" type="button">＋ Zoom</button><button class="bk"
+                                    id="tkZo" type="button">－ Zoom</button><button class="bk" id="tkFit" type="button">⤢
+                                    Recentrer</button><button class="bk" id="tkDelPt" type="button">✕ Supprimer le
+                                    point</button></div>
+                            <canvas id="tkCanvas"></canvas>
+                        </div>
+                        <div class="tk-alt">
+                            <h3 class="sec">Altitude</h3>
+                            <div class="lbl"><span class="setting-label"><span>Point sélectionné</span><output
+                                        id="tkAltV">–</output></span><input type="range" id="tkAlt" min="0" max="100"
+                                    step=".5"></div>
+                            <p class="multi-intro">Clique un point du tracé, puis règle son altitude (0 à 100 m).</p>
+                        </div>
+                    </div>
+                    <p class="multi-intro">Clic : ajouter un point · glisser un point : le déplacer · clic droit : le
+                        supprimer · glisser le fond : se déplacer. Seule contrainte : une ligne droite principale d’au
+                        moins 140 m de chaque côté du départ, avec de la place côté extérieur pour les stands (zone
+                        bleue).</p>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Identité</h3>
+                    <div class="form">
+                        <div class="lbl">Nom<input class="theme-input" id="tkName" maxlength="24"></div>
+                        <div class="lbl">Décor<div class="chips" id="tkTheme"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Départ</h3>
+                    <div class="form">
+                        <div class="lbl"><span class="setting-label"><span>Position de départ</span><output
+                                    id="tkStartV"></output></span><input type="range" id="tkStart" min="0" max="1000"
+                                step="2"></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3 class="sec">Essai</h3>
+                    <div class="lbl">Voiture de test<select class="theme-select" id="tkCar"></select></div>
+                </div>
+                <div class="dz-bar">
+                    <button class="btn" id="tkSave" type="button">💾 Enregistrer</button>
+                    <button class="btn alt" id="tkTest" type="button">▶ Tester</button>
+                    <button class="btn alt" id="tkDel" type="button" hidden>🗑</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="race">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2 id="raceScreenTitle">Course</h2>
+        </header>
+        <div class="wrap panel">
+            <div class="rec sum">
+                <div><span>Circuit</span><b id="sumC"></b></div>
+                <div><span>Voiture</span><b id="sumV"></b></div>
+            </div>
+            <!-- Configuration Solo -->
+            <div id="soloConfig">
+                <div class="form">
+                    <div class="lbl">Qualifications
+                        <select class="theme-select" id="qualifying">
+                            <option value="false">Sans qualification</option>
+                            <option value="true">Un tour de qualification</option>
+                        </select>
+                    </div>
+                    <div class="lbl">Voitures de la grille
+                        <select class="theme-select" id="carMode">
+                            <option value="same">Toutes identiques à ma voiture</option>
+                            <option value="mixed">Voitures variées</option>
+                        </select>
+                    </div>
+                    <div class="lbl" id="startField"><span class="setting-label">Position de départ <output
+                                class="range-value" id="startPositionValue"></output></span>
+                        <input id="startPosition" type="range" min="0" max="1" step="1">
+                        <div class="range-ends"><span>Milieu</span><span id="startPositionMax"></span></div>
+                    </div>
+                    <div class="lbl"><span class="setting-label">Tours <output class="range-value"
+                                id="lapsValue"></output></span>
+                        <input id="laps" type="range" min="1" max="20" step="1">
+                        <div class="range-ends"><span>1</span><span>20</span></div>
+                    </div>
+                    <div class="lbl"><span class="setting-label">Adversaires (IA) <output class="range-value"
+                                id="aiValue"></output></span>
+                        <input id="ai" type="range" min="0" max="19" step="1">
+                        <div class="range-ends"><span>0</span><span>19</span></div>
+                    </div>
+                    <div class="lbl">Difficulté
+                        <select class="theme-select" id="diff"></select>
+                    </div>
+                </div>
+                <button class="btn" id="launch" type="button">Lancer</button>
+            </div>
+            <!-- Configuration Multijoueur -->
+            <div id="multiConfig" hidden>
+                <p class="multi-intro" style="margin-bottom: 16px; color: var(--pale);">Crée une room avec ce circuit et
+                    cette voiture, ou rejoins la partie d'un ami avec son code.</p>
+                <div class="form">
+                    <div class="lbl">Pseudo
+                        <input class="theme-input" id="multiName" maxlength="16" autocomplete="nickname"
+                            placeholder="Pilote">
+                    </div>
+                </div>
+                <div class="multi-actions" style="margin: 16px 0 12px;">
+                    <button class="btn" id="createRoom" type="button">Créer une room</button>
+                    <span>ou</span>
+                </div>
+                <div class="join-row">
+                    <input class="theme-input code-input" id="roomCode" maxlength="6" placeholder="CODE">
+                    <button class="btn alt" id="joinRoom" type="button">Rejoindre</button>
+                </div>
+                <p class="multi-status" id="multiStatus" aria-live="polite"></p>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="rules">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>📖 Règles</h2>
+        </header>
+        <div class="wrap wide">
+            <div class="seg" role="tablist"><button class="segb on" type="button" role="tab" data-rl="base">🏁
+                    Bases</button><button class="segb" type="button" role="tab" data-rl="ctrl">🎮
+                    Contrôles</button><button class="segb" type="button" role="tab" data-rl="pen">⚠️
+                    Pénalités</button><button class="segb" type="button" role="tab" data-rl="pit">🔧
+                    Stands</button><button class="segb" type="button" role="tab" data-rl="mode">🎯 Modes</button></div>
+            <div class="rpage on" data-p="base">
+                <div class="rcard"><i>🏆</i>
+                    <div><b>Objectif</b>
+                        <p>Termine <strong>premier</strong>. Une fois le premier arrivé, les autres finissent au
+                            prochain passage de ligne.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🚦</i>
+                    <div><b>Départ</b>
+                        <p>Attends l’extinction des <strong>5 feux</strong>. Accélérer avant = faux départ : tu pars,
+                            mais un drive-through est à effectuer.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🧪</i>
+                    <div><b>Simulation</b>
+                        <p>Pas d’objets, pas de bonus : seul le pilotage compte.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🌱</i>
+                    <div><b>Pistes</b>
+                        <p>Le <strong>gravier</strong> et l’herbe ralentissent. Vibreurs : léger bruit, usure du fond.
+                        </p>
+                    </div>
+                </div>
+                <div class="rcard"><i>💥</i>
+                    <div><b>Dégâts</b>
+                        <p>Murs et chocs abîment la voiture (ailerons, fond, nez) : moins d’appui, moins d’adhérence,
+                            plus de traînée.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>📊</i>
+                    <div><b>Classement</b>
+                        <p>Résultat final : meilleur tour, place de départ et d’arrivée.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpage" data-p="ctrl">
+                <div class="kgrid">
+                    <div class="panel2">
+                        <h3>⌨️ Clavier</h3>
+                        <div class="krow"><span>↑ / Z / W</span><em>Accélérer</em></div>
+                        <div class="krow"><span>↓ / S</span><em>Freiner · marche arrière à l’arrêt</em></div>
+                        <div class="krow"><span>← / Q / A</span><em>Tourner à gauche</em></div>
+                        <div class="krow"><span>→ / D</span><em>Tourner à droite</em></div>
+                        <div class="krow"><span>Échap</span><em>Pause</em></div>
+                    </div>
+                    <div class="panel2">
+                        <h3>📱 Tactile</h3>
+                        <div class="krow"><span>Glisser</span><em>Direction (zone de volant)</em></div>
+                        <div class="krow"><span>Pédale verte</span><em>Accélérer</em></div>
+                        <div class="krow"><span>Pédale rouge</span><em>Freiner / reculer</em></div>
+                        <div class="krow"><span>❚❚</span><em>Pause</em></div>
+                    </div>
+                </div>
+                <div class="rcard"><i>↩️</i>
+                    <div><b>Marche arrière</b>
+                        <p>Maintiens le frein presque à l’arrêt (0,3 s). Relâche ou accélère pour en sortir.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>⚙️</i>
+                    <div><b>Paramètres</b>
+                        <p>Dans la pause : ligne idéale, zone de freinage, minimap, pénalités et point de vue.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpage" data-p="pen">
+                <div class="rcard"><i>✂️</i>
+                    <div><b>Coupe de virage</b>
+                        <p>Couper un virage par l’intérieur en gravier = <strong>+3 s</strong>. Désactivable dans
+                            Paramètres.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🚨</i>
+                    <div><b>Faux départ</b>
+                        <p>Accélérer avant l’extinction des feux = <strong>drive-through</strong> à effectuer (pas en
+                            qualifs ni en contre la montre).</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🛞</i>
+                    <div><b>Drive-through</b>
+                        <p>Traverse toute la voie des stands <strong>sans t’arrêter au box</strong> (s’arrêter ne
+                            l’annule pas), puis sors-en.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>⛔</i>
+                    <div><b>DSQ</b>
+                        <p>Drive-through non effectué à l’arrivée = <strong>DSQ</strong>, classé dernier des arrivants.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpage" data-p="pit">
+                <div class="rcard"><i>🛣️</i>
+                    <div><b>Entrée</b>
+                        <p>La voie des stands longe la ligne droite, côté extérieur de la ligne de départ.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🟩</i>
+                    <div><b>Box vert</b>
+                        <p>Arrête-toi dans ton box pour réparer à <strong>100 %</strong> (2,5 s). Facultatif.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🐢</i>
+                    <div><b>Pit limiter</b>
+                        <p>Limiteur automatique à <strong>80 km/h</strong> dans la voie des stands.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rpage" data-p="mode">
+                <div class="rcard"><i>🏎️</i>
+                    <div><b>Course</b>
+                        <p>Contre l’IA, 1 à 20 tours, 4 niveaux de difficulté.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>⏱️</i>
+                    <div><b>Qualifications</b>
+                        <p>Option : un tour chrono qui détermine la grille de départ.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🎯</i>
+                    <div><b>Contre la montre</b>
+                        <p>Tours illimités, sans IA. Meilleur tour enregistré par circuit et par voiture (Records).</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🌐</i>
+                    <div><b>Multijoueur</b>
+                        <p>Crée une room, partage le code ; l’hôte règle tours, IA et difficulté.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🛠️</i>
+                    <div><b>Conception</b>
+                        <p>Crée ta voiture (type, couleur, specs) et teste-la sur le circuit de ton choix.</p>
+                    </div>
+                </div>
+                <div class="rcard"><i>🛣️</i>
+                    <div><b>Circuits perso</b>
+                        <p>Trace ton circuit point par point (relief, décor, départ). Il faut une <strong>longue ligne
+                                droite</strong> au départ pour la voie des stands.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="scr" id="records">
+        <header class="top"><button class="bk" type="button" data-back>‹ Retour</button>
+            <h2>🏆 Records</h2>
+        </header>
+        <div class="wrap wide">
+            <div class="seg" role="tablist">
+                <button class="segb on" type="button" role="tab" data-rt="clm">⏱️ Contre la montre <em
+                        id="rcClm">0</em></button>
+                <button class="segb" type="button" role="tab" data-rt="race">🏁 Course <em id="rcRace">0</em></button>
+                <button class="segb" type="button" role="tab" data-rt="best">⭐ Meilleurs tours</button>
+            </div>
+            <div class="panel">
+                <label class="lbl" id="rcSel" for="rcCircuit">Circuit<select class="theme-select"
+                        id="rcCircuit"></select></label>
+                <div class="rlist" id="rcList"></div>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

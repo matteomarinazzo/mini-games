@@ -291,6 +291,10 @@
             "endless-hall": {
                 "name": "Endless Hall",
                 "description": "Walk a hotel corridor and spot what is wrong. If nothing is, cross the line. If something is, turn back. Eight halls, no mistakes."
+            },
+            "balloon-rise": {
+                "name": "Balloon Rise",
+                "description": "Push away spikes, bars, and marbles before they pop your balloon."
             }
         },
         "badges": {

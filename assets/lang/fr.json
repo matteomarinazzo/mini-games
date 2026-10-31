@@ -298,6 +298,10 @@
             "little-turismo": {
                 "name": "Little Turismo",
                 "description": "Course 3D : 24 circuits, 22 voitures, qualifications, contre-la-montre et multijoueur en ligne jusqu'à 20 pilotes. Crée aussi tes propres voitures et circuits."
+            },
+            "anagram": {
+                "name": "Anagramme",
+                "description": "Réordonne les tuiles pour retrouver le mot caché, en français, allemand ou anglais. Mot suivant à l'infini, même hors ligne."
             }
         },
         "badges": {

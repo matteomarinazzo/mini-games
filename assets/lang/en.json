@@ -299,6 +299,10 @@
             "little-turismo": {
                 "name": "Little Turismo",
                 "description": "3D race : 24 tracks, 22 cars, qualifications, time trial and online multiplayer with up to 20 drivers. Also create your own cars and tracks."
+            },
+            "anagram": {
+                "name": "Anagram",
+                "description": "Rearrange the tiles to find the hidden word, in French, German or English. Infinite next word, even offline."
             }
         },
         "badges": {

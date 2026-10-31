@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.45.2026-10-31.1";
+const CACHE_NAME = "mini-games-cache-v1.46.2026-10-31.2";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -114,6 +114,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/endless-hall.webp',
     'assets/logos/balloon-rise.webp',
     'assets/logos/little-turismo.webp',
+    'assets/logos/anagram.webp',
 
     // About
     'about/about.html',
@@ -653,6 +654,13 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/track-editor.js',
     'games/little-turismo/js/core/track-mesh.js',
     'games/little-turismo/js/core/track.js',
+
+    // Game: Anagram
+    'games/anagram/index.html',
+    'games/anagram/css/game.css',
+    'games/anagram/js/game.js',
+    'games/anagram/js/core/words.js',
+    'games/anagram/js/core/lang.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

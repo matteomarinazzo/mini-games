@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.45.2026-10-31",
+    "currentVersion": "1.46.2026-10-31",
     "lastUpdate": "2026-10-31",
     "history": [
+        {
+            "version": "1.46.2026-10-31",
+            "date": "2026-10-31",
+            "changes": [
+                "Ajout du jeu Anagramme"
+            ]
+        },
         {
             "version": "1.45.2026-10-31",
             "date": "2026-10-31",

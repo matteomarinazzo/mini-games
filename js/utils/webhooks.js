@@ -35,7 +35,7 @@ export async function getAppVersion() {
     } catch (e) {
         // Ignorer l'erreur réseau éventuelle
     }
-    return cachedVersion || "1.43.2026-10-23";
+    return cachedVersion || "0.00.0000-00-00";
 }
 
 /**
@@ -168,9 +168,10 @@ export async function notifyHeartbeat() {
     const uid = await getFirebaseUid();
     const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     const version = await getAppVersion();
+    const totalMin = localStorage.getItem("mg_stat_play_time_min") || "0";
     const page = document.title || location.pathname;
     await sendDiscordMessage(
-        `⏱️ **+1 min Jouée**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n📄 Page : \`${page}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `⏱️ **+1 min Jouée**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n⏱️ Temps total joué : \`${totalMin} min\`\n📄 Page : \`${page}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 
@@ -205,8 +206,9 @@ export async function notifyBackToHome() {
     const uid = await getFirebaseUid();
     const userName = localStorage.getItem("mg_player_name") || "Anonyme";
     const version = await getAppVersion();
+    const totalMin = localStorage.getItem("mg_stat_play_time_min") || "0";
     await sendDiscordMessage(
-        `🏠 **Retour à l'Accueil**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `🏠 **Retour à l'Accueil**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n⏱️ Temps total joué : \`${totalMin} min\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 

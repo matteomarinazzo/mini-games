@@ -245,6 +245,21 @@
     }
   },
   "puzzle": {
+    "anagram": {
+      "path": "./games/anagram/index.html",
+      "name": "Anagramme",
+      "emoji": "🔀",
+      "description": "Réordonne les tuiles pour retrouver le mot caché, en français, allemand ou anglais. Mot suivant à l'infini, même hors ligne.",
+      "tags": [
+        "vocabulary",
+        "puzzle",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "ball-sort": {
       "path": "./games/ball-sort/index.html",
       "name": "Ball Sort",

@@ -622,6 +622,22 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "four-in-a-row": {
+      "path": "./games/four-in-a-row/index.html",
+      "name": "Quatre en Ligne",
+      "emoji": "🔴",
+      "description": "Aligne 4 pions avant l'adversaire. Contre l'IA, à deux sur le même écran, ou en ligne.",
+      "tags": [
+        "strategy",
+        "multiplayer",
+        "solo",
+        "fast"
+      ],
+      "badge": "classic",
+      "badgeText": "Classique",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "pong": {
       "path": "./games/pong/index.html",
       "name": "Pong",

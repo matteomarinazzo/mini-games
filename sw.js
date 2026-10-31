@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.46.2026-10-31.2";
+const CACHE_NAME = "mini-games-cache-v1.47.2026-11-01.0";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -115,6 +115,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/balloon-rise.webp',
     'assets/logos/little-turismo.webp',
     'assets/logos/anagram.webp',
+    'assets/logos/four-in-a-row.webp',
 
     // About
     'about/about.html',
@@ -661,6 +662,22 @@ const ASSETS_TO_CACHE = [
     'games/anagram/js/game.js',
     'games/anagram/js/core/words.js',
     'games/anagram/js/core/lang.js',
+
+    // Game: Four in a Row
+    'games/four-in-a-row/index.html',
+    'games/four-in-a-row/game.html',
+    'games/four-in-a-row/css/menu.css',
+    'games/four-in-a-row/css/game.css',
+    'games/four-in-a-row/js/menu.js',
+    'games/four-in-a-row/js/menu-net.js',
+    'games/four-in-a-row/js/game.js',
+    'games/four-in-a-row/js/core/ai.js',
+    'games/four-in-a-row/js/core/board.js',
+    'games/four-in-a-row/js/core/modes.js',
+    'games/four-in-a-row/js/core/online.js',
+    'games/four-in-a-row/js/core/store.js',
+    'games/four-in-a-row/js/core/sync.js',
+    'games/four-in-a-row/js/core/ui.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

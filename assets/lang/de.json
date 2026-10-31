@@ -303,6 +303,10 @@
             "anagram": {
                 "name": "Anagramm",
                 "description": "Ordne die Kacheln neu an, um das versteckte Wort zu finden, auf Französisch, Deutsch oder Englisch. Unendliches nächstes Wort, sogar offline."
+            },
+            "four-in-a-row": {
+                "name": "Vier in einer Reihe",
+                "description": "Bringe 4 Steine vor dem Gegner ins Zentrum. Gegen die KI, zu zweit auf demselben Bildschirm oder online."
             }
         },
         "badges": {

@@ -290,6 +290,14 @@
             "endless-hall": {
                 "name": "Couloir Sans Fin",
                 "description": "Avance dans un couloir d'hôtel et repère ce qui cloche. Si tout est normal, passe la ligne. Sinon, reviens en arrière. Huit couloirs sans erreur."
+            },
+            "balloon-rise": {
+                "name": "Balloon Rise",
+                "description": "Écarte les piques, barres et billes avant qu'ils n'éclatent ton ballon."
+            },
+            "little-turismo": {
+                "name": "Little Turismo",
+                "description": "Course 3D : 24 circuits, 22 voitures, qualifications, contre-la-montre et multijoueur en ligne jusqu'à 20 pilotes. Crée aussi tes propres voitures et circuits."
             }
         },
         "badges": {

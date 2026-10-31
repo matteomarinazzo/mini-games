@@ -291,6 +291,14 @@
             "endless-hall": {
                 "name": "Endloser Flur",
                 "description": "Gehe einen Hotelflur entlang und entdecke, was nicht stimmt. Wenn alles normal ist, gehe über die Linie. Sonst gehe zurück. Acht Korridore ohne Fehler."
+            },
+            "balloon-rise": {
+                "name": "Balloon Rise",
+                "description": "Stößt Piques, Balken und Murmeln weg, bevor sie deinen Ballon platzen lassen."
+            },
+            "little-turismo": {
+                "name": "Little Turismo",
+                "description": "3D-Rennen: 24 Strecken, 22 Autos, Qualifikationsrunden, Zeitfahren und Online-Multiplayer für bis zu 20 Fahrer. Gestalte auch deine eigenen Autos und Strecken."
             }
         },
         "badges": {

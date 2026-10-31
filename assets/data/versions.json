@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.44.2026-10-26",
-    "lastUpdate": "2026-10-26",
+    "currentVersion": "1.45.2026-10-31",
+    "lastUpdate": "2026-10-31",
     "history": [
+        {
+            "version": "1.45.2026-10-31",
+            "date": "2026-10-31",
+            "changes": [
+                "Ajout du jeu Little Turismo",
+                "Ajout du jeu Balloon Rise"
+            ]
+        },
         {
             "version": "1.44.2026-10-26",
             "date": "2026-10-26",

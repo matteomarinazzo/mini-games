@@ -1,0 +1,117 @@
+// menu-net.js — parcours « en ligne » du menu : créer / rejoindre un salon, salle d'attente, lancement. Chargé à la demande par menu.js.
+import { MODES } from './core/modes.js';
+import { normCode, cleanName } from './core/sync.js';
+
+const $ = id => document.getElementById(id);
+const st = (() => { try { return window.localStorage; } catch { return null; } })();
+const SAVED = 'four-in-a-row_room', HB_MS = 10000, STALE_MS = 25000;
+let net = null, mode = 'four', lobby = null;       // lobby = { code, uid, host, room, unsub, timers[] }
+const seen = {};                                    // uid → { v, at } : « hors ligne » si le battement n'a pas changé depuis STALE_MS (horloge locale, insensible au décalage)
+
+const say = (m, ok) => { const e = $('netErr'); e.textContent = m || ''; e.dataset.ok = ok ? '1' : ''; };
+const busy = b => { for (const id of ['netCreate', 'netJoin', 'netResume']) $(id).disabled = b; };
+const saved = () => { try { return st?.getItem(SAVED) || ''; } catch { return ''; } };
+const remember = c => { try { st?.setItem(SAVED, c); } catch { } };
+const forget = () => { try { st?.removeItem(SAVED); } catch { } };
+const safeMode = m => (Object.hasOwn(MODES, m) ? m : 'four');
+// Nom : champ du menu, sinon mg_player_name (clé commune du site)
+const lsName = () => { try { return cleanName(st?.getItem('mg_player_name')); } catch { return ''; } };
+const nameVal = () => cleanName($('netName').value) || lsName();
+const saveName = () => { const v = nameVal(); if (v) try { st?.setItem('mg_player_name', v); } catch { } };
+
+$('netName').value = nameVal();
+const view = lob => { $('netStep1').hidden = lob; $('netStep2').hidden = !lob; $('netTitle').textContent = lob ? 'Salon en ligne' : 'Jouer en ligne'; };
+const summary = m => `${MODES[safeMode(m)].label} · ${MODES[safeMode(m)].desc}`;
+
+export function show(id) {
+  mode = safeMode(id); view(false); say('');
+  $('netName').value = lsName(); $('netCode').value = '';
+  $('netModeInfo').textContent = 'Si tu crées le salon : ' + summary(mode) + '. Hôte = rouge, invité = jaune. Une partie rejointe reprend le mode de l\'hôte.';
+  const sv = saved(); $('netResume').hidden = !sv; if (sv) $('netResume').textContent = 'Reprendre le salon ' + sv;
+}
+export const active = () => !!lobby;
+export async function hide() { await leave(); }
+
+async function create() {
+  say('Création du salon…', true); busy(true);
+  try {
+    net ??= await import('./core/online.js');
+    saveName();
+    const { code, uid } = await net.createLobby(mode, {}, nameVal());
+    remember(code); openLobby(code, uid, true); say('');
+  } catch (e) { say(e.message); } finally { busy(false); }
+}
+async function join(code, resume = false) {
+  say('Connexion au salon…', true); busy(true);
+  try {
+    net ??= await import('./core/online.js');
+    saveName();
+    const r = await net.joinLobby(code, nameVal(), resume);
+    remember(r.code);
+    if (r.room.state !== 'waiting') { location.href = `game.html?mode=${safeMode(r.room.config?.mode)}&opp=online&room=${r.code}`; return; }   // partie lancée : retour direct
+    openLobby(r.code, r.uid, r.room.leaderId === r.uid); say('');
+  } catch (e) { console.warn('[four-in-a-row] rejoindre : échec', e?.code || '', e?.message); if (e.gone) forget(); say(e.message); $('netResume').hidden = !saved(); } finally { busy(false); }
+}
+$('netCreate').addEventListener('click', create);
+$('netJoin').addEventListener('click', () => join($('netCode').value));
+// V8 : le champ accepte un collage « sale » (espace, saut de ligne, minuscules) puis le ramène à 6 caractères (l'ancien maxlength=6 tronquait le collage).
+$('netCode').addEventListener('input', e => { const v = normCode(e.target.value).slice(0, 6); if (v !== e.target.value) e.target.value = v; });
+$('netCode').addEventListener('keydown', e => { if (e.key === 'Enter') join($('netCode').value); });
+$('netResume').addEventListener('click', () => join(saved(), true));
+$('netLeave').addEventListener('click', async () => { await leave(); view(false); show(mode); });
+$('netCopy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(lobby.code); say('Code copié.', true); return; } catch { }
+  try {                                                                            // repli (page non sécurisée / navigateur ancien) : sélection + commande de copie
+    const r = document.createRange(); r.selectNodeContents($('netCodeShown')); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    say(document.execCommand('copy') ? 'Code copié.' : 'Copie impossible : le code est sélectionné, copie-le à la main.', true);
+  } catch { say('Copie impossible : recopie le code à la main.'); }
+});
+$('netStart').addEventListener('click', async () => {
+  const room = lobby?.room, guest = room && Object.keys(room.players || {}).find(i => i !== room.leaderId);
+  if (!guest) return;
+  $('netStart').disabled = true;
+  try { await net.startRoom(lobby.code, lobby.uid, guest); } catch (e) { say('Lancement impossible : ' + (e.code || e.message)); draw(); }   // la redirection vient de l'écoute du salon
+});
+
+function openLobby(code, uid, host) {
+  stopLobby();
+  const l = lobby = { code, uid, host, room: null, unsub: null, timers: [] };
+  view(true); $('netCodeShown').textContent = code;
+  l.unsub = net.watch('rooms/' + net.idOf(code), onRoom);
+  l.timers.push(setInterval(() => net.beat(code, uid), HB_MS), setInterval(() => lobby === l && l.room && draw(), 3000));
+  net.beat(code, uid);
+}
+function stopLobby() { if (!lobby) return; try { lobby.unsub?.(); } catch { } lobby.timers.forEach(clearInterval); lobby = null; }
+async function leave() {
+  const l = lobby; if (!l) return;
+  stopLobby(); forget();
+  try { await net.leaveLobby(l.code, l.uid, l.host); } catch { }
+}
+function closed(msg) { stopLobby(); forget(); view(false); show(mode); say(msg); }
+
+function onRoom(room) {
+  if (!lobby) return;
+  if (!room) return closed('Le salon a été fermé par l\'hôte.');
+  const ps = room.players || {}, now = performance.now();
+  if (!ps[lobby.uid]) return closed('Tu ne fais plus partie de ce salon.');
+  if (room.state === 'playing') { const c = lobby.code; stopLobby(); location.href = `game.html?mode=${safeMode(room.config?.mode)}&opp=online&room=${c}`; return; }
+  lobby.room = room; lobby.host = room.leaderId === lobby.uid;
+  for (const [id, p] of Object.entries(ps)) if (!seen[id] || seen[id].v !== p.lastSeen) seen[id] = { v: p.lastSeen, at: now };
+  draw();
+}
+function draw() {
+  const room = lobby.room, ps = room.players || {}, now = performance.now();
+  const ids = Object.keys(ps).sort((a, b) => (b === room.leaderId) - (a === room.leaderId)).slice(0, 2), box = $('netPlayers');
+  box.textContent = '';
+  for (const id of ids) {
+    const off = now - (seen[id]?.at ?? now) > STALE_MS, c = document.createElement('div'), n = document.createElement('span'), t = document.createElement('em');
+    c.className = 'chip' + (off ? ' off' : ''); n.textContent = String(ps[id].name ?? 'Joueur').slice(0, 15);
+    t.textContent = [id === room.leaderId ? 'hôte · rouge' : 'invité · jaune', id === lobby.uid ? 'toi' : '', off ? 'déconnecté ?' : ''].filter(Boolean).join(' · ');
+    c.append(n, t); box.appendChild(c);
+  }
+  if (ids.length < 2) { const c = document.createElement('div'); c.className = 'chip empty'; c.textContent = 'En attente du 2e joueur…'; box.appendChild(c); }
+  const guest = ids.find(i => i !== room.leaderId), ok = !!guest && now - seen[guest].at < STALE_MS;
+  $('netRules').textContent = summary(room.config?.mode);
+  $('netStart').hidden = !lobby.host; $('netStart').disabled = !ok;
+  $('netWait').textContent = lobby.host ? (ok ? 'Les deux joueurs sont là : lance la partie.' : 'Partage le code ci-dessus et attends le deuxième joueur.') : 'Connecté. En attente du lancement par l\'hôte…';
+}

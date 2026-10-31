@@ -302,6 +302,10 @@
             "anagram": {
                 "name": "Anagramme",
                 "description": "Réordonne les tuiles pour retrouver le mot caché, en français, allemand ou anglais. Mot suivant à l'infini, même hors ligne."
+            },
+            "four-in-a-row": {
+                "name": "Quatre en Ligne",
+                "description": "Aligne 4 pions avant l'adversaire. Contre l'IA, à deux sur le même écran, ou en ligne."
             }
         },
         "badges": {

@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.46.2026-10-31",
-    "lastUpdate": "2026-10-31",
+    "currentVersion": "1.47.2026-11-01",
+    "lastUpdate": "2026-11-01",
     "history": [
+        {
+            "version": "1.47.2026-11-01",
+            "date": "2026-11-01",
+            "changes": [
+                "Ajout du jeu 4 en Ligne"
+            ]
+        },
         {
             "version": "1.46.2026-10-31",
             "date": "2026-10-31",

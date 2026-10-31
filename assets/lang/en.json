@@ -303,6 +303,10 @@
             "anagram": {
                 "name": "Anagram",
                 "description": "Rearrange the tiles to find the hidden word, in French, German or English. Infinite next word, even offline."
+            },
+            "four-in-a-row": {
+                "name": "Four in a Row",
+                "description": "Line up 4 pawns before the opponent. Against AI, two on the same screen, or online."
             }
         },
         "badges": {

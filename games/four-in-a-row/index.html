@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Quatre en Ligne – contre l'IA, à deux sur le même écran ou en ligne | Mini‑Games</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow">
+    <meta name="description"
+        content="Aligne 4 pions avant l'adversaire : contre l'ordinateur (4 niveaux), à deux sur le même écran ou en ligne. Gratuit sur Mini‑Games.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/four-in-a-row/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="Quatre en Ligne – contre l'IA, à deux sur le même écran ou en ligne | Mini‑Games">
+    <meta property="og:description" content="Aligne 4 pions contre l'ordinateur, à deux sur le même écran ou en ligne.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/four-in-a-row/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/four-in-a-row.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+        content="Quatre en Ligne – contre l'IA, à deux sur le même écran ou en ligne | Mini‑Games">
+    <meta name="twitter:description"
+        content="Aligne 4 pions contre l'ordinateur, à deux sur le même écran ou en ligne.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/four-in-a-row.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context":"https://schema.org",
+        "@type":"VideoGame",
+        "name":"Quatre en Ligne",
+        "url":"https://mini-games.ch",
+        "description":"Aligne 4 pions contre l'ordinateur, à deux sur le même écran ou en ligne.",
+        "applicationCategory":"Game",
+        "operatingSystem":"Any",
+        "genre":["Strategy","Multiplayer"],
+        "inLanguage":"fr",
+        "publisher":{
+            "@type":"Organization",
+            "name":"Mini‑Games"
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body class="studio-body menu-body">
+    <a href="../../index.html" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Accueil</span>
+    </a>
+    <div class="container" id="mainMenu">
+        <h1>Quatre en Ligne</h1>
+        <p class="subtitle">Aligne tes pions avant ton adversaire.</p>
+        <button class="btn go" id="resume" type="button" hidden></button>
+        <div class="seg" id="opp" role="radiogroup" aria-label="Adversaire">
+            <button type="button" role="radio" data-opp="cpu" aria-checked="false">🖥️ Contre l'IA</button>
+            <button type="button" role="radio" data-opp="2p" aria-checked="true">👥 À deux sur cet écran</button>
+            <button type="button" role="radio" data-opp="online" aria-checked="false">🌐 En ligne</button>
+        </div>
+        <div class="seg sm" id="lvl" role="radiogroup" aria-label="Difficulté" hidden>
+            <button type="button" role="radio" data-lv="easy" aria-checked="false">Facile</button>
+            <button type="button" role="radio" data-lv="medium" aria-checked="true">Moyen</button>
+            <button type="button" role="radio" data-lv="hard" aria-checked="false">Difficile</button>
+            <button type="button" role="radio" data-lv="expert" aria-checked="false">Expert</button>
+        </div>
+        <nav class="modes" id="modes">
+            <button class="mode" type="button" data-mode="four"><b>4 en Ligne</b><span>Grille 7×6, aligne 4
+                    pions.</span><i class="dots"><u></u><u></u><u></u><u></u></i></button>
+            <button class="mode" type="button" data-mode="five"><b>5 en Ligne</b><span>Grille 9×7, aligne 5
+                    pions.</span><i class="dots"><u></u><u></u><u></u><u></u><u></u></i></button>
+        </nav>
+        <button class="cfg" id="histBtn" type="button">📊 Historique</button>
+    </div>
+
+    <div class="ov" id="ovNames" hidden>
+        <div class="modal" role="dialog" aria-labelledby="nmTitle">
+            <button class="x" id="nmClose" type="button" aria-label="Fermer">✕</button>
+            <h2 id="nmTitle">Les deux joueurs</h2>
+            <label class="fld"><span class="r">● Rouge, joueur 1</span><input id="n1" maxlength="15"
+                    autocomplete="nickname"></label>
+            <label class="fld"><span class="y">● Jaune, joueur 2</span><input id="n2" maxlength="15"
+                    autocomplete="off"></label>
+            <p id="nmErr" role="alert"></p>
+            <div class="stack"><button class="btn" id="nmOk" type="button">Jouer</button></div>
+        </div>
+    </div>
+    <div class="ov" id="ovConf" hidden>
+        <div class="modal" role="alertdialog" aria-labelledby="cfTitle">
+            <h2 id="cfTitle">Grille en cours</h2>
+            <p id="cfText"></p>
+            <div class="stack"><button class="btn" id="cfGo" type="button">Reprendre</button>
+                <button class="btn sec" id="cfNew" type="button">Nouvelle partie (abandonne la grille)</button>
+                <button class="btn sec" id="cfNo" type="button">Annuler</button>
+            </div>
+        </div>
+    </div>
+    <div class="ov" id="ovHist" hidden>
+        <div class="modal" role="dialog" aria-labelledby="hiTitle">
+            <button class="x" id="hiClose" type="button" aria-label="Fermer">✕</button>
+            <h2 id="hiTitle">Historique</h2>
+            <div class="seg" id="hiTabs" role="tablist" aria-label="Mode">
+                <button type="button" role="tab" data-mode="four" aria-checked="true">4 en Ligne</button>
+                <button type="button" role="tab" data-mode="five" aria-checked="false">5 en Ligne</button>
+            </div>
+            <div id="hiBody"></div>
+        </div>
+    </div>
+    <div class="ov" id="netOv" hidden>
+        <div class="modal" role="dialog" aria-labelledby="netTitle">
+            <button class="x" id="netClose" type="button" aria-label="Fermer">✕</button>
+            <h2 id="netTitle">Jouer en ligne</h2>
+            <div id="netStep1">
+                <p id="netModeInfo"></p>
+                <label class="fld">Ton nom<input id="netName" maxlength="15" autocomplete="nickname"
+                        placeholder="Joueur"></label>
+                <div class="stack">
+                    <button class="btn" id="netCreate" type="button">Créer un salon</button>
+                    <label class="fld">…ou rejoindre avec un code<input id="netCode" maxlength="32" autocomplete="off"
+                            autocapitalize="characters" spellcheck="false" placeholder="ABC234"></label>
+                    <button class="btn sec" id="netJoin" type="button">Rejoindre</button>
+                    <button class="btn sec" id="netResume" type="button" hidden>Reprendre le salon</button>
+                </div>
+            </div>
+            <div id="netStep2" hidden>
+                <p>Partage ce code avec ton adversaire :</p>
+                <div class="code"><b id="netCodeShown">······</b><button class="btn sec" id="netCopy" type="button"
+                        aria-label="Copier le code">Copier</button></div>
+                <p id="netRules"></p>
+                <div class="plist" id="netPlayers"></div>
+                <p id="netWait"></p>
+                <div class="stack"><button class="btn" id="netStart" type="button" hidden disabled>Lancer la
+                        partie</button>
+                    <button class="btn sec" id="netLeave" type="button">Quitter le salon</button>
+                </div>
+            </div>
+            <p id="netErr" role="alert"></p>
+        </div>
+    </div>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

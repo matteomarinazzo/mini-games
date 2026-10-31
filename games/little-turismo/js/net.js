@@ -1,7 +1,7 @@
-// Réseau 3D Racing : rooms Firebase et état de course autoritaire côté créateur.
+// Réseau Little Turismo : rooms Firebase et état de course autoritaire côté créateur.
 // Les rendus clients interpolent les snapshots publiés par l'hôte.
 const PREFIX = 'racing_';
-export const ROOM_KEY = '3d-racing-room';
+export const ROOM_KEY = 'little-turismo-room';
 export const N = { cfg: null, fb: null, uid: null, offset: 0, _ref: null, _update: null, _onValue: null, db: null };
 
 export const roomId = (code) => PREFIX + code;
@@ -27,14 +27,15 @@ export async function init() {
     N._ref = cfg.getRef();
     N._update = cfg.getUpdate ? cfg.getUpdate() : null;
     N._onValue = cfg.getOnValue();
-    try { N._onValue(N._ref(N.db, '.info/serverTimeOffset'), (s) => { N.offset = Number(s.val()) || 0; }); } catch { /* horloge locale */ }
+    // Attendre l'offset serveur (max 1,5 s) : horodatages cohérents, pas de paquets rejetés après un saut d'horloge.
+    await new Promise((res) => { const to = setTimeout(res, 1500); try { N._onValue(N._ref(N.db, '.info/serverTimeOffset'), (s) => { N.offset = Number(s.val()) || 0; clearTimeout(to); res(); }); } catch { clearTimeout(to); res(); } });
     return N;
   } catch (e) { console.warn('Racing network unavailable', e); return null; }
 }
 
 // Mise à jour directe SDK sans checkRealConnection (trop lent pour le temps-réel)
 export async function update(code, data) {
-  if (!N._ref || !N._update) return N.fb?.updateRoom(roomId(code), data);
+  if (!N._ref || !N._update) { try { return (await N.fb?.updateRoom(roomId(code), data)) !== false; } catch { return false; } }
   try {
     await N._update(N._ref(N.db, `rooms/${roomId(code)}`), data);
     return true;
@@ -74,4 +75,17 @@ export async function leave(code, started = false) {
   if (!others.length) { await N.fb.deleteRoom(roomId(code)); clearSession(); return; }
   await update(code, started ? { [`players/${N.uid}/away`]: true, [`players/${N.uid}/lastSeen`]: now() } : { [`players/${N.uid}`]: null });
   clearSession();
+}
+// --- Rooms publiques : index léger sous rooms/racing_public/<code> (même zone que les rooms, donc mêmes règles d'écriture).
+const PUB = 'rooms/racing_public';
+export async function setPublic(code, info) {   // info = null → retire de la liste
+  if (!N._ref || !N._update || !N.db) return false;
+  try { await N._update(N._ref(N.db, PUB), { [code]: info ? { ...info, code, t: now() } : null }); return true; } catch (e) { console.warn('setPublic refusé', e); return false; }
+}
+export function watchPublic(cb) {
+  if (!N._onValue || !N._ref || !N.db) return () => { };
+  return N._onValue(N._ref(N.db, PUB), (s) => {
+    const v = s.val() || {}, t = now();
+    cb(Object.values(v).filter((r) => r && r.code && t - (r.t || 0) < 90000).sort((a, b) => (b.t || 0) - (a.t || 0)));
+  }, (e) => { console.warn('watchPublic refusé', e); cb([]); });
 }

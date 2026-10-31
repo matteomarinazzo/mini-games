@@ -520,3 +520,63 @@ html.rot{overflow:hidden}
 html.rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
 
 .long{font-size:11px!important;line-height:1.15;white-space:normal}
+
+/* ---------- Mobile paysage : html.compact (posé par le script de game.html quand la hauteur utile <= 540 px, tactile) ---------- */
+html.compact{--sl:max(8px,env(safe-area-inset-left,0px));--sr:max(8px,env(safe-area-inset-right,0px));--sb:calc(8px + env(safe-area-inset-bottom,0px))}
+html.compact .exit{top:max(6px,env(safe-area-inset-top,0px));left:var(--sl);width:32px;height:32px;font-size:15px;border-radius:9px}
+html.compact .board{top:calc(44px + env(safe-area-inset-top,0px));left:var(--sl);width:150px;font-size:11px;padding:3px;border-radius:10px}
+html.compact .board div{grid-template-columns:14px 1fr auto;gap:4px;padding:1px 4px}
+html.compact .map{left:var(--sl);top:auto;bottom:var(--sb);transform:none;width:128px!important;height:auto!important}
+html.compact .hud{top:max(6px,env(safe-area-inset-top,0px));right:var(--sr);width:152px;padding:6px 8px;border-radius:12px}
+html.compact .hud-track{font-size:8px}
+html.compact .hud-speed{margin-top:2px;gap:5px}
+html.compact .hud-speed b{font-size:32px}
+html.compact .hud-speed small{font-size:10px;padding-bottom:4px}
+html.compact .hud-speed em{font-size:17px;min-width:28px;padding:2px 6px;border-radius:8px}
+html.compact .hud-rpm{height:5px;margin:5px 0 6px}
+html.compact .hud-grid{gap:4px}
+html.compact .chip{padding:3px 6px;border-radius:8px}
+html.compact .chip span{font-size:7.5px}
+html.compact .chip b{font-size:12px}
+html.compact .chip.wide b{font-size:15px}
+html.compact .pads{height:50%;padding:0 var(--sr) var(--sb) var(--sl)}
+html.compact .steer{padding-bottom:10px;font-size:12px}
+html.compact .pedals{gap:10px}
+html.compact .pedal{border-radius:16px;font-size:14px}
+html.compact .pedal.gas{width:74px;height:106px}
+html.compact .pedal.brake{width:62px;height:72px}
+html.compact .dmg{right:calc(var(--sr) + 164px);bottom:var(--sb);width:68px;height:113px}
+html.compact .lights{top:6px}
+html.compact #lights{gap:6px;padding:6px 10px;border-radius:10px;border-top-width:3px}
+html.compact #lights i{width:22px;height:22px}
+html.compact .banner{top:62px;font-size:24px}
+html.compact .results{padding:8px}
+html.compact .rcard{padding:10px 14px;gap:6px;border-radius:14px;max-height:100%;overflow:auto}
+html.compact .rcard h2{font-size:20px}
+html.compact .rcard p{font-size:12px}
+html.compact .rscroll{max-height:calc(var(--eh,380px) - 118px)}
+html.compact table{font-size:11px;border-spacing:2px}
+html.compact td,html.compact th{padding:4px 5px}
+html.compact .rbtns{gap:8px}
+html.compact .rbtns .btn{padding:8px;font-size:14px;border-radius:10px}
+html.compact .rbtns.pcol{flex-direction:row;flex-wrap:wrap}
+html.compact .rbtns.pcol .btn{flex:1 1 30%}
+html.compact #setPanel{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:0 14px;padding:0 6px}
+html.compact #setPanel[hidden]{display:none}
+html.compact .tg{padding:5px 4px;font-size:14px;gap:8px}
+html.compact .tg input{width:18px;height:18px}
+html.compact .view-picker{grid-column:1/-1;padding:4px 4px 6px;font-size:14px}
+html.compact .view-picker>div{margin-top:4px}
+html.compact .view-picker button{height:30px}
+html.compact .cockpit .dashboard{height:36%}
+html.compact .cluster{width:250px;padding:5px 10px}
+html.compact .dial{width:84px;left:5%}
+html.compact .dash-info{width:120px;padding:5px 7px;gap:3px;right:5%}
+html.compact .wheel{width:150px}
+html.tiny .hud-track{display:none}
+html.tiny .hud-speed b{font-size:26px}
+html.tiny .board{width:136px;font-size:10px}
+html.tiny .pedal.gas{width:66px;height:90px}
+html.tiny .pedal.brake{width:54px;height:62px}
+html.tiny .dmg{right:calc(var(--sr) + 148px);width:60px;height:100px}
+html.tiny .map{width:112px!important}

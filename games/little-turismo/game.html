@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>3D Racing – Serra Nova | Mini‑Games</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Little Turismo – Serra Nova | Mini‑Games</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="index, nofollow">
 
-    <script>(function(){var r=document.documentElement,m=matchMedia('(pointer:coarse)'),f=function(){r.classList.toggle('rot',m.matches&&innerHeight>innerWidth)};f();addEventListener('resize',f);addEventListener('orientationchange',f)})()</script>
+    <script>(function () { var r = document.documentElement, m = matchMedia('(pointer:coarse)'), f = function () { var p = m.matches && innerHeight > innerWidth, e = p ? innerWidth : innerHeight, c = m.matches && e <= 540; r.classList.toggle('rot', p); r.classList.toggle('compact', c); r.classList.toggle('tiny', c && e <= 350); r.style.setProperty('--eh', e + 'px') }; f(); addEventListener('resize', f); addEventListener('orientationchange', f) })()</script>
     <link rel="stylesheet" href="css/game.css">
     <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
 
@@ -37,25 +38,59 @@
         <i class="cp-wheel l"></i><i class="cp-wheel r"></i>
         <div class="dashboard">
             <div class="cluster">
-                <div class="shiftbar" id="shiftBar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="shiftbar" id="shiftBar">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
                 <div class="cl-main">
                     <div class="cl-gear" id="dashGear">1</div>
                     <div class="cl-speed"><b id="dashSpeed">0</b><span>km/h</span></div>
                     <div class="cl-rpm"><b id="dashRpm">0</b><span>tr/min</span></div>
                 </div>
-                <div class="cl-row"><span>Tour<b id="dashLap">–</b></span><span>Pos.<b id="dashPos">–</b></span><span>Temps<b id="dashTime">–</b></span></div>
+                <div class="cl-row"><span>Tour<b id="dashLap">–</b></span><span>Pos.<b
+                            id="dashPos">–</b></span><span>Temps<b id="dashTime">–</b></span></div>
             </div>
-            <div class="dial"><div class="needle" id="needle"></div><b>RPM</b></div>
+            <div class="dial">
+                <div class="needle" id="needle"></div><b>RPM</b>
+            </div>
             <div class="dash-info">
                 <div><span>Meilleur</span><b id="dashBest">–</b></div>
                 <div><span>Pénalités</span><b id="dashPen">0 s</b></div>
-                <div class="pedbars"><div><i id="pThr"></i></div><div class="b"><i id="pBrk"></i></div></div>
+                <div class="pedbars">
+                    <div><i id="pThr"></i></div>
+                    <div class="b"><i id="pBrk"></i></div>
+                </div>
             </div>
         </div>
         <div class="wheel" id="wheel">
             <svg viewBox="0 0 200 200" aria-hidden="true">
-                <g class="wr"><circle cx="100" cy="100" r="86" fill="none" stroke="#101216" stroke-width="20"/><circle cx="100" cy="100" r="96" fill="none" stroke="#3a4048" stroke-width="2"/><rect x="95" y="3" width="10" height="24" rx="2" fill="#ff4d3d"/><rect x="16" y="92" width="168" height="16" rx="8" fill="#171a1f"/><rect x="92" y="100" width="16" height="74" rx="6" fill="#171a1f"/><circle cx="100" cy="100" r="30" fill="#1f232a" stroke="#4a515a" stroke-width="3"/><text class="wg" x="100" y="111" text-anchor="middle" font-size="30" font-weight="700" fill="#b5ffda">1</text><ellipse cx="14" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/><ellipse cx="186" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/></g>
-                <g class="wf"><rect x="4" y="68" width="30" height="92" rx="14" fill="#1d2127"/><rect x="166" y="68" width="30" height="92" rx="14" fill="#1d2127"/><path d="M34 52Q34 36 54 34H146Q166 36 166 52L176 138Q178 170 150 172H50Q22 170 24 138Z" fill="#14171c" stroke="#3a4048" stroke-width="3"/><rect x="95" y="28" width="10" height="10" fill="#ff4d3d"/><rect x="58" y="52" width="84" height="58" rx="6" fill="#06141a" stroke="#4a515a" stroke-width="2"/><text class="wg" x="100" y="97" text-anchor="middle" font-size="42" font-weight="700" fill="#b5ffda">1</text><circle cx="64" cy="132" r="9" fill="#e5352b"/><circle cx="100" cy="137" r="9" fill="#f2d03b"/><circle cx="136" cy="132" r="9" fill="#3ccf5a"/><circle cx="76" cy="154" r="6" fill="#4a90e2"/><circle cx="124" cy="154" r="6" fill="#ff9d2e"/><ellipse cx="19" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/><ellipse cx="181" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2"/></g>
+                <g class="wr">
+                    <circle cx="100" cy="100" r="86" fill="none" stroke="#101216" stroke-width="20" />
+                    <circle cx="100" cy="100" r="96" fill="none" stroke="#3a4048" stroke-width="2" />
+                    <rect x="95" y="3" width="10" height="24" rx="2" fill="#ff4d3d" />
+                    <rect x="16" y="92" width="168" height="16" rx="8" fill="#171a1f" />
+                    <rect x="92" y="100" width="16" height="74" rx="6" fill="#171a1f" />
+                    <circle cx="100" cy="100" r="30" fill="#1f232a" stroke="#4a515a" stroke-width="3" /><text class="wg"
+                        x="100" y="111" text-anchor="middle" font-size="30" font-weight="700" fill="#b5ffda">1</text>
+                    <ellipse cx="14" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2" />
+                    <ellipse cx="186" cy="104" rx="16" ry="22" fill="#23262c" stroke="#ff4d3d" stroke-width="2" />
+                </g>
+                <g class="wf">
+                    <rect x="4" y="68" width="30" height="92" rx="14" fill="#1d2127" />
+                    <rect x="166" y="68" width="30" height="92" rx="14" fill="#1d2127" />
+                    <path d="M34 52Q34 36 54 34H146Q166 36 166 52L176 138Q178 170 150 172H50Q22 170 24 138Z"
+                        fill="#14171c" stroke="#3a4048" stroke-width="3" />
+                    <rect x="95" y="28" width="10" height="10" fill="#ff4d3d" />
+                    <rect x="58" y="52" width="84" height="58" rx="6" fill="#06141a" stroke="#4a515a"
+                        stroke-width="2" /><text class="wg" x="100" y="97" text-anchor="middle" font-size="42"
+                        font-weight="700" fill="#b5ffda">1</text>
+                    <circle cx="64" cy="132" r="9" fill="#e5352b" />
+                    <circle cx="100" cy="137" r="9" fill="#f2d03b" />
+                    <circle cx="136" cy="132" r="9" fill="#3ccf5a" />
+                    <circle cx="76" cy="154" r="6" fill="#4a90e2" />
+                    <circle cx="124" cy="154" r="6" fill="#ff9d2e" />
+                    <ellipse cx="19" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2" />
+                    <ellipse cx="181" cy="116" rx="15" ry="24" fill="#23262c" stroke="#ff4d3d" stroke-width="2" />
+                </g>
             </svg>
         </div>
     </div>

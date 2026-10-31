@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.45.2026-10-27.1";
+const CACHE_NAME = "mini-games-cache-v1.45.2026-10-31.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -113,7 +113,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/skyjo.webp',
     'assets/logos/endless-hall.webp',
     'assets/logos/balloon-rise.webp',
-    'assets/logos/3d-racing.webp',
+    'assets/logos/little-turismo.webp',
 
     // About
     'about/about.html',
@@ -627,6 +627,32 @@ const ASSETS_TO_CACHE = [
     'games/balloon-rise/index.html',
     'games/balloon-rise/css/game.css',
     'games/balloon-rise/js/game.js',
+
+    // Game: Little Turismo
+    'games/little-turismo/index.html',
+    'games/little-turismo/game.html',
+    'games/little-turismo/css/menu.css',
+    'games/little-turismo/css/game.css',
+    'games/little-turismo/js/menu.js',
+    'games/little-turismo/js/game.js',
+    'games/little-turismo/js/net.js',
+    'games/little-turismo/js/core/ai.js',
+    'games/little-turismo/js/core/aids.js',
+    'games/little-turismo/js/core/cars.js',
+    'games/little-turismo/js/core/circuits.js',
+    'games/little-turismo/js/core/config.js',
+    'games/little-turismo/js/core/damage.js',
+    'games/little-turismo/js/core/drive-temp.js',
+    'games/little-turismo/js/core/gl.js',
+    'games/little-turismo/js/core/input.js',
+    'games/little-turismo/js/core/map.js',
+    'games/little-turismo/js/core/physics.js',
+    'games/little-turismo/js/core/race.js',
+    'games/little-turismo/js/core/raceline.js',
+    'games/little-turismo/js/core/sheets.js',
+    'games/little-turismo/js/core/track-editor.js',
+    'games/little-turismo/js/core/track-mesh.js',
+    'games/little-turismo/js/core/track.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

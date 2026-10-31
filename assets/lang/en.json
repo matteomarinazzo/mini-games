@@ -295,6 +295,10 @@
             "balloon-rise": {
                 "name": "Balloon Rise",
                 "description": "Push away spikes, bars, and marbles before they pop your balloon."
+            },
+            "little-turismo": {
+                "name": "Little Turismo",
+                "description": "3D race : 24 tracks, 22 cars, qualifications, time trial and online multiplayer with up to 20 drivers. Also create your own cars and tracks."
             }
         },
         "badges": {

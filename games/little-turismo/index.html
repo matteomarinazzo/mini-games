@@ -3,54 +3,56 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>3D Racing – Course de simulation en 3D | Mini‑Games</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Little Turismo – Course 3D multijoueur gratuite | Mini‑Games</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="index, follow">
 
-    <script>(function () { var r = document.documentElement, m = matchMedia('(pointer:coarse)'), f = function () { r.classList.toggle('rot', m.matches && innerHeight > innerWidth) }; f(); addEventListener('resize', f); addEventListener('orientationchange', f) })()</script>
-    <link rel="stylesheet" href="css/menu.css">
-    <style>
-        .tk-trace { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: start }
-        .tk-alt { padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .1) }
-        @media (max-width: 700px) { .tk-trace { grid-template-columns: 1fr } }
-    </style>
-    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+    <script>(function () { var r = document.documentElement, m = matchMedia('(pointer:coarse)'), f = function () { var p = m.matches && innerHeight > innerWidth, e = p ? innerWidth : innerHeight, c = m.matches && e <= 540; r.classList.toggle('rot', p); r.classList.toggle('compact', c); r.classList.toggle('tiny', c && e <= 350); r.style.setProperty('--eh', e + 'px') }; f(); addEventListener('resize', f); addEventListener('orientationchange', f) })()</script>
 
     <meta name="description"
-        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+        content="Jouez gratuitement à Little Turismo sur Mini‑Games. Course 3D : 24 circuits, 22 voitures, multijoueur en ligne, contre-la-montre et éditeurs de voiture et de circuit.">
 
-    <link rel="canonical" href="https://mini-games.ch/games/3d-racing/" />
+    <link rel="canonical" href="https://mini-games.ch/games/little-turismo/" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="3D Racing – Course de simulation en 3D | Mini‑Games">
+    <meta property="og:title" content="Little Turismo – Course 3D multijoueur gratuite | Mini‑Games">
     <meta property="og:description"
-        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+        content="Course 3D gratuite : 24 circuits, 22 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mini-games.ch/games/3d-racing/">
+    <meta property="og:url" content="https://mini-games.ch/games/little-turismo/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/little-turismo.webp">
     <meta property="og:site_name" content="Mini‑Games">
     <meta property="og:locale" content="fr_CH">
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="3D Racing – Course de simulation en 3D | Mini‑Games">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Little Turismo – Course 3D multijoueur gratuite | Mini‑Games">
     <meta name="twitter:description"
-        content="Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.">
+        content="Course 3D gratuite : 24 circuits, 22 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/little-turismo.webp">
 
     <!-- Schema.org -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "VideoGame",
-      "name": "3D Racing",
-      "url": "https://mini-games.ch/games/3d-racing/",
-      "description": "Jouez gratuitement à 3D Racing sur Mini‑Games : une course de simulation en 3D sur le circuit Serra Nova. Terminez premier.",
+      "name": "Little Turismo",
+      "url": "https://mini-games.ch/games/little-turismo/",
+      "description": "Jeu de course 3D gratuit : 24 circuits, 22 voitures, course contre l'IA, qualifications, contre-la-montre, multijoueur en ligne jusqu'à 20 pilotes, éditeur de voitures et éditeur de circuits.",
       "applicationCategory": "Game",
       "operatingSystem": "Any",
-      "genre": ["Racing Game", "Simulation Game", "Singleplayer"],
+      "genre": ["Racing Game", "Simulation Game", "Singleplayer", "Multiplayer"],
       "inLanguage": "fr",
-      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mini‑Games"
+      }
     }
     </script>
+
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
 
     <!-- Script Google Adsense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
@@ -78,8 +80,15 @@
     <section class="scr on" id="home">
         <div class="wrap hero">
             <div class="emoji">🏁</div>
-            <h1>3D Racing</h1>
+            <h1>Little Turismo</h1>
             <p class="circuit">Serra Nova</p>
+            <a href="../../index.html" class="home-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Accueil</span>
+            </a>
             <div class="modes">
                 <button class="mode primary" id="btnSolo" type="button"
                     data-go="circuits"><i>🏎️</i><span><b>Solo</b><small>Course contre l'IA</small></span></button>
@@ -96,7 +105,6 @@
                 <button class="btn alt" id="rulesBtn" type="button" data-go="rules">📖 Règles</button>
                 <button class="btn alt" id="recordsBtn" type="button" data-go="records">🏆 Records</button>
             </div>
-            <a class="back" href="../../index.html">‹ Retour aux jeux</a>
         </div>
     </section>
     <div class="room-overlay" id="roomOverlay" hidden>
@@ -124,6 +132,8 @@
                     <select class="theme-select" id="roomDiff"></select>
                 </label>
             </div>
+            <label class="tg" id="publicWrap" hidden style="display:flex;gap:8px;margin:10px 0"><input type="checkbox"
+                    id="roomPublic"> Room publique (visible par les autres joueurs)</label>
             <div class="guest-waiting" id="guestWaiting" hidden>
                 <p>En attente que le créateur lance la course…</p>
             </div>
@@ -220,8 +230,9 @@
                     <h3 class="sec">Tracé</h3>
                     <div class="tk-trace">
                         <div>
-                            <div class="tk-tools"><button class="bk" id="tkZi" type="button">＋ Zoom</button><button class="bk"
-                                    id="tkZo" type="button">－ Zoom</button><button class="bk" id="tkFit" type="button">⤢
+                            <div class="tk-tools"><button class="bk" id="tkZi" type="button">＋ Zoom</button><button
+                                    class="bk" id="tkZo" type="button">－ Zoom</button><button class="bk" id="tkFit"
+                                    type="button">⤢
                                     Recentrer</button><button class="bk" id="tkDelPt" type="button">✕ Supprimer le
                                     point</button></div>
                             <canvas id="tkCanvas"></canvas>
@@ -231,7 +242,17 @@
                             <div class="lbl"><span class="setting-label"><span>Point sélectionné</span><output
                                         id="tkAltV">–</output></span><input type="range" id="tkAlt" min="0" max="100"
                                     step=".5"></div>
-                            <p class="multi-intro">Clique un point du tracé, puis règle son altitude (0 à 100 m).</p>
+                            <div class="lbl">Forme du virage<select class="theme-select" id="tkCorner">
+                                    <option value="smooth">Lisse (défaut)</option>
+                                    <option value="sharp">Angle vif / 90°</option>
+                                    <option value="round">Arrondi</option>
+                                    <option value="hairpin">Épingle</option>
+                                </select></div>
+                            <div class="lbl"><span class="setting-label"><span>Rayon de virage</span><output
+                                        id="tkRadiusV">–</output></span><input type="range" id="tkRadius" min="5"
+                                    max="200" step="5" value="35"></div>
+                            <p class="multi-intro">Clique un point du tracé, puis règle altitude et géométrie locale.
+                                Rayon mesuré en mètres.</p>
                         </div>
                     </div>
                     <p class="multi-intro">Clic : ajouter un point · glisser un point : le déplacer · clic droit : le
@@ -329,6 +350,10 @@
                 <div class="join-row">
                     <input class="theme-input code-input" id="roomCode" maxlength="6" placeholder="CODE">
                     <button class="btn alt" id="joinRoom" type="button">Rejoindre</button>
+                </div>
+                <div id="publicRooms" style="margin-top:14px">
+                    <p class="multi-intro" style="color: var(--pale);margin-bottom:6px">Rooms publiques</p>
+                    <div id="publicList"></div>
                 </div>
                 <p class="multi-status" id="multiStatus" aria-live="polite"></p>
             </div>
@@ -507,6 +532,11 @@
     </section>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="../../js/countPlayedTime.js"></script>
+    <script type="module"
+        src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092"
+        integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw=="
+        data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","spa":2}'
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

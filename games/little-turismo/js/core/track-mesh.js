@@ -1,5 +1,5 @@
 // Géométrie procédurale : circuit (asphalte, vibreurs, gravier, herbe/terre, murs, portique, ligne de départ) et repère temporaire du mobile.
-import { TRACK, GRAVEL, frameAt, PIT, pitExt } from './track.js';
+import { TRACK, GRAVEL, frameAt, edgePoint, PIT, pitExt } from './track.js';
 import { SKY } from './gl.js';
 
 const hex = (h) => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
@@ -48,7 +48,7 @@ export function buildTrackMesh() {
   for (let k = 0; k < N; k++) SL0[k] = dn[k] > 1e8 ? 0 : Math.max(0, Math.min(.6, (P[k * 3 + 1] - yn[k] + 1.5) / Math.max(Math.min(70, dn[k] - G - 1.5) - G - .5, 10)));
   for (let k = 0; k < N; k++) { let a = 0; for (let d = -8; d <= 8; d++) a += SL0[(k + d + N) % N]; S[k] = a / 17; }
   const lim = (k, sg) => Math.max(G + .5, Math.min(dn[k] - G - 1.5, Kc[k] * sg > 0 ? .85 / Math.abs(Kc[k]) : 1e9));
-  const pt = (i, o, dy) => { i %= N; return [P[i * 3] - T[i * 2 + 1] * o, P[i * 3 + 1] + dy, P[i * 3 + 2] + T[i * 2] * o]; };
+  const pt = (i, o, dy) => { i %= N; const q = edgePoint(TRACK, i, o < 0 ? -1 : 1, Math.abs(o)); return [q[0], P[i * 3 + 1] + dy, q[1]]; };
   const lerp = (a, b, u) => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
   const nrm = (i) => {
     const j = (i + 1) % N, k = (i + N - 1) % N, tx = T[i * 2], tz = T[i * 2 + 1], ty = (P[j * 3 + 1] - P[k * 3 + 1]) / (2 * ds), l = Math.hypot(tx, ty, tz);

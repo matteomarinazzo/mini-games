@@ -1,12 +1,12 @@
 {
-    "currentVersion": "1.45.2026-10-29",
-    "lastUpdate": "2026-10-29",
+    "currentVersion": "1.45.2026-10-31",
+    "lastUpdate": "2026-10-31",
     "history": [
         {
-            "version": "1.45.2026-10-29",
-            "date": "2026-10-29",
+            "version": "1.45.2026-10-31",
+            "date": "2026-10-31",
             "changes": [
-                "Ajout du jeu 3D Racing",
+                "Ajout du jeu Little Turismo",
                 "Ajout du jeu Balloon Rise"
             ]
         },

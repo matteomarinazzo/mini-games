@@ -8,19 +8,21 @@ export const stadium = () => {
   const L = 300, R = 130, a = (c, t) => [Math.round(c[0] + R * Math.cos(t * Math.PI / 180)), Math.round(c[1] + R * Math.sin(t * Math.PI / 180))], p = [[-L, 0], [0, 0], [L, 0]];
   for (const t of [-60, -30, 0, 30, 60]) p.push(a([L, R], t));
   p.push([L, 2 * R], [0, 2 * R], [-L, 2 * R]); for (const t of [120, 150, 180, 210, 240]) p.push(a([-L, R], t));
-  return { id: null, name: 'Mon circuit', theme: 'temperate', start: 300, pts: p, elev: p.map(() => 0) };
+  return { id: null, name: 'Mon circuit', theme: 'temperate', start: 300, pts: p, elev: p.map(() => 0), corners: p.map(() => ({ type: 'smooth', radius: 35 })) };
 };
 
 /** Valide une définition { start, pts, elev, theme } → { err[], ck[[ok,txt]], bad[], t (circuit), S0, back, fwd, sg, h }. */
 export function analyze(S) {
   const err = [], bad = [], ck = [];
   if (S.pts.length < 6) return { err: ['Au moins 6 points'], ck: [[false, 'Au moins 6 points']], bad, t: null };
-  let t; try { t = buildTrack({ name: S.name, start: S.start, pts: S.pts, elev: S.elev, theme: S.theme, ec: true }, 'tmp'); } catch (e) { return { err: ['Tracé invalide'], ck: [[false, 'Tracé invalide']], bad, t: null }; }
+  let t; try { t = buildTrack({ name: S.name, start: S.start, pts: S.pts, elev: S.elev, theme: S.theme, corners: S.corners, ec: true }, 'tmp'); } catch (e) { return { err: ['Tracé invalide'], ck: [[false, 'Tracé invalide']], bad, t: null }; }
   const { N, ds, P, K, length } = t, si = Math.round(S.start / ds) % N, S0 = si * ds, wrapD = (d) => d - length * Math.round(d / length);
   const add = (ok, txt) => { ck.push([ok, txt]); if (!ok) err.push(txt); };
   add(length >= 800 && length <= 12000, `Longueur ${Math.round(length)} m (800 – 12 000)`);
-  let km = 0; for (let i = 0; i < N; i++) if (Math.abs(K[i]) > Math.abs(K[km])) km = i;
-  const okK = Math.abs(K[km]) <= MAX_K; if (!okK) bad.push(km); add(okK, `Virage le plus serré : rayon ${Math.round(1 / Math.max(Math.abs(K[km]), 1e-4))} m (≥ ${Math.round(1 / MAX_K)})`);
+  const sharpPts = (S.corners || []).map((c, i) => c?.type === 'sharp' ? S.pts[i] : null).filter(Boolean);
+  const exempt = (i) => sharpPts.some((p) => Math.hypot(P[i * 3] - p[0], P[i * 3 + 2] - p[1]) <= 20);
+  let km = -1; for (let i = 0; i < N; i++) if (!exempt(i) && (km < 0 || Math.abs(K[i]) > Math.abs(K[km]))) km = i;
+  const okK = km < 0 || Math.abs(K[km]) <= MAX_K; if (!okK) bad.push(km); add(okK, `Virage le plus serré : rayon ${Math.round(1 / Math.max(Math.abs(K[km] || 0), 1e-4))} m (≥ ${Math.round(1 / MAX_K)})`);
   let md = 1e9, mi = -1; const lim2 = MIN_CLEAR * MIN_CLEAR;
   for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
     const dx = P[i * 3] - P[j * 3], dz = P[i * 3 + 2] - P[j * 3 + 2], d2 = dx * dx + dz * dz; if (d2 >= lim2) continue;
@@ -77,9 +79,9 @@ export function createTrackEditor(cv, pf, onChange) {
   function addPoint(w) {
     const n = S.pts.length; let bi = n - 1, bd = 1e18;
     for (let i = 0; i < n; i++) { const a = S.pts[i], b = S.pts[(i + 1) % n], ex = b[0] - a[0], ez = b[1] - a[1], u = Math.max(0, Math.min(1, ((w[0] - a[0]) * ex + (w[1] - a[1]) * ez) / (ex * ex + ez * ez || 1))), q = Math.hypot(w[0] - a[0] - ex * u, w[1] - a[1] - ez * u); if (q < bd) { bd = q; bi = i; } }
-    S.pts.splice(bi + 1, 0, [Math.round(w[0]), Math.round(w[1])]); S.elev.splice(bi + 1, 0, (S.elev[bi] + S.elev[(bi + 1) % n]) / 2); sel = bi + 1; refresh();
+    S.pts.splice(bi + 1, 0, [Math.round(w[0]), Math.round(w[1])]); S.elev.splice(bi + 1, 0, (S.elev[bi] + S.elev[(bi + 1) % n]) / 2); S.corners.splice(bi + 1, 0, { type: 'smooth', radius: 35 }); sel = bi + 1; refresh();
   }
-  const rm = (i) => { if (S.pts.length <= 3) return; S.pts.splice(i, 1); S.elev.splice(i, 1); sel = -1; refresh(); };
+  const rm = (i) => { if (S.pts.length <= 3) return; S.pts.splice(i, 1); S.elev.splice(i, 1); S.corners.splice(i, 1); sel = -1; refresh(); };
   cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); const i = hit(pos(e)); drag = { i, x: e.clientX, y: e.clientY, mv: false, vx: V.x, vz: V.z }; if (i >= 0) { sel = i; refresh(); } });
   cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (!drag.mv && Math.hypot(dx, dy) < 5) return; drag.mv = true; if (drag.i >= 0) { const w = toW(pos(e)); S.pts[drag.i] = [Math.round(w[0]), Math.round(w[1])]; refresh(); } else { V.x = drag.vx - dx / V.k; V.z = drag.vz - dy / V.k; draw(); } });
   cv.addEventListener('pointerup', (e) => { if (drag && !drag.mv && drag.i < 0) addPoint(toW(pos(e))); drag = null; });
@@ -89,7 +91,7 @@ export function createTrackEditor(cv, pf, onChange) {
   addEventListener('resize', () => { if (cv.clientWidth) draw(); });
   return {
     get def() { return S; }, get sel() { return sel; }, refresh, zoom, fit: () => { fit(); draw(); },
-    load(d) { S = { id: d.id || null, name: d.name || 'Mon circuit', theme: d.theme || 'temperate', start: d.start || 0, pts: d.pts.map((p) => [...p]), elev: d.elev.slice() }; sel = -1; fit(); refresh(); },
-    del() { if (sel >= 0) rm(sel); }, setStart(v) { S.start = v; refresh(); }, setAlt(v) { if (sel >= 0) { S.elev[sel] = v; refresh(); } },
+    load(d) { S = { id: d.id || null, name: d.name || 'Mon circuit', theme: d.theme || 'temperate', start: d.start || 0, pts: d.pts.map((p) => [...p]), elev: d.elev.slice(), corners: d.pts.map((_, i) => ({ type: d.corners?.[i]?.type || 'smooth', radius: Number.isFinite(+d.corners?.[i]?.radius) ? Math.max(0, Math.min(200, +d.corners[i].radius)) : 35 })) }; sel = -1; fit(); refresh(); },
+    del() { if (sel >= 0) rm(sel); }, setStart(v) { S.start = v; refresh(); }, setAlt(v) { if (sel >= 0) { S.elev[sel] = v; refresh(); } }, setCorner(type, radius) { if (sel >= 0) { S.corners[sel] = { type, radius: Math.max(0, Math.min(200, +radius || 0)) }; refresh(); } },
   };
 }

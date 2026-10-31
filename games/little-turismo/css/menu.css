@@ -64,6 +64,57 @@ body {
     font-size: 24px
 }
 
+.tk-trace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 16px;
+    align-items: start
+}
+
+.tk-alt {
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .1)
+}
+
+.home-button {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--chalk);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    opacity: 0.6;
+    transition: var(--transition-smooth);
+    z-index: 2000;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.home-button:hover {
+    opacity: 1;
+    transform: translateX(-5px);
+}
+
+.home-button svg {
+    transition: transform 0.3s var(--ease-spring);
+}
+
+.home-button:hover svg {
+    transform: scale(1.1);
+}
+
+@media (max-width: 700px) {
+    .tk-trace {
+        grid-template-columns: 1fr
+    }
+}
+
 .hm {
     position: fixed;
     top: 20px;
@@ -1114,4 +1165,362 @@ input[type=color] {
     .kgrid {
         grid-template-columns: 1fr
     }
+}
+
+/* ---------- Mobile paysage : html.compact (posé par le script d'index.html : tactile, hauteur utile <= 540 px) ---------- */
+html.compact {
+    --sl: max(12px, env(safe-area-inset-left, 0px));
+    --sr: max(12px, env(safe-area-inset-right, 0px))
+}
+
+html.compact .scr {
+    padding: 8px var(--sr) 12px var(--sl)
+}
+
+html.compact .hm {
+    top: 8px;
+    left: var(--sl);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px
+}
+
+html.compact .hm svg {
+    width: 18px;
+    height: 18px
+}
+
+html.compact .top {
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-left: 44px;
+    min-height: 34px
+}
+
+html.compact .top h2 {
+    font-size: 18px
+}
+
+html.compact .bk {
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 10px
+}
+
+html.compact .panel {
+    padding: 12px;
+    border-radius: 14px
+}
+
+html.compact .btn {
+    padding: 9px;
+    font-size: 15px;
+    border-radius: 11px
+}
+
+html.compact .theme-input,
+html.compact .theme-select {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 10px
+}
+
+html.compact .theme-select {
+    padding-right: 34px
+}
+
+html.compact input[type=color] {
+    height: 36px
+}
+
+html.compact .form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 14px;
+    margin-bottom: 10px
+}
+
+html.compact .form label,
+html.compact .lbl {
+    font-size: 12px;
+    gap: 4px
+}
+
+html.compact .sec {
+    font-size: 11px;
+    margin-bottom: 8px
+}
+
+html.compact .seg {
+    margin-bottom: 8px
+}
+
+html.compact .segb {
+    padding: 6px 12px;
+    font-size: 13px
+}
+
+html.compact .rec {
+    font-size: 14px;
+    gap: 6px
+}
+
+html.compact ul.rules {
+    font-size: 13px;
+    line-height: 1.45
+}
+
+html.compact ul.rules li {
+    margin-bottom: 3px
+}
+
+/* accueil : titre à gauche, modes à droite */
+html.compact .hero {
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    column-gap: 24px;
+    align-content: center;
+    align-items: center;
+    margin: auto
+}
+
+html.compact .hero>* {
+    grid-column: 1
+}
+
+html.compact .hero .modes {
+    grid-column: 2;
+    grid-row: 1/7;
+    margin: 0;
+    gap: 8px
+}
+
+html.compact .emoji {
+    font-size: 34px
+}
+
+html.compact h1 {
+    font-size: 26px;
+    margin: 0
+}
+
+html.compact .links {
+    gap: 8px;
+    margin-top: 10px
+}
+
+html.compact .links .btn {
+    font-size: 13px;
+    padding: 8px
+}
+
+html.compact .back {
+    margin-top: 8px;
+    font-size: 12px
+}
+
+html.compact .mode {
+    padding: 9px 6px;
+    border-radius: 12px;
+    gap: 2px
+}
+
+html.compact .mode.primary {
+    padding: 12px;
+    gap: 10px
+}
+
+html.compact .mode i {
+    font-size: 22px
+}
+
+html.compact .mode.primary i {
+    font-size: 28px
+}
+
+html.compact .mode b {
+    font-size: 15px
+}
+
+html.compact .mode small {
+    font-size: 10px
+}
+
+/* grilles circuits / voitures */
+html.compact .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px
+}
+
+html.compact .gcard {
+    padding: 6px;
+    gap: 4px;
+    border-radius: 12px
+}
+
+html.compact .gcard h3 {
+    font-size: 14px
+}
+
+html.compact .gcard canvas {
+    border-radius: 8px
+}
+
+html.compact .st {
+    font-size: 11px
+}
+
+/* concepteurs */
+html.compact .dz {
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 10px
+}
+
+html.compact .dz-prev {
+    top: 8px
+}
+
+html.compact .dz-main {
+    gap: 8px
+}
+
+html.compact .dz-main .panel {
+    padding: 10px
+}
+
+html.compact #dzCanvas {
+    margin-bottom: 8px
+}
+
+html.compact .tk-trace {
+    grid-template-columns: minmax(0, 1fr) 170px;
+    gap: 10px
+}
+
+html.compact .tk-alt {
+    padding: 8px
+}
+
+html.compact #tkCanvas {
+    height: clamp(160px, calc(var(--eh, 380px) - 120px), 340px);
+    margin: 6px 0
+}
+
+html.compact #tkProf {
+    height: 50px;
+    margin: 8px 0
+}
+
+html.compact .chip {
+    padding: 5px 10px;
+    font-size: 12px
+}
+
+html.compact .chk {
+    font-size: 12px
+}
+
+html.compact .tk-tools .bk {
+    padding: 5px 8px;
+    font-size: 12px
+}
+
+/* multijoueur : room */
+html.compact .room-overlay {
+    display: flex;
+    padding: 8px var(--sr) 8px var(--sl)
+}
+
+html.compact .room-card {
+    margin: auto;
+    padding: 12px 16px;
+    border-radius: 14px;
+    width: min(100%, 720px)
+}
+
+html.compact .room-card h2 {
+    font-size: 18px
+}
+
+html.compact .room-code-wrap {
+    margin: 2px auto 6px
+}
+
+html.compact .room-code {
+    font-size: 22px
+}
+
+html.compact .room-note {
+    font-size: 12px
+}
+
+html.compact .room-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 8px 0
+}
+
+html.compact .room-grid label {
+    font-size: 11px;
+    gap: 3px
+}
+
+html.compact .room-grid input[type=range] {
+    height: 22px
+}
+
+html.compact .room-players {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin: 8px 0
+}
+
+html.compact .room-player {
+    padding: 5px 9px;
+    font-size: 12px;
+    border-radius: 8px
+}
+
+html.compact .room-buttons {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px
+}
+
+html.compact .guest-waiting {
+    padding: 8px;
+    margin: 8px 0;
+    font-size: 13px
+}
+
+html.compact .multi-panel {
+    gap: 8px
+}
+
+html.compact .multi-intro {
+    font-size: 12px;
+    line-height: 1.35
+}
+
+html.compact .multi-actions {
+    margin: 8px 0 !important
+}
+
+html.compact .join-row .btn {
+    padding: 7px 12px;
+    font-size: 13px
+}
+
+html.compact #publicList .btn {
+    padding: 7px 10px;
+    font-size: 12px;
+    margin: 3px 0
+}
+
+html.compact #publicWrap {
+    font-size: 13px;
+    padding: 2px 0;
+    margin: 4px 0 !important
 }

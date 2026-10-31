@@ -8,10 +8,10 @@ import * as Net from './net.js';
 
 const $ = (id) => document.getElementById(id);
 let cfg = loadSaved();
-let gameMode = sessionStorage.getItem('3d-racing-mode') || 'solo';
-$('btnSolo')?.addEventListener('click', () => { gameMode = 'solo'; sessionStorage.setItem('3d-racing-mode', 'solo'); });
-$('btnClm')?.addEventListener('click', () => { gameMode = 'clm'; sessionStorage.setItem('3d-racing-mode', 'clm'); });
-$('btnMulti')?.addEventListener('click', () => { gameMode = 'multi'; sessionStorage.setItem('3d-racing-mode', 'multi'); });
+let gameMode = sessionStorage.getItem('little-turismo-mode') || 'solo';
+$('btnSolo')?.addEventListener('click', () => { gameMode = 'solo'; sessionStorage.setItem('little-turismo-mode', 'solo'); });
+$('btnClm')?.addEventListener('click', () => { gameMode = 'clm'; sessionStorage.setItem('little-turismo-mode', 'clm'); });
+$('btnMulti')?.addEventListener('click', () => { gameMode = 'multi'; sessionStorage.setItem('little-turismo-mode', 'multi'); });
 const PARENT = { home: null, circuits: 'home', cars: 'circuits', race: 'cars', rules: 'home', records: 'home', designer: 'cars', tdesigner: 'circuits' };
 let dzFrom = 'cars', dz = null, mine = false, tkFrom = 'circuits', tkPending = null, tkLoaded = false, mineT = false, TK = null;
 const cur = () => { const h = location.hash.slice(1); return h in PARENT ? h : 'home'; };
@@ -173,8 +173,8 @@ function sync(save) {
   $('sumC').textContent = byId(circuitList(), cfg.circuit).name; $('sumV').textContent = carName(cfg.car);
   if (save === true) saveSaved(cfg);
 }
-function launchClm(over = {}) { try { localStorage.removeItem('3d-racing-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
-function launch() { cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('3d-racing-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
+function launchClm(over = {}) { try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
+function launch() { cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
 $('launch').addEventListener('click', launch);
 addEventListener('keydown', (e) => {
   if ((e.key === 'Escape' || e.key === 'Backspace') && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); back(); }
@@ -248,6 +248,7 @@ function tkUi(A, S, sel) {
   if (A.t) { const st = stats(A.t); for (const [k, v] of [['Longueur', (st.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', st.turns], ['Dénivelé', Math.round(st.climb) + ' m'], ['Points', S.pts.length]]) { const d = document.createElement('div'); d.innerHTML = '<span></span><b></b>'; d.firstChild.textContent = k; d.lastChild.textContent = v; b.appendChild(d); } }
   $('tkStart').max = Math.floor(A.t ? A.t.length : 1000); $('tkStart').value = S.start; $('tkStartV').textContent = Math.round(S.start) + ' m'; setP($('tkStart'));
   $('tkAlt').disabled = sel < 0; $('tkAltV').textContent = sel < 0 ? '–' : S.elev[sel] + ' m'; if (sel >= 0) $('tkAlt').value = S.elev[sel]; setP($('tkAlt'));
+  $('tkCorner').disabled = $('tkRadius').disabled = sel < 0; $('tkCorner').value = sel < 0 ? 'smooth' : (S.corners[sel]?.type || 'smooth'); $('tkRadius').value = sel < 0 ? 35 : (S.corners[sel]?.radius ?? 35); $('tkRadiusV').textContent = sel < 0 ? '–' : $('tkRadius').value + ' m'; setP($('tkRadius')); $('tkRadius').closest('.lbl').hidden = sel < 0 || $('tkCorner').value === 'smooth' || $('tkCorner').value === 'sharp';
   $('tkSave').disabled = $('tkTest').disabled = A.err.length > 0; $('tkDelPt').disabled = sel < 0;
   for (const x of $('tkTheme').children) x.classList.toggle('on', x.dataset.k === S.theme);
 }
@@ -262,11 +263,13 @@ function tkSave() {
   if (!TK || !$('tkSave') || $('tkSave').disabled) return null;
   const S = TK.def, l = loadTracks(); S.name = S.name.trim().slice(0, 24) || 'Mon circuit'; S.id = S.id || 'c-' + Date.now().toString(36);
   const i = l.findIndex((t) => t.id === S.id); if (i < 0 && l.length >= MAX_TRACKS) { alert('Maximum ' + MAX_TRACKS + ' circuits.'); return null; }
-  const o = { id: S.id, name: S.name, start: Math.round(S.start), pts: S.pts.map((p) => [...p]), elev: S.elev.slice(), theme: S.theme }; i < 0 ? l.push(o) : (l[i] = o); saveTracks(l); return o;
+  const o = { id: S.id, name: S.name, start: Math.round(S.start), pts: S.pts.map((p) => [...p]), elev: S.elev.slice(), theme: S.theme, corners: S.corners.map((c) => ({ type: c.type, radius: c.radius })) }; i < 0 ? l.push(o) : (l[i] = o); saveTracks(l); return o;
 }
 $('tkName').addEventListener('input', (e) => { if (TK) TK.def.name = e.target.value; });
 $('tkStart').addEventListener('input', (e) => TK.setStart(+e.target.value));
 $('tkAlt').addEventListener('input', (e) => TK.setAlt(+e.target.value));
+$('tkCorner').addEventListener('change', (e) => { if (TK) TK.setCorner(e.target.value, +$('tkRadius').value); });
+$('tkRadius').addEventListener('input', (e) => { $('tkRadiusV').textContent = e.target.value + ' m'; if (TK) TK.setCorner($('tkCorner').value, +e.target.value); });
 $('tkZi').addEventListener('click', () => TK.zoom(1.3)); $('tkZo').addEventListener('click', () => TK.zoom(1 / 1.3)); $('tkFit').addEventListener('click', () => TK.fit()); $('tkDelPt').addEventListener('click', () => TK.del());
 $('tkSave').addEventListener('click', () => { if (tkSave()) { mineT = true; location.replace('#circuits'); } });
 $('tkTest').addEventListener('click', () => { const o = tkSave(); if (o) launchClm({ circuit: o.id, car: $('tkCar').value }); });
@@ -303,7 +306,7 @@ const playerName = () => {
 try {
   $('multiName').value = localStorage.getItem('mg_display_name')
     || localStorage.getItem('mg_player_name')
-    || localStorage.getItem('3d-racing-name') || '';
+    || localStorage.getItem('little-turismo-name') || '';
 } catch { /* stockage indisponible */ }
 $('multiName').addEventListener('input', () => {
   const n = $('multiName').value.trim().slice(0, 16);
@@ -358,10 +361,47 @@ function renderRoom(d) {
     row.lastChild.textContent = (uid === d.leaderId ? '👑 Créateur · ' : '') + carName;
     $('roomPlayers').appendChild(row);
   }
+  $('publicWrap').hidden = !host || d.state === 'playing'; if (host) $('roomPublic').checked = !!d.public;
   $('startRoom').hidden = !host;
   $('startRoom').disabled = players.length < 1 || players.length + (+$('roomAi').value || 0) > 20;
-  if (d.state === 'playing') beginMultiplayer(d);
+  if (d.state === 'playing') { if (host) Net.setPublic(activeRoom, null); beginMultiplayer(d); }
+  else if (host) syncPublic(d);
 }
+// Rooms publiques : l'hôte publie une fiche dans l'index, rafraîchie toutes les 20 s tant que la room attend.
+let pubTimer = null, pubOn = false;
+function syncPublic(d) {
+  const on = !!d.public && d.state === 'waiting';
+  clearInterval(pubTimer); pubTimer = null;
+  if (!on) { if (pubOn) { pubOn = false; Net.setPublic(d.code || activeRoom, null); } return; }
+  pubOn = true;
+  const push = () => {
+    const r = roomData; if (!r || !activeRoom) return; const me = r.players?.[r.leaderId], c = r.config || {};
+    return Net.setPublic(activeRoom, { host: me?.name || 'Pilote', n: Object.keys(r.players || {}).length, max: r.maxHumans || 20, circuit: c.circuit || '', laps: c.laps || 3, ai: c.ai || 0 });
+  };
+  const go = async () => { if (!(await push())) { const el = $('roomNote'); if (el) el.textContent = 'Publication impossible (droits Firebase sur rooms/racing_public ?)'; } };
+  go(); pubTimer = setInterval(push, 20000);
+}
+$('roomPublic')?.addEventListener('change', async () => {
+  if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
+  await Net.update(activeRoom, { public: $('roomPublic').checked });
+});
+let stopPub = null;
+async function showPublicRooms() {
+  if (stopPub || !(await Net.init())) return;
+  stopPub = Net.watchPublic((list) => {
+    const el = $('publicList'); if (!el) return; el.textContent = '';
+    if (!list.length) { el.textContent = 'Aucune room publique pour le moment.'; el.style.opacity = .7; return; }
+    el.style.opacity = 1;
+    for (const r of list) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'btn alt'; b.style.cssText = 'display:block;width:100%;margin:4px 0;text-align:left';
+      const cn = (circuitList().find((c) => c.id === r.circuit) || {}).name || r.circuit || '';
+      b.textContent = (r.host || 'Pilote') + ' · ' + cn + ' · ' + r.laps + ' tours · ' + r.n + '/' + r.max + ' joueurs';
+      b.addEventListener('click', () => { $('roomCode').value = r.code; $('joinRoom').click(); });
+      el.appendChild(b);
+    }
+  });
+}
+showPublicRooms(); setInterval(showPublicRooms, 3000);   // réessaie tant que le réseau n'est pas prêt
 
 function enterRoom(code, d) {
   activeRoom = code; $('roomOverlay').hidden = false; if (stopRoomWatch) stopRoomWatch(); stopRoomWatch = Net.watch(code, renderRoom); renderRoom(d);
@@ -434,12 +474,14 @@ $('startRoom').addEventListener('click', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
   const players = Object.keys(roomData.players || {}).length, aiCount = +$('roomAi').value || 0;
   if (players < 1 || players + aiCount > 20) return;
+  clearInterval(pubTimer); pubOn = false; await Net.setPublic(activeRoom, null);   // plus visible dans la liste une fois lancée
   const qual = $('roomQualifying').value === 'true';
   const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value });
   await Net.update(activeRoom, { config: nextConfig, state: 'playing', startedAt: Net.now(), runtime: { tick: 0, stamp: Net.now() } });
 });
 
 $('leaveRoom').addEventListener('click', async () => {
+  if (activeRoom && roomData?.leaderId === Net.N.uid) { clearInterval(pubTimer); await Net.setPublic(activeRoom, null); }
   if (activeRoom) await Net.leave(activeRoom, roomData?.state === 'playing');
   if (stopRoomWatch) stopRoomWatch();
   activeRoom = null;

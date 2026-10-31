@@ -66,7 +66,7 @@ export function stepCar(c, inp, dt) {
     const d = (inp.steer * S.steerMax * fs + pull * cl(speed / 20, 0, 1)) / (1 + (speed / S.steerV) ** 2), cd = Math.cos(d), sd = Math.sin(d);
     // moteur (puissance / vitesse, coupure à vmax, trou de boîte) et freins (répartis selon la charge, léger biais avant)
     let Fd = 0;
-    if (c.shift > 0) c.shift -= h; else if (c.rev) Fd = -inp.brake * 7000 * cl((7 + u) / 2, 0, 1); else Fd = inp.throttle * Math.min(S.power * S.eff * fp / Math.max(u, 4), 1e5 * fp) * cl((S.vmax * fv - u) / 4, 0, 1);
+    if (c.shift > 0) c.shift -= h; else if (c.rev) Fd = -inp.brake * 7000 * cl((7 + u) / 2, 0, 1); else Fd = inp.throttle * Math.min(S.power * S.eff * fp / Math.max(u, 4), 1e5 * fp) * cl((S.vmax * fv - u) / 4, 0, 1) * (c.limit ? cl((c.limit - u) / 1.5, 0, 1) : 1);
     const Fb = c.rev ? 0 : inp.brake * S.brakeForce * fb, sf = Nf / (Nf + Nr) + .10, brk = Fb > 100;
     const af = Math.atan2(w + a * r, ue) - d * su, ar = Math.atan2(w - b * r, ue);
     const [fxf, fyf] = axle(Nf, S.grip * (1 - .2 * S.understeer) * (1 - .12 * (1 - faf)) * mu0, ltf, -sgn * Fb * sf, af, .12 + .05 * S.understeer, brk);
@@ -79,7 +79,7 @@ export function stepCar(c, inp, dt) {
     let Mz = a * (fyf * cd + fxf * sd) - b * fyr;
     if (kerb) { const j = cl(speed / 20, 0, 1); Fy += m * .9 * j * Math.sin(c.t * 53); Mz += 500 * j * Math.sin(c.t * 31 + 1); }
     c.t += h;
-    c.u += (Fx / m + w * r) * h; if (c.limit && c.u > c.limit) c.u = Math.max(c.limit, c.u - 30 * h);
+    c.u += (Fx / m + w * r) * h; if (c.limit && c.u > c.limit) c.u = Math.min(c.u, Math.max(c.limit, u - 30 * h));   // pit limiter : plafond dur, décélération max 30 m/s² si on arrive plus vite
     c.w += (Fy / m - u * r) * h; c.r += Mz / S.iz * h;   // (limiter 80 km/h ci-dessus)
     if (Math.abs(c.u) < 6) { const kk = (1 - Math.abs(c.u) / 6) * 10; c.w *= Math.exp(-kk * h); c.r *= Math.exp(-kk * .5 * h); }  // stabilité à l'arrêt
     c.psi += c.r * h;

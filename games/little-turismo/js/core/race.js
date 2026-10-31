@@ -52,16 +52,21 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
 
   R.update = (dt, thr) => {
     R.penaltyMsgT = Math.max(0, R.penaltyMsgT - dt); R.lapMsgT = Math.max(0, R.lapMsgT - dt);
-    if (R.phase === 'intro' || R.phase === 'lights') {
+    // Contre-la-montre : pas de feux, démarrage immédiat avec message GO.
+    if (training) {
+      if (R.phase === 'intro' || R.phase === 'lights') { R.phase = 'go'; R.lights = 0; R.goMsg = 1.2; R.t = 0; }
+      if (R.phase !== 'go') return;
+      R.t += dt; if (R.goMsg > 0) R.goMsg -= dt;
+      R.msg = R.goMsg > 0 ? 'GO !' : '';
+    } else if (R.phase === 'intro' || R.phase === 'lights') {
       R.clock += dt;
       if (R.clock < 1) { R.phase = 'intro'; R.lights = 0; R.msg = 'Préparez-vous'; return; }
       const STEP = .7, all = 1 + 4 * STEP;                                  // un feu toutes les 0,7 s, puis attente variable
       R.phase = 'lights'; R.lights = Math.min(5, Math.floor((R.clock - 1) / STEP) + 1); R.msg = '';
-      if (thr > .3 && !R.falseStart) { R.falseStart = true; if (!qualifying && !training) { R.dt = true; R.penaltyMsg = 'Faux départ : drive-through à effectuer'; R.penaltyMsgT = 4; } }                                   // faux départ : accélération bloquée un instant
-      if (R.clock >= all + R.hold) { R.phase = 'go'; R.lights = 0; R.goMsg = 1.2;  }
+      if (thr > .3 && !R.falseStart) { R.falseStart = true; if (!qualifying) { R.dt = true; R.penaltyMsg = 'Faux départ : drive-through à effectuer'; R.penaltyMsgT = 4; } }  // en qualif : noté mais pas de DT
+      if (R.clock >= all + R.hold) { R.phase = 'go'; R.lights = 0; R.goMsg = 1.2; }
       return;
-    }
-    if (R.phase !== 'go') return;
+    } else if (R.phase !== 'go') return;
     R.t += dt; if (R.penalty > 0) R.penalty -= dt; if (R.goMsg > 0) R.goMsg -= dt;
     R.msg = R.penalty > 0 ? 'Faux départ ! Accélération bloquée' : R.goMsg > 0 ? 'GO !' : '';
     for (const e of E) {

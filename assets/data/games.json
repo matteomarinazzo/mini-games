@@ -1,5 +1,23 @@
 {
   "action": {
+    "little-turismo": {
+      "path": "./games/little-turismo/index.html",
+      "name": "Little Turismo",
+      "emoji": "🏁",
+      "description": "Course 3D : 24 circuits, 22 voitures, qualifications, contre-la-montre et multijoueur en ligne jusqu'à 20 pilotes. Crée aussi tes propres voitures et circuits.",
+      "tags": [
+        "racing",
+        "physics",
+        "real-time",
+        "creativity",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "simulation",
+      "badgeText": "Simulation",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "rush-highway": {
       "path": "./games/rush-highway/index.html",
       "name": "Rush Highway",
@@ -845,23 +863,6 @@
       ],
       "badge": "fun",
       "badgeText": "Fun !",
-      "rating": "0",
-      "stars": "☆☆☆☆☆"
-    }
-  },
-  "test": {
-    "3d-racing": {
-      "path": "./games/3d-racing/index.html",
-      "name": "3d-racing",
-      "emoji": "🚗",
-      "description": "Conduis ta voiture et évite les obstacles.",
-      "tags": [
-        "arcade",
-        "racing",
-        "solo"
-      ],
-      "badge": "classic",
-      "badgeText": "Classique",
       "rating": "0",
       "stars": "☆☆☆☆☆"
     }

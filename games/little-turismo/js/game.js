@@ -18,7 +18,7 @@ const canvas = $('gameCanvas'), lost = $('ctxLost');
 const R = createGL(canvas, { onLost: () => { lost.hidden = false; }, onRestored: () => { lost.hidden = true; } });
 if (!R) { $('noGl').hidden = false; throw new Error('WebGL2 indisponible'); }
 
-const LIVE_KEY = '3d-racing-live-v1';
+const LIVE_KEY = 'little-turismo-live-v1';
 function readLive() { try { const raw = localStorage.getItem(LIVE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
 const live = readLive();
 const online = Net.readSession();
@@ -46,7 +46,7 @@ const drv = createCar(sheet, field.playerSlot.s, field.playerSlot.lat), cam = cr
 const menuLink = $('results').querySelector('a.btn');   // lien Menu de la fenêtre de résultats (masqué pendant et après les qualifications)
 
 // IA et voitures humaines distantes : seul l'hôte simule la grille entière.
-const place = (c, slot) => { c.slot = slot; c.ph = createCar(c.sheet, slot.s, slot.lat); if (c.ai) { c.ai.ph = c.ph; c.ai.tl = c.ph.lat; } };
+const place = (c, slot) => { c.slot = slot; c.ph = createCar(c.sheet, slot.s, slot.lat); if (c.ai) { c.ai.ph = c.ph; c.ph.sheet = c.ai.sheet; c.ai.tl = c.ph.lat; } };   // sheet : fiche de l'IA (bonus de specs expert / difficile)
 const humanCars = field.cars.slice(0, remotePlayers.length), aiCars = field.cars.slice(remotePlayers.length);
 for (let i = 0; i < humanCars.length; i++) {
   const c = humanCars[i], [uid, player] = remotePlayers[i], choice = CARS[player.car] || sheet;
@@ -68,7 +68,7 @@ for (let i = 0; i < aiCars.length; i++) {
   c.body = lk.color;
   c.sc = lk.sc;
   c.ph = createCar(choice, c.slot.s, c.slot.lat);
-  c.ai = createAi(c.ph, cfg.diff, c.n);
+  c.ai = createAi(c.ph, cfg.diff, c.n, !!cfg.qualifying, cfg.mode === 'clm' ? 0 : cfg.laps);
   c.netKey = 'ai:' + i;
 }
 if (multiplayer && !cfg.qualifying && !cfg.gridOrder) {
@@ -103,24 +103,27 @@ $('viewPrev').addEventListener('click', () => setView(-1)); $('viewNext').addEve
 
 const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 let tick = 0, acc = 0, last = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0;
-const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp'];
+const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
 // Réseau fluide : chaque machine est autoritaire sur SA voiture (physique locale 60 Hz) et la publie à 20 Hz en tableau compact.
 // L'hôte publie IA + humains ; les clients rejouent les paquets avec un retard fixe (interpolation, extrapolation courte).
-const NF = ['x', 'y', 'z', 'psi', 'pitch', 'roll', 'u', 'w', 'r', 's', 'lat', 'kmh'], NLEN = 13, DELAY = 110, NET_STEP = .045;
+const NF = ['x', 'y', 'z', 'psi', 'pitch', 'roll', 'u', 'w', 'r', 's', 'lat', 'kmh'], NLEN = 20, DELAY = 90, NET_STEP = .045, DK = ['nose', 'fw', 'hood', 'l', 'r', 'floor', 'rw'];
 const r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
-const packCar = (c) => [r2(c.x), r2(c.y), r2(c.z), r3(c.psi), r3(c.pitch), r3(c.roll), r2(c.u), r2(c.w), r3(c.r), r2(c.s), r2(c.lat), Math.round(c.kmh), c.raceFinished ? 1 : 0];
+const dmArr = (w) => DK.map((k) => Math.round(Math.min(1, Math.max(0, (w && w[k]) || 0)) * 100));
+const packCar = (c, w) => [r2(c.x), r2(c.y), r2(c.z), r3(c.psi), r3(c.pitch), r3(c.roll), r2(c.u), r2(c.w), r3(c.r), r2(c.s), r2(c.lat), Math.round(c.kmh), c.raceFinished ? 1 : 0, ...dmArr(w)];
 const normArr = (v) => Array.isArray(v) ? v : Array.from({ length: NLEN }, (_, i) => +v?.[i] || 0);
 const normMap = (m) => { const o = {}; for (const k in m) o[k] = normArr(m[k]); return o; };
 const netRT = () => ({ phase: race.phase, clock: race.clock, t: race.t, lights: race.lights, hold: race.hold });
 const netRE = () => ({ results: race.results || null, E: race.E.map((e) => Object.fromEntries(['n', 'p0', 'p', 'maxP', 'prevS', 'k', 'lapStart', 'best', 'last', 'fin', 'fl', 'fp'].map((k) => [k, e[k]]))) });
 const newBuf = () => ({ b: [], rt: null });
-function pushBuf(B, t, d) { const L = B.b[B.b.length - 1]; if (L && t <= L.t) return; B.b.push({ t, d }); if (B.b.length > 8) B.b.shift(); }
+function pushBuf(B, t, d) { const L = B.b[B.b.length - 1]; if (L && t <= L.t) { if (L.t - t < 1500) return; B.b.length = 0; B.rt = null; } B.b.push({ t, d }); B.at = performance.now(); if (B.b.length > 8) B.b.shift(); }
 /** Carte clé → tableau interpolé à (dernier paquet − DELAY). Horloge propre au tampon (pas besoin d'horloges synchronisées). */
 function sampleBuf(B, dt) {
   const n = B.b.length; if (!n) return null;
   const last = B.b[n - 1].t;
   if (B.rt === null) B.rt = last - DELAY;
-  B.rt += dt * 1000; B.rt += (last - DELAY - B.rt) * Math.min(1, dt * 2);
+  const target = last - DELAY, lag = target - B.rt;
+  B.rt += dt * 1000 * (1 + Math.max(0, Math.min(.65, lag * .004)));
+  B.rt += (target - B.rt) * Math.min(1, dt * 5);
   let i = n - 1; while (i > 0 && B.b[i].t > B.rt) i--;
   const A = B.b[i], C = B.b[i + 1], out = {};
   for (const key in A.d) {
@@ -140,9 +143,10 @@ function sampleBuf(B, dt) {
 function applyArr(c, a, fin) {
   for (let i = 0; i < 12; i++) c[NF[i]] = a[i];
   if (fin && a[12] === 1) c.raceFinished = true;
+  const dm = c.dmo || (c.dmo = {}); for (let i = 0; i < 7; i++) dm[DK[i]] = (a[13 + i] || 0) / 100;
   c.v = c.u; const p = c.prev; p.x = c.x; p.y = c.y; p.z = c.z; p.psi = c.psi;
 }
-let netAcc = 0, netSeq = 0, netBusy = false, netUnwatch = null, netLast = 0, seenAt = 0;
+let netPend = 0, lastResub = 0, netAcc = 0, netSeq = 0, netBusy = false, netDirty = false, netRetry = null, netUnwatch = null, netLast = 0, seenAt = 0;
 const guestBuf = newBuf(), humanBufs = {};
 function onRuntime(s) {   // invité : paquet hôte
   if (!s || hostMode) return;
@@ -156,7 +160,7 @@ function onRuntime(s) {   // invité : paquet hôte
 function onPlayers(pl) {   // hôte : paquets des invités
   if (!pl) return;
   for (const c of humanCars) {
-    const p = pl[c.humanUid]?.car;
+    const p = pl[c.humanUid]?.carState || pl[c.humanUid]?.car;
     if (p?.a && p.t) pushBuf(humanBufs[c.humanUid] ||= newBuf(), p.t, { k: normArr(p.a) });
     const pen = pl[c.humanUid]?.pen, dtf = pl[c.humanUid]?.dt;
     if (dtf !== undefined) { const e = race.E.find((x) => x.n === c.humanUid); if (e) e.dt = !!dtf; }
@@ -175,30 +179,40 @@ function syncNet() {
   if (m[localUid] && m[localUid][12] === 1) drv.raceFinished = true;
 }
 async function publishNetwork() {
-  if (!multiplayer || !Net.N.uid || netBusy) return;
+  if (!multiplayer || !Net.N.uid) return;
+  netDirty = true; if (netBusy) return;
   netBusy = true;
   try {
-    const d = {}, t = Net.now();
-    if (hostMode) {
-      const cars = { [localUid]: packCar(drv) };
-      for (const c of humanCars) cars[c.humanUid] = packCar(c.ph);
-      for (const c of aiCars) cars[c.netKey] = packCar(c.ph);
-      d['runtime/stamp'] = t; d['runtime/cars'] = cars; d['runtime/rt'] = netRT();
-      if (netSeq++ % 5 === 0 || race.phase === 'finished') d['runtime/race'] = netRE();
-    } else {
-      d[`players/${localUid}/car`] = { t, a: packCar(drv) };
-      if (race.timePenalty > 0) d[`players/${localUid}/pen`] = race.timePenalty;
-      d[`players/${localUid}/dt`] = race.dt ? 1 : 0;
+    while (netDirty) {
+      netDirty = false;
+      const d = {}, t = Net.now();
+      if (hostMode) {
+        const cars = { [localUid]: packCar(drv, dmg.w) };
+        for (const c of humanCars) cars[c.humanUid] = packCar(c.ph, c.ph.dmo);
+        for (const c of aiCars) cars[c.netKey] = packCar(c.ph, c.ai.damage.w);
+        d['runtime/stamp'] = t; d['runtime/cars'] = cars; d['runtime/rt'] = netRT();
+        if (netSeq++ % 5 === 0 || race.phase === 'finished') d['runtime/race'] = netRE();
+      } else {
+        d[`players/${localUid}/carState`] = { t, a: packCar(drv, dmg.w) };
+        if (race.timePenalty > 0) d[`players/${localUid}/pen`] = race.timePenalty;
+        d[`players/${localUid}/dt`] = race.dt ? 1 : 0;
+      }
+      if (Date.now() - seenAt > 2000) { seenAt = Date.now(); d[`players/${localUid}/lastSeen`] = t; }
+      Net.update(online.code, d).catch(() => { });   // sans attendre l'ack : le SDK garde l'ordre, la latence ne bride plus le débit
+      if (++netPend > 6) { netPend = 0; await new Promise((r) => setTimeout(r, 60)); }
     }
-    if (Date.now() - seenAt > 2000) { seenAt = Date.now(); d[`players/${localUid}/lastSeen`] = t; }
-    await Net.update(online.code, d);
-  } catch { /* le paquet suivant reprendra */ } finally { netBusy = false; }
+  } catch { netDirty = true; /* réessayer le dernier état après un bref délai */ } finally { netBusy = false; if (netDirty && netRetry === null) netRetry = setTimeout(() => { netRetry = null; publishNetwork(); }, 100); }
 }
 if (multiplayer) {
-  Net.init().then((n) => {
-    if (!n) return;
+  const startWatch = async () => {
+    if (netUnwatch) { try { netUnwatch(); } catch { /* ignoré */ } netUnwatch = null; }
+    const n = await Net.init(); if (!n) return false;
     netUnwatch = hostMode ? Net.watchPlayers(online.code, onPlayers) : Net.watchRuntime(online.code, onRuntime);
-  });
+    return true;
+  };
+  (async () => { for (let i = 0; i < 20 && !(await startWatch()); i++) await new Promise((r) => setTimeout(r, 1500)); })();
+  // Chien de garde : plus aucun paquet depuis 3 s → on se réabonne (écoute perdue, session expirée…)
+  setInterval(() => { if (document.hidden || race.phase === 'finished') return; const bufs = hostMode ? humanCars.map((c) => humanBufs[c.humanUid] || { at: 0 }) : [guestBuf]; const stale = bufs.some((b) => performance.now() - (b.at || 0) > 3000); if (stale && performance.now() - lastResub > 4000) { lastResub = performance.now(); startWatch(); } }, 1500);
   addEventListener('pagehide', () => { if (netUnwatch) netUnwatch(); });
 }
 function captureCar(c) { const v = {}; for (const k of Object.keys(c)) if (k !== 'sheet' && k !== 'prev') v[k] = c[k]; return { v, prev: { ...c.prev } }; }
@@ -230,19 +244,19 @@ function restoreLive(data) {
   } catch (e) { return false; }
 }
 // Pause : Échap / bouton / onglet masqué ; après un refresh accidentel on repart en pause (records déjà en localStorage)
-const nav = performance.getEntriesByType('navigation')[0], go = sessionStorage.getItem('3d-racing-go');
-sessionStorage.removeItem('3d-racing-go');
+const nav = performance.getEntriesByType('navigation')[0], go = sessionStorage.getItem('little-turismo-go');
+sessionStorage.removeItem('little-turismo-go');
 let paused = false;
 function setPause(p) { if (shown || qualNotice || liveShown) p = false; paused = p; $('pause').hidden = !p; if (p) { input.reset(); persistLive(); } }
-const restart = () => { discardingLive = true; try { localStorage.removeItem(LIVE_KEY); sessionStorage.setItem('3d-racing-go', '1'); } catch (e) { /* stockage indisponible */ } location.reload(); };
+const restart = () => { discardingLive = true; try { localStorage.removeItem(LIVE_KEY); sessionStorage.setItem('little-turismo-go', '1'); } catch (e) { /* stockage indisponible */ } location.reload(); };
 $('pauseBtn').addEventListener('click', () => setPause(true));
 $('resume').addEventListener('click', () => setPause(false));
 $('restart').addEventListener('click', restart);
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.repeat) setPause(!paused); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) setPause(true); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && !multiplayer) setPause(true); });
 const restored = restoreLive(multiplayer ? null : live);
 if (restored && race.phase !== 'finished') setPause(true);
-else if (!restored && !go && nav && nav.type === 'reload') setPause(true);
+else if (!restored && !go && !multiplayer && nav && nav.type === 'reload') setPause(true);
 if (restored && race.phase === 'finished') persistLive();
 addEventListener('pagehide', persistLive);
 cam.aspect = R.resize();
@@ -356,8 +370,9 @@ async function replayMulti() {   // hôte : remet la room en attente ; invités 
   const b = $('again'); b.disabled = true;
   await Net.init();
   if (hostMode) {
+    // Garder players/<uid>/car (choix du lobby), mais effacer les snapshots de conduite.
     const d = { state: 'waiting', runtime: null };
-    for (const [uid] of sortedHumans) d['players/' + uid + '/car'] = null;
+    for (const [uid] of sortedHumans) d['players/' + uid + '/carState'] = null;
     await Net.update(online.code, d); toLobby();
   } else { b.textContent = 'En attente de l\u2019hôte…'; Net.watchState(online.code, (s) => { if (s === 'waiting') toLobby(); }); }
 }
@@ -421,13 +436,13 @@ $('again').addEventListener('click', () => {
   cfg.qualifying = false;   // même session : la grille de départ est cfg.gridOrder (classement des qualifs)
   try { localStorage.removeItem(LIVE_KEY); } catch (e) { /* stockage indisponible */ }
   startSession(cfg);
-  try { sessionStorage.setItem('3d-racing-go', '1'); } catch (e) { /* stockage indisponible */ }
+  try { sessionStorage.setItem('little-turismo-go', '1'); } catch (e) { /* stockage indisponible */ }
   location.reload();
 });
 
 function frame(ts) {
   requestAnimationFrame(frame);
-  const dt = paused ? 0 : Math.min(.1, (ts - last) / 1000 || 0); last = ts;
+  const dt = (paused && !multiplayer) ? 0 : Math.min(.1, (ts - last) / 1000 || 0); last = ts;
   ema += (dt - ema) * .05;
   if (ema > .03 && R.scale > .5) { if (++slow > 40) { slow = 0; ema = DT; cam.aspect = R.resize(R.scale * .8); } } else slow = 0;
   // Guest mode: apply network snapshot once per frame (outside the physics loop)
@@ -461,7 +476,7 @@ function frame(ts) {
       if (!multiplayer || hostMode) {
         if (!race.qualifying || race.E[0].fin === null) stepCar(drv, race.penalty > 0 ? NOGAS : gi, DT);
         race.checkCut(drv, DT);
-        stepField(ais, all, tick++, DT, !race.qualifying);
+        stepField(ais, all, tick++, DT, !race.qualifying, !!race.qualifying);
         if (drv.hv > 0) { dmg.hit(drv.hv, drv.hnx, drv.hnz, drv.psi); drv.hv = 0; }
         dmg.tick(DT, drv.surf, drv.kmh); pitService(DT); dmg.apply(drv);
       } else {
@@ -515,7 +530,16 @@ function frame(ts) {
   drawLights(R, lampMesh || (lampMesh = R.mesh(buildLamp())), race.lights);
   const showPlayer = set.view !== 'cockpit' && set.view !== 'front';
   if (race.qualifying) drawCars(R, { player: field.player, cars: [] }, a, cam, showPlayer); else drawCars(R, field, a, cam, showPlayer);
-  if (!race.qualifying) for (const c of aiCars) if (!c.ph.gone) drawWear(R, c.ai.damage.w, { ...c.ph, sc: c.sc, body: c.body });
+  if (!race.qualifying) {
+    if (!multiplayer) { for (const c of aiCars) if (!c.ph.gone) drawWear(R, c.ai.damage.w, { ...c.ph, sc: c.sc, body: c.body }); }
+    else for (const c of field.cars) {   // multi : dégâts (carrosserie, pare-brise, fumée, ailerons) de toutes les voitures distantes, transmis par le réseau
+      const ph = c.ph; if (ph.gone) continue;
+      const w = c.ai && hostMode ? c.ai.damage.w : ph.dmo; if (!w) continue;
+      const q = c.wq || (c.wq = { n: 0 });
+      q.x = ph.x; q.y = ph.y; q.z = ph.z; q.psi = ph.psi; q.pitch = ph.pitch; q.roll = ph.roll; q.sc = c.sc; q.body = c.body; q.kind = look(c.sheet).kind;
+      drawWear(R, w, q); c.wr = q.wr; c.wf = q.wf; c.xl = q.xl; c.xr = q.xr;
+    }
+  }
   if (showPlayer) drawWear(R, dmg.w, me);
 }
 requestAnimationFrame(frame);

@@ -111,28 +111,28 @@ function build(D, id) {
     if (runs.length) {
       const soft = Float32Array.from(ideal, v => Math.max(-lim, Math.min(lim, v * .85)));
       // Estimate local lap-time cost including lateral grip and backward braking envelope.
-      const score = (line, lo, hi) => {
-        const nwin = hi-lo, v = new Float32Array(nwin+1), kap = new Float32Array(nwin+1), speedMax = 58, ay=6.0, decel=8.5;
-        const off = (q) => line[(q%N+N)%N];
-        for(let q=0;q<=nwin;q++) {
-          const i=(lo+q)%N, im=(i+N-1)%N, ip=(i+1)%N;
-          const x0=P[im*3]-T[im*2+1]*off(im), z0=P[im*3+2]+T[im*2]*off(im);
-          const x1=P[i*3]-T[i*2+1]*off(i), z1=P[i*3+2]+T[i*2]*off(i);
-          const x2=P[ip*3]-T[ip*2+1]*off(ip), z2=P[ip*3+2]+T[ip*2]*off(ip);
-          const ax=x1-x0, az=z1-z0, bx=x2-x1, bz=z2-z1, l=Math.hypot(ax,az)*Math.hypot(bx,bz)||1;
-          kap[q]=Math.abs((ax*bz-az*bx)/l); v[q]=Math.min(speedMax,Math.sqrt(ay/Math.max(kap[q],.00001)));
+      const score = (line, lo, span) => {
+        const v = new Float32Array(span + 1), kap = new Float32Array(span + 1), speedMax = 58, ay = 6.0, decel = 8.5;
+        const off = (q) => line[(q % N + N) % N];
+        for (let q = 0; q <= span; q++) {
+          const i = (lo + q) % N, im = (i + N - 1) % N, ip = (i + 1) % N;
+          const x0 = P[im * 3] - T[im * 2 + 1] * off(im), z0 = P[im * 3 + 2] + T[im * 2] * off(im);
+          const x1 = P[i * 3] - T[i * 2 + 1] * off(i), z1 = P[i * 3 + 2] + T[i * 2] * off(i);
+          const x2 = P[ip * 3] - T[ip * 2 + 1] * off(ip), z2 = P[ip * 3 + 2] + T[ip * 2] * off(ip);
+          const ax = x1 - x0, az = z1 - z0, bx = x2 - x1, bz = z2 - z1, l = Math.hypot(ax, az) * Math.hypot(bx, bz) || 1;
+          kap[q] = Math.abs((ax * bz - az * bx) / l); v[q] = Math.min(speedMax, Math.sqrt(ay / Math.max(kap[q], .00001)));
         }
-        for(let q=nwin-1;q>=0;q--) v[q]=Math.min(v[q],Math.sqrt(v[q+1]*v[q+1]+2*decel*ds));
-        let t=0; for(let q=0;q<nwin;q++) t+=ds/Math.max(v[q],4); return t;
+        for (let q = span - 1; q >= 0; q--) v[q] = Math.min(v[q], Math.sqrt(v[q + 1] * v[q + 1] + 2 * decel * ds));
+        let t = 0; for (let q = 0; q < span; q++) t += ds / Math.max(v[q], 4); return t;
       };
-      for(const run of runs) {
-        const pad=Math.round(35/ds), lo=(run.start-pad+N)%N, hi=(run.end+pad+N)%N;
-        let span=(hi-lo+N)%N; if(span<1) continue;
-        let best=.0,bestCost=Infinity;
-        for(let a=0;a<=.6001;a+=.1) {
-          const trial=Float32Array.from(soft);
-          for(let q=0;q<=span;q++) { const i=(lo+q)%N, fade=Math.min(1,q/Math.max(1,pad),(span-q)/Math.max(1,pad)); const w=clamp01(fade)*a; trial[i]=soft[i]*(1-w)+aggressive[i]*w; }
-          const cost=score(trial,lo,hi); if(cost<bestCost){bestCost=cost;best=a;}
+      for (const run of runs) {
+        const pad = Math.round(35 / ds), lo = (run.start - pad + N) % N, hi = (run.end + pad + N) % N;
+        let span = (hi - lo + N) % N; if (span < 1) continue;
+        let best = .0, bestCost = Infinity;
+        for (let a = 0; a <= .6001; a += .1) {
+          const trial = Float32Array.from(soft);
+          for (let q = 0; q <= span; q++) { const i = (lo + q) % N, fade = Math.min(1, q / Math.max(1, pad), (span - q) / Math.max(1, pad)); const w = clamp01(fade) * a; trial[i] = soft[i] * (1 - w) + aggressive[i] * w; }
+          const cost = score(trial, lo, span); if (cost < bestCost) { bestCost = cost; best = a; }
         }
         for(let q=0;q<=span;q++) { const i=(lo+q)%N, fade=Math.min(1,q/Math.max(1,pad),(span-q)/Math.max(1,pad)); alpha[i]=Math.max(alpha[i],best*clamp01(fade)); }
       }

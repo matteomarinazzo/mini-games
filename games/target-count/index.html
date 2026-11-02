@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Compte Cible – Atteins la cible | Mini‑Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <meta name="description"
+        content="Jouez gratuitement à Compte Cible sur Mini‑Games. Trouvez l'expression qui donne exactement la cible avec les nombres tirés, le plus vite possible !">
+
+    <link rel="canonical" href="https://mini-games.ch/games/target-count/" />
+
+    <!-- Open Graph (og:image / twitter:image volontairement absents : visuel assets/logos/target-count.webp à créer) -->
+    <meta property="og:title" content="Compte Cible – Atteins la cible | Mini‑Games">
+    <meta property="og:description"
+        content="Construisez l'expression qui donne exactement la cible avec les nombres tirés, le plus vite possible !">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/target-count/">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Compte Cible – Atteins la cible | Mini‑Games">
+    <meta name="twitter:description"
+        content="Construisez l'expression qui donne exactement la cible avec les nombres tirés, le plus vite possible !">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Compte Cible",
+      "url": "https://mini-games.ch/games/target-count/",
+      "description": "Jeu de calcul : combinez les nombres tirés avec des opérations pour obtenir exactement la cible, le plus vite possible.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "genre": ["Puzzle Game", "Educational Game", "Singleplayer"],
+      "inLanguage": "fr",
+      "publisher": { "@type": "Organization", "name": "Mini‑Games" }
+    }
+    </script>
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+
+    <!-- ─── PLATEAU ─── -->
+    <main class="play hidden" id="play">
+        <div class="play-inner">
+            <div class="eq" id="eq" aria-label="Expression à construire"></div>
+            <div class="tools">
+                <button class="tool-btn" id="lessBtn" title="Retirer une case">− case</button>
+                <button class="tool-btn" id="moreBtn" title="Ajouter une case">+ case</button>
+                <button class="tool-btn" id="clearBtn" title="Tout effacer">Effacer</button>
+            </div>
+            <div>
+                <div class="tray-label">Nombres</div>
+                <div class="tray" id="numTray"></div>
+            </div>
+            <div>
+                <div class="tray-label">Opérations</div>
+                <div class="tray" id="opTray"></div>
+            </div>
+            <div class="msg" id="msg" role="status"></div>
+            <button class="btn-sky check" id="checkBtn">Valider</button>
+        </div>
+    </main>
+
+    <!-- ─── START OVERLAY ─── -->
+    <div class="overlay open" id="startOverlay">
+        <div class="modal start-modal">
+            <div class="gameover-emoji">🎯</div>
+            <h2 class="start-title">Compte Cible</h2>
+            <p class="start-text">Combine les <strong>nombres tirés</strong> avec des opérations pour obtenir exactement la
+                <strong>cible</strong>.<br>Plus tu es rapide, mieux c'est !
+            </p>
+            <p class="start-keys">Choisis un nombre ou une opération, puis touche une case<br>(ou glisse-la à la
+                souris). Échap : pause</p>
+            <div class="diff-row" id="diffRow" role="group" aria-label="Mode de difficulté">
+                <button class="diff-btn selected" data-level="easy" aria-pressed="true">Facile<span>+ − × ÷</span></button>
+                <button class="diff-btn" data-level="medium" aria-pressed="false">Moyen<span>x² x³ √</span></button>
+                <button class="diff-btn" data-level="hard" aria-pressed="false">Difficile<span>0–99</span></button>
+            </div>
+            <button class="btn-sky" id="playBtn">Jouer</button>
+        </div>
+    </div>
+
+    <!-- ─── PAUSE OVERLAY ─── -->
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary danger" id="abandonBtn">Abandonner</button>
+                <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── FIN DE PARTIE ─── -->
+    <div class="overlay" id="winOverlay">
+        <div class="modal win-modal">
+            <div class="gameover-title win-title" id="winTitle">🎯 Cible atteinte !</div>
+            <div class="win-record" id="winRecord" hidden>🏆 Nouveau record !</div>
+            <div class="win-note" id="winNote" hidden></div>
+
+            <div class="end-label" id="winExprLabel">Ton expression</div>
+            <div class="end-expr" id="winExpr"></div>
+
+            <div class="final-stats">
+                <div class="stat-row" id="rowTime"><span>Temps</span><span class="stat-val" id="winTime">0:00.0</span></div>
+                <div class="stat-row"><span>Meilleur temps</span><span class="stat-val" id="winRecTime">–</span></div>
+                <div class="stat-row"><span>Record mondial</span><span class="stat-val" id="winWorld">–</span></div>
+                <div class="stat-row"><span>Mode</span><span class="stat-val" id="winMode">Facile</span></div>
+            </div>
+            <div class="pause-menu">
+                <button class="btn-sky" id="winAgainBtn">Rejouer</button>
+                <button class="btn-sky secondary" id="winModeBtn">Changer de mode</button>
+                <button class="btn-sky secondary" id="winMenuBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── RÈGLES OVERLAY (placé après les autres : s'ouvre par-dessus) ─── -->
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal">
+            <button class="modal-close" id="rulesClose" aria-label="Fermer">✕</button>
+            <h2>📖 Règles de Compte Cible</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Construis une expression qui donne <strong>exactement</strong> la cible (« = 15 »).</li>
+                    <li>Aucune réponse approximative : le résultat doit être égal à la cible.</li>
+                    <li>Le chrono démarre au début de la partie et s'arrête à la victoire.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🔢 Les nombres</h3>
+                <ul>
+                    <li>Les <strong>nombres tirés</strong> (4 en Facile et Moyen, 6 en Difficile) doivent tous être utilisés <strong>au moins une
+                            fois</strong>.</li>
+                    <li>Un nombre peut être <strong>réutilisé</strong> : ajoute des cases avec <strong>+ case</strong>
+                        (jusqu'à 10 cases).</li>
+                    <li>Un tirage est toujours résoluble.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>➕ Les opérations</h3>
+                <ul>
+                    <li><strong>+ − × ÷</strong> se placent entre deux nombres, avec les priorités habituelles
+                        (× et ÷ d'abord). Pas de parenthèses.</li>
+                    <li>Une <strong>division</strong> doit toujours donner un entier (calcul de gauche à droite).</li>
+                    <li><strong>x²</strong>, <strong>x³</strong> et <strong>√</strong> se placent directement sur un
+                        nombre. Une racine doit donner un entier.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>📐 Modes</h3>
+                <ul>
+                    <li><strong>Facile</strong> : + − × ÷, nombres de 0 à 9. Les résultats intermédiaires restent
+                        positifs.</li>
+                    <li><strong>Moyen</strong> : + − × ÷ x² x³ √, nombres de 0 à 30, intermédiaires négatifs permis.
+                    </li>
+                    <li><strong>Difficile</strong> : comme Moyen, nombres de 0 à 99.</li>
+                    <li>Un meilleur temps et un record mondial par mode.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🖱️ Commandes</h3>
+                <ul>
+                    <li><strong>Toucher / clic</strong> – Choisis un nombre ou une opération, puis une case.</li>
+                    <li><strong>Glisser-déposer</strong> (souris) – Dépose un nombre ou une opération sur une case.</li>
+                    <li><strong>×</strong> sur une case, ou <strong>Effacer</strong> – Retire le contenu.</li>
+                    <li><strong>Valider</strong> (ou Entrée) – Vérifie ton expression.</li>
+                    <li><strong>Échap</strong> – Pause</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── RECORDS OVERLAY ─── -->
+    <div class="overlay" id="recordsOverlay">
+        <div class="modal records-modal">
+            <button class="modal-close" id="recordsClose" aria-label="Fermer">✕</button>
+            <h2 class="records-title">🏆 Records</h2>
+            <div class="diff-row" id="recTabs" role="group" aria-label="Mode">
+                <button class="diff-btn" data-level="easy" aria-pressed="false">Facile</button>
+                <button class="diff-btn" data-level="medium" aria-pressed="false">Moyen</button>
+                <button class="diff-btn" data-level="hard" aria-pressed="false">Difficile</button>
+            </div>
+            <section class="records-section">
+                <h3>👤 Mon meilleur temps</h3>
+                <div class="record-grid">
+                    <div class="record-card"><span class="rc-label">Meilleur temps</span><span class="rc-value"
+                            id="recBest">–</span></div>
+                </div>
+            </section>
+            <section class="records-section">
+                <h3>🌍 Record mondial</h3>
+                <div class="record-grid">
+                    <div class="record-card global"><span class="rc-label">Record mondial</span><span class="rc-value"
+                            id="recWorld">–</span></div>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ─── POPUP RECORD MONDIAL (au-dessus des autres fenêtres) ─── -->
+    <div class="overlay" id="recordMessagePopup">
+        <div class="modal">
+            <h2>🏆 Record mondial !</h2>
+            <p>Tu as battu le record mondial. Laisse un message pour l'histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Ton message..." maxlength="50" autocomplete="off">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <!-- ─── HUD ─── -->
+    <div class="hud">
+        <div class="hud-left">
+            <a href="../../index.html" class="icon-btn" title="Retour au menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </a>
+            <button class="icon-btn" id="rulesBtn" title="Règles du jeu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="score-label">Temps</span>
+            <span class="score-value" id="timeValue">0:00.0</span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recordsBtn" title="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="pauseBtn" title="Pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- INDICATEURS LATÉRAUX -->
+    <div id="bestBadge">Meilleur<span id="bestVal">–</span></div>
+    <div id="heightIndicator">
+        <span class="hi-label">Mode</span>
+        <span class="hi-value" id="modeVal">Facile</span>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

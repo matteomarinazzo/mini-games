@@ -56,31 +56,37 @@ export function stepCar(c, inp, dt) {
   const mu0 = (SURF_G[sA] + SURF_G[sB]) / 2 * c.fg, qb = (SURF_Q[sA] + SURF_Q[sB]) / 2, qv = (SURF_QV[sA] + SURF_QV[sB]) / 2;
   const kerb = sA === 1 || sB === 1;
 
-  const n = 2, h = dt / n; let Fx = 0, Fy = 0;
+  const n = c.u > 220 ? 8 : c.u > 100 ? 5 : 2, h = dt / n; let Fx = 0, Fy = 0;
   for (let k = 0; k < n; k++) {
     const u = c.u, w = c.w, r = c.r, speed = Math.hypot(u, w), sgn = cl(u / .6, -1, 1), ue = Math.max(Math.abs(u), 3), su = u < 0 ? -1 : 1;
-    const down = S.aero * c.fa * speed * speed;
+    const down = Math.min(S.aero * c.fa * speed * speed, m * G * 6);
     // charges : statique + appui aéro + transfert longitudinal ; transfert latéral grossier
     const Nf = m * G * b / L + .45 * down * faf - m * c.ax * S.h / L, Nr = m * G * a / L + .55 * down * far + m * c.ax * S.h / L;
     const tr = m * Math.abs(c.ay) * S.h / S.tw * .5, ltf = Math.min(.9, tr / Math.max(Nf / 2, 300)), ltr = Math.min(.9, tr / Math.max(Nr / 2, 300));
-    const d = (inp.steer * S.steerMax * fs + pull * cl(speed / 20, 0, 1)) / (1 + (speed / S.steerV) ** 2), cd = Math.cos(d), sd = Math.sin(d);
+    const steerSpeedScale = 1 + (speed / S.steerV) ** 2;
+    const d = (inp.steer * S.steerMax * fs + pull * cl(speed / 20, 0, 1)) / steerSpeedScale, cd = Math.cos(d), sd = Math.sin(d);
     // moteur (puissance / vitesse, coupure à vmax, trou de boîte) et freins (répartis selon la charge, léger biais avant)
     let Fd = 0;
-    if (c.shift > 0) c.shift -= h; else if (c.rev) Fd = -inp.brake * 7000 * cl((7 + u) / 2, 0, 1); else Fd = inp.throttle * Math.min(S.power * S.eff * fp / Math.max(u, 4), 1e5 * fp) * cl((S.vmax * fv - u) / 4, 0, 1) * (c.limit ? cl((c.limit - u) / 1.5, 0, 1) : 1);
+    const maxTraction = Math.max(1.2e5, Math.min(3.5e5, S.power * 0.35)) * fp;
+    if (c.shift > 0) c.shift -= h; else if (c.rev) Fd = -inp.brake * 7000 * cl((7 + u) / 2, 0, 1); else Fd = inp.throttle * Math.min(S.power * S.eff * fp / Math.max(u, 2.5), maxTraction) * cl((S.vmax * fv - u) / 4, 0, 1) * (c.limit ? cl((c.limit - u) / 1.5, 0, 1) : 1);
     const Fb = c.rev ? 0 : inp.brake * S.brakeForce * fb, sf = Nf / (Nf + Nr) + .10, brk = Fb > 100;
     const af = Math.atan2(w + a * r, ue) - d * su, ar = Math.atan2(w - b * r, ue);
     const [fxf, fyf] = axle(Nf, S.grip * (1 - .2 * S.understeer) * (1 - .12 * (1 - faf)) * mu0, ltf, -sgn * Fb * sf, af, .12 + .05 * S.understeer, brk);
     const [fxr, fyr] = axle(Nr, S.grip * (S.rearK || 1) * (1 - .08 * S.oversteer) * (1 - .2 * (1 - far)) * mu0, ltr, Fd - sgn * Fb * (1 - sf), ar, .075 + .02 * S.oversteer, brk);
     // traînée (+ traînée induite de l'appui), roulement, sol meuble
-    const kd = (S.drag + .12 * S.aero * c.fa * (faf + far) / 2) * c.fd, q = .15 + qb + qv * speed, rs = speed + .5;
+    const dragFactor = speed > 100 ? Math.max(0.18, 1 - (speed - 100) / 280) : 1;
+    const kd = (S.drag + (speed > 100 ? .08 : .12) * S.aero * c.fa * (faf + far) / 2) * c.fd * dragFactor, q = .15 + qb + qv * speed, rs = speed + .5;
     Fx = fxr + fxf * cd - fyf * sd - kd * speed * u - m * q * u / rs;
     if (inp.rev && !c.rev && u < 0) Fx += m * 6 * cl(-u / 1.5, 0, 1);   // relâcher en marche arrière : la voiture s'arrête
     Fy = fyr + fyf * cd + fxf * sd - kd * speed * w - m * q * w / rs;
     let Mz = a * (fyf * cd + fxf * sd) - b * fyr;
+    Mz -= (S.aero * 15 + m * 0.08) * speed * c.r;   // amortissement aérodynamique en lacet
     if (kerb) { const j = cl(speed / 20, 0, 1); Fy += m * .9 * j * Math.sin(c.t * 53); Mz += 500 * j * Math.sin(c.t * 31 + 1); }
     c.t += h;
-    c.u += (Fx / m + w * r) * h; if (c.limit && c.u > c.limit) c.u = Math.min(c.u, Math.max(c.limit, u - 30 * h));   // pit limiter : plafond dur, décélération max 30 m/s² si on arrive plus vite
-    c.w += (Fy / m - u * r) * h; c.r += Mz / S.iz * h;   // (limiter 80 km/h ci-dessus)
+    c.u += (Fx / m + cl(w * r, -50, 50)) * h; if (c.limit && c.u > c.limit) c.u = Math.min(c.u, Math.max(c.limit, u - 30 * h));   // pit limiter
+    c.w = cl(c.w + (cl(Fy / m, -120, 120) - u * c.r) * h, -45, 45);
+    const rAcc = cl(Mz / S.iz, -60, 60);
+    c.r = cl(c.r + rAcc * h, -5, 5);
     if (Math.abs(c.u) < 6) { const kk = (1 - Math.abs(c.u) / 6) * 10; c.w *= Math.exp(-kk * h); c.r *= Math.exp(-kk * .5 * h); }  // stabilité à l'arrêt
     c.psi += c.r * h;
     const cs = Math.cos(c.psi), sn = Math.sin(c.psi);
@@ -88,8 +94,15 @@ export function stepCar(c, inp, dt) {
   }
   const f1 = Math.min(1, 8 * dt); c.ax += (Fx / m - c.ax) * f1; c.ay += (Fy / m - c.ay) * f1;
 
+  if (!Number.isFinite(c.u) || !Number.isFinite(c.w) || !Number.isFinite(c.r) || !Number.isFinite(c.x) || !Number.isFinite(c.z)) {
+    c.u = 0; c.w = 0; c.r = 0; c.ax = 0; c.ay = 0;
+    const f0 = frameAt(c.s || TRACK.startIdx * TRACK.ds);
+    c.x = f0.x; c.z = f0.z; c.y = f0.y; c.psi = Math.atan2(f0.tz, f0.tx);
+  }
+
   // mur (limite extérieure du gravier) : contact inélastique, on longe en perdant de la vitesse
   let l = locate(c.x, c.z, c.idx);
+  if (!l || !Number.isFinite(l.lat)) l = { i: 0, s: 0, lat: 0, y: 0, tx: 1, tz: 0, cx: 0, cz: 0 };
   const th = c.psi - Math.atan2(l.tz, l.tx), ext = .94 * Math.abs(Math.cos(th)) + 2.3 * Math.abs(Math.sin(th)), sg0 = Math.sign(l.lat) || 1, aa = Math.abs(l.lat), pit = sg0 === PIT.sg;
   let over = aa + ext - (pit ? Math.max(WALL_LAT, TRACK.half + pitExt(l.s)) : WALL_LAT), flip = 1;   // côté stands : la limite suit la zone goudronnée
   const pw = pit && over <= 0 ? pitWall(l.s) : null;                                                 // muret piste / voie rapide

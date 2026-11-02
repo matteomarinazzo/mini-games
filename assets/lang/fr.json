@@ -31,6 +31,7 @@
         "online": "En ligne",
         "offline": "Hors ligne",
         "favorites": "❤️ Favoris",
+        "new_games": "✨ Nouveautés",
         "all": "Tout",
         "random_title": "Jeu Aléatoire",
         "random_desc": "Laisse le hasard choisir ton prochain défi parmi tous nos jeux !",
@@ -306,6 +307,14 @@
             "four-in-a-row": {
                 "name": "Quatre en Ligne",
                 "description": "Aligne 4 pions avant l'adversaire. Contre l'IA, à deux sur le même écran, ou en ligne."
+            },
+            "target-count": {
+                "name": "Compte Cible",
+                "description": "Combine les nombres tirés avec des opérations pour obtenir exactement la cible, le plus vite possible. Trois modes, du plus simple au plus corsé."
+            },
+            "escape-game": {
+                "name": "Escape Game",
+                "description": "Enfermé dans une salle sombre, fouille chaque recoin, déchiffre les indices et trouve le code de la porte avant d'épuiser tes essais. Les salles s'enchaînent : jusqu'où iras-tu ?"
             }
         },
         "badges": {

@@ -212,6 +212,23 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "escape-game": {
+      "path": "./games/escape-game/index.html",
+      "name": "Escape Game",
+      "emoji": "🗝️",
+      "description": "Enfermé dans une salle sombre, fouille chaque recoin, déchiffre les indices et trouve le code de la porte avant d'épuiser tes essais. Les salles s'enchaînent : jusqu'où iras-tu ?",
+      "tags": [
+        "exploration",
+        "puzzle",
+        "reflexion",
+        "observation",
+        "solo"
+      ],
+      "badge": "adventure",
+      "badgeText": "Aventure",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "lostBelow": {
       "path": "./games/lostBelow/index.html",
       "name": "Lost Below",
@@ -331,6 +348,23 @@
       "tags": [
         "logic",
         "puzzle",
+        "reflexion",
+        "solo"
+      ],
+      "badge": "brain",
+      "badgeText": "Casse-tête",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "target-count": {
+      "path": "./games/target-count/index.html",
+      "name": "Compte Cible",
+      "emoji": "🎯",
+      "description": "Combine les nombres tirés avec des opérations pour obtenir exactement la cible, le plus vite possible. Trois modes, du plus simple au plus corsé.",
+      "tags": [
+        "logic",
+        "puzzle",
+        "numbers",
         "reflexion",
         "solo"
       ],

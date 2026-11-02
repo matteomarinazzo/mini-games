@@ -501,7 +501,9 @@ function frame(ts) {
   const a = acc / DT, p = drv.prev;
   me.x = p.x + (drv.x - p.x) * a; me.y = p.y + (drv.y - p.y) * a; me.z = p.z + (drv.z - p.z) * a; me.psi = p.psi + wrap(drv.psi - p.psi) * a;
   me.pitch = drv.pitch; me.roll = drv.roll;
-  camPsi += wrap(me.psi - camPsi) * (1 - Math.exp(-(set.view === 'cockpit' || set.view === 'front' ? 12 : 5) * dt));
+  if (!Number.isFinite(camPsi)) camPsi = me.psi || 0;
+  camPsi += wrap((me.psi || 0) - camPsi) * (1 - Math.exp(-(set.view === 'cockpit' || set.view === 'front' ? 12 : 5) * dt));
+  if (!Number.isFinite(camPsi)) camPsi = me.psi || 0;
   const fx = Math.cos(camPsi), fz = Math.sin(camPsi), rx = -fz, rz = fx;
   let cx, cz, cy, tx, tz, ty;
   if (set.view === 'cockpit') {
@@ -521,6 +523,10 @@ function frame(ts) {
     const safeGroundY = Math.min(camY + 1.8, groundH + 1);
     cy = Math.max(camY, safeGroundY);
     tx = me.x + fx * 10; tz = me.z + fz * 10; ty = camT;
+  }
+  if (!Number.isFinite(cx) || !Number.isFinite(cy) || !Number.isFinite(cz) || !Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(tz)) {
+    cx = me.x - fx * 8.5; cy = me.y + 3.1; cz = me.z - fz * 8.5;
+    tx = me.x; ty = me.y + 1; tz = me.z;
   }
   if (set.view === 'cockpit') cockpitTick();
   cam.look(cx, cy, cz, tx, ty, tz);

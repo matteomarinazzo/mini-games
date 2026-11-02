@@ -22,6 +22,7 @@ export const SKY = { hor: [.72, .82, .92], zen: [.2, .42, .78] };
 export function createCamera(fov = 65, near = .5, far = 5000) {
   const c = { fov, near, far, aspect: 1, pos: [0, 0, 0], f: [0, 0, -1], r: [1, 0, 0], u: [0, 1, 0], vp: new Float32Array(16) };
   c.look = (ex, ey, ez, tx, ty, tz) => {
+    if (!Number.isFinite(ex) || !Number.isFinite(ey) || !Number.isFinite(ez) || !Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(tz)) return;
     let fx = tx - ex, fy = ty - ey, fz = tz - ez; const fl = Math.hypot(fx, fy, fz) || 1; fx /= fl; fy /= fl; fz /= fl;
     let rx = -fz, rz = fx; const rl = Math.hypot(rx, rz) || 1; rx /= rl; rz /= rl;
     const ux = -rz * fy, uy = rz * fx - rx * fz, uz = rx * fy;

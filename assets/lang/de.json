@@ -31,6 +31,7 @@
         "online": "Online",
         "offline": "Offline",
         "favorites": "❤️ Favoriten",
+        "new_games": "✨ Neuheiten",
         "all": "Alle",
         "random_title": "Zufälliges Spiel",
         "random_desc": "Lass das Schicksal deine nächste Herausforderung aus allen unseren Spielen wählen!",
@@ -307,6 +308,14 @@
             "four-in-a-row": {
                 "name": "Vier in einer Reihe",
                 "description": "Bringe 4 Steine vor dem Gegner ins Zentrum. Gegen die KI, zu zweit auf demselben Bildschirm oder online."
+            },
+            "target-count": {
+                "name": "Zielzahl",
+                "description": "Kombiniere die gezogenen Zahlen mit Operationen, um genau die Zielzahl zu erreichen, so schnell wie möglich. Drei Modi, vom einfachsten bis zum schwierigsten."
+            },
+            "escape-game": {
+                "name": "Fluchtspiel",
+                "description": "Eingesperrt in einem dunklen Raum, durchsuche jede Ecke, entschlüssele die Hinweise und finde den Türcode, bevor dir die Versuche ausgehen. Die Räume reihen sich aneinander: wie weit wirst du kommen?"
             }
         },
         "badges": {

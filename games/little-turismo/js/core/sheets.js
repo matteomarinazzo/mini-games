@@ -34,30 +34,113 @@ const L = [
     car('rallye', 'Rallye 4×4', 'rally', [.9, .58, .08], { mass: 1380, vmax: 78, power: 420000, brakeForce: 24500, grip: 1.62, understeer: .3, oversteer: .18, aero: .65, drag: .62, a: 1.3, b: 1.42, h: .62, tw: 1.7, iz: 3100, steerV: 28, rearK: 1.12, sc: [1, 1, 1] }),
     car('baroudeur', 'Baroudeur', 'rally', [.1, .3, .9], { mass: 1320, vmax: 76, power: 400000, brakeForce: 24000, grip: 1.7, aero: .7, drag: .62, a: 1.3, b: 1.42, h: .62, tw: 1.7, iz: 3000, steerV: 28, rearK: 1.1, accent: [1, .8, .1] }),
     car('safari', 'Safari', 'rally', [.85, .8, .7], { mass: 1450, vmax: 74, power: 440000, brakeForce: 25000, grip: 1.55, aero: .6, drag: .65, a: 1.32, b: 1.42, h: .66, tw: 1.72, steerV: 27, rearK: 1.08, sc: [1.02, 1.04, 1], accent: [.8, .1, .1] }),
+    // dragster
+    car('top_fuel', 'Top Fuel Drag', 'drag', [.1, .1, .12], { mass: 980, vmax: 165, power: 5500000, brakeForce: 42000, grip: 3.2, aero: 4.8, drag: .36, a: .7, b: 2.6, h: .32, tw: 1.9, eff: .96, steerMax: .36, steerV: 44, rearK: 1.5, understeer: .45, oversteer: .1, accent: [.95, .18, .05], sc: [1, 1, 1] }),
+    // concept car supersonique
+    car('thrust_ssc', 'ThrustSSC', 'thrust', [.08, .09, .11], { mass: 10500, vmax: 341.1, power: 77963000, brakeForce: 180000, grip: 2.5, aero: 3.5, drag: .16, a: 1.2, b: 3.8, h: .35, tw: 2.8, eff: .98, steerMax: .26, steerV: 55, rearK: 1.35, understeer: .2, oversteer: .1, accent: [.85, .88, .92], sc: [1.3, .9, 1.55] }),
 ];
 for (const S of L) CARS[S.id] = fin(S);
 Object.assign(CARS.serra_gt, { kind: 'gt' });
 export const look = (S) => ({ color: S.color || [.95, .42, .1], sc: S.sc || [1, 1, 1], kind: S.kind || 'gt', accent: S.accent || [.96, .96, .96] });
 
 // --- Voitures personnalisées (créées dans le menu Conception, stockées dans localStorage via config.js)
-export const KIND_LIST = [['gt', 'GT'], ['wedge', 'Hypercar'], ['proto', 'Prototype'], ['rally', 'Rallye'], ['open', 'Monoplace']];
-/** [clé, libellé, min, max, pas, unité] */
-export const SPEC = [['vmax', 'Vitesse max', 150, 400, 5, ' km/h'], ['ch', 'Puissance', 200, 1500, 10, ' ch'], ['mass', 'Masse', 500, 1800, 10, ' kg'], ['grip', 'Adhérence', 1, 3.5, .05, ''], ['aero', 'Appui aéro', .3, 4.5, .1, ''], ['bal', 'Équilibre : sous-virage ↔ survirage', 0, 1, .05, '']];
+export const KIND_LIST = [['gt', 'GT'], ['wedge', 'Hypercar'], ['proto', 'Prototype'], ['rally', 'Rallye'], ['open', 'Monoplace'], ['drag', 'Dragster'], ['thrust', 'Supersonique']];
+
+export const SPEC_DEFS = [
+    ['vmax', 'Vitesse max', ' km/h'],
+    ['ch', 'Puissance', ' ch'],
+    ['mass', 'Masse', ' kg'],
+    ['grip', 'Adhérence', ''],
+    ['aero', 'Appui aéro', ''],
+    ['bal', 'Équilibre : sous-virage ↔ survirage', ''],
+];
+
+/** Plages de réglage [min, max, pas] cohérentes et hiérarchisées par type de voiture */
+export const KIND_RANGES = {
+    rally: {
+        vmax: [140, 260, 5],
+        ch: [250, 600, 10],
+        mass: [1100, 1600, 10],
+        grip: [1.2, 2.0, .05],
+        aero: [.3, 1.4, .1],
+        bal: [0, 1, .05],
+    },
+    gt: {
+        vmax: [180, 360, 5],
+        ch: [300, 950, 10],
+        mass: [1050, 1800, 10],
+        grip: [1.2, 2.2, .05],
+        aero: [.4, 2.4, .1],
+        bal: [0, 1, .05],
+    },
+    wedge: {
+        vmax: [240, 440, 5],
+        ch: [500, 1800, 20],
+        mass: [950, 1650, 10],
+        grip: [1.3, 2.6, .05],
+        aero: [.6, 3.2, .1],
+        bal: [0, 1, .05],
+    },
+    proto: {
+        vmax: [260, 420, 5],
+        ch: [550, 1300, 20],
+        mass: [800, 1150, 10],
+        grip: [1.5, 3.0, .05],
+        aero: [1.2, 4.2, .1],
+        bal: [0, 1, .05],
+    },
+    open: {
+        vmax: [280, 500, 5],
+        ch: [500, 1600, 20],
+        mass: [500, 900, 10],
+        grip: [1.7, 4.0, .05],
+        aero: [1.4, 5.5, .1],
+        bal: [0, 1, .05],
+    },
+    drag: {
+        vmax: [350, 750, 10],
+        ch: [3000, 15000, 100],
+        mass: [650, 1400, 10],
+        grip: [2.5, 5.5, .05],
+        aero: [2.0, 7.0, .1],
+        bal: [0, 1, .05],
+    },
+    thrust: {
+        vmax: [600, 1228, 1],
+        ch: [20000, 106000, 500],
+        mass: [5000, 12000, 50],
+        grip: [2.0, 4.5, .05],
+        aero: [2.0, 8.0, .1],
+        bal: [0, 1, .05],
+    },
+};
+
+export const getSpecRange = (kind, key) => (KIND_RANGES[kind] || KIND_RANGES.gt)[key] || [0, 1, .05];
+/** Format rétrocompatible [clé, libellé, min, max, pas, unité] pour initialisation générale */
+export const SPEC = SPEC_DEFS.map(([k, label, u]) => [k, label, KIND_RANGES.gt[k][0], KIND_RANGES.gt[k][1], KIND_RANGES.gt[k][2], u]);
+
 const GEO = {
     gt: { a: 1.25, b: 1.45, h: .5, tw: 1.6, drag: .55, steerMax: .5, steerV: 30 },
     wedge: { a: 1.18, b: 1.4, h: .44, tw: 1.6, drag: .5, steerMax: .5, steerV: 30 },
     proto: { a: 1.12, b: 1.5, h: .42, tw: 1.72, drag: .5, steerMax: .49, steerV: 31, eff: .92 },
     rally: { a: 1.3, b: 1.42, h: .62, tw: 1.7, drag: .62, steerMax: .5, steerV: 28 },
     open: { a: 1.05, b: 1.55, h: .38, tw: 1.8, drag: .48, steerMax: .48, steerV: 32, eff: .92 },
+    drag: { a: .7, b: 2.6, h: .32, tw: 1.9, drag: .35, steerMax: .38, steerV: 42, eff: .96, rearK: 1.48 },
+    thrust: { a: 1.2, b: 3.8, h: .35, tw: 2.8, drag: .16, steerMax: .26, steerV: 55, eff: .98, rearK: 1.35 },
 };
 const rgb = (h) => (/^#[0-9a-f]{6}$/i.test(h) ? [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255) : [.9, .2, .1]);
-const val = (d, k) => { const s = SPEC.find((q) => q[0] === k), v = parseFloat(d[k]); return Math.max(s[2], Math.min(s[3], Number.isFinite(v) ? v : s[2])); };
-/** Définition { id, name, kind, color '#rrggbb', accent, vmax km/h, ch, mass, grip, aero, bal 0–1 } → fiche physique complète. */
+const val = (d, k, kind) => {
+    const [min, max] = getSpecRange(kind, k);
+    const v = parseFloat(d[k]);
+    return Math.max(min, Math.min(max, Number.isFinite(v) ? v : min));
+};
+/** Définition { id, name, kind, color '#rrggbb', accent, vmax km/h, ch, mass, grip, aero, bal 0–1 } → fiche physique complète (validée et clampée). */
 export function customSheet(d) {
-    const kind = GEO[d.kind] ? d.kind : 'gt', mass = val(d, 'mass'), grip = val(d, 'grip'), bal = val(d, 'bal');
+    const kind = GEO[d.kind] ? d.kind : 'gt';
+    const mass = val(d, 'mass', kind), grip = val(d, 'grip', kind), bal = val(d, 'bal', kind);
     return fin(car(String(d.id), String(d.name || 'Ma voiture').slice(0, 16), kind, rgb(d.color), {
-        ...GEO[kind], mass, grip, vmax: val(d, 'vmax') / 3.6, power: val(d, 'ch') * 735.5, brakeForce: Math.round(mass * grip * 11.5),
-        aero: val(d, 'aero'), understeer: 1 - bal, oversteer: bal, accent: rgb(d.accent),
+        ...GEO[kind], mass, grip, vmax: val(d, 'vmax', kind) / 3.6, power: val(d, 'ch', kind) * 735.5, brakeForce: Math.round(mass * grip * 12.5),
+        aero: val(d, 'aero', kind), understeer: 1 - bal, oversteer: bal, accent: rgb(d.accent),
     }));
 }
 export const registerCustom = (d) => (CARS[d.id] = customSheet(d));

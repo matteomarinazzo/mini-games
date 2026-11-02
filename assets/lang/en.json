@@ -31,6 +31,7 @@
         "online": "Online",
         "offline": "Offline",
         "favorites": "❤️ Favorites",
+        "new_games": "✨ New Games",
         "all": "All",
         "random_title": "Random Game",
         "random_desc": "Let fate pick your next challenge from all our games!",
@@ -307,6 +308,14 @@
             "four-in-a-row": {
                 "name": "Four in a Row",
                 "description": "Line up 4 pawns before the opponent. Against AI, two on the same screen, or online."
+            },
+            "target-count": {
+                "name": "Target Count",
+                "description": "Combine the numbers drawn with operations to get exactly the target, as quickly as possible. Three modes, from the simplest to the most difficult."
+            },
+            "escape-game": {
+                "name": "Escape Game",
+                "description": "Trapped in a dark room, search every corner, decipher the clues and find the door code before running out of tries. Rooms keep coming: how far will you go?"
             }
         },
         "badges": {

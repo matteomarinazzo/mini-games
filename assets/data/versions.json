@@ -1,7 +1,23 @@
 {
-    "currentVersion": "1.47.2026-11-01",
-    "lastUpdate": "2026-11-01",
+    "currentVersion": "1.49.2026-11-02",
+    "lastUpdate": "2026-11-02",
     "history": [
+        {
+            "version": "1.49.2026-11-02",
+            "date": "2026-11-02",
+            "changes": [
+                "Ajout du jeu Escape Game",
+                "Ajout des jeux avec balises 'nouveauté'",
+                "Ajout de drag et supersonic cars dans Little Turismo"
+            ]
+        },
+        {
+            "version": "1.48.2026-11-01",
+            "date": "2026-11-01",
+            "changes": [
+                "Ajout du jeu Compte Cible"
+            ]
+        },
         {
             "version": "1.47.2026-11-01",
             "date": "2026-11-01",

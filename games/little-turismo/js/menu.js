@@ -2,7 +2,7 @@ import { CIRCUITS, circuitList, loadTracks, saveTracks, CAR_LIST, DIFFS, loadSav
 import { trackOf } from './core/track.js';
 import { drawTrack, startMark, stats } from './core/map.js';
 import { CARS } from './core/physics.js';
-import { look, customSheet, registerCustom, KIND_LIST, SPEC } from './core/sheets.js';
+import { look, customSheet, registerCustom, KIND_LIST, SPEC, getSpecRange } from './core/sheets.js';
 import { createTrackEditor, THEMES, stadium } from './core/track-editor.js';
 import * as Net from './net.js';
 
@@ -134,7 +134,54 @@ function carPreview(x, c) {
     x.fillStyle = col; rr(x, -102, -39, 206, 78, 10); x.fillStyle = ac; x.fillRect(-98, -5, 196, 10);
     x.fillStyle = G; rr(x, -52, -31, 98, 62, 8); x.fillStyle = col; rr(x, -42, -26, 72, 52, 6);
     x.fillStyle = '#ffe9a0'; for (const dy of [-20, -7, 7, 20]) rr(x, 40, dy - 4, 6, 8, 2);
-    x.fillStyle = D; rr(x, -114, -46, 12, 92, 2);
+  } else if (k === 'drag') {
+    wh([[96, -26, 22, 10], [96, 26, 22, 10], [-65, -46, 52, 28], [-65, 46, 52, 28]]);
+    x.strokeStyle = D; x.lineWidth = 3; x.beginPath(); x.moveTo(-90, -12); x.lineTo(-124, -8); x.moveTo(-90, 12); x.lineTo(-124, 8); x.stroke();
+    x.fillStyle = '#ee3322'; rr(x, -127, -10, 5, 4, 1); rr(x, -127, 6, 5, 4, 1);
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(116, 0); x.lineTo(95, -12); x.lineTo(-38, -16); x.lineTo(-65, -28); x.lineTo(-94, -28); x.lineTo(-98, -20);
+    x.lineTo(-98, 20); x.lineTo(-94, 28); x.lineTo(-65, 28); x.lineTo(-38, 16); x.lineTo(95, 12); x.closePath();
+    x.fill();
+    x.fillStyle = ac; x.fillRect(-35, -4, 138, 8);
+    x.fillStyle = G; rr(x, -38, -11, 36, 22, 6); x.fillStyle = col; rr(x, -28, -7, 20, 14, 3);
+    x.fillStyle = D; rr(x, 2, -14, 28, 28, 4);
+    x.fillStyle = '#ee2211'; rr(x, 14, -8, 14, 16, 2);
+    x.fillStyle = '#ff7722'; for (let i = 0; i < 4; i++) { x.fillRect(4 + i * 5, -17, 3, 3); x.fillRect(4 + i * 5, 14, 3, 3); }
+    x.fillStyle = D; rr(x, 100, -28, 8, 56, 2);
+    x.fillStyle = D; rr(x, -88, -48, 24, 96, 3);
+    x.fillStyle = col; rr(x, -86, -46, 20, 92, 2);
+    x.fillStyle = ac; rr(x, -92, -49, 30, 4, 2); rr(x, -92, 45, 30, 4, 2); rr(x, -82, -2, 22, 4, 1);
+  } else if (k === 'thrust') {
+    // ThrustSSC : double réacteurs Spey latéraux, fuselage aiguille, roues pleines alu, grand empennage arrière
+    wh([[44, -46, 26, 11], [44, 46, 26, 11], [-84, -14, 26, 11], [-84, 14, 26, 11]]);
+    x.fillStyle = '#dde3ea';
+    rr(x, 32, -50, 24, 8, 2); rr(x, 32, 42, 24, 8, 2); rr(x, -96, -17, 24, 6, 2); rr(x, -96, 11, 24, 6, 2);
+    // Fuselage aiguille central
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(135, 0); x.lineTo(95, -10); x.lineTo(-105, -16); x.lineTo(-120, -12);
+    x.lineTo(-120, 12); x.lineTo(-105, 16); x.lineTo(95, 10); x.closePath();
+    x.fill();
+    // Sonde pitot supersonique
+    x.fillStyle = '#cfd4dc'; x.fillRect(135, -2, 22, 4);
+    // Double turboréacteurs Rolls-Royce Spey
+    for (const dy of [-38, 38]) {
+      x.fillStyle = col; rr(x, -95, dy - 14, 168, 28, 8);
+      x.fillStyle = '#b0b8c4'; rr(x, 68, dy - 13, 8, 26, 3);
+      x.fillStyle = D; rr(x, 60, dy - 11, 8, 22, 2);
+      x.fillStyle = '#282c34'; rr(x, -108, dy - 12, 14, 24, 2);
+      x.fillStyle = '#ff5511'; rr(x, -114, dy - 9, 7, 18, 2);
+      x.fillStyle = '#ffee44'; rr(x, -112, dy - 5, 4, 10, 1);
+    }
+    // Cockpit
+    x.fillStyle = G; rr(x, 0, -8, 42, 16, 5); x.fillStyle = col; rr(x, 10, -5, 22, 10, 3);
+    // Bande de fuselage
+    x.fillStyle = ac; x.fillRect(-85, -3, 175, 6);
+    // Empennage vertical arrière
+    x.fillStyle = D; rr(x, -118, -4, 45, 8, 2); x.fillStyle = col; rr(x, -114, -2, 38, 4, 1);
+    // Parachutes
+    x.fillStyle = '#ee3322'; rr(x, -122, -6, 4, 4, 1); rr(x, -122, 2, 4, 4, 1);
   } else {
     wh([[59, -41, 30, 14], [59, 41, 30, 14], [-57, -41, 30, 14], [-57, 41, 30, 14]]);
     x.fillStyle = D; rr(x, -108, -40, 10, 80, 2); rr(x, 92, -32, 10, 64, 2);
@@ -183,7 +230,7 @@ addEventListener('keydown', (e) => {
 // ── Conception de voiture : création / édition (stockée dans localStorage), test sur le circuit choisi (contre la montre).
 const MAX_CUSTOM = 12;
 const carName = (id) => (CAR_LIST.find((c) => c.id === id) || loadCustom().find((c) => c.id === id) || CAR_LIST[0]).name;
-const newDef = () => ({ id: 'c_' + Date.now().toString(36), name: 'Ma voiture', kind: 'gt', color: '#e5352b', accent: '#f5f5f5', vmax: 300, ch: 600, mass: 1250, grip: 1.5, aero: 1.1, bal: .5 });
+const newDef = () => ({ id: 'c_' + Date.now().toString(36), name: 'Ma voiture', kind: 'gt', color: '#e5352b', accent: '#f5f5f5', vmax: 280, ch: 500, mass: 1250, grip: 1.5, aero: 1.1, bal: .5 });
 const dzEl = {};
 for (const [k, label, mn, mx, st, u] of SPEC) {
   const d = document.createElement('div'); d.className = 'lbl';
@@ -192,7 +239,23 @@ for (const [k, label, mn, mx, st, u] of SPEC) {
   const i = d.querySelector('input'); i.min = mn; i.max = mx; i.step = st;
   dzEl[k] = { i, o: d.querySelector('output'), u, mn, mx }; $(SPEC.findIndex((q) => q[0] === k) < 3 ? 'dzSliders' : 'dzSliders2').appendChild(d);
 }
-for (const [k, n] of KIND_LIST) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.k = k; b.textContent = n; b.addEventListener('click', () => { if (dz) { dz.kind = k; dzDraw(); } }); $('dzKind').appendChild(b); }
+function dzUpdateRanges() {
+  if (!dz) return;
+  const kind = dz.kind || 'gt';
+  for (const k in dzEl) {
+    const [mn, mx, st] = getSpecRange(kind, k);
+    const e = dzEl[k];
+    e.mn = mn; e.mx = mx;
+    e.i.min = mn; e.i.max = mx; e.i.step = st;
+    dz[k] = Math.max(mn, Math.min(mx, Number.isFinite(dz[k]) ? dz[k] : mn));
+    e.i.value = dz[k];
+  }
+}
+for (const [k, n] of KIND_LIST) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.k = k; b.textContent = n;
+  b.addEventListener('click', () => { if (dz) { dz.kind = k; dzUpdateRanges(); dzDraw(); } });
+  $('dzKind').appendChild(b);
+}
 const fillCirc = (el) => { el.textContent = ''; for (const c of circuitList()) el.add(new Option(c.name, c.id)); };
 function dzRead() { dz.name = $('dzName').value; dz.color = $('dzColor').value; dz.accent = $('dzAccent').value; for (const k in dzEl) dz[k] = parseFloat(dzEl[k].i.value); }
 function dzDraw() {
@@ -204,7 +267,7 @@ function dzDraw() {
 }
 function fillDz() {
   $('dzName').value = dz.name; $('dzColor').value = dz.color; $('dzAccent').value = dz.accent;
-  for (const k in dzEl) dzEl[k].i.value = dz[k];
+  dzUpdateRanges();
   fillCirc($('dzCircuit')); $('dzCircuit').value = cfg.circuit; $('dzDel').hidden = !loadCustom().some((c) => c.id === dz.id); dzDraw();
 }
 const openDz = (d, from) => { dzFrom = from; dz = { ...newDef(), ...d }; fillDz(); location.hash = 'designer'; };

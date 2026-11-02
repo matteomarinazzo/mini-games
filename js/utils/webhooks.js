@@ -193,9 +193,10 @@ export async function notifyNewPlayer() {
 export async function notifyGameLaunch(gameId, gameName) {
     const uid = await getFirebaseUid();
     const userName = localStorage.getItem("mg_player_name") || "Anonyme";
+    const totalMin = localStorage.getItem("mg_stat_play_time_min") || "0";
     const version = await getAppVersion();
     await sendDiscordMessage(
-        `🎮 **Lancement : ${gameName || gameId}**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
+        `🎮 **Lancement : ${gameName || gameId}**\n👤 UID : \`${uid}\`\n👤 Nom : \`${userName}\`\n📦 Version : \`${version}\`\n⏱️ Temps total joué : \`${totalMin} min\`\n🕒 Heure : ${new Date().toLocaleTimeString()}\n_ _`
     );
 }
 

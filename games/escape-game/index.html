@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Escape Game – salles infinies en 3D | Mini‑Games</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow">
+    <meta name="description"
+        content="Fouille des salles en 3D, déduis le code, ouvre le coffre et trouve la clé. Trois essais par salle, salles infinies. Gratuit sur Mini‑Games.">
+
+    <link rel="canonical" href="https://mini-games.ch/games/escape-game/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Escape Game – salles infinies en 3D | Mini‑Games">
+    <meta property="og:description" content="Fouille, assemble le code, prends la clé, enchaîne les salles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mini-games.ch/games/escape-game/">
+    <meta property="og:image" content="https://mini-games.ch/assets/logos/escape-game.webp">
+    <meta property="og:site_name" content="Mini‑Games">
+    <meta property="og:locale" content="fr_CH">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Escape Game – salles infinies en 3D | Mini‑Games">
+    <meta name="twitter:description" content="Fouille, assemble le code, prends la clé, enchaîne les salles.">
+    <meta name="twitter:image" content="https://mini-games.ch/assets/logos/escape-game.webp">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context":"https://schema.org",
+        "@type":"VideoGame",
+        "name":"Escape Game",
+        "url":"https://mini-games.ch/games/escape-game/",
+        "description":"Salles infinies en 3D : fouille, codes, coffre et clé.",
+        "applicationCategory":"Game",
+        "operatingSystem":"Any",
+        "genre":["Puzzle","Adventure"],
+        "inLanguage":"fr",
+        "publisher":{
+            "@type":"Organization",
+            "name":"Mini‑Games"
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+    <canvas id="gameCanvas" aria-label="Vue à la première personne de la salle"></canvas>
+    <div id="vig"></div>
+    <div id="reticle"></div>
+    <div id="inv" class="inv" hidden></div>
+    <div id="toast"></div>
+    <div id="fade"></div>
+
+    <div class="hud">
+        <div class="hud-left">
+            <button class="icon-btn" id="retourBtn" title="Retour" aria-label="Retour" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="rulesBtn" title="Livret (R)" aria-label="Livret">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+            </button>
+            <button class="icon-btn" id="noteBtn" title="Carnet (C)" aria-label="Carnet" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="3" width="14" height="18" rx="2" />
+                    <line x1="9" y1="8" x2="15" y2="8" />
+                    <line x1="9" y1="12" x2="15" y2="12" />
+                    <line x1="9" y1="16" x2="13" y2="16" />
+                </svg>
+            </button>
+        </div>
+        <div class="hud-center">
+            <span class="chrono" id="chrono">00:00</span>
+            <span class="hud-sub"><span id="roomLbl">Salle –</span> · <span id="tryLbl">Essais 3</span></span>
+        </div>
+        <div class="hud-right">
+            <button class="icon-btn" id="recBtn" title="Records" aria-label="Records">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </button>
+            <button class="icon-btn hint-btn" id="hintBtn" title="Indice (I)" aria-label="Indice" disabled>Indice <b
+                    id="hintN">3</b></button>
+            <button class="icon-btn" id="pauseBtn" title="Pause" aria-label="Pause" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="act-btn" id="searchBtn" hidden>Fouiller</button>
+
+    <div class="pad" id="pad">
+        <button class="pad-btn up" data-act="fwd" aria-label="Avancer">▲</button>
+        <button class="pad-btn lf" data-act="left" aria-label="Pas à gauche">◀</button>
+        <button class="pad-btn dn" data-act="back" aria-label="Reculer">▼</button>
+        <button class="pad-btn rt" data-act="right" aria-label="Pas à droite">▶</button>
+    </div>
+
+    <div class="menu open" id="startScreen">
+        <div class="modal start-modal">
+            <div class="start-emoji">🗝️</div>
+            <h1 class="start-title">Escape Game</h1>
+            <p class="start-text">Fouille ce qui est décalé, croise tes pages, ouvre le coffre, <strong>prends la
+                    clé</strong> et passe la porte.
+                Les salles ne s’arrêtent jamais.</p>
+            <p class="gl-msg" id="glMsg" hidden>Ton navigateur ne prend pas en charge WebGL : le jeu ne peut pas
+                démarrer ici.</p>
+            <div class="pause-menu">
+                <button class="btn-sky" id="playBtn">Jouer</button>
+                <button class="btn-sky" id="continueBtn" hidden>Continuer</button>
+                <button class="btn-sky secondary" id="recordsBtn">Records</button>
+                <button class="btn-sky secondary" id="rulesBtn2">Livret</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+        <div class="modal">
+            <h2>Pause</h2>
+            <div class="pause-menu">
+                <button class="btn-sky" id="resumeBtn">Reprendre</button>
+                <button class="btn-sky secondary" id="giveUpBtn">Abandonner</button>
+                <button class="btn-sky secondary" id="menuBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="confOverlay">
+        <div class="modal">
+            <h2>Quitter la partie ?</h2>
+            <p class="start-text">Ton score sera enregistré et tu reviendras à l’écran titre.</p>
+            <div class="pause-menu">
+                <button class="btn-sky" id="confYes">Quitter</button>
+                <button class="btn-sky secondary" id="confNo">Continuer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="rulesOverlay">
+        <div class="modal livret">
+            <button class="modal-close" id="rulesClose" aria-label="Fermer">✕</button>
+            <h2>📖 Livret</h2>
+            <div class="lv-tabs">
+                <button class="lv-tab on" data-t="i">Jeu</button><button class="lv-tab"
+                    data-t="k">Touches</button><button class="lv-tab" data-t="r">Romain</button><button class="lv-tab"
+                    data-t="b">Binaire</button><button class="lv-tab" data-t="br">Braille</button><button class="lv-tab"
+                    data-t="m">Morse</button>
+            </div>
+            <div class="lv-pg" id="lv-i">
+                <ul>
+                    <li><strong>Regarde</strong> librement. <strong>Fouille</strong> ce qui est devant toi : un document
+                        s’ouvre en page, et le carnet le garde.</li>
+                    <li>À chaque instant, un seul objet répond. Les autres ne bougent pas : à toi de comprendre lequel.
+                    </li>
+                    <li>Deux tiroirs à 2 chiffres, puis le coffre à 4 chiffres qui garde la clé ; la porte veut cette
+                        clé. Un code n’est jamais écrit : il se <strong>déduit</strong> des pages déjà lues.</li>
+                    <li><strong>3 essais</strong> par verrou, remis à 3 quand il s’ouvre ; <strong>3 indices</strong>
+                        par salle, valables pour l’étape en cours.</li>
+                    <li>La plaque sur le mur indique le numéro de la salle. Ce n’est jamais un indice.</li>
+                    <li>Le score est le nombre de salles ; à égalité, le temps le plus court gagne.</li>
+                </ul>
+            </div>
+            <div class="lv-pg" id="lv-k" hidden>
+                <ul>
+                    <li><strong>Se déplacer</strong> : WASD, ZQSD ou flèches. Souris : clique pour regarder.</li>
+                    <li><strong>E</strong>, clic ou bouton : fouiller.</li>
+                    <li><strong>C</strong> carnet · <strong>I</strong> indice · <strong>R</strong> livret.</li>
+                    <li><strong>Échap</strong> ferme la page ouverte, puis le carnet, puis met en pause.</li>
+                    <li><strong>Mobile</strong> : glisse pour regarder, pad pour avancer, bouton rond pour fouiller.
+                    </li>
+                </ul>
+            </div>
+            <div class="lv-pg" id="lv-r" hidden>
+                <p class="lv-t">I = 1, V = 5, X = 10, L = 50. Forme standard, pas de IIII. XIV = 14.</p>
+                <p class="lv-t">I = 1 · II = 2 · III = 3 · IV = 4 · V = 5 · VI = 6 · VII = 7 · VIII = 8 · IX = 9</p>
+            </div>
+            <div class="lv-pg" id="lv-b" hidden>
+                <p class="lv-t">4 lampes par chiffre, lues de gauche à droite. ● = 1, ○ = 0. Jamais au-dessus de 9.</p>
+                <p class="lv-t">0000 = 0 · 0001 = 1 · 0010 = 2 · 0011 = 3 · 0100 = 4 · 0101 = 5 · 0110 = 6 · 0111 = 7 ·
+                    1000 = 8 · 1001 = 9</p>
+            </div>
+            <div class="lv-pg" id="lv-br" hidden>
+                <p class="lv-t">Chiffres 0 à 9. Cellule de 6 points : deux colonnes de trois. ● = point plein.</p>
+                <div class="brg">
+                    <div class="brc"><b>0</b>
+                        <pre>○●
+●●
+○○</pre>
+                    </div>
+                    <div class="brc"><b>1</b>
+                        <pre>●○
+○○
+○○</pre>
+                    </div>
+                    <div class="brc"><b>2</b>
+                        <pre>●○
+●○
+○○</pre>
+                    </div>
+                    <div class="brc"><b>3</b>
+                        <pre>●●
+○○
+○○</pre>
+                    </div>
+                    <div class="brc"><b>4</b>
+                        <pre>●●
+○●
+○○</pre>
+                    </div>
+                    <div class="brc"><b>5</b>
+                        <pre>●○
+○●
+○○</pre>
+                    </div>
+                    <div class="brc"><b>6</b>
+                        <pre>●●
+●○
+○○</pre>
+                    </div>
+                    <div class="brc"><b>7</b>
+                        <pre>●●
+●●
+○○</pre>
+                    </div>
+                    <div class="brc"><b>8</b>
+                        <pre>●○
+●●
+○○</pre>
+                    </div>
+                    <div class="brc"><b>9</b>
+                        <pre>○●
+●○
+○○</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="lv-pg" id="lv-m" hidden>
+                <p class="lv-t">Chiffres seulement. Point . et tiret -. Les groupes sont séparés par un espace large.
+                </p>
+                <p class="lv-t mono">0 ----- · 1 .---- · 2 ..--- · 3 ...-- · 4 ....- · 5 ..... · 6 -.... · 7 --... · 8
+                    ---.. · 9 ----.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="docOverlay">
+        <div class="modal doc-modal" id="docBox">
+            <button class="modal-close" id="docClose" aria-label="Fermer">✕</button>
+            <div id="docBody"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="noteOverlay">
+        <div class="modal">
+            <button class="modal-close" id="noteClose" aria-label="Fermer">✕</button>
+            <h2>📓 Carnet</h2>
+            <p class="note-room" id="noteRoom"></p>
+            <ul id="noteList"></ul>
+        </div>
+    </div>
+
+    <div class="overlay" id="recOverlay">
+        <div class="modal">
+            <button class="modal-close" id="recClose" aria-label="Fermer">✕</button>
+            <h2>🏆 Records</h2>
+            <section class="records-section">
+                <h3>👤 Mon record</h3>
+                <div class="record-card">
+                    <span class="rc-label">Salles</span><span class="rc-value" id="recPersonalRooms">–</span>
+                    <span class="rc-label">Temps</span><span class="rc-value" id="recPersonalTime">–</span>
+                </div>
+            </section>
+            <section class="records-section">
+                <h3>🌍 Record mondial</h3>
+                <div class="record-card global" id="recGlobalCard">
+                    <span class="rc-label">Salles</span><span class="rc-value" id="recGlobalRooms">–</span>
+                    <span class="rc-label">Temps</span><span class="rc-value" id="recGlobalTime">–</span>
+                </div>
+                <div class="connection-status" id="recStatus">Synchronisation...</div>
+            </section>
+        </div>
+    </div>
+
+    <div class="overlay" id="endOverlay">
+        <div class="modal">
+            <h2>Fin de partie</h2>
+            <p class="win-time"><span id="endRooms">0</span> <small>salles</small></p>
+            <p class="win-best">Temps : <span id="endTime">00:00</span></p>
+            <p class="win-best" id="endBest"></p>
+            <p class="connection-status go-world" id="goWorldStatus"></p>
+            <p class="win-note" id="endNote" hidden></p>
+            <div class="pause-menu">
+                <button class="btn-sky" id="againBtn">Rejouer</button>
+                <button class="btn-sky secondary" id="endMenuBtn">Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="padOverlay">
+        <div class="modal pad-modal" id="padBox">
+            <button class="modal-close" id="padClose" aria-label="Fermer">✕</button>
+            <h2 id="padTitle">Coffre</h2>
+            <div class="code-disp" id="codeDisp"></div>
+            <div class="keypad" id="keypad"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="recordMessagePopup" style="display: none; z-index: 2000;">
+        <div class="modal">
+            <h2>🏆 Nouveau record !</h2>
+            <p class="start-text">Tu as battu le record mondial. Laisse un message pour l’histoire :</p>
+            <div class="message-input-wrapper">
+                <input type="text" id="recordMsgInput" placeholder="Ton message..." maxlength="50" autocomplete="off">
+                <div class="char-counter" id="recordCharCounter">0/50</div>
+            </div>
+            <button class="btn-sky" id="saveRecordMsgBtn">Sauvegarder</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

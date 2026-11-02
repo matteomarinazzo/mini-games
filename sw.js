@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.47.2026-11-01.0";
+const CACHE_NAME = "mini-games-cache-v1.49.2026-11-02.4";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -116,6 +116,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/little-turismo.webp',
     'assets/logos/anagram.webp',
     'assets/logos/four-in-a-row.webp',
+    'assets/logos/escape-game.webp',
 
     // About
     'about/about.html',
@@ -678,6 +679,23 @@ const ASSETS_TO_CACHE = [
     'games/four-in-a-row/js/core/store.js',
     'games/four-in-a-row/js/core/sync.js',
     'games/four-in-a-row/js/core/ui.js',
+
+    // Game: Compte Cible
+    'games/target-count/index.html',
+    'games/target-count/css/game.css',
+    'games/target-count/js/game.js',
+    'games/target-count/js/core/engine.js',
+    'games/target-count/js/core/records.js',
+
+    // Game: Escape Game
+    'games/escape-game/index.html',
+    'games/escape-game/css/game.css',
+    'games/escape-game/js/game.js',
+    'games/escape-game/js/core/docs.js',
+    'games/escape-game/js/core/input.js',
+    'games/escape-game/js/core/render.js',
+    'games/escape-game/js/core/room.js',
+    'games/escape-game/js/core/save.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

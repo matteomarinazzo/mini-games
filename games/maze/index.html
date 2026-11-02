@@ -17,7 +17,8 @@
 
     <!-- Open Graph (og:image / twitter:image volontairement absents : visuel assets/logos/maze.webp à créer, voir README) -->
     <meta property="og:title" content="Labyrinthe 3D – Trouve la sortie | Mini‑Games">
-    <meta property="og:description" content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
+    <meta property="og:description"
+        content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mini-games.ch/games/maze/">
     <meta property="og:site_name" content="Mini‑Games">
@@ -26,7 +27,8 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Labyrinthe 3D – Trouve la sortie | Mini‑Games">
-    <meta name="twitter:description" content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
+    <meta name="twitter:description"
+        content="Explorez un labyrinthe à la première personne et trouvez la sortie le plus vite possible !">
 
     <!-- Schema.org -->
     <script type="application/ld+json">
@@ -74,20 +76,25 @@
             <h2 class="start-title">Labyrinthe 3D</h2>
             <p class="start-text">Trouve la <strong>sortie</strong> : une colonne <strong>rose</strong> au bout d'un
                 cul-de-sac.<br>Plus tu es rapide, mieux c'est !</p>
-            <p class="start-keys">↑ ↓ · W / S · Z : avancer, reculer<br>← → · A / D · Q : tourner<br>Échap : pause · sur mobile : boutons en bas</p>
+            <p class="start-keys">↑ ↓ · W / S · Z : avancer, reculer<br>← → · A / D · Q : tourner<br>Échap : pause · sur
+                mobile : boutons en bas</p>
             <div class="diff-row" id="diffRow" role="group" aria-label="Taille du labyrinthe">
                 <button class="diff-btn" data-level="easy" aria-pressed="false">Petit<span>8×8</span></button>
-                <button class="diff-btn selected" data-level="normal" aria-pressed="true">Moyen<span>15×15</span></button>
+                <button class="diff-btn selected" data-level="normal"
+                    aria-pressed="true">Moyen<span>15×15</span></button>
                 <button class="diff-btn" data-level="hard" aria-pressed="false">Grand<span>25×25</span></button>
-                <button class="diff-btn" data-level="custom" aria-pressed="false">Perso<span id="customSizeLabel">12×12</span></button>
+                <button class="diff-btn" data-level="custom" aria-pressed="false">Perso<span
+                        id="customSizeLabel">12×12</span></button>
             </div>
             <div class="custom-panel" id="customPanel" hidden>
                 <label class="custom-field">Colonnes
-                    <input type="number" id="customCols" inputmode="numeric" min="2" max="60" step="1" value="12" autocomplete="off">
+                    <input type="number" id="customCols" inputmode="numeric" min="2" max="60" step="1" value="12"
+                        autocomplete="off">
                 </label>
                 <span class="custom-x" aria-hidden="true">×</span>
                 <label class="custom-field">Lignes
-                    <input type="number" id="customRows" inputmode="numeric" min="2" max="60" step="1" value="12" autocomplete="off">
+                    <input type="number" id="customRows" inputmode="numeric" min="2" max="60" step="1" value="12"
+                        autocomplete="off">
                 </label>
                 <p class="custom-note">De 2 à 60 par côté. Pas de record pour cette taille.</p>
             </div>
@@ -107,12 +114,15 @@
                 <button class="btn-sky secondary" id="menuPauseBtn">Menu</button>
                 <div class="tertiary-controls">
                     <button class="btn-tertiary" id="soundToggle" title="Son">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
                         </svg>
                     </button>
                     <button class="btn-tertiary" id="musicToggle" title="Musique">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M9 18V5l12-2v13"></path>
                             <circle cx="6" cy="18" r="3"></circle>
                             <circle cx="18" cy="16" r="3"></circle>
@@ -131,21 +141,26 @@
             <div class="win-note" id="winNote" hidden></div>
 
             <div class="map-wrap" id="mapWrap">
-                <canvas id="mapCanvas" aria-label="Vue de dessus du labyrinthe : départ, sortie, ton trajet et le chemin le plus court"></canvas>
+                <canvas id="mapCanvas"
+                    aria-label="Vue de dessus du labyrinthe : départ, sortie, ton trajet et le chemin le plus court"></canvas>
             </div>
             <div class="map-legend">
                 <span class="map-key"><i class="dot start"></i>Départ</span>
                 <span class="map-key"><i class="dot exit"></i>Sortie</span>
-                <button class="map-chip on" data-layer="trail" aria-pressed="true"><i class="line trail"></i>Mon trajet</button>
-                <button class="map-chip on" data-layer="best" aria-pressed="true"><i class="line best"></i>Chemin le plus court</button>
+                <button class="map-chip on" data-layer="trail" aria-pressed="true"><i class="line trail"></i>Mon
+                    trajet</button>
+                <button class="map-chip on" data-layer="best" aria-pressed="true"><i class="line best"></i>Chemin le
+                    plus court</button>
             </div>
 
             <div class="final-stats">
                 <div class="stat-row"><span>Temps</span><span class="stat-val" id="winTime">0:00.0</span></div>
                 <div class="stat-row"><span>Meilleur temps</span><span class="stat-val" id="winRecTime">–</span></div>
                 <div class="stat-row"><span>Record mondial</span><span class="stat-val" id="winWorld">–</span></div>
-                <div class="stat-row"><span>Distance parcourue</span><span class="stat-val"><span id="winDist">0</span> m</span></div>
-                <div class="stat-row"><span>Chemin le plus court</span><span class="stat-val"><span id="winBest">0</span> m</span></div>
+                <div class="stat-row"><span>Distance parcourue</span><span class="stat-val"><span id="winDist">0</span>
+                        m</span></div>
+                <div class="stat-row"><span>Chemin le plus court</span><span class="stat-val"><span
+                            id="winBest">0</span> m</span></div>
                 <div class="stat-row"><span>Labyrinthe</span><span class="stat-val" id="winSize">15×15</span></div>
             </div>
             <div class="pause-menu">
@@ -173,14 +188,17 @@
                 <ul>
                     <li>Un seul chemin relie le <strong>départ</strong> (dalle verte) à la sortie.</li>
                     <li>Les murs sont infranchissables : tu glisses le long.</li>
-                    <li>À l'arrivée, une <strong>vue de dessus</strong> montre ton trajet et le chemin le plus court (tu peux afficher ou masquer chaque tracé).</li>
-                    <li>Tu peux <strong>abandonner</strong> depuis le menu pause : la vue de dessus s'affiche aussi, sans enregistrer de temps.</li>
+                    <li>À l'arrivée, une <strong>vue de dessus</strong> montre ton trajet et le chemin le plus court (tu
+                        peux afficher ou masquer chaque tracé).</li>
+                    <li>Tu peux <strong>abandonner</strong> depuis le menu pause : la vue de dessus s'affiche aussi,
+                        sans enregistrer de temps.</li>
                 </ul>
             </section>
             <section>
                 <h3>📐 Tailles</h3>
                 <ul>
-                    <li><strong>Petit</strong> 8×8, <strong>Moyen</strong> 15×15, <strong>Grand</strong> 25×25 : meilleur temps et record mondial.</li>
+                    <li><strong>Petit</strong> 8×8, <strong>Moyen</strong> 15×15, <strong>Grand</strong> 25×25 :
+                        meilleur temps et record mondial.</li>
                     <li><strong>Perso</strong> : de 2 à 60 colonnes et lignes, <strong>sans record</strong>.</li>
                 </ul>
             </section>
@@ -189,7 +207,8 @@
                 <ul>
                     <li><strong>↑ ↓</strong> ou <strong>W S</strong> (<strong>Z</strong>) – Avancer, reculer</li>
                     <li><strong>← →</strong> ou <strong>A D</strong> (<strong>Q</strong>) – Tourner</li>
-                    <li><strong>Mobile</strong> – Boutons ◀ ▶ (tourner) et ▼ ▲ (reculer, avancer), maintenir ; plusieurs doigts possibles</li>
+                    <li><strong>Mobile</strong> – Boutons ◀ ▶ (tourner) et ▼ ▲ (reculer, avancer), maintenir ; plusieurs
+                        doigts possibles</li>
                     <li><strong>Échap</strong> – Pause</li>
                 </ul>
             </section>
@@ -204,17 +223,23 @@
             <section class="records-section">
                 <h3>👤 Mes meilleurs temps</h3>
                 <div class="record-grid">
-                    <div class="record-card"><span class="rc-label">Petit · 8×8</span><span class="rc-value" id="recEasy">–</span></div>
-                    <div class="record-card"><span class="rc-label">Moyen · 15×15</span><span class="rc-value" id="recNormal">–</span></div>
-                    <div class="record-card"><span class="rc-label">Grand · 25×25</span><span class="rc-value" id="recHard">–</span></div>
+                    <div class="record-card"><span class="rc-label">Petit · 8×8</span><span class="rc-value"
+                            id="recEasy">–</span></div>
+                    <div class="record-card"><span class="rc-label">Moyen · 15×15</span><span class="rc-value"
+                            id="recNormal">–</span></div>
+                    <div class="record-card"><span class="rc-label">Grand · 25×25</span><span class="rc-value"
+                            id="recHard">–</span></div>
                 </div>
             </section>
             <section class="records-section">
                 <h3>🌍 Record mondial</h3>
                 <div class="record-grid">
-                    <div class="record-card global"><span class="rc-label">Petit · 8×8</span><span class="rc-value" id="wrEasy">–</span></div>
-                    <div class="record-card global"><span class="rc-label">Moyen · 15×15</span><span class="rc-value" id="wrNormal">–</span></div>
-                    <div class="record-card global"><span class="rc-label">Grand · 25×25</span><span class="rc-value" id="wrHard">–</span></div>
+                    <div class="record-card global"><span class="rc-label">Petit · 8×8</span><span class="rc-value"
+                            id="wrEasy">–</span></div>
+                    <div class="record-card global"><span class="rc-label">Moyen · 15×15</span><span class="rc-value"
+                            id="wrNormal">–</span></div>
+                    <div class="record-card global"><span class="rc-label">Grand · 25×25</span><span class="rc-value"
+                            id="wrHard">–</span></div>
                 </div>
                 <div class="connection-status" id="recStatus">Synchronisation...</div>
             </section>
@@ -260,8 +285,10 @@
             <button class="icon-btn" id="recordsBtn" title="Records">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" />
-                    <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" />
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                 </svg>
             </button>
             <button class="icon-btn" id="pauseBtn" title="Pause">

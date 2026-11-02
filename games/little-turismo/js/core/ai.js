@@ -39,7 +39,7 @@ const withSpec = (S, k) => { if (!k || S._spec) return S; const key = S.id + '|'
 const PR = new Map();
 const YG = .8, CK = .8, BMU = .75, RM = .85;   // CK : crédit d'appui, BMU : adhérence de freinage (× grip), RM : capacité latérale réelle (cercle de friction au freinage)
 // CM : adhérence utilisée en courbe, calibrée par voiture en simulation (≈ 0 sortie de piste sur 10 circuits, le reste est corrigé par l'apprentissage ci-dessous)
-const CMS = { serra_gt: .65, titan: .65, nebula: .65, vipere: .61, comete: .59, spectre: .59, aigle: .57, prototype: .57, f1: .57, lame: .57, zephyr: .57, foudre: .55, mistral: .53, rallye: .49, safari: .49, baroudeur: .49 };
+const CMS = { serra_gt: .65, titan: .65, nebula: .65, vipere: .61, comete: .59, spectre: .59, aigle: .57, prototype: .57, f1: .57, lame: .57, zephyr: .57, foudre: .55, mistral: .53, rallye: .49, safari: .49, baroudeur: .49, top_fuel: .68, thrust_ssc: .72 };
 const cmOf = (S) => CMS[S.id] ?? .53;
 /** Décélération maximale (m/s²) à la vitesse v : pneus (charge + appui) ou freins, + traînée. */
 export const decelAt = (S, v) => { const kd = (S.drag + .12 * S.aero) * v * v / S.mass; return Math.min(S.grip * BMU * (9.81 + S.aero * v * v / S.mass), S.brakeForce / S.mass * .95) + kd; };

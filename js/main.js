@@ -20,14 +20,99 @@ var games = {};
 let categoriesData = {};
 let currentFilter = 'Tout';
 let currentSortOrder = 'default';
+let versionsData = null;
+let newGameIds = [];
 
-fetch("./assets/data/games.json")
-  .then((res) => {
+// Détecte automatiquement les 5 derniers jeux ajoutés d'après l'historique de versions.json
+function extractNewGameIds(manifest, allGames, limit = 5) {
+  if (!manifest || !Array.isArray(manifest.history)) return [];
+
+  const normalize = (str) => {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '');
+  };
+
+  const gameEntries = Object.entries(allGames).map(([id, g]) => ({
+    id,
+    name: g.name,
+    normName: normalize(g.name),
+    normId: normalize(id)
+  }));
+
+  const matchGame = (changeText) => {
+    const match = changeText.match(/ajout du jeu\s+(.+)/i);
+    if (!match) return null;
+    let raw = match[1].trim().replace(/\s*\(v\d+\)/i, '');
+    let norm = normalize(raw);
+
+    // Correspondance exacte sur nom normalisé ou id
+    let found = gameEntries.find(g => g.normName === norm || g.normId === norm);
+    if (found) return found.id;
+
+    // Alias pour variantes de noms
+    if (norm.includes('4enligne') || norm.includes('quatreenligne') || norm.includes('quatre')) {
+      found = gameEntries.find(g => g.id === 'four-in-a-row');
+      if (found) return found.id;
+    }
+    if (norm.includes('endlesshall') || norm.includes('couloirsansfin')) {
+      found = gameEntries.find(g => g.id === 'endless-hall');
+      if (found) return found.id;
+    }
+    if (norm.includes('fils') || norm.includes('fil')) {
+      found = gameEntries.find(g => g.id === 'mindplay-wire');
+      if (found) return found.id;
+    }
+
+    // Sous-chaîne
+    found = gameEntries.find(g => g.normName.includes(norm) || norm.includes(g.normName));
+    if (found) return found.id;
+
+    return null;
+  };
+
+  const foundIds = [];
+  for (const h of manifest.history) {
+    if (!Array.isArray(h.changes)) continue;
+    for (const c of h.changes) {
+      if (/ajout du jeu/i.test(c)) {
+        const id = matchGame(c);
+        if (id && allGames[id] && !foundIds.includes(id)) {
+          foundIds.push(id);
+          if (foundIds.length >= limit) return foundIds;
+        }
+      }
+    }
+  }
+
+  return foundIds;
+}
+
+function isNewGame(gameId) {
+  if (!gameId || !games[gameId]) return false;
+  return newGameIds.includes(gameId);
+}
+
+function getNewGamesList() {
+  return newGameIds.filter(id => games[id]).slice(0, 5);
+}
+
+function getNewGamesEntries() {
+  return getNewGamesList().map(id => [id, games[id]]);
+}
+
+Promise.all([
+  fetch("./assets/data/games.json").then((res) => {
     if (!res.ok) throw new Error("Erreur chargement games.json");
     return res.json();
-  })
-  .then(async (data) => {
+  }),
+  fetch("./assets/data/versions.json").then((res) => res.ok ? res.json() : null).catch(() => null)
+])
+  .then(async ([data, manifest]) => {
     categoriesData = data;
+    versionsData = manifest;
     games = {};
     for (const [catName, catGames] of Object.entries(data)) {
       for (const [gameId, game] of Object.entries(catGames)) {
@@ -35,6 +120,9 @@ fetch("./assets/data/games.json")
         games[gameId].category = catName;
       }
     }
+
+    // Détection automatique STRICTEMENT des 5 derniers jeux ajoutés
+    newGameIds = extractNewGameIds(versionsData, games, 5);
 
     // 1. On détermine la langue : Priorité au Cache, sinon Navigateur, sinon FR
     const browserLang = navigator.language.split('-')[0].toUpperCase();
@@ -327,9 +415,13 @@ function sortGamesList(entriesList) {
       return pB - pA;
     }
     if (currentSortOrder === 'new') {
-      const isNewA = gameA.badge === 'new' ? 1 : 0;
-      const isNewB = gameB.badge === 'new' ? 1 : 0;
-      return isNewB - isNewA;
+      const isNewA = isNewGame(idA) ? 1 : 0;
+      const isNewB = isNewGame(idB) ? 1 : 0;
+      if (isNewA !== isNewB) return isNewB - isNewA;
+      const idxA = newGameIds.indexOf(idA);
+      const idxB = newGameIds.indexOf(idB);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      return 0;
     }
     return 0;
   });
@@ -599,6 +691,11 @@ function initCategoryFilters() {
     createFilterButton(t('menu.favorites'), likedCount, 'Favoris');
   }
 
+  const newGamesCount = getNewGamesList().length;
+  if (newGamesCount > 0) {
+    createFilterButton(t('menu.new_games') || '✨ Nouveautés', newGamesCount, 'Nouveautes');
+  }
+
   for (const [catName, catGames] of Object.entries(categoriesData)) {
     const count = Object.keys(catGames).length;
     createFilterButton(t('menu.categories.' + catName), count, catName);
@@ -665,8 +762,23 @@ function generateGameCards() {
     }
   }
 
+  // Nouveautés (affiché entre Favoris et la liste des jeux)
+  if (currentFilter === 'Nouveautes' || (currentFilter === 'Tout' && currentSortOrder === 'default')) {
+    const newGamesEntries = getNewGamesEntries();
+    if (newGamesEntries.length > 0) {
+      allItems.push({ type: 'header', title: t('menu.new_games') || '✨ Nouveautés' });
+      let count = 0;
+      newGamesEntries.forEach(([gameId, gameData]) => {
+        allItems.push({ type: 'card', id: gameId, data: gameData });
+        count++;
+      });
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      if (!isMobile && count % 2 !== 0 && currentFilter === 'Tout') allItems.push({ type: 'spacer' });
+    }
+  }
+
   // Catégories — si tri actif : on fusionne tout en une liste globale triée
-  if (currentFilter !== 'Favoris') {
+  if (currentFilter !== 'Favoris' && currentFilter !== 'Nouveautes') {
     if (currentSortOrder !== 'default') {
       // Rassembler tous les jeux des catégories concernées en une liste plate
       const allGameEntries = [];
@@ -796,6 +908,11 @@ function createGameCard(gameId, game, isPriority = false) {
   }
 
   const isLiked = getLikedGames().includes(gameId);
+  const isNew = isNewGame(gameId);
+
+  if (isNew) {
+    card.dataset.badge += " " + t("menu.badges.new").toLowerCase();
+  }
 
   // Badges contextuels dynamiques (Multijoueur, 3D, Stratégie...)
   const contextBadges = [];
@@ -816,6 +933,7 @@ function createGameCard(gameId, game, isPriority = false) {
   card.innerHTML = `
     <div class="card-header">
       <span class="badge badge-${game.badge}">${t("menu.badges." + game.badge)}</span>
+      ${isNew ? `<span class="badge badge-new">${t("menu.badges.new")}</span>` : ''}
     </div>
     ${contextBadgesHtml}
     <div class="card-image">
@@ -1057,9 +1175,7 @@ function filterGames() {
 
 async function displayAppVersion() {
   try {
-    const res = await fetch('./assets/data/versions.json');
-    if (!res.ok) throw new Error("Impossible de charger versions.json");
-    const manifest = await res.json();
+    const manifest = versionsData || await (await fetch('./assets/data/versions.json')).json();
     const version = manifest.currentVersion || "1.0.0";
     const el = document.getElementById('app-version');
     if (el) el.textContent = version;

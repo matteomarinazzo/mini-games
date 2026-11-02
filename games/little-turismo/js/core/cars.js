@@ -145,12 +145,155 @@ function buildOpen() {
   bx(B, 0, .45, -2.21, .14, .03, .01, RED); bx(B, 0, .3, -2.3, .3, .05, .06, hex(0x111419));
   return pack(B, W, F, ML, MR);
 }
+// --- Dragster (Top Fuel : longue flèche effilée, compresseur blower, zoomies, géant aileron arrière en hauteur, wheelie bar)
+const DRAG_S = [
+  [-2.2, .48, .22, .56, .38],
+  [-1.4, .45, .20, .68, .36],
+  [-.7, .42, .20, .58, .34],
+  [.2, .32, .18, .44, .24],
+  [1.4, .24, .18, .38, .18],
+  [2.5, .18, .16, .32, .14],
+  [3.0, .14, .16, .28, .10]
+];
+const DRAG_C = [
+  [-1.6, .36, .60, .85, .26],
+  [-1.3, .38, .62, 1.02, .22],
+  [-1.0, .36, .60, .82, .24]
+];
+function buildDrag() {
+  const B = builder(), W = builder(), F = builder(), ML = builder(), MR = builder(), D = DARK;
+  // Châssis en flèche effilée
+  loft(B, DRAG_S, [0, .4, 0], BODY(1), BODY(1.08));
+  // Habitacle / carénage cockpit
+  loft(B, DRAG_C, [0, .8, -1.3], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
+
+  // Roues avant : toutes petites, étroites et rapprochées
+  for (const x of [-.38, .38]) cyl(B, x, .22, 2.7, .22, .12, hex(0xb9bec6));
+  bx(B, 0, .22, 2.7, .38, .02, .02, MET); // essieu avant
+
+  // Roues arrière : ÉNORMES slicks géants et très larges
+  for (const x of [-.95, .95]) cyl(B, x, .50, -1.5, .50, .48, hex(0x1a1a1d));
+  bx(B, 0, .50, -1.5, .9, .04, .04, MET); // essieu arrière
+
+  // Pilote / Casque / Visière
+  bx(B, 0, .82, -1.25, .1, .1, .12, WHT);
+  bx(B, 0, .84, -1.15, .08, .03, .01, GLS);
+
+  // Arceau de sécurité tubulaire
+  for (const x of [-.22, .22]) {
+    bx(B, x, .85, -1.25, .02, .2, .02, D);
+    bx(B, x, .95, -1.45, .02, .02, .22, D);
+  }
+  bx(B, 0, 1.05, -1.35, .22, .02, .02, D);
+
+  // Moteur V8 massif suralimenté en avant du cockpit
+  bx(B, 0, .54, -.5, .32, .22, .35, hex(0x3a4048));
+  // Blower (compresseur chromé)
+  bx(B, 0, .80, -.5, .18, .12, .28, MET);
+  // Écope d'admission rouge (bugcatcher)
+  bx(B, 0, .96, -.45, .22, .08, .18, hex(0xd01010));
+  for (const x of [-.12, 0, .12]) bx(B, x, .96, -.35, .04, .05, .02, hex(0x111111));
+
+  // Échappements zoomies (4 tubes inclinés de chaque côté)
+  for (const x of [-1, 1]) {
+    for (let i = 0; i < 4; i++) {
+      bx(B, x * .46, .52 + i * .06, -.7 + i * .14, .035, .12, .035, MET);
+    }
+  }
+
+  // Wheelie bar à l'arrière pour éviter le retournement au décollage
+  for (const x of [-.28, .28]) {
+    bx(B, x, .22, -2.75, .02, .02, .55, MET);
+    bx(B, x, .35, -2.70, .02, .02, .50, MET);
+    cyl(B, x, .12, -3.3, .10, .06, hex(0x222222));
+  }
+  // Sacs de parachute double à l'arrière
+  for (const x of [-.16, .16]) {
+    bx(B, x, .62, -2.25, .12, .1, .1, hex(0x1e2025));
+    bx(B, x, .62, -2.31, .09, .07, .02, hex(0xee3322));
+  }
+
+  // BIG AILERON EN HAUTEUR À L'ARRIÈRE (W)
+  // Montants verticaux hauts (struts)
+  for (const x of [-.45, .45]) {
+    bx(W, x, 1.25, -2.1, .025, .55, .06, D);
+    bx(W, x, 1.15, -1.8, .02, .45, .03, D);
+  }
+  // Plan principal de l'aile arrière
+  bx(W, 0, 1.78, -2.15, 1.15, .03, .38, D);
+  bx(W, 0, 1.86, -2.05, 1.1, .02, .25, BODY(.9));
+  // Grandes dérives latérales (endplates géantes)
+  for (const x of [-1.15, 1.15]) {
+    bx(W, x, 1.75, -2.15, .02, .32, .52, BODY(.85));
+  }
+  // Dérive centrale stabilisatrice
+  bx(W, 0, 1.45, -2.15, .015, .32, .35, D);
+
+  // AILE AVANT (F) tout au bout du museau en flèche
+  bx(F, 0, .14, 2.95, .65, .02, .18, D);
+  for (const x of [-.65, .65]) bx(F, x, .18, 2.95, .015, .08, .22, BODY(.9));
+
+  // DÉFLECTEURS LATÉRAUX / RÉTROS (ML, MR)
+  for (const x of [-.56, .56]) bx(x < 0 ? ML : MR, x, .62, -1.0, .04, .08, .16, BODY(.9));
+
+  return pack(B, W, F, ML, MR);
+}
+// --- Supersonique ThrustSSC (fuselage effilé, doubles réacteurs Rolls-Royce Spey latéraux, roues pleines en alu, empennage vertical géant, tube pitot)
+const THRUST_S = [
+  [-2.6, .35, .20, .65, .22],
+  [-1.8, .40, .20, .70, .26],
+  [-.8, .45, .20, .72, .28],
+  [.4, .45, .20, .72, .28],
+  [1.6, .38, .18, .62, .24],
+  [2.6, .26, .16, .45, .16],
+  [3.3, .12, .14, .30, .08],
+  [3.6, .05, .16, .24, .04]
+];
+const THRUST_C = [
+  [-.4, .24, .64, .90, .18],
+  [.2, .24, .65, .96, .16],
+  [.8, .22, .64, .82, .14]
+];
+function buildThrust() {
+  const B = builder(), W = builder(), F = builder(), ML = builder(), MR = builder(), D = DARK;
+  loft(B, THRUST_S, [0, .45, 0], BODY(1), BODY(1.06));
+  loft(B, THRUST_C, [0, .8, .2], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
+
+  for (const x of [-1.02, 1.02]) {
+    bx(B, x, .46, -.2, .38, .36, 1.85, BODY(1.02));
+    bx(B, x, .46, 1.66, .37, .35, .04, MET);
+    bx(B, x, .46, 1.60, .12, .12, .15, D);
+    bx(B, x, .46, -2.15, .35, .33, .12, hex(0x282c34));
+    bx(B, x, .46, -2.28, .32, .30, .04, hex(0x181a20));
+    bx(B, x, .46, -2.31, .22, .20, .01, hex(0xff5511));
+    bx(B, x, .46, -2.31, .12, .10, .01, hex(0xffee88));
+  }
+
+  for (const x of [-1.02, 1.02]) cyl(B, x, .28, .85, .28, .15, hex(0xdde3ea));
+  for (const x of [-.30, .30]) cyl(B, x, .28, -1.85, .28, .16, hex(0xdde3ea));
+
+  bx(W, 0, 1.15, -2.1, .025, .48, .45, BODY(1));
+  bx(W, 0, 1.25, -2.35, .02, .50, .22, D);
+  bx(W, 0, 1.72, -2.0, .01, .01, .15, MET);
+
+  bx(F, 0, .20, 3.85, .018, .018, .32, MET);
+  bx(F, 0, .20, 4.12, .008, .008, .12, MET);
+
+  bx(B, 0, .66, -2.62, .16, .08, .06, hex(0x1a1a20));
+  for (const x of [-.07, .07]) bx(B, x, .66, -2.66, .05, .06, .02, hex(0xee3322));
+
+  for (const x of [-1.02, 1.02]) bx(x < 0 ? ML : MR, x * 1.38, .44, -.4, .08, .02, .45, BODY(1));
+
+  return pack(B, W, F, ML, MR);
+}
 const KINDS = {
   gt: { build: buildGT, S: BODY_S, y: 1.15, z: -.4, k: 1, st: [[.95, 1.4, 2.1, 2.25], [-2.25, -2, -1.25]] },
   wedge: { build: buildWedge, S: WS, y: 1.0, z: 0, k: 1, st: [[1.25, 1.8, 2.25], [-2.2, -1.9, -1.4]] },
   proto: { build: buildProto, S: PS, y: .98, z: -.05, k: 1, st: [[1.2, 1.8, 2.25], [-2.25, -1.6, -1.0]] },
   rally: { build: buildRally, S: RS, y: 1.5, z: -.4, k: 1, st: [[1.0, 1.5, 2.15], [-2.15, -1.6]] },
   open: { build: buildOpen, S: OS, y: .405, z: 1.2, k: .5, st: [] },
+  drag: { build: buildDrag, S: DRAG_S, y: .68, z: .5, k: .65, st: [[.4, 1.2, 2.0, 2.8], [-2.0, -1.4]] },
+  thrust: { build: buildThrust, S: THRUST_S, y: .80, z: .2, k: .7, st: [[.8, 1.6, 2.6], [-2.2, -1.4]] },
 };
 const topY = (S, z) => { for (let i = 0; i < S.length - 1; i++) { const a = S[i], b = S[i + 1]; if (z <= b[0]) return a[3] + (b[3] - a[3]) * (z - a[0]) / (b[0] - a[0]); } return S[S.length - 1][3]; };
 

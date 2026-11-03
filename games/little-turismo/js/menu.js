@@ -1,19 +1,25 @@
-import { CIRCUITS, circuitList, loadTracks, saveTracks, CAR_LIST, DIFFS, loadSaved, loadRec, loadClm, saveSaved, sanitize, startSession, loadCustom, saveCustom } from './core/config.js';
-import { trackOf } from './core/track.js';
+import { CIRCUITS, circuitList, loadTracks, saveTracks, CAR_LIST, DIFFS, loadSaved, loadRec, loadClm, saveSaved, sanitize, startSession, loadCustom, saveCustom, loadMpCars, saveMpCars, loadMpTracks, saveMpTracks } from './core/config.js';
+import { trackOf, buildTrack } from './core/track.js';
 import { drawTrack, startMark, stats } from './core/map.js';
 import { CARS } from './core/physics.js';
 import { look, customSheet, registerCustom, KIND_LIST, SPEC, getSpecRange } from './core/sheets.js';
 import { createTrackEditor, THEMES, stadium } from './core/track-editor.js';
 import * as Net from './net.js';
+import { listPublished, loadPublishedTrack, loadPublishedCar, publishItem, unpublishItem } from './core/publish.js';
+import { notify } from './ui/notify.js';
 
 const $ = (id) => document.getElementById(id);
 let cfg = loadSaved();
 let gameMode = sessionStorage.getItem('little-turismo-mode') || 'solo';
+let multiCreatePending = false, roomCreateToken = 0, roomCreationInFlight = false, roomJoinToken = 0;
 $('btnSolo')?.addEventListener('click', () => { gameMode = 'solo'; sessionStorage.setItem('little-turismo-mode', 'solo'); });
 $('btnClm')?.addEventListener('click', () => { gameMode = 'clm'; sessionStorage.setItem('little-turismo-mode', 'clm'); });
 $('btnMulti')?.addEventListener('click', () => { gameMode = 'multi'; sessionStorage.setItem('little-turismo-mode', 'multi'); });
 const PARENT = { home: null, circuits: 'home', cars: 'circuits', race: 'cars', rules: 'home', records: 'home', designer: 'cars', tdesigner: 'circuits' };
 let dzFrom = 'cars', dz = null, mine = false, tkFrom = 'circuits', tkPending = null, tkLoaded = false, mineT = false, TK = null;
+let carTab = 'stock', trackTab = 'stock', pubCars = [], pubTracks = [], pubCarCursor = null, pubTrackCursor = null; const pubSeen = { car: new Set(), track: new Set() }, pubBusy = new Set(), pubLoading = new Set();
+const pubPreviewCache = new Map(), pubPreviewQueue = [], pubDataPending = new Map(), pubDataQueue = []; let pubPreviewActive = 0, pubDataActive = 0; const PUB_PREVIEW_CACHE_MAX = 40; const pubCountToken = { car: 0, track: 0 };
+const pubPreviewObserver = typeof IntersectionObserver === 'function' ? new IntersectionObserver(entries => { for (const e of entries) if (e.isIntersecting) { pubPreviewObserver.unobserve(e.target); queuePubPreview(e.target) } }, { rootMargin: '140px' }) : null;
 const cur = () => { const h = location.hash.slice(1); return h in PARENT ? h : 'home'; };
 const f3 = (t) => { const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(3); };
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
@@ -21,24 +27,26 @@ const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 const markCards = (el, id) => { for (const b of el.querySelectorAll('.gcard')) { const on = b.dataset.id === id; b.style.borderColor = on ? 'var(--acc)' : ''; b.style.boxShadow = on ? '0 0 0 2px var(--acc)' : ''; b.setAttribute('aria-pressed', on); } };
 function show() {
   const id = cur();
+  if (id !== 'circuits') multiCreatePending = false;
   document.querySelectorAll('.scr').forEach((s) => s.classList.toggle('on', s.id === id));
   $('hm').hidden = id === 'home';
   scrollTo(0, 0);
   if (id === 'circuits') {
-    $('cgrid').hidden = mineT; $('tmine').hidden = !mineT; $('tabCStock').classList.toggle('on', !mineT); $('tabCMine').classList.toggle('on', mineT);
-    renderMineT(); $('cntCStock').textContent = CIRCUITS.length; $('cntCMine').textContent = loadTracks().length; markCards($('cgrid'), cfg.circuit); markCards($('tgrid'), cfg.circuit);
+    $('cgrid').hidden = trackTab !== 'stock'; $('tmine').hidden = trackTab !== 'mine'; $('tpub').hidden = trackTab !== 'published';['tabCStock', 'tabCMine', 'tabCPub'].forEach((x, i) => { const on = ['stock', 'mine', 'published'][i] === trackTab; $(x).classList.toggle('on', on); $(x).setAttribute('aria-selected', String(on)); });
+    renderMineT(); $('cntCStock').textContent = CIRCUITS.length; $('cntCMine').textContent = loadTracks().length; refreshPublishedCount('track'); markCards($('cgrid'), cfg.circuit); markCards($('tgrid'), cfg.circuit);
   }
   if (id !== 'tdesigner') tkLoaded = false; else if (!tkLoaded) { tkLoaded = true; tkOpen(tkPending); tkPending = null; }
   if (id !== 'designer') dz = null; else if (!dz) { dz = newDef(); fillDz(); }
   if (id === 'cars') {
-    $('vgrid').hidden = mine; $('mine').hidden = !mine; $('tabStock').classList.toggle('on', !mine); $('tabMine').classList.toggle('on', mine);
-    renderMine(); $('cntStock').textContent = CAR_LIST.length; $('cntMine').textContent = loadCustom().length; $('tabStock').setAttribute('aria-selected', !mine); $('tabMine').setAttribute('aria-selected', mine); markCards($('vgrid'), cfg.car); markCards($('mgrid'), cfg.car);
+    $('vgrid').hidden = carTab !== 'stock'; $('mine').hidden = carTab !== 'mine'; $('vpub').hidden = carTab !== 'published';['tabStock', 'tabMine', 'tabPub'].forEach((x, i) => { const on = ['stock', 'mine', 'published'][i] === carTab; $(x).classList.toggle('on', on); $(x).setAttribute('aria-selected', String(on)); });
+    renderMine(); $('cntStock').textContent = CAR_LIST.length; $('cntMine').textContent = loadCustom().length; refreshPublishedCount('car'); markCards($('vgrid'), cfg.car); markCards($('mgrid'), cfg.car);
   }
   if (id === 'race') {
     const isMulti = gameMode === 'multi';
     if ($('soloConfig')) $('soloConfig').hidden = isMulti;
     if ($('multiConfig')) $('multiConfig').hidden = !isMulti;
     if ($('raceScreenTitle')) $('raceScreenTitle').textContent = isMulti ? 'Multijoueur' : 'Course';
+    $('sumC').parentElement.hidden = isMulti;
     sync();
   }
   if (id === 'records') renderRecords();
@@ -79,7 +87,8 @@ function renderRecords() {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-rt]'); if (b) { recTab = b.dataset.rt; renderRecords(); } });
 document.addEventListener('change', (e) => { if (e.target.id === 'rcCircuit') { recCircuit = e.target.value; renderRecords(); } });
-const back = () => { const p = cur() === 'designer' ? dzFrom : cur() === 'tdesigner' ? tkFrom : PARENT[cur()]; if (p) location.replace('#' + p); };
+const MP_PARENT = { cars: 'home', circuits: 'race', race: 'cars' };
+const back = () => { const from = cur(), p = from === 'designer' ? dzFrom : from === 'tdesigner' ? tkFrom : (gameMode === 'multi' && MP_PARENT[from]) || PARENT[from]; if (from === 'circuits' && gameMode === 'multi') multiCreatePending = false; if (from === 'race') { if (roomCreationInFlight) roomCreateToken++; if (roomBusy) roomJoinToken++; } if (p) location.replace('#' + p); };
 addEventListener('hashchange', show);
 document.addEventListener('click', (e) => {
   const g = e.target.closest('[data-go]'); if (g) location.hash = g.dataset.go;
@@ -103,7 +112,7 @@ function cardEl(it, preview, stats, pick) {
 // Circuits : aperçu dessiné depuis la spline de chaque circuit (intégrés et perso)
 const cPrev = (x, c) => { const t = trackOf(c.id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); };
 const cStats = (c) => { const s = stats(trackOf(c.id)); return [['Longueur', (s.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', s.turns], ['Dénivelé', Math.round(s.climb) + ' m']]; };
-const cPick = (c) => { cfg.circuit = c.id; saveSaved(cfg); location.hash = 'cars'; };
+const cPick = (c) => { cfg.circuit = c.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
 grid($('cgrid'), CIRCUITS, cPrev, cStats, cPick);
 
 // Voitures : aperçu vectoriel (vue de dessus, sans image, livrée et proportions de la fiche) et stats lues dans les fiches physiques
@@ -200,7 +209,12 @@ function options(el, entries) {
   el.textContent = '';
   for (const [v, label] of entries) { const o = document.createElement('option'); o.value = v; o.textContent = label; el.appendChild(o); }
 }
+const CAR_MODES = [['same', 'Toutes identiques à ma voiture'], ['mixed', 'Voitures variées']];
 options($('diff'), DIFFS);
+// Solo et multijoueur partagent exactement les mêmes valeurs et libellés.
+const fillCarMode = (el) => options(el, CAR_MODES);
+fillCarMode($('carMode'));
+fillCarMode($('roomCarMode'));
 options($('roomDiff'), DIFFS);
 const upd = (k, v) => { cfg = sanitize({ ...cfg, [k]: k === 'qualifying' ? v === 'true' : v }); sync(true); };
 $('laps').addEventListener('input', (e) => upd('laps', e.target.value));
@@ -274,22 +288,24 @@ const openDz = (d, from) => { dzFrom = from; dz = { ...newDef(), ...d }; fillDz(
 function dzSave() {
   dzRead(); dz.name = dz.name.trim().slice(0, 16) || 'Ma voiture';
   const l = loadCustom(), i = l.findIndex((c) => c.id === dz.id);
-  if (i < 0 && l.length >= MAX_CUSTOM) { alert('Maximum ' + MAX_CUSTOM + ' voitures.'); return false; }
-  const d = { ...dz }; if (i < 0) l.push(d); else l[i] = d;
+  if (i < 0 && l.length >= MAX_CUSTOM) { notify.show({ type: 'error', title: 'Limite atteinte', message: 'Maximum ' + MAX_CUSTOM + ' voitures.' }); return false; }
+  const d = { ...dz }; if (i < 0) l.push(d); else { if (l[i].pubId) { d.pubId = l[i].pubId; d.pubOwner = l[i].pubOwner; d.published = true; } l[i] = d; }
   saveCustom(l); registerCustom(d); return true;
 }
 $('designer').addEventListener('input', () => { if (dz) { dzRead(); dzDraw(); } });
-$('dzSave').addEventListener('click', () => { if (dzSave()) { mine = true; location.replace('#cars'); } });
+$('dzSave').addEventListener('click', () => { if (dzSave()) { mine = true; carTab = 'mine'; location.replace('#cars'); } });
 $('dzTest').addEventListener('click', () => { if (dzSave()) launchClm({ circuit: $('dzCircuit').value, car: dz.id }); });
-$('dzDel').addEventListener('click', () => {
+$('dzDel').addEventListener('click', async () => {
+  const old = loadCustom().find(c => c.id === dz.id); if (old?.pubId) { if (!await notify.confirm({ title: 'Dépublier et supprimer', message: 'Cette voiture publiée sera retirée avant sa suppression. Continuer ?' })) return; try { await unpublishItem('car', old.pubId) } catch (e) { notify.show({ type: 'error', title: 'Dépublication impossible', message: publicationError(e) }); return } }
   saveCustom(loadCustom().filter((c) => c.id !== dz.id)); delete CARS[dz.id];
   if (cfg.car === dz.id) { cfg.car = 'serra_gt'; saveSaved(cfg); }
-  mine = true; location.replace('#cars');
+  mine = true; carTab = 'mine'; location.replace('#cars');
 });
 $('newCar').addEventListener('click', () => openDz(null, 'cars'));
 $('btnDesign').addEventListener('click', () => openDz(null, 'home'));
-$('tabStock').addEventListener('click', () => { mine = false; show(); });
-$('tabMine').addEventListener('click', () => { mine = true; show(); });
+$('tabStock').addEventListener('click', () => { carTab = 'stock'; mine = false; show(); });
+$('tabMine').addEventListener('click', () => { carTab = 'mine'; mine = true; show(); });
+$('tabPub').addEventListener('click', () => { carTab = 'published'; show(); loadPublishedCards('car', true) }); $('moreCars').addEventListener('click', () => loadPublishedCards('car', false));
 function renderMine() {
   const el = $('mgrid'), l = loadCustom(); el.textContent = '';
   if (!l.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.style.gridColumn = '1/-1'; p.textContent = 'Aucune voiture créée pour le moment.'; el.appendChild(p); return; }
@@ -297,7 +313,7 @@ function renderMine() {
     const w = document.createElement('div'); w.className = 'mcell';
     w.appendChild(cardEl(d, (x, c) => carPreview(x, { sheet: CARS[c.id] }), (c) => statsOf(CARS[c.id]), pickCar));
     const e = document.createElement('button'); e.type = 'button'; e.className = 'bk'; e.textContent = '✎ Modifier'; e.addEventListener('click', () => openDz(d, 'cars'));
-    w.appendChild(e); el.appendChild(w);
+    w.appendChild(e); w.appendChild(pubLocalControl('car', d)); el.appendChild(w);
   }
 }
 // ── Conception de circuit : l'éditeur (core/track-editor.js) dessine sur #tkCanvas ; ici : champs, validation, enregistrement, essai (contre la montre).
@@ -325,8 +341,8 @@ const openTk = (d, from) => { tkFrom = from; tkPending = d; tkLoaded = false; lo
 function tkSave() {
   if (!TK || !$('tkSave') || $('tkSave').disabled) return null;
   const S = TK.def, l = loadTracks(); S.name = S.name.trim().slice(0, 24) || 'Mon circuit'; S.id = S.id || 'c-' + Date.now().toString(36);
-  const i = l.findIndex((t) => t.id === S.id); if (i < 0 && l.length >= MAX_TRACKS) { alert('Maximum ' + MAX_TRACKS + ' circuits.'); return null; }
-  const o = { id: S.id, name: S.name, start: Math.round(S.start), pts: S.pts.map((p) => [...p]), elev: S.elev.slice(), theme: S.theme, corners: S.corners.map((c) => ({ type: c.type, radius: c.radius })) }; i < 0 ? l.push(o) : (l[i] = o); saveTracks(l); return o;
+  const i = l.findIndex((t) => t.id === S.id); if (i < 0 && l.length >= MAX_TRACKS) { notify.show({ type: 'error', title: 'Limite atteinte', message: 'Maximum ' + MAX_TRACKS + ' circuits.' }); return null; }
+  const previous = l.find(t => t.id === S.id); const o = { ...(previous?.pubId ? { pubId: previous.pubId, pubOwner: previous.pubOwner, published: true } : {}), id: S.id, name: S.name, start: Math.round(S.start), pts: S.pts.map((p) => [...p]), elev: S.elev.slice(), theme: S.theme, corners: S.corners.map((c) => ({ type: c.type, radius: c.radius })) }; i < 0 ? l.push(o) : (l[i] = o); saveTracks(l); return o;
 }
 $('tkName').addEventListener('input', (e) => { if (TK) TK.def.name = e.target.value; });
 $('tkStart').addEventListener('input', (e) => TK.setStart(+e.target.value));
@@ -334,17 +350,18 @@ $('tkAlt').addEventListener('input', (e) => TK.setAlt(+e.target.value));
 $('tkCorner').addEventListener('change', (e) => { if (TK) TK.setCorner(e.target.value, +$('tkRadius').value); });
 $('tkRadius').addEventListener('input', (e) => { $('tkRadiusV').textContent = e.target.value + ' m'; if (TK) TK.setCorner($('tkCorner').value, +e.target.value); });
 $('tkZi').addEventListener('click', () => TK.zoom(1.3)); $('tkZo').addEventListener('click', () => TK.zoom(1 / 1.3)); $('tkFit').addEventListener('click', () => TK.fit()); $('tkDelPt').addEventListener('click', () => TK.del());
-$('tkSave').addEventListener('click', () => { if (tkSave()) { mineT = true; location.replace('#circuits'); } });
+$('tkSave').addEventListener('click', () => { if (tkSave()) { mineT = true; trackTab = 'mine'; location.replace('#circuits'); } });
 $('tkTest').addEventListener('click', () => { const o = tkSave(); if (o) launchClm({ circuit: o.id, car: $('tkCar').value }); });
-$('tkDel').addEventListener('click', () => {
-  const id = TK.def.id; saveTracks(loadTracks().filter((c) => c.id !== id));
+$('tkDel').addEventListener('click', async () => {
+  const id = TK.def.id, old = loadTracks().find(t => t.id === id); if (old?.pubId) { if (!await notify.confirm({ title: 'Dépublier et supprimer', message: 'Ce circuit publié sera retiré avant sa suppression. Continuer ?' })) return; try { await unpublishItem('track', old.pubId) } catch (e) { notify.show({ type: 'error', title: 'Dépublication impossible', message: publicationError(e) }); return } } saveTracks(loadTracks().filter((c) => c.id !== id));
   if (cfg.circuit === id) { cfg.circuit = 'serra-nova'; saveSaved(cfg); }
-  mineT = true; location.replace('#circuits');
+  mineT = true; trackTab = 'mine'; location.replace('#circuits');
 });
 $('newTrack').addEventListener('click', () => openTk(null, 'circuits'));
 $('btnTrack').addEventListener('click', () => openTk(null, 'home'));
-$('tabCStock').addEventListener('click', () => { mineT = false; show(); });
-$('tabCMine').addEventListener('click', () => { mineT = true; show(); });
+$('tabCStock').addEventListener('click', () => { trackTab = 'stock'; mineT = false; show(); });
+$('tabCMine').addEventListener('click', () => { trackTab = 'mine'; mineT = true; show(); });
+$('tabCPub').addEventListener('click', () => { trackTab = 'published'; show(); loadPublishedCards('track', true) }); $('moreTracks').addEventListener('click', () => loadPublishedCards('track', false));
 function renderMineT() {
   const el = $('tgrid'), l = loadTracks(); el.textContent = '';
   if (!l.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.style.gridColumn = '1/-1'; p.textContent = 'Aucun circuit créé pour le moment.'; el.appendChild(p); return; }
@@ -352,13 +369,145 @@ function renderMineT() {
     const w = document.createElement('div'); w.className = 'mcell';
     w.appendChild(cardEl({ id: d.id, name: d.name }, cPrev, cStats, cPick));
     const e = document.createElement('button'); e.type = 'button'; e.className = 'bk'; e.textContent = '✎ Modifier'; e.addEventListener('click', () => openTk(d, 'circuits'));
-    w.appendChild(e); el.appendChild(w);
+    w.appendChild(e); w.appendChild(pubLocalControl('track', d)); el.appendChild(w);
   }
 }
+
+function pubLocalControl(kind, d) { const b = document.createElement('button'); b.type = 'button'; b.className = 'bk'; const key = kind + ':' + d.id; const owner = Net.N.cfg?.auth?.currentUser?.uid; b.textContent = d.pubId ? (d.pubOwner === owner ? '↗ Publié · Dépublier' : '↗ Publié') : '🌐 Publier'; b.disabled = pubBusy.has(key); b.addEventListener('click', async () => { if (pubBusy.has(key)) return; pubBusy.add(key); b.disabled = true; try { await Net.publicationReady(); const uid = Net.N.cfg?.auth?.currentUser?.uid; if (d.pubId) { if (d.pubOwner !== uid) throw Error('Cette publication ne vous appartient pas.'); if (!await notify.confirm({ title: 'Dépublier', message: 'Retirer cette création de la liste publique ?' })) return; await unpublishItem(kind, d.pubId); delete d.pubId; delete d.pubOwner; delete d.published; saveLocal(kind, d); notify.show({ type: 'success', title: 'Dépublication effectuée', message: 'La création n’est plus visible publiquement.' }); } else { await publishItem(kind, d); d.pubOwner = uid; saveLocal(kind, d); notify.show({ type: 'success', title: 'Publication effectuée', message: 'Votre création est maintenant visible par les joueurs.' }); } show(); } catch (e) { notify.show({ type: 'error', title: 'Publication impossible', message: publicationError(e) }); } finally { pubBusy.delete(key); b.disabled = false } }); return b }
+function saveLocal(k, d) { if (k === 'car') { const a = loadCustom(), i = a.findIndex(x => x.id === d.id); if (i >= 0) a[i] = d; saveCustom(a) } else { const a = loadTracks(), i = a.findIndex(x => x.id === d.id); if (i >= 0) a[i] = d; saveTracks(a) } }
+function publicationError(e) { const m = String(e?.message || e || 'Erreur réseau'); if (/permission_denied|permission denied|PERMISSION_DENIED/i.test(m)) return 'Permission refusée par Firebase. Vérifiez les règles de publication et votre connexion.'; if (/60|minute|rate/i.test(m)) return '1 publication maximum par minute.'; if (/network|offline|connexion|unavailable/i.test(m)) return 'Connexion réseau indisponible. Réessayez lorsque vous serez en ligne.'; return m }
+function localHas(k, id) { return (k === 'car' ? loadCustom() : loadTracks()).some(x => x.id === id) }
+async function refreshPublishedCount(k) { const el = $(k === 'car' ? 'cntPub' : 'cntCPub'); if (!el) return; const token = ++pubCountToken[k], seen = new Set(); let before = null; try { while (true) { const items = await listPublished(k, { before, reset: before === null }); if (!items.length) break; for (const item of items) if (item?.id) seen.add(item.id); const next = items[items.length - 1]?.id; if (!next || next === before || items.length < 20) break; before = next; } if (pubCountToken[k] === token) el.textContent = String(seen.size) } catch (e) { if (pubCountToken[k] === token) el.textContent = '–' } }
+async function loadPublishedCards(k, reset) { if (pubLoading.has(k)) return; pubLoading.add(k); const el = $(k === 'car' ? 'vpgrid' : 'tpgrid'), more = $(k === 'car' ? 'moreCars' : 'moreTracks'); if (reset) { pubSeen[k].clear(); el.textContent = ''; if (k === 'car') { pubCars = []; pubCarCursor = null } else { pubTracks = []; pubTrackCursor = null } } const existing = pubSeen[k]; try { const items = await listPublished(k, { before: reset ? null : (k === 'car' ? pubCarCursor : pubTrackCursor), reset }); const clean = []; for (const it of items) { if (!it?.id || existing.has(it.id)) continue; existing.add(it.id); clean.push(it) } for (const it of clean) appendPubCardOnce(k, it, el); const all = k === 'car' ? pubCars : pubTracks; all.push(...clean); if (clean.length) { if (k === 'car') pubCarCursor = clean.at(-1).id; else pubTrackCursor = clean.at(-1).id } more.hidden = items.length < 20; if (!all.length && !items.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.textContent = 'Aucune création publiée pour le moment.'; el.append(p) } } catch (e) { notify.show({ type: 'error', title: 'Erreur réseau', message: publicationError(e) }) } finally { pubLoading.delete(k); refreshPublishedCount(k) } }
+function appendPubCardOnce(k, it, el) { // le document d/{id} n'est chargé que lorsque l'aperçu entre dans le viewport.
+  const wrap = document.createElement('div'); wrap.className = 'mcell'; const b = document.createElement('button'); b.type = 'button'; b.className = 'gcard'; b.dataset.id = it.id; b.dataset.pubKind = k; b.dataset.previewState = 'loading'; b.innerHTML = '<canvas width="300" height="220" aria-label="Aperçu en chargement"></canvas><h3></h3><p></p><small>Créé par un joueur</small><div class="pub-preview-stats"></div>'; b.querySelector('h3').textContent = it.name; b.querySelector('p').textContent = 'par ' + it.author; drawPubPlaceholder(b.querySelector('canvas').getContext('2d'), 'Chargement de l’aperçu…'); b.addEventListener('click', async () => { b.disabled = true; try { const o = await loadPubData(k, it.id); if (!o) throw Error('Création publiée introuvable.'); if (k === 'car') { o.id = 'pubcar_' + it.id; sessionStorage.setItem('little-turismo-pub-car', JSON.stringify(o)); registerCustom(o); cfg.car = o.id; saveSaved(cfg); location.hash = 'race' } else { o.id = 'pubtrack_' + it.id; sessionStorage.setItem('little-turismo-pub-track', JSON.stringify(o)); cfg.circuit = o.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); if (create) makeRoom(); } else location.hash = 'cars' } } catch (e) { notify.show({ type: 'error', title: 'Chargement impossible', message: publicationError(e) }) } finally { b.disabled = false } }); wrap.append(b); el.append(wrap); if (pubPreviewObserver) pubPreviewObserver.observe(b.querySelector('canvas')); else queuePubPreview(b.querySelector('canvas'))
+}
+function drawPubPlaceholder(x, label) { if (!x) return; x.clearRect(0, 0, 300, 220); x.fillStyle = '#111827'; x.fillRect(0, 0, 300, 220); x.fillStyle = '#8290a8'; x.font = '14px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(label, 150, 110) }
+function queuePubPreview(canvas) { const card = canvas.closest('.gcard'); if (!card || card.dataset.previewQueued) return; card.dataset.previewQueued = '1'; pubPreviewQueue.push({ canvas, card, kind: card.dataset.pubKind, id: card.dataset.id }); pumpPubPreviews() }
+function loadPubData(kind, id) { const key = kind + ':' + id; if (pubDataPending.has(key)) return pubDataPending.get(key); const req = new Promise((resolve, reject) => { pubDataQueue.push({ kind, id, key, resolve, reject }); pumpPubData() }); pubDataPending.set(key, req); return req }
+function pumpPubData() { while (pubDataActive < 3 && pubDataQueue.length) { const job = pubDataQueue.shift(); pubDataActive++; (job.kind === 'car' ? loadPublishedCar(job.id) : loadPublishedTrack(job.id)).then(job.resolve, job.reject).finally(() => { pubDataPending.delete(job.key); pubDataActive--; pumpPubData() }) } }
+function pumpPubPreviews() { while (pubPreviewActive < 3 && pubPreviewQueue.length) { const job = pubPreviewQueue.shift(); if (!job.card.isConnected) continue; pubPreviewActive++; renderPubPreview(job).catch(() => { if (job.canvas.isConnected) { job.card.dataset.previewState = 'error'; job.canvas.setAttribute('aria-label', 'Échec du chargement de l’aperçu'); drawPubPlaceholder(job.canvas.getContext('2d'), 'Échec du chargement') } }).finally(() => { pubPreviewActive--; pumpPubPreviews() }) } }
+async function renderPubPreview({ canvas, card, kind, id }) { const key = kind + ':' + id, cached = pubPreviewCache.get(key); if (cached) { const image = new Image(); await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = cached.image }); if (!canvas.isConnected) return; const x = canvas.getContext('2d'); x.clearRect(0, 0, 300, 220); x.drawImage(image, 0, 0, 300, 220); canvas.setAttribute('aria-label', kind === 'car' ? 'Aperçu de la voiture publiée' : 'Aperçu du circuit publié'); card.dataset.previewState = 'ready'; pubPreviewCache.delete(key); pubPreviewCache.set(key, cached); appendPubPreviewStats(card, cached.rows); return } const d = await loadPubData(kind, id); if (!d) throw Error('Aperçu indisponible'); if (!canvas.isConnected) return; const x = canvas.getContext('2d'); x.clearRect(0, 0, 300, 220); let rows = []; if (kind === 'car') { const sheet = customSheet(d); carPreview(x, { sheet }); rows = statsOf(sheet) } else { const t = buildTrack({ ...d, ec: true }, 'pubtrack_' + id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); const st = stats(t); rows = [['Longueur', (st.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', st.turns], ['Dénivelé', Math.round(st.climb) + ' m']] } card.dataset.previewState = 'ready'; canvas.setAttribute('aria-label', kind === 'car' ? 'Aperçu de la voiture publiée' : 'Aperçu du circuit publié'); pubPreviewCache.set(key, { image: canvas.toDataURL('image/png'), rows }); while (pubPreviewCache.size > PUB_PREVIEW_CACHE_MAX) pubPreviewCache.delete(pubPreviewCache.keys().next().value); appendPubPreviewStats(card, rows) }
+function appendPubPreviewStats(card, rows) { const box = card.querySelector('.pub-preview-stats'); if (!box || box.childElementCount) return; for (const [name, value] of rows) { const row = document.createElement('div'); row.className = 'st'; row.innerHTML = '<span></span><b></b>'; row.firstChild.textContent = name; row.lastChild.textContent = value; box.appendChild(row) } }
+
 sync(false); show();
 
+// Asset exchange: published items are represented only by Firebase ID; local items use a bounded compact payload.
+const ASSET_MAX = 14000;
+const packedBytes = value => new TextEncoder().encode(JSON.stringify(value)).byteLength;
+const safeName = (v, max = 24) => typeof v === 'string' && v.length <= max;
+const validTrack = d => d && typeof d === 'object' && safeName(d.name, 24) && Number.isFinite(d.start) && d.start >= 0 && d.start <= 12000 && ['temperate','forest','snow','desert','tropical','autumn','volcano','dusk'].includes(d.theme) &&
+  Array.isArray(d.pts) && d.pts.length >= 6 && d.pts.length <= 96 && d.pts.every(p => Array.isArray(p) && p.length === 2 && p.every(v => Number.isFinite(v) && Math.abs(v) <= 2000)) &&
+  Array.isArray(d.elev) && d.elev.length === d.pts.length && d.elev.every(v => Number.isFinite(v) && v >= -200 && v <= 300) &&
+  (!d.corners || (Array.isArray(d.corners) && (d.corners.length === 0 || d.corners.length === d.pts.length) && d.corners.length <= 96 && d.corners.every(c => c && ['smooth','sharp','round','hairpin'].includes(c.type) && Number.isFinite(c.radius) && c.radius >= 0 && c.radius <= 250)));
+const validCar = d => d && typeof d === 'object' && safeName(d.name, 32) && ['gt','wedge','proto','rally','open','drag','thrust'].includes(d.kind) &&
+  /^#[0-9a-f]{6}$/i.test(d.color) && /^#[0-9a-f]{6}$/i.test(d.accent) &&
+  ['vmax','ch','mass','grip','aero','bal'].every(k => { const [lo,hi] = getSpecRange(d.kind,k); return Number.isFinite(d[k]) && d[k] >= lo && d[k] <= hi; });
+function packLocal(kind, d) {
+  if (kind === 'track') {
+    if (!validTrack(d)) throw Error('Le circuit local contient des données invalides.');
+    return { n:d.name, s:Math.round(d.start), p:d.pts.map(p=>p.map(v=>Math.round(v*10)/10)), e:d.elev.map(v=>Math.round(v*10)/10), h:d.theme, c:(d.corners||[]).map(x=>({t:x.type,r:Math.round(x.radius*10)/10})) };
+  }
+  if (!validCar(d)) throw Error('La voiture locale contient des données invalides.');
+  return { n:d.name, k:d.kind, c:d.color, a:d.accent, v:d.vmax, ch:d.ch, m:d.mass, g:d.grip, ae:d.aero, b:d.bal };
+}
+function unpackLocal(kind, d) {
+  if (kind === 'track') return { name:d.n, start:d.s, pts:d.p, elev:d.e, theme:d.h, corners:(d.c||[]).map(x=>({type:x.t,radius:x.r})) };
+  return { name:d.n, kind:d.k, color:d.c, accent:d.a, vmax:d.v, ch:d.ch, mass:d.m, grip:d.g, aero:d.ae, bal:d.b };
+}
+function assetRef(kind, id, uid = Net.N.uid) {
+  let d = kind === 'track' ? loadTracks().find(x=>x.id===id) : loadCustom().find(x=>x.id===id);
+  if (!d && (id.startsWith(kind === 'track' ? 'pubtrack_' : 'pubcar_') || id.startsWith('mp' + (kind === 'track' ? 't_' : 'c_')))) {
+    try { d = JSON.parse(sessionStorage.getItem(kind === 'track' ? 'little-turismo-pub-track' : 'little-turismo-pub-car')); } catch {}
+    if (d?.id !== id) d = null;
+  }
+  // Un pubId valide est un digest SHA-256 sur 20 octets = 40 chars hex (ou au moins /^[a-f0-9]{20}$/ selon publish.js).
+  // Si pubId vaut l'ID local (ex: 'c_mw13nnnd'), on l'ignore : la voiture est locale, pas publiée.
+  const rawPubId = d?.pubId || (id.startsWith(kind === 'track' ? 'pubtrack_' : 'pubcar_') ? id.slice(kind === 'track' ? 9 : 7) : null);
+  const pubId = typeof rawPubId === 'string' && /^[a-f0-9]{20}$/.test(rawPubId) ? rawPubId : null;
+  if (pubId) return { type:'published', id:pubId };
+  if (kind === 'track' && !d && [...CIRCUITS, ...loadTracks()].some(x=>x.id===id)) return { type:'stock', id };
+  if (kind === 'car' && !d && CAR_LIST.some(x=>x.id===id)) return { type:'stock', id };
+  if (!d) throw Error(`Création ${kind === 'track' ? 'de circuit' : 'de voiture'} introuvable : ${id}`);
+  const data = packLocal(kind,d), text = JSON.stringify(data);
+  if (packedBytes(data) > ASSET_MAX) throw Error('Création locale trop volumineuse (maximum 14 Ko).');
+  return { type:'local', id:d.id, data:text };
+}
+function publishedAssetId(ref, kind) {
+  if (typeof ref?.id !== 'string') return null;
+  // La sélection réseau envoie l'ID Firebase brut (20 hex). Accepter aussi
+  // l'ID UI pubcar_/pubtrack_ des anciennes rooms, en retirant son préfixe.
+  const prefix = kind === 'car' ? 'pubcar_' : 'pubtrack_';
+  const id = ref.id.startsWith(prefix) ? ref.id.slice(prefix.length) : ref.id;
+  // Seuls les IDs Firebase valides (digest SHA-256 tronqué = 20 chars hex minuscule) sont acceptés.
+  // Cela empêche les IDs locaux (ex: 'c_mw13nnnd') d'être traités comme des publications Firebase.
+  return /^[a-f0-9]{20}$/.test(id) ? id : null;
+}
+function unpackAssetLocal(ref, kind) {
+  const payload = JSON.parse(ref.data);
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw Error('Format local invalide.');
+  // Formats compact actuels + fiche étendue historique (publish.js / room ancienne).
+  const compact = kind === 'track' ? Object.prototype.hasOwnProperty.call(payload, 'p') : Object.prototype.hasOwnProperty.call(payload, 'k') && Object.prototype.hasOwnProperty.call(payload, 'v');
+  return compact ? unpackLocal(kind, payload) : payload;
+}
+function validAssetRef(ref, kind) {
+  if (!ref || typeof ref !== 'object' || !['track','car'].includes(kind)) return false;
+  if (ref.type === 'published') return !!publishedAssetId(ref, kind);
+  if (ref.type === 'stock') return typeof ref.id === 'string' && (kind === 'track' ? CIRCUITS.some(x=>x.id===ref.id) : CAR_LIST.some(x=>x.id===ref.id));
+  if (ref.type !== 'local' || typeof ref.id !== 'string' || ref.id.length > 80 || typeof ref.data !== 'string') return false;
+  try {
+    if (new TextEncoder().encode(ref.data).byteLength > ASSET_MAX) return false;
+    const d = unpackAssetLocal(ref, kind);
+    return kind === 'track' ? validTrack(d) : validCar(d);
+  } catch { return false; }
+}
+async function installAsset(ref, kind, owner = 'guest') {
+  // Cas spécial : ref 'published' avec un ID non-Firebase (ex: ID local hérité d'un bug ancien).
+  // On tente un repli stock avant de rejeter.
+  if (ref?.type === 'published' && !publishedAssetId(ref, kind)) {
+    const rawId = typeof ref.id === 'string' ? ref.id : '';
+    if (kind === 'track' && CIRCUITS.some(x => x.id === rawId)) return rawId;
+    if (kind === 'car' && CAR_LIST.some(x => x.id === rawId)) return rawId;
+    throw Error(`Ref de publication invalide (ID non-Firebase : "${rawId}"). Recréez la room pour appliquer le correctif.`);
+  }
+  if (!validAssetRef(ref,kind)) throw Error(`Données de ${kind === 'track' ? 'circuit' : 'voiture'} invalides.`);
+  if (ref.type === 'stock') return ref.id;
+  let d;
+  if (ref.type === 'published') {
+    const id = publishedAssetId(ref, kind);
+    // S'assurer que Firebase est initialisé avant de lire (les invités rejoignant une room peuvent avoir une auth en cours)
+    if (!Net.N.db) await Net.init();
+    // Essaie jusqu'à 3 fois (connexion Firebase parfois lente pour les joueurs qui rejoignent)
+    for (let attempt = 0; attempt < 3 && !d; attempt++) {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt));
+      try { d = kind === 'track' ? await loadPublishedTrack(id) : await loadPublishedCar(id); } catch { /* réessai */ }
+    }
+    // Repli : cache localStorage (item mis en place lors de la navigation/publication ou de la sélection en lobby)
+    if (!d) {
+      try {
+        const ck = `lt-pub-${kind === 'track' ? 'track' : 'car'}-item-v2-${id}`;
+        const cached = JSON.parse(localStorage.getItem(ck));
+        if (cached?.v && Date.now() - cached.t < 600000) d = cached.v;
+      } catch { /* pas de cache */ }
+    }
+    if (!d) throw Error(`Publication ${ref.id} introuvable ou inaccessible. Vérifiez la connexion Firebase.`);
+  } else d = unpackAssetLocal(ref, kind);
+  if (!(kind === 'track' ? validTrack(d) : validCar(d))) throw Error(`Publication: données de ${kind} invalides.`);
+  const suffix = `${String(owner).replace(/[^a-zA-Z0-9]/g,'').slice(0,40)}_${ref.type === 'published' ? ref.id : ref.id.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,36)}`;
+  const id = (kind === 'track' ? 'mpt_' : 'mpc_') + suffix;
+  if (kind === 'track') {
+    // Stocker dans la liste MP séparée : n'apparaît PAS dans "Mes Créations"
+    const list = loadMpTracks(); if (!list.some(x=>x.id===id)) { list.push({ ...d, id }); saveMpTracks(list); }
+  } else {
+    const installed = { ...d, id };
+    // Stocker dans la liste MP séparée : n'apparaît PAS dans "Mes Créations"
+    const list = loadMpCars(); if (!list.some(x=>x.id===id)) { list.push(installed); saveMpCars(list); }
+    registerCustom(installed);
+  }
+  return id;
+}
 // ── Multijoueur : l'hôte configure uniquement les qualifications et le nombre d'IA.
-let activeRoom = null, roomData = null, stopRoomWatch = null, roomBusy = false;
+let activeRoom = null, roomData = null, stopRoomWatch = null, roomBusy = false, roomLoadNotice = '';
 const roomStatus = (s) => { const el = $('multiStatus'); if (el) el.textContent = s || ''; };
 const playerName = () => {
   const n = $('multiName').value.trim().slice(0, 16);
@@ -399,6 +548,7 @@ function fitRoomRanges() {
     if (+aiEl.value > maxAi) aiEl.value = String(maxAi);
     $('roomAiValue').textContent = aiEl.value;
   }
+  $('roomCarModeWrap').hidden = !(+aiEl?.value > 0);
 }
 
 function renderRoom(d) {
@@ -406,12 +556,12 @@ function renderRoom(d) {
   if (!d) { $('roomOverlay').hidden = true; return; }
   const session = Net.readSession(), host = d.leaderId === session?.uid, players = Object.entries(d.players || {});
   $('roomCodeLabel').textContent = d.code || activeRoom;
-  $('roomNote').textContent = host ? 'Tu choisis les qualifications, les tours, la difficulté et les IA en plus.' : 'En attente que le créateur lance la course…';
+  $('roomNote').textContent = d.state === 'loading' ? 'Chargement des créations avant le départ…' : (roomLoadNotice && host ? roomLoadNotice : host ? 'Tu choisis les qualifications, les tours, la difficulté et les IA en plus.' : 'En attente que le créateur lance la course…');
   $('hostSettings').hidden = !host;
   $('guestWaiting').hidden = host;
   const dc = d.config || cfg;
   $('roomQualifying').value = String(!!dc.qualifying);
-  $('roomAi').value = String(dc.ai || 0);
+  $('roomAi').value = String(dc.ai || 0); $('roomCarMode').value = dc.carMode === 'same' ? 'same' : 'mixed';
   $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; $('roomDiff').value = dc.diff || 'normal';
   fitRoomRanges();
   $('roomPlayers').textContent = '';
@@ -426,8 +576,8 @@ function renderRoom(d) {
   }
   $('publicWrap').hidden = !host || d.state === 'playing'; if (host) $('roomPublic').checked = !!d.public;
   $('startRoom').hidden = !host;
-  $('startRoom').disabled = players.length < 1 || players.length + (+$('roomAi').value || 0) > 20;
-  if (d.state === 'playing') { if (host) Net.setPublic(activeRoom, null); beginMultiplayer(d); }
+  $('startRoom').disabled = d.state !== 'waiting' || players.length < 1 || players.length + (+$('roomAi').value || 0) > 20;
+  if (d.state === 'loading' || d.state === 'playing') { if (host) Net.setPublic(activeRoom, null); beginMultiplayer(d); if (host && d.state === 'loading') monitorRoomPreparation(d); }
   else if (host) syncPublic(d);
 }
 // Rooms publiques : l'hôte publie une fiche dans l'index, rafraîchie toutes les 20 s tant que la room attend.
@@ -470,11 +620,40 @@ function enterRoom(code, d) {
   activeRoom = code; $('roomOverlay').hidden = false; if (stopRoomWatch) stopRoomWatch(); stopRoomWatch = Net.watch(code, renderRoom); renderRoom(d);
 }
 
-function beginMultiplayer(d) {
+let preparingToken = null;
+async function beginMultiplayer(d) {
   const session = Net.readSession(), p = d.players?.[session?.uid];
-  if (!session || !p || session.going) return;
-  session.going = true; session.hostId = d.leaderId; session.players = d.players; session.code = d.code; Net.saveSession(session);
-  const rc = sanitize({ ...d.config, car: p.car || d.config.car }); startSession(rc); location.href = 'game.html';
+  if (!session || !p || session.going || !['loading','playing'].includes(d.state)) return;
+  const token = `${d.code}:${d.startedAt || ''}:${d.state}:${session.uid}`;
+  if (preparingToken === token) return;
+  preparingToken = token; roomStatus('Chargement et validation des créations…');
+  try {
+    const trackId = await installAsset(d.assets?.track || assetRef('track', d.config?.circuit), 'track', d.leaderId);
+    const mappedPlayers = {};
+    for (const [uid, player] of Object.entries(d.players || {})) {
+      if (player.away) { mappedPlayers[uid] = player; continue; }
+      const playerCar = await installAsset(player.carAsset || assetRef('car', player.car || d.config?.car), 'car', uid);
+      mappedPlayers[uid] = { ...player, car:playerCar };
+    }
+    const carId = mappedPlayers[session.uid]?.car || await installAsset(p.carAsset || assetRef('car', p.car || d.config?.car), 'car', session.uid);
+    if (d.state === 'loading') {
+      const latest = await Net.getRoom(d.code);
+      if (!latest || latest.state !== 'loading' || !latest.players?.[session.uid] || latest.players[session.uid].away) {
+        preparingToken = null; roomStatus('Le chargement a été interrompu : vous n’êtes plus dans cette room.'); return;
+      }
+      await Net.update(d.code, { [`players/${session.uid}/ready`]: true, [`players/${session.uid}/readyAt`]: Net.now(), [`players/${session.uid}/readyError`]: null });
+      roomStatus('Créations chargées ; attente des autres pilotes…'); return;
+    }
+    const latest = await Net.getRoom(d.code);
+    if (!latest || latest.state !== 'playing' || !latest.players?.[session.uid] || latest.players[session.uid].away) { preparingToken = null; roomStatus('Le départ a été annulé ou le joueur a quitté la room.'); return; }
+    session.going = true; session.hostId = latest.leaderId; session.players = Object.fromEntries(Object.entries(latest.players || {}).map(([uid, player]) => [uid, mappedPlayers[uid] || player])); session.code = latest.code;
+    session.assets = { trackId, carId }; session.replayConfig = latest.config; Net.saveSession(session);
+    const rc = sanitize({ ...latest.config, circuit:trackId, car:carId }); startSession(rc); location.href = 'game.html';
+  } catch (e) {
+    preparingToken = null;
+    roomStatus(`Chargement impossible : ${e.message || 'données incorrectes'}`);
+    if (Net.N.uid) await Net.update(d.code, { [`players/${session.uid}/ready`]: false, [`players/${session.uid}/readyError`]: String(e.message || e).slice(0,180) });
+  }
 }
 
 $('roomQualifying')?.addEventListener('change', async () => {
@@ -484,6 +663,10 @@ $('roomQualifying')?.addEventListener('change', async () => {
 
 $('roomLaps')?.addEventListener('input', () => { $('roomLapsValue').textContent = $('roomLaps').value; });
 
+$('roomCarMode')?.addEventListener('change', async () => {
+  if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
+  await Net.update(activeRoom, { 'config/carMode': $('roomCarMode').value });
+});
 $('roomAi')?.addEventListener('input', async () => {
   fitRoomRanges();
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
@@ -495,60 +678,107 @@ for (const [id, key] of [['roomLaps', 'laps'], ['roomDiff', 'diff']]) $(id)?.add
   await Net.update(activeRoom, { ['config/' + key]: key === 'laps' ? +$(id).value : $(id).value });
 });
 
-$('createRoom').addEventListener('click', async () => {
-  if (roomBusy) return; const name = playerName(); if (!name) return; roomBusy = true; roomStatus('Connexion…');
+$('createRoom').addEventListener('click', () => { if (!roomBusy && playerName()) { multiCreatePending = true; location.hash = 'circuits'; } });
+async function makeRoom() {
+  if (roomBusy) return; const name = playerName(); if (!name) return; roomBusy = true; roomCreationInFlight = true; const token = ++roomCreateToken; roomStatus('Connexion…');
+  let made = null, sessionSaved = false;
   try {
     if (!(await Net.init())) throw new Error('offline');
-    let made = null; const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: 'mixed', ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff });
+    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff });
     for (let i = 0; i < 4 && !made; i++) {
       const c = Net.code();
       const ok = await Net.createRoom(c, {
         code: c, state: 'waiting', leaderId: Net.N.uid, createdAt: Net.now(), maxHumans: 20, numPlayers: 20, config: initial,
-        players: { [Net.N.uid]: { uid: Net.N.uid, name, score: 0, car: cfg.car, joined: Net.now(), lastSeen: Net.now(), away: false } }
+        assets: { track: assetRef('track', cfg.circuit) },
+        players: { [Net.N.uid]: { uid: Net.N.uid, name, score: 0, car: cfg.car, carAsset: assetRef('car', cfg.car), joined: Net.now(), lastSeen: Net.now(), away: false } }
       });
       if (ok) made = c;
     }
     if (!made) throw new Error('room');
-    Net.saveSession({ code: made, uid: Net.N.uid, going: false });
+    if (token !== roomCreateToken) { await Net.leave(made, false); return; }
+    const created = await Net.getRoom(made);
+    if (token !== roomCreateToken) { await Net.leave(made, false); return; }
+    Net.saveSession({ code: made, uid: Net.N.uid, going: false }); sessionSaved = true;
     roomStatus('');
-    enterRoom(made, await Net.getRoom(made));
-  } catch { roomStatus('Multijoueur indisponible. Vérifie la connexion.'); } finally { roomBusy = false; }
-});
+    enterRoom(made, created);
+  } catch (e) {
+    if (made && !sessionSaved) { try { await Net.leave(made, false); } catch { /* nettoyage au mieux */ } }
+    roomStatus(e?.message || 'Multijoueur indisponible. Vérifie la connexion.');
+  } finally { roomBusy = false; roomCreationInFlight = false; }
+}
 
 $('joinRoom').addEventListener('click', async () => {
   if (roomBusy) return; const name = playerName(), code = $('roomCode').value.trim().toUpperCase();
   if (!name || code.length !== 6) { roomStatus('Entre un code de room valide.'); return; }
-  roomBusy = true; roomStatus('Recherche…');
+  roomBusy = true; const token = ++roomJoinToken; roomStatus('Recherche…');
   try {
     if (!(await Net.init())) throw new Error('offline');
+    if (token !== roomJoinToken) return;
     const d = await Net.getRoom(code);
+    if (token !== roomJoinToken) return;
     if (!d || d.state !== 'waiting') throw new Error('missing');
-    if (d.players?.[Net.N.uid]) { Net.saveSession({ code, uid: Net.N.uid, going: false }); enterRoom(code, d); return; }
+    if (d.players?.[Net.N.uid]) {
+      if (token !== roomJoinToken) return;
+      const updated = await Net.update(code, { [`players/${Net.N.uid}/car`]: cfg.car, [`players/${Net.N.uid}/carAsset`]: assetRef('car', cfg.car) });
+      if (!updated) throw new Error('join');
+      if (token !== roomJoinToken) return;
+      Net.saveSession({ code, uid: Net.N.uid, going: false }); enterRoom(code, await Net.getRoom(code)); return;
+    }
     if (Object.keys(d.players || {}).length >= (d.maxHumans || 20)) throw new Error('full');
-    const r = await Net.join(code, { name, score: 0, car: cfg.car, joined: Net.now(), lastSeen: Net.now(), away: false });
+    const r = await Net.join(code, { name, score: 0, car: cfg.car, carAsset: assetRef('car', cfg.car), joined: Net.now(), lastSeen: Net.now(), away: false });
     if (r !== true) throw new Error('join');
+    if (token !== roomJoinToken) { await Net.leave(code, false); return; }
     Net.saveSession({ code, uid: Net.N.uid, going: false });
     roomStatus('');
     enterRoom(code, await Net.getRoom(code));
-  } catch (e) { roomStatus(e.message === 'full' ? 'Cette room est complète.' : 'Room introuvable ou déjà lancée.'); } finally { roomBusy = false; }
+  } catch (e) { if (token === roomJoinToken) roomStatus(e.message === 'full' ? 'Cette room est complète.' : 'Room introuvable ou déjà lancée.'); } finally { roomBusy = false; }
 });
 
+let prepMonitor = null;
+function monitorRoomPreparation(initial) {
+  if (prepMonitor) return;
+  const code = initial.code || activeRoom, deadline = Date.now() + 45000;
+  prepMonitor = setInterval(async () => {
+    const d = await Net.getRoom(code);
+    if (!d || d.state !== 'loading') { clearInterval(prepMonitor); prepMonitor = null; return; }
+    const players = Object.entries(d.players || {}).filter(([,p]) => !p.away);
+    const bad = players.find(([,p]) => p.readyError);
+    if (bad) { await abortRoomLoad(code, `Échec du chargement (${bad[1].name || 'un joueur'}) : ${bad[1].readyError}`); return; }
+    if (players.length && players.every(([,p]) => p.ready === true)) {
+      clearInterval(prepMonitor); prepMonitor = null;
+      await Net.update(code, { state:'playing', startedAt:Net.now() }); return;
+    }
+    if (Date.now() >= deadline) await abortRoomLoad(code, 'Délai dépassé (45 s) : un pilote n’a pas chargé les créations. Réessayez ou retirez-le de la room.');
+  }, 700);
+}
+async function abortRoomLoad(code, message) {
+  clearInterval(prepMonitor); prepMonitor = null;
+  const d = await Net.getRoom(code); if (d?.state !== 'loading') return;
+  const updates = { state:'waiting', startedAt:null };
+  for (const [uid] of Object.entries(d.players || {})) { updates[`players/${uid}/ready`] = false; updates[`players/${uid}/readyError`] = null; }
+  await Net.update(code, updates); roomLoadNotice = message; roomStatus(message); const note = $('roomNote'); if (note) note.textContent = message;
+}
 $('startRoom').addEventListener('click', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
   const players = Object.keys(roomData.players || {}).length, aiCount = +$('roomAi').value || 0;
   if (players < 1 || players + aiCount > 20) return;
   clearInterval(pubTimer); pubOn = false; await Net.setPublic(activeRoom, null);   // plus visible dans la liste une fois lancée
   const qual = $('roomQualifying').value === 'true';
-  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value });
-  await Net.update(activeRoom, { config: nextConfig, state: 'playing', startedAt: Net.now(), runtime: { tick: 0, stamp: Net.now() } });
+  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value });
+  // Reset ready flags each round; the assets/config remain intact for replay.
+  roomLoadNotice = ''; const updates = { config: nextConfig, state:'loading', startedAt:Net.now(), runtime:null };
+  for (const uid of Object.keys(roomData.players || {})) { updates[`players/${uid}/ready`] = false; updates[`players/${uid}/readyError`] = null; }
+  if (!(await Net.update(activeRoom, updates))) { roomStatus('Impossible de préparer la course (droits Firebase ou connexion).'); return; }
+  const fresh = await Net.getRoom(activeRoom); if (fresh) monitorRoomPreparation(fresh);
 });
 
 $('leaveRoom').addEventListener('click', async () => {
-  if (activeRoom && roomData?.leaderId === Net.N.uid) { clearInterval(pubTimer); await Net.setPublic(activeRoom, null); }
+  preparingToken = null; if (prepMonitor) { clearInterval(prepMonitor); prepMonitor = null; }
+  if (activeRoom && roomData?.leaderId === Net.N.uid) { clearInterval(pubTimer); pubTimer = null; pubOn = false; await Net.setPublic(activeRoom, null); }
   if (activeRoom) await Net.leave(activeRoom, roomData?.state === 'playing');
-  if (stopRoomWatch) stopRoomWatch();
-  activeRoom = null;
-  $('roomOverlay').hidden = true;
+  if (stopRoomWatch) { stopRoomWatch(); stopRoomWatch = null; }
+  activeRoom = null; roomData = null; roomLoadNotice = '';
+  $('roomOverlay').hidden = true; roomStatus('');
 });
 
 // Retour dans le lobby après un rechargement avant le départ.
@@ -565,3 +795,4 @@ document.addEventListener('click', (e) => {
   document.querySelectorAll('[data-rl]').forEach((x) => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on); });
   document.querySelectorAll('.rpage').forEach((p) => p.classList.toggle('on', p.dataset.p === b.dataset.rl));
 });
+

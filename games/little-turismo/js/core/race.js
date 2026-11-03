@@ -1,7 +1,8 @@
 // Règle de course : feux, faux départ, tours (sens obligatoire via progression maximale), meilleurs tours, classement, résultats.
 import { TRACK } from './track.js';
 
-const LEN = TRACK.length, S0 = TRACK.startIdx * TRACK.ds;
+export const GAP_SENSOR_INTERVAL_M = 50;
+const LEN = TRACK.length, S0 = TRACK.startIdx * TRACK.ds, GAP_SENSOR_COUNT = Math.max(1, Math.ceil(LEN / GAP_SENSOR_INTERVAL_M)), GAP_SENSOR_STEP = LEN / GAP_SENSOR_COUNT;
 const wrapS = (d) => d - LEN * Math.round(d / LEN);
 /** Rang de grille du joueur (0 = pole) : milieu de grille, dernier s'il y a peu d'IA. */
 export const playerIndex = (total) => (total <= 6 ? total - 1 : Math.floor(total / 2));
@@ -10,9 +11,34 @@ export const fmt = (t) => { if (t == null || !isFinite(t)) return '–'; const m
 /** entries[0] = joueur. Chaque entrée : { n, name, ph (physique), start (place de départ 1-based), player? } */
 export function createRace({ laps, entries, waitAll = false, qualifying = false, penaltiesEnabled = true, multi = false, training = false }) {
   const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0 }; });
+  const GAP_LAPS = Math.max(2, Math.min(1002, Math.ceil(Number.isFinite(laps) ? laps : 20) + 2));
+  const gapTimes = new Float64Array(E.length * GAP_LAPS * GAP_SENSOR_COUNT); gapTimes.fill(NaN);
+  const observedS = new Float64Array(E.length), observedP = new Float64Array(E.length), observedT = new Float64Array(E.length);
+  for (let i = 0; i < E.length; i++) { observedS[i] = E[i].ph.s; observedP[i] = E[i].p0; }
+  const gapIndex = (car, progressSensor) => car * GAP_LAPS * GAP_SENSOR_COUNT + progressSensor;
+  const stampSensors = (carIndex, from, to, tFrom, tTo) => {
+    if (!(to > from)) return;
+    let sensor = Math.floor(from / GAP_SENSOR_STEP) + 1;
+    for (let pos = sensor * GAP_SENSOR_STEP; pos <= to && sensor < GAP_LAPS * GAP_SENSOR_COUNT; sensor++, pos = sensor * GAP_SENSOR_STEP) {
+      const index = gapIndex(carIndex, sensor); if (!Number.isFinite(gapTimes[index])) gapTimes[index] = tFrom + (tTo - tFrom) * ((pos - from) / (to - from));
+    }
+  };
+
   const R = {
     phase: 'intro', clock: 0, t: 0, laps, E, waitAll, qualifying, afterPlayer: 0, lights: 0, hold: .5 + Math.random() * 1.5, falseStart: false, penalty: 0, dt: false, goMsg: 0, msg: '', results: null,
-    penaltiesEnabled, penalties: 0, timePenalty: 0, lapPenalty: 0, cutTimer: 0, cutCooldown: 0, penaltyMsg: '', penaltyMsgT: 0, lapMsg: '', lapMsgT: 0, firstFin: false, doneT: 0, sinceFirst: 0
+    penaltiesEnabled, penalties: 0, timePenalty: 0, lapPenalty: 0, cutTimer: 0, cutCooldown: 0, penaltyMsg: '', penaltyMsgT: 0, lapMsg: '', lapMsgT: 0, firstFin: false, doneT: 0, sinceFirst: 0, gapTimes, gapSensorCount: GAP_SENSOR_COUNT, gapSensorStep: GAP_SENSOR_STEP
+  };
+  R.observeSensors = (entry, clock) => {
+    const i = typeof entry === 'number' ? entry : E.indexOf(entry); if (i < 0 || i >= E.length) return; entry = E[i];
+    const s = entry.ph.s, d = wrapS(s - observedS[i]), t0 = observedT[i]; observedS[i] = s;
+    if (d > 0 && d < 80) { const from = observedP[i], to = from + d; stampSensors(i, from, to, t0, clock); observedP[i] = to; }
+    observedT[i] = clock;
+  };
+  R.gapAtSameProgress = (entry, ahead) => {
+    const a = typeof entry === 'number' ? entry : E.indexOf(entry), b = typeof ahead === 'number' ? ahead : E.indexOf(ahead); if (a < 0 || b < 0) return null;
+    const hi = Math.min(GAP_LAPS * GAP_SENSOR_COUNT - 1, Math.floor(Math.max(observedP[a], observedP[b]) / GAP_SENSOR_STEP));
+    for (let sensor = hi; sensor >= 0; sensor--) { const ta = gapTimes[gapIndex(a, sensor)], tb = gapTimes[gapIndex(b, sensor)]; if (Number.isFinite(ta) && Number.isFinite(tb)) return tb - ta; }
+    return null;
   };
 
   const projected = (e) => e.fin !== null ? e.fin : R.t + Math.max(0, laps * LEN - e.maxP) / Math.max(12, (e.maxP - e.p0) / Math.max(R.t, .1)) + (e.player ? R.timePenalty : (e.timePenalty || 0));
@@ -69,11 +95,13 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
     } else if (R.phase !== 'go') return;
     R.t += dt; if (R.penalty > 0) R.penalty -= dt; if (R.goMsg > 0) R.goMsg -= dt;
     R.msg = R.penalty > 0 ? 'Faux départ ! Accélération bloquée' : R.goMsg > 0 ? 'GO !' : '';
-    for (const e of E) {
+    for (let ei = 0; ei < E.length; ei++) {
+      const e = E[ei];
       const d = wrapS(e.ph.s - e.prevS); e.prevS = e.ph.s; if (Math.abs(d) > 80) continue;
       e.p += d;
       if (e.p > e.maxP) {                                                  // seule la progression maximale compte : un demi-tour / aller-retour ne recompte pas
         const old = e.maxP; e.maxP = e.p;
+
         while (e.maxP >= e.k * LEN) {
           const tc = R.t - dt * (1 - (e.k * LEN - old) / (e.maxP - old));  // instant de franchissement interpolé
           if (e.k >= 1) {

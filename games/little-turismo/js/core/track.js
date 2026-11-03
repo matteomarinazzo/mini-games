@@ -1,5 +1,5 @@
 // Circuits : définis à la main (Catmull-Rom fermée, repère x/z, y = altitude). Un seul est construit au chargement (config de session) ; trackOf(id) construit les autres à la demande (aperçus du menu).
-import { sessionConfig, queryConfig, loadTracks } from './config.js';
+import { sessionConfig, queryConfig, loadTracks, loadMpTracks } from './config.js';
 import { NEW } from './circuits.js';
 import { racingLine } from './raceline.js';
 
@@ -178,7 +178,7 @@ export function edgePoint(t, i, sg, requested) {
   }
   return [P[i * 3] - (t.T[i * 2 + 1] || 0) * sg * offset, P[i * 3 + 2] + (t.T[i * 2] || 0) * sg * offset];
 }
-const CACHE = {}, custom = (id) => { const t = loadTracks().find((c) => c.id === id); return t && { name: t.name, start: t.start, pts: t.pts, elev: t.elev, theme: t.theme, corners: t.corners, ec: true }; };
+const CACHE = {}, custom = (id) => { const t = loadTracks().find((c) => c.id === id) || loadMpTracks().find((c) => c.id === id); if (t) return { name: t.name, start: t.start, pts: t.pts, elev: t.elev, theme: t.theme, corners: t.corners, ec: true }; try { const p = JSON.parse(sessionStorage.getItem('little-turismo-pub-track')); if (p?.id === id && id.startsWith('pubtrack_')) return { name:p.name,start:p.start,pts:p.pts,elev:p.elev,theme:p.theme,corners:p.corners,ec:true }; } catch {} return null; };
 export { build as buildTrack };
 export const trackOf = (id) => { const D = DEFS[id] || custom(id); if (!D) id = 'serra-nova'; return CACHE[id] || (CACHE[id] = build(D || DEFS[id], id)); };
 export const TRACK = trackOf((sessionConfig() || queryConfig()).circuit);
@@ -256,3 +256,4 @@ const PW = [TRACK.half + 2.5, TRACK.half + 3.5];
 export const pitWall = (s) => pitExt(s) >= PIT.FULL - .01 ? PW : null;
 /** Voiture dans le box du joueur (voie des box, en face de la marque). */
 export const inPitBox = (c) => { const a = c.lat * PIT.sg; return Math.abs(wrapD(c.s - PIT.S0 - PIT.boxD)) < 7 && a > TRACK.half + 9.5 && a < TRACK.half + PIT.FULL + .5; };
+

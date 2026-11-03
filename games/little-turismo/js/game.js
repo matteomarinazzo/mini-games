@@ -60,9 +60,12 @@ for (let i = 0; i < humanCars.length; i++) {
     c.ph = createCar(choice, c.slot.s, c.slot.lat);
   }
 }
+// En multijoueur, « same » désigne la voiture du créateur pour que tous les
+// clients affichent/simuleraient la même fiche IA (les voitures humaines restent personnelles).
+const sharedAiSheet = multiplayer ? (CARS[online.players?.[online.hostId]?.car] || sheet) : sheet;
 for (let i = 0; i < aiCars.length; i++) {
   const c = aiCars[i];
-  const choice = cfg.carMode === 'same' ? sheet : CARS[CAR_LIST[(i * 5 + 3) % CAR_LIST.length].id] || sheet;
+  const choice = cfg.carMode === 'same' ? sharedAiSheet : CARS[CAR_LIST[(i * 5 + 3) % CAR_LIST.length].id] || sheet;
   c.sheet = choice;
   const lk = look(choice);
   c.body = lk.color;
@@ -102,55 +105,30 @@ const setView = (step = 0) => {
 $('viewPrev').addEventListener('click', () => setView(-1)); $('viewNext').addEventListener('click', () => setView(1)); setView();
 
 const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-let tick = 0, acc = 0, last = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0;
+let tick = 0, acc = 0, last = 0, sensorClock = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0;
 const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
 // Réseau fluide : chaque machine est autoritaire sur SA voiture (physique locale 60 Hz) et la publie à 20 Hz en tableau compact.
 // L'hôte publie IA + humains ; les clients rejouent les paquets avec un retard fixe (interpolation, extrapolation courte).
-const NF = ['x', 'y', 'z', 'psi', 'pitch', 'roll', 'u', 'w', 'r', 's', 'lat', 'kmh'], NLEN = 20, DELAY = 90, NET_STEP = .045, DK = ['nose', 'fw', 'hood', 'l', 'r', 'floor', 'rw'];
+const NF = ['x', 'y', 'z', 'psi', 'pitch', 'roll', 'u', 'w', 'r', 's', 'lat', 'kmh'], NLEN = 20, NET_STEP = field.cars.length > 11 ? .055 : .045, DK = ['nose', 'fw', 'hood', 'l', 'r', 'floor', 'rw'];
 const r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
 const dmArr = (w) => DK.map((k) => Math.round(Math.min(1, Math.max(0, (w && w[k]) || 0)) * 100));
 const packCar = (c, w) => [r2(c.x), r2(c.y), r2(c.z), r3(c.psi), r3(c.pitch), r3(c.roll), r2(c.u), r2(c.w), r3(c.r), r2(c.s), r2(c.lat), Math.round(c.kmh), c.raceFinished ? 1 : 0, ...dmArr(w)];
-const normArr = (v) => Array.isArray(v) ? v : Array.from({ length: NLEN }, (_, i) => +v?.[i] || 0);
-const normMap = (m) => { const o = {}; for (const k in m) o[k] = normArr(m[k]); return o; };
+const SCL = [100, 100, 100, 1000, 1000, 1000, 100, 100, 1000, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 1], SC = new Float64Array(NLEN), LEN = TRACK.length;
+const packSC = (a) => { const o = new Array(NLEN); for (let i = 0; i < NLEN; i++) o[i] = Math.round(a[i] * SCL[i]) / SCL[i]; return o; };   // voiture distante : pose extrapolée, avant collisions de l'hôte
 const netRT = () => ({ phase: race.phase, clock: race.clock, t: race.t, lights: race.lights, hold: race.hold });
 const netRE = () => ({ results: race.results || null, E: race.E.map((e) => Object.fromEntries(['n', 'p0', 'p', 'maxP', 'prevS', 'k', 'lapStart', 'best', 'last', 'fin', 'fl', 'fp'].map((k) => [k, e[k]]))) });
-const newBuf = () => ({ b: [], rt: null });
-function pushBuf(B, t, d) { const L = B.b[B.b.length - 1]; if (L && t <= L.t) { if (L.t - t < 1500) return; B.b.length = 0; B.rt = null; } B.b.push({ t, d }); B.at = performance.now(); if (B.b.length > 8) B.b.shift(); }
-/** Carte clé → tableau interpolé à (dernier paquet − DELAY). Horloge propre au tampon (pas besoin d'horloges synchronisées). */
-function sampleBuf(B, dt) {
-  const n = B.b.length; if (!n) return null;
-  const last = B.b[n - 1].t;
-  if (B.rt === null) B.rt = last - DELAY;
-  const target = last - DELAY, lag = target - B.rt;
-  B.rt += dt * 1000 * (1 + Math.max(0, Math.min(.65, lag * .004)));
-  B.rt += (target - B.rt) * Math.min(1, dt * 5);
-  let i = n - 1; while (i > 0 && B.b[i].t > B.rt) i--;
-  const A = B.b[i], C = B.b[i + 1], out = {};
-  for (const key in A.d) {
-    const a = A.d[key], c = C && C.d[key], o = a.slice();
-    if (c) {
-      const k = Math.max(0, Math.min(1, (B.rt - A.t) / (C.t - A.t || 1)));
-      for (let j = 0; j < 12; j++) o[j] = a[j] + (c[j] - a[j]) * k;
-      o[3] = a[3] + wrap(c[3] - a[3]) * k; if (Math.abs(c[9] - a[9]) > 300) o[9] = c[9]; o[12] = c[12];
-    } else {
-      const e = Math.min(.25, Math.max(0, (B.rt - A.t) / 1000)), cs = Math.cos(a[3]), sn = Math.sin(a[3]);
-      o[0] += (cs * a[6] - sn * a[7]) * e; o[2] += (sn * a[6] + cs * a[7]) * e; o[3] += a[8] * e; o[9] += a[6] * e;
-    }
-    out[key] = o;
-  }
-  return out;
-}
 function applyArr(c, a, fin) {
   for (let i = 0; i < 12; i++) c[NF[i]] = a[i];
+  if (c.s >= LEN) c.s -= LEN; else if (c.s < 0) c.s += LEN;
   if (fin && a[12] === 1) c.raceFinished = true;
   const dm = c.dmo || (c.dmo = {}); for (let i = 0; i < 7; i++) dm[DK[i]] = (a[13 + i] || 0) / 100;
   c.v = c.u; const p = c.prev; p.x = c.x; p.y = c.y; p.z = c.z; p.psi = c.psi;
 }
 let netPend = 0, lastResub = 0, netAcc = 0, netSeq = 0, netBusy = false, netDirty = false, netRetry = null, netUnwatch = null, netLast = 0, seenAt = 0;
-const guestBuf = newBuf(), humanBufs = {};
+const guestBuf = Net.newChan(), humanBufs = {}, one = { k: null };
 function onRuntime(s) {   // invité : paquet hôte
   if (!s || hostMode) return;
-  if (s.cars && s.stamp) pushBuf(guestBuf, s.stamp, normMap(s.cars));
+  if (s.cars && s.stamp) Net.chanPush(guestBuf, s.stamp, s.cars);
   const rt = s.rt; if (rt) for (const k of ['phase', 'clock', 't', 'lights', 'hold']) if (rt[k] !== undefined) race[k] = rt[k];
   const rs = s.race; if (rs) {
     if (rs.results !== undefined) race.results = rs.results;
@@ -161,7 +139,7 @@ function onPlayers(pl) {   // hôte : paquets des invités
   if (!pl) return;
   for (const c of humanCars) {
     const p = pl[c.humanUid]?.carState || pl[c.humanUid]?.car;
-    if (p?.a && p.t) pushBuf(humanBufs[c.humanUid] ||= newBuf(), p.t, { k: normArr(p.a) });
+    if (p?.a && p.t) { one.k = p.a; Net.chanPush(humanBufs[c.humanUid] ||= Net.newChan(), p.t, one); }
     const pen = pl[c.humanUid]?.pen, dtf = pl[c.humanUid]?.dt;
     if (dtf !== undefined) { const e = race.E.find((x) => x.n === c.humanUid); if (e) e.dt = !!dtf; }
     if (typeof pen === 'number') {
@@ -170,13 +148,12 @@ function onPlayers(pl) {   // hôte : paquets des invités
     }
   }
 }
-function syncNet() {
+function syncNet() {   // pose de chaque voiture distante estimée à « maintenant » (extrapolation + lissage) : rendu ET collisions utilisent la même pose
   const now = performance.now(), dt = Math.min(.25, (now - netLast) / 1000 || 0); netLast = now;
-  if (hostMode) { for (const c of humanCars) { const m = humanBufs[c.humanUid] && sampleBuf(humanBufs[c.humanUid], dt); if (m) applyArr(c.ph, m.k, false); } return; }
-  const m = sampleBuf(guestBuf, dt); if (!m) return;
-  for (const c of humanCars) if (m[c.humanUid]) applyArr(c.ph, m[c.humanUid], true);
-  for (const c of aiCars) if (m[c.netKey]) applyArr(c.ph, m[c.netKey], true);
-  if (m[localUid] && m[localUid][12] === 1) drv.raceFinished = true;
+  if (hostMode) { for (const c of humanCars) { const B = humanBufs[c.humanUid]; if (B && Net.chanSample(B, 'k', dt, SC)) applyArr(c.ph, SC, false); } return; }
+  for (const c of humanCars) if (Net.chanSample(guestBuf, c.humanUid, dt, SC)) applyArr(c.ph, SC, true);
+  for (const c of aiCars) if (Net.chanSample(guestBuf, c.netKey, dt, SC)) applyArr(c.ph, SC, true);
+  const mine = Net.chanRaw(guestBuf, localUid); if (mine && mine[12] === 1) drv.raceFinished = true;
 }
 async function publishNetwork() {
   if (!multiplayer || !Net.N.uid) return;
@@ -188,7 +165,7 @@ async function publishNetwork() {
       const d = {}, t = Net.now();
       if (hostMode) {
         const cars = { [localUid]: packCar(drv, dmg.w) };
-        for (const c of humanCars) cars[c.humanUid] = packCar(c.ph, c.ph.dmo);
+        for (const c of humanCars) { const B = humanBufs[c.humanUid]; cars[c.humanUid] = B && Net.chanSample(B, 'k', 0, SC) ? packSC(SC) : packCar(c.ph, c.ph.dmo); }   // relais : pose non perturbée par les collisions de l'hôte
         for (const c of aiCars) cars[c.netKey] = packCar(c.ph, c.ai.damage.w);
         d['runtime/stamp'] = t; d['runtime/cars'] = cars; d['runtime/rt'] = netRT();
         if (netSeq++ % 5 === 0 || race.phase === 'finished') d['runtime/race'] = netRE();
@@ -263,23 +240,41 @@ cam.aspect = R.resize();
 addEventListener('resize', () => { cam.aspect = R.resize(); });
 
 const hud = $('hud'), lights = $('lights').children, mapCars = [];
-// Classement local (5 lignes autour de moi, écart en secondes : - devant, + derrière). Progression cumulée calculée localement : fluide pour hôte et invités.
+// Classement local : - devant (rouge), + derrière (vert). Progression cumulée locale, fluide pour hôte et invités.
 const boardEl = $('board'), rows = Array.from({ length: 5 }, () => { const d = document.createElement('div'); d.innerHTML = '<i></i><span></span><b></b>'; boardEl.appendChild(d); return d; });
-const pgs = new Map(), LENT = TRACK.length, wrapT = (d) => d - LENT * Math.round(d / LENT);
-function prog(e) { let q = pgs.get(e.n); if (!q) pgs.set(e.n, q = { p: e.p, s: e.ph.s }); const d = wrapT(e.ph.s - q.s); q.s = e.ph.s; if (Math.abs(d) < 80) q.p += d; return q.p; }
+const boardCars = race.E.map((e) => ({ e, p: e.p, s: e.ph.s, score: 0 })), playerBoardCar = boardCars[0], LENT = TRACK.length, wrapT = (d) => d - LENT * Math.round(d / LENT);
+const boardCmp = (a, b) => (b.score - a.score) || (a.e.fin !== null && b.e.fin !== null ? a.e.fin - b.e.fin : a.e.fin !== null ? -1 : b.e.fin !== null ? 1 : 0);
 function updateBoard() {
   boardEl.hidden = race.qualifying || clm; if (race.qualifying || clm) return;
-  const me = race.E[0], list = race.E.map((e) => ({ e, p: prog(e) }));
-  const sc = (x) => x.e.fin !== null ? x.e.fp : x.p;
-  list.sort((a, b) => (sc(b) - sc(a)) || (a.e.fin !== null && b.e.fin !== null ? a.e.fin - b.e.fin : a.e.fin !== null ? -1 : b.e.fin !== null ? 1 : 0));
-  const n = list.length, i = list.findIndex((x) => x.e === me), pm = list[i].p, st = Math.max(0, Math.min(i - 2, n - 5));
-  rows.forEach((row, r) => {
-    const q = list[st + r]; row.hidden = !q; if (!q) return;
-    const isMe = q.e === me, d = q.p - pm, v = -d / Math.max(12, d > 0 ? me.ph.u : q.e.ph.u);
+  for (let j = 0; j < boardCars.length; j++) {
+    const q = boardCars[j], d = wrapT(q.e.ph.s - q.s); q.s = q.e.ph.s;
+    if (Math.abs(d) < 80) q.p += d;
+    q.score = q.e.fin !== null ? q.e.fp : q.p;
+  }
+  for (let a = 1; a < boardCars.length; a++) {
+    const item = boardCars[a]; let b = a - 1;
+    while (b >= 0 && boardCmp(boardCars[b], item) > 0) { boardCars[b + 1] = boardCars[b]; b--; }
+    boardCars[b + 1] = item;
+  }
+  let i = 0; while (boardCars[i] !== playerBoardCar) i++;
+  const n = boardCars.length, st = Math.max(0, Math.min(i - 2, n - 5));
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r], q = boardCars[st + r]; row.hidden = !q; if (!q) continue;
+    const isMe = q === playerBoardCar;
     row.className = isMe ? 'me' : '';
     row.children[0].textContent = st + r + 1; row.children[1].textContent = (q.e.fin !== null ? '🏁 ' : '') + (isMe ? 'Vous' : q.e.name);
-    const b = row.children[2]; b.textContent = isMe ? '—' : (v < 0 ? '-' : '+') + Math.min(999.999, Math.abs(v)).toFixed(3); b.className = isMe ? '' : v < 0 ? 'f' : 'r';
-  });
+    const b = row.children[2];
+    if (isMe) { b.textContent = '—'; b.className = ''; continue; }
+    const rivalAhead = st + r < i;
+    const lapDelta = (q.score - q.e.p0) - (playerBoardCar.score - playerBoardCar.e.p0), lapGap = Math.floor(Math.abs(lapDelta) / LENT);
+    if (lapGap >= 1) {
+      b.textContent = (rivalAhead ? '-' : '+') + lapGap + ' T'; b.className = rivalAhead ? 'f' : 'r';
+    } else {
+      const found = race.gapAtSameProgress(playerBoardCar.e, q.e), value = Number.isFinite(found) ? Math.abs(found) : NaN;
+      b.textContent = Number.isFinite(value) ? (rivalAhead ? '-' : '+') + value.toFixed(3) : '—';
+      b.className = !Number.isFinite(value) ? '' : rivalAhead ? 'f' : 'r';
+    }
+  }
 }
 /** Stands : pit limiter 80 km/h dans la voie rapide ; arrêté dans le box du joueur, réparation en 2,5 s ; drive-through = traverser la voie sans s'arrêter au box, puis en sortir. */
 const PIT_LIM = 80 / 3.6, PIT_FIX = 2.5;
@@ -453,6 +448,7 @@ function frame(ts) {
     input.update(DT);
     if (!multiplayer || hostMode) {
       race.update(DT, input.state.throttle);
+      sensorClock = race.t;
     } else {
       if (race.phase === 'lights' && input.state.throttle > .3) { race.falseStart = true; if (!race._falseStartHandled) { race._falseStartHandled = true; if (!race.qualifying && !clm) { race.dt = true; race.penaltyMsg = 'Faux départ : drive-through à effectuer'; race.penaltyMsgT = 4; } } }
       if (race.phase === 'go') {
@@ -462,6 +458,7 @@ function frame(ts) {
         }
         race.checkCut(drv, DT);
       }
+      if (race.phase === 'go') sensorClock += DT;
       race.penaltyMsgT = Math.max(0, race.penaltyMsgT - DT);
       if (race.penalty > 0) race.penalty = Math.max(0, race.penalty - DT);
     }
@@ -488,6 +485,7 @@ function frame(ts) {
         dmg.tick(DT, drv.surf, drv.kmh); pitService(DT); dmg.apply(drv);
       }
     }
+    if (race.phase === 'go') { const localRaceTime = multiplayer && !hostMode ? sensorClock : race.t; for (let ei = 0; ei < race.E.length; ei++) race.observeSensors(ei, localRaceTime); }
     if (multiplayer) { netAcc += DT; if (netAcc >= NET_STEP) { netAcc = 0; publishNetwork(); } }
     acc -= DT;
     if (!multiplayer) { saveAcc += DT; if (saveAcc >= .4) { saveAcc = 0; persistLive(); } }
@@ -496,7 +494,8 @@ function frame(ts) {
   if (multiplayer && !race.qualifying && !shown && humanCars.length && race.E[0].fin !== null) { finAt ||= performance.now(); if (performance.now() - finAt > 1000 && race.phase !== 'finished' && (!liveShown || ++liveTick % 30 === 0)) showLive(); }
   if (race.phase === 'finished' && !shown && (race.results || !multiplayer || hostMode)) showResults();
   if (R.lost) return;
-  if (++hudN % 4 === 0) { updateHud(); updateBoard(); dmg.draw(); }
+  boardAcc += dt; if (boardAcc >= .1) { boardAcc = 0; updateBoard(); }
+  if (++hudN % 4 === 0) { updateHud(); dmg.draw(); }
   if (set.map && hudN % 2 === 0 && !race.qualifying) { mapCars.length = 0; for (const c of field.cars) if (!(c.ai && c.ph.raceFinished)) mapCars.push(c); mp.draw(drv, mapCars); }
   const a = acc / DT, p = drv.prev;
   me.x = p.x + (drv.x - p.x) * a; me.y = p.y + (drv.y - p.y) * a; me.z = p.z + (drv.z - p.z) * a; me.psi = p.psi + wrap(drv.psi - p.psi) * a;

@@ -7,6 +7,7 @@ import { checkRealConnection } from "../network.js";
 const LOCAL_TIME_KEY = 'mg_stat_play_time_min';
 const FEEDBACK_STATUS_KEY = 'mg_feedback_status'; // 'submitted' | 'never'
 const FEEDBACK_NEXT_MIN_KEY = 'mg_feedback_next_trigger_min'; // Seuil en minutes pour le prochain affichage
+const FEEDBACK_PENDING_KEY = 'mg_feedback_pending'; // Modal en attente sur l'index racine
 
 let isModalOpen = false;
 
@@ -741,10 +742,16 @@ export async function checkFeedbackTrigger() {
     }
     if (!shouldShowFeedbackModal()) return;
 
+    // Mémoriser le déclenchement ; afficher uniquement sur le menu principal.
+    localStorage.setItem(FEEDBACK_PENDING_KEY, 'true');
+    const isRootIndex = window.location.pathname === '/' || window.location.pathname === '/index.html';
+    if (!isRootIndex) return;
+
     // Ne pas afficher la modal si hors-ligne
     const isOnline = await checkRealConnection();
     if (!isOnline) return;
 
+    localStorage.removeItem(FEEDBACK_PENDING_KEY);
     openFeedbackModal();
 }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.49.2026-11-02.4";
+const CACHE_NAME = "mini-games-cache-v1.52.2026-11-04.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -650,12 +650,14 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/input.js',
     'games/little-turismo/js/core/map.js',
     'games/little-turismo/js/core/physics.js',
+    'games/little-turismo/js/core/publish.js',
     'games/little-turismo/js/core/race.js',
     'games/little-turismo/js/core/raceline.js',
     'games/little-turismo/js/core/sheets.js',
     'games/little-turismo/js/core/track-editor.js',
     'games/little-turismo/js/core/track-mesh.js',
     'games/little-turismo/js/core/track.js',
+    'games/little-turismo/js/ui/notify.js',
 
     // Game: Anagram
     'games/anagram/index.html',

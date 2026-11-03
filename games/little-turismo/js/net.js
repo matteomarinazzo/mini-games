@@ -73,7 +73,11 @@ export async function leave(code, started = false) {
   const d = await getRoom(code); if (!d) return;
   const others = Object.keys(d.players || {}).filter((u) => u !== N.uid);
   if (!others.length) { await N.fb.deleteRoom(roomId(code)); clearSession(); return; }
-  await update(code, started ? { [`players/${N.uid}/away`]: true, [`players/${N.uid}/lastSeen`]: now() } : { [`players/${N.uid}`]: null });
+  if (!started && d.leaderId === N.uid && ['waiting','loading'].includes(d.state)) {
+    const next = others.find((u) => !d.players?.[u]?.away) || others[0], changes = { [`players/${N.uid}`]: null, leaderId: next, state: 'waiting', startedAt: null };
+    for (const uid of others) { changes[`players/${uid}/ready`] = false; changes[`players/${uid}/readyError`] = null; }
+    await update(code, changes);
+  } else await update(code, started ? { [`players/${N.uid}/away`]: true, [`players/${N.uid}/lastSeen`]: now() } : { [`players/${N.uid}`]: null });
   clearSession();
 }
 // --- Rooms publiques : index léger sous rooms/racing_public/<code> (même zone que les rooms, donc mêmes règles d'écriture).
@@ -89,3 +93,51 @@ export function watchPublic(cb) {
     cb(Object.values(v).filter((r) => r && r.code && t - (r.t || 0) < 90000).sort((a, b) => (b.t || 0) - (a.t || 0)));
   }, (e) => { console.warn('watchPublic refusé', e); cb([]); });
 }
+
+// --- Dead reckoning : chaque voiture distante est extrapolée jusqu'à « maintenant » (horloge serveur) depuis son dernier paquet horodaté.
+// À chaque nouveau paquet, l'écart de prédiction est étalé (décroissance exponentielle) : pas de saut visible, pas de retard d'interpolation.
+// Réglages : EXT_MAX = extrapolation max (s) ; TAU = vitesse de résorption des écarts (s) ; SNAP = écart (m) au-delà duquel on téléporte ; ASSUME = latence supposée (s) si l'horloge serveur est inutilisable.
+export const SYNC = { EXT_MAX: .3, TAU: .1, SNAP: 12, ASSUME: .08 };
+const NL = 20, TA = new Float64Array(NL), TB = new Float64Array(NL), TWO_PI = 6.283185307;
+function reck(o, a, e) {   // a = [x y z psi pitch roll u w r s …] ; vitesse corps constante, lacet constant (point milieu)
+  o.set(a); if (e <= 0) return;
+  const dp = Math.max(-.6, Math.min(.6, a[8] * e)), m = a[3] + dp * .5, cs = Math.cos(m), sn = Math.sin(m);
+  o[0] = a[0] + (cs * a[6] - sn * a[7]) * e; o[2] = a[2] + (sn * a[6] + cs * a[7]) * e; o[3] = a[3] + dp; o[9] = a[9] + a[6] * e;
+}
+/** Canal = un émetteur (hôte pour les invités ; un invité pour l'hôte). */
+export const newChan = () => ({ t: 0, at: 0, age: 0, base: 1e9, cars: new Map() });
+/** map = { clé: tableau|objet de 20 valeurs }. stamp = Net.now() de l'émetteur. Renvoie false si paquet ignoré (ancien / doublon). */
+export function chanPush(C, stamp, map) {
+  if (stamp <= C.t) { if (C.t - stamp < 1500) return false; C.t = 0; C.at = 0; C.base = 1e9; C.cars.clear(); }
+  const pn = performance.now(), raw = (now() - stamp) / 1000;
+  C.base = Math.min(raw, C.base + .002);   // minimum glissant : détecte une horloge incohérente
+  const age = C.base > -.1 && C.base < .8 ? Math.max(0, raw) : Math.max(0, raw - C.base + SYNC.ASSUME), had = C.at > 0, pe = C.age + (pn - C.at) / 1000;
+  for (const k in map) {
+    const v = map[k]; if (!v) continue;
+    let S = C.cars.get(k); const fresh = !S;
+    if (fresh) C.cars.set(k, S = { p: new Float64Array(NL), q: new Float64Array(NL), off: new Float64Array(6) }); else S.q.set(S.p);
+    for (let i = 0; i < NL; i++) S.p[i] = +v[i] || 0;
+    if (fresh || !had) continue;
+    reck(TA, S.q, Math.min(SYNC.EXT_MAX, pe)); reck(TB, S.p, Math.min(SYNC.EXT_MAX, age));   // ancienne vs nouvelle prédiction à l'instant présent
+    const o = S.off, nx = o[0] + TA[0] - TB[0], nz = o[2] + TA[2] - TB[2];
+    if (nx * nx + nz * nz > SYNC.SNAP * SYNC.SNAP) o.fill(0);
+    else { o[0] = nx; o[1] += TA[1] - TB[1]; o[2] = nz; const dp = o[3] + TA[3] - TB[3]; o[3] = dp - TWO_PI * Math.round(dp / TWO_PI); o[4] += TA[4] - TB[4]; o[5] += TA[5] - TB[5]; }
+  }
+  C.t = stamp; C.at = pn; C.age = age; return true;
+}
+/** Pose estimée « maintenant » dans out (Float64Array(20)). dt > 0 : résorbe l'écart de lissage ; dt = 0 : lecture seule. */
+export function chanSample(C, k, dt, out) {
+  const S = C.cars.get(k); if (!S) return false;
+  reck(out, S.p, Math.min(SYNC.EXT_MAX, C.age + (performance.now() - C.at) / 1000));
+  const o = S.off, f = dt > 0 ? Math.exp(-dt / SYNC.TAU) : 1;
+  for (let i = 0; i < 6; i++) { o[i] *= f; out[i] += o[i]; }
+  return true;
+}
+export const chanRaw = (C, k) => { const S = C.cars.get(k); return S ? S.p : null; };
+
+
+
+// Outils ponctuels dédiés aux publications ; l’UID métier reste auth.currentUser.uid.
+export async function publicationReady(){await init();return !!(N.db&&N._ref&&N._onValue&&N.cfg?.auth?.currentUser?.uid)}
+export function publicationRead(path){if(!N.db||!N._ref||!N._onValue)return Promise.reject(Error('Connexion Firebase indisponible'));return new Promise((resolve,reject)=>{let stop=null,settled=false;const clean=()=>{if(stop){stop();stop=null}};try{stop=N._onValue(N._ref(N.db,path),s=>{if(settled)return;settled=true;resolve(s.val());if(stop)clean();else queueMicrotask(clean)},e=>{if(settled)return;settled=true;reject(e);if(stop)clean();else queueMicrotask(clean)})}catch(e){reject(e)}})}
+export async function publicationUpdate(updates){if(!N.db||!N._ref||!N._update)throw Error('Connexion Firebase indisponible');await N._update(N._ref(N.db),updates)}

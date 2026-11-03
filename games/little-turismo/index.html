@@ -92,8 +92,8 @@
             <div class="modes">
                 <button class="mode primary" id="btnSolo" type="button"
                     data-go="circuits"><i>🏎️</i><span><b>Solo</b><small>Course contre l'IA</small></span></button>
-                <button class="mode" id="btnMulti" type="button"
-                    data-go="circuits"><i>🌐</i><b>Multijoueur</b><small>Entre amis, avec un code</small></button>
+                <button class="mode" id="btnMulti" type="button" data-go="cars"><i>🌐</i><b>Multijoueur</b><small>Entre
+                        amis, avec un code</small></button>
                 <button class="mode" id="btnClm" type="button" data-go="circuits"><i>⏱️</i><b>Contre la
                         montre</b><small>Bats ton record</small></button>
                 <button class="mode" id="btnDesign" type="button"><i>🛠️</i><b>Concevoir une voiture</b><small>Type,
@@ -131,6 +131,9 @@
                 <label>Difficulté de l'IA
                     <select class="theme-select" id="roomDiff"></select>
                 </label>
+                <label id="roomCarModeWrap" hidden>Voitures de la grille
+                    <select class="theme-select" id="roomCarMode"></select>
+                </label>
             </div>
             <label class="tg" id="publicWrap" hidden style="display:flex;gap:8px;margin:10px 0"><input type="checkbox"
                     id="roomPublic"> Room publique (visible par les autres joueurs)</label>
@@ -151,11 +154,16 @@
         <div class="wrap wide">
             <div class="seg" role="tablist"><button class="segb on" id="tabCStock" type="button" role="tab">🏁 Circuits
                     <em id="cntCStock">0</em></button><button class="segb" id="tabCMine" type="button" role="tab">⭐ Mes
-                    circuits <em id="cntCMine">0</em></button></div>
+                    circuits <em id="cntCMine">0</em></button><button class="segb" id="tabCPub" type="button" role="tab"
+                    aria-selected="false">🌐 Créés par les joueurs <em id="cntCPub">0</em></button></div>
             <div class="grid" id="cgrid"></div>
             <div id="tmine" hidden><button class="btn" id="newTrack" type="button" style="margin-bottom:14px">＋ Créer un
                     circuit</button>
                 <div class="grid" id="tgrid"></div>
+            </div>
+            <div id="tpub" hidden>
+                <div class="grid" id="tpgrid"></div><button class="btn alt" id="moreTracks" type="button" hidden>Charger
+                    plus</button>
             </div>
         </div>
     </section>
@@ -166,11 +174,16 @@
         <div class="wrap wide">
             <div class="seg" role="tablist"><button class="segb on" id="tabStock" type="button" role="tab">🚗 Voitures
                     <em id="cntStock">0</em></button><button class="segb" id="tabMine" type="button" role="tab">⭐ Mes
-                    voitures <em id="cntMine">0</em></button></div>
+                    voitures <em id="cntMine">0</em></button><button class="segb" id="tabPub" type="button" role="tab"
+                    aria-selected="false">🌐 Créées par les joueurs <em id="cntPub">0</em></button></div>
             <div class="grid" id="vgrid"></div>
             <div id="mine" hidden><button class="btn" id="newCar" type="button" style="margin-bottom:14px">＋ Créer une
                     voiture</button>
                 <div class="grid" id="mgrid"></div>
+            </div>
+            <div id="vpub" hidden>
+                <div class="grid" id="vpgrid"></div><button class="btn alt" id="moreCars" type="button" hidden>Charger
+                    plus</button>
             </div>
         </div>
     </section>
@@ -307,10 +320,7 @@
                         </select>
                     </div>
                     <div class="lbl">Voitures de la grille
-                        <select class="theme-select" id="carMode">
-                            <option value="same">Toutes identiques à ma voiture</option>
-                            <option value="mixed">Voitures variées</option>
-                        </select>
+                        <select class="theme-select" id="carMode"></select>
                     </div>
                     <div class="lbl" id="startField"><span class="setting-label">Position de départ <output
                                 class="range-value" id="startPositionValue"></output></span>
@@ -335,7 +345,8 @@
             </div>
             <!-- Configuration Multijoueur -->
             <div id="multiConfig" hidden>
-                <p class="multi-intro" style="margin-bottom: 16px; color: var(--pale);">Crée une room avec ce circuit et
+                <p class="multi-intro" style="margin-bottom: 16px; color: var(--pale);">Crée une room (tu choisiras le
+                    circuit) avec
                     cette voiture, ou rejoins la partie d'un ami avec son code.</p>
                 <div class="form">
                     <div class="lbl">Pseudo
@@ -532,11 +543,6 @@
     </section>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="../../js/countPlayedTime.js"></script>
-    <script type="module"
-        src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092"
-        integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw=="
-        data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","spa":2}'
-        crossorigin="anonymous"></script>
 </body>
 
 </html>

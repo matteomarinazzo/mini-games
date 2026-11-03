@@ -1,6 +1,6 @@
 // Fiches voiture V11–V14. color = livrée, sc = échelle (largeur, hauteur, longueur), kind = carrosserie (gt, wedge, proto, rally, open), accent = couleur de bande.
 import { CARS } from './physics.js';
-import { loadCustom } from './config.js';
+import { loadCustom, loadMpCars } from './config.js';
 
 const car = (id, name, kind, color, o) => ({
     id, name, kind, color, mass: 1250, vmax: 85, power: 440000, brakeForce: 21000, grip: 1.5, understeer: .3, oversteer: .3, aero: 1.1, drag: .55,
@@ -145,3 +145,8 @@ export function customSheet(d) {
 }
 export const registerCustom = (d) => (CARS[d.id] = customSheet(d));
 for (const d of loadCustom()) registerCustom(d);
+// Enregistre aussi les voitures MP temporaires (adversaires en multi) sans les mélanger aux créations perso.
+for (const d of loadMpCars()) registerCustom(d);
+
+
+try { const d = JSON.parse(sessionStorage.getItem('little-turismo-pub-car')); if (d && typeof d.id === 'string' && d.id.startsWith('pubcar_')) registerCustom(d); } catch {}

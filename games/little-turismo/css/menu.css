@@ -359,6 +359,10 @@ button.btn {
     font-size: 13px;
 }
 
+.room-grid label[hidden] {
+    display: none;
+}
+
 .room-grid output {
     color: var(--text);
     font-weight: 700;

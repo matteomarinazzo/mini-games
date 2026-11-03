@@ -1,7 +1,15 @@
 {
-    "currentVersion": "1.49.2026-11-02",
-    "lastUpdate": "2026-11-02",
+    "currentVersion": "1.50.2026-11-04",
+    "lastUpdate": "2026-11-04",
     "history": [
+        {
+            "version": "1.50.2026-11-04",
+            "date": "2026-11-04",
+            "changes": [
+                "Ajout de la mise en ligne de nos cérations + amélioration du multijoueur dans Little Turismo",
+                "Suppression des scripts cloudflare"
+            ]
+        },
         {
             "version": "1.49.2026-11-02",
             "date": "2026-11-02",

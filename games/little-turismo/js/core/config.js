@@ -9,15 +9,29 @@ export const saveCustom = (l) => { try { localStorage.setItem(CKEY, JSON.stringi
 export const TKEY = 'little-turismo-tracks';
 export const loadTracks = () => { try { const a = JSON.parse(localStorage.getItem(TKEY)); return Array.isArray(a) ? a.filter((t) => t && typeof t.id === 'string' && Array.isArray(t.pts) && t.pts.length >= 6) : []; } catch (e) { return []; } };
 export const saveTracks = (l) => { try { localStorage.setItem(TKEY, JSON.stringify(l)); } catch (e) { /* stockage indisponible */ } };
-/** Circuits intégrés + personnalisés. */
-export const circuitList = () => [...CIRCUITS, ...loadTracks().map((t) => ({ id: t.id, name: String(t.name || 'Mon circuit').slice(0, 24), custom: true }))];
+// --- Assets multijoueur temporaires (voitures/circuits des adversaires) : JAMAIS affichés dans "Mes Créations".
+export const MP_CKEY = 'little-turismo-mp-cars';
+export const MP_TKEY = 'little-turismo-mp-tracks';
+export const loadMpCars = () => { try { const a = JSON.parse(localStorage.getItem(MP_CKEY)); return Array.isArray(a) ? a.filter((c) => c && typeof c.id === 'string') : []; } catch { return []; } };
+export const saveMpCars = (l) => { try { localStorage.setItem(MP_CKEY, JSON.stringify(l)); } catch { /* stockage indisponible */ } };
+export const loadMpTracks = () => { try { const a = JSON.parse(localStorage.getItem(MP_TKEY)); return Array.isArray(a) ? a.filter((t) => t && typeof t.id === 'string' && Array.isArray(t.pts) && t.pts.length >= 6) : []; } catch { return []; } };
+export const saveMpTracks = (l) => { try { localStorage.setItem(MP_TKEY, JSON.stringify(l)); } catch { /* stockage indisponible */ } };
+// --- Migration automatique : retire les assets MP (mpc_/mpt_) qui se sont glissés dans les listes perso par l'ancien bug.
+try {
+  const rawC = JSON.parse(localStorage.getItem(CKEY)); if (Array.isArray(rawC) && rawC.some(c => c?.id?.startsWith('mpc_'))) { const mp = rawC.filter(c => c?.id?.startsWith('mpc_')), own = rawC.filter(c => !c?.id?.startsWith('mpc_')); localStorage.setItem(CKEY, JSON.stringify(own)); const existing = JSON.parse(localStorage.getItem(MP_CKEY)) || []; const ids = new Set(existing.map(x => x?.id)); localStorage.setItem(MP_CKEY, JSON.stringify([...existing, ...mp.filter(c => !ids.has(c.id))])); }
+} catch { /* migration au mieux */ }
+try {
+  const rawT = JSON.parse(localStorage.getItem(TKEY)); if (Array.isArray(rawT) && rawT.some(t => t?.id?.startsWith('mpt_'))) { const mp = rawT.filter(t => t?.id?.startsWith('mpt_')), own = rawT.filter(t => !t?.id?.startsWith('mpt_')); localStorage.setItem(TKEY, JSON.stringify(own)); const existing = JSON.parse(localStorage.getItem(MP_TKEY)) || []; const ids = new Set(existing.map(x => x?.id)); localStorage.setItem(MP_TKEY, JSON.stringify([...existing, ...mp.filter(t => !ids.has(t.id))])); }
+} catch { /* migration au mieux */ }
+/** Circuits intégrés + personnalisés + MP temporaires (pour que sanitize() accepte les IDs multi). */
+export const circuitList = () => { let pub = []; try { const t = JSON.parse(sessionStorage.getItem('little-turismo-pub-track')); if (t && typeof t.id === 'string' && t.id.startsWith('pubtrack_')) pub = [{ id: t.id, name: t.name, custom: true }]; } catch {} return [...CIRCUITS, ...loadTracks().map((t) => ({ id: t.id, name: String(t.name || 'Mon circuit').slice(0, 24), custom: true })), ...loadMpTracks().map((t) => ({ id: t.id, name: String(t.name || 'Circuit multi').slice(0, 24), custom: true, mp: true })), ...pub]; };
 export const DIFFS = [['facile', 'Facile'], ['normal', 'Normal'], ['difficile', 'Difficile'], ['expert', 'Expert']];
 export const DEFAULTS = { circuit: 'serra-nova', car: 'serra_gt', laps: 3, ai: 8, diff: 'normal', startPosition: 0, qualifying: false, carMode: 'mixed' };
 const num = (v, a, b, d) => { v = parseInt(v, 10); return Number.isFinite(v) ? Math.max(a, Math.min(b, v)) : d; };
 export function sanitize(o = {}) {
   return {
     circuit: circuitList().some((c) => c.id === o.circuit) ? o.circuit : DEFAULTS.circuit,
-    car: CAR_LIST.some((c) => c.id === o.car) || loadCustom().some((c) => c.id === o.car) ? o.car : DEFAULTS.car,
+    car: CAR_LIST.some((c) => c.id === o.car) || loadCustom().some((c) => c.id === o.car) || loadMpCars().some((c) => c.id === o.car) || (o.car && String(o.car).startsWith('pubcar_') && (() => { try { return JSON.parse(sessionStorage.getItem('little-turismo-pub-car'))?.id === o.car; } catch { return false; } })()) ? o.car : DEFAULTS.car,
     laps: num(o.laps, 1, 20, DEFAULTS.laps), ai: num(o.ai, 0, 19, DEFAULTS.ai),
     diff: DIFFS.some((d) => d[0] === o.diff) ? o.diff : DEFAULTS.diff,
     startPosition: num(o.startPosition, 0, 20, DEFAULTS.startPosition),
@@ -58,3 +72,4 @@ export function saveClm(circuit, car, lap) {
   if (c[car] !== undefined && c[car] <= lap) return false;
   wr({ clm: { ...all, [circuit]: { ...c, [car]: lap } } }); return true;
 }
+

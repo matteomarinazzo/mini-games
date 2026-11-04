@@ -24,9 +24,9 @@ try {
   const rawT = JSON.parse(localStorage.getItem(TKEY)); if (Array.isArray(rawT) && rawT.some(t => t?.id?.startsWith('mpt_'))) { const mp = rawT.filter(t => t?.id?.startsWith('mpt_')), own = rawT.filter(t => !t?.id?.startsWith('mpt_')); localStorage.setItem(TKEY, JSON.stringify(own)); const existing = JSON.parse(localStorage.getItem(MP_TKEY)) || []; const ids = new Set(existing.map(x => x?.id)); localStorage.setItem(MP_TKEY, JSON.stringify([...existing, ...mp.filter(t => !ids.has(t.id))])); }
 } catch { /* migration au mieux */ }
 /** Circuits intégrés + personnalisés + MP temporaires (pour que sanitize() accepte les IDs multi). */
-export const circuitList = () => { let pub = []; try { const t = JSON.parse(sessionStorage.getItem('little-turismo-pub-track')); if (t && typeof t.id === 'string' && t.id.startsWith('pubtrack_')) pub = [{ id: t.id, name: t.name, custom: true }]; } catch {} return [...CIRCUITS, ...loadTracks().map((t) => ({ id: t.id, name: String(t.name || 'Mon circuit').slice(0, 24), custom: true })), ...loadMpTracks().map((t) => ({ id: t.id, name: String(t.name || 'Circuit multi').slice(0, 24), custom: true, mp: true })), ...pub]; };
+export const circuitList = () => { let pub = []; try { const t = JSON.parse(sessionStorage.getItem('little-turismo-pub-track')); if (t && typeof t.id === 'string' && t.id.startsWith('pubtrack_')) pub = [{ id: t.id, name: t.name, custom: true }]; } catch { } return [...CIRCUITS, ...loadTracks().map((t) => ({ id: t.id, name: String(t.name || 'Mon circuit').slice(0, 24), custom: true })), ...loadMpTracks().map((t) => ({ id: t.id, name: String(t.name || 'Circuit multi').slice(0, 24), custom: true, mp: true })), ...pub]; };
 export const DIFFS = [['facile', 'Facile'], ['normal', 'Normal'], ['difficile', 'Difficile'], ['expert', 'Expert']];
-export const DEFAULTS = { circuit: 'serra-nova', car: 'serra_gt', laps: 3, ai: 8, diff: 'normal', startPosition: 0, qualifying: false, carMode: 'mixed' };
+export const DEFAULTS = { circuit: 'serra-nova', car: 'serra_gt', laps: 3, ai: 8, diff: 'normal', startPosition: 0, qualifying: false, carMode: 'mixed', damage: true };
 const num = (v, a, b, d) => { v = parseInt(v, 10); return Number.isFinite(v) ? Math.max(a, Math.min(b, v)) : d; };
 export function sanitize(o = {}) {
   return {
@@ -37,6 +37,7 @@ export function sanitize(o = {}) {
     startPosition: num(o.startPosition, 0, 20, DEFAULTS.startPosition),
     qualifying: o.qualifying === true, mode: o.mode === 'clm' ? 'clm' : 'solo',
     carMode: o.carMode === 'same' ? 'same' : 'mixed',
+    damage: o.damage !== false,
     gridOrder: Array.isArray(o.gridOrder) ? o.gridOrder.filter((n) => Number.isInteger(n) && n >= 1 && n <= 20).slice(0, 20) : null,
   };
 }
@@ -45,8 +46,8 @@ const wr = (o) => { try { localStorage.setItem(KEY, JSON.stringify({ ...rd(), ..
 export function loadSaved() { const o = rd(); return sanitize(o.cfg || o); }
 export function saveSaved(c) { wr({ cfg: c }); }
 /** Aides (pause > Paramètres) : ligne idéale, points de freinage, minimap. */
-export function loadSet() { const s = rd().set || {}; return { line: s.line === true, brake: s.brake === true, map: s.map !== false, penalties: s.penalties !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' }; }
-export function saveSet(s) { wr({ set: { line: !!s.line, brake: !!s.brake, map: !!s.map, penalties: s.penalties !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' } }); }
+export function loadSet() { const s = rd().set || {}; return { line: s.line === true, brake: s.brake === true, map: s.map !== false, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' }; }
+export function saveSet(s) { wr({ set: { line: !!s.line, brake: !!s.brake, map: !!s.map, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' } }); }
 /** Records par circuit (Serra Nova garde l'ancienne clé `rec`, les autres sont dans `recs`) : { lap: secondes | null, place: rang d'arrivée | null }. */
 export function loadRec(id = DEFAULTS.circuit) {
   const o = rd(), r = (id === DEFAULTS.circuit ? o.rec : (o.recs || {})[id]) || {};

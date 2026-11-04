@@ -363,6 +363,25 @@ button.btn {
     display: none;
 }
 
+.room-damage-label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    grid-column: 1 / -1 !important;
+    margin-top: 4px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text) !important;
+}
+
+.room-damage-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--acc);
+    cursor: pointer;
+}
+
 .room-grid output {
     color: var(--text);
     font-weight: 700;

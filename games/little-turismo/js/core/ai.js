@@ -75,23 +75,24 @@ function learnRun(S, level, q, pm, seed, run) {
   return !g.ev;
 }
 function learn(S, level, q = false) {
-  const {key,pm:cached}=learnSetup(S,level,q); if(cached)return cached;
-  const pm=new Float32Array(NB).fill(1);PMS.set(key,pm);
-  outer:for(const seed of [3,17,41,59])for(let run=0;run<8;run++)if(learnRun(S,level,q,pm,seed,run))break outer;
+  const { key, pm: cached } = learnSetup(S, level, q); if (cached) return cached;
+  const pm = new Float32Array(NB).fill(1); PMS.set(key, pm);
+  outer: for (const seed of [3, 17, 41, 59]) for (let run = 0; run < 8; run++)if (learnRun(S, level, q, pm, seed, run)) break outer;
   return pm;
 }
 async function learnRunAsync(S, level, q, pm, seed) {
-  const ph=createCar(S,TRACK.startIdx*ds-14,0),g=mk(ph,level,seed,pm,q),all=[ph];let tick=0,p=0,prev=ph.s;
-  while(tick<60*60*5&&p<2*LEN){const end=Math.min(tick+480,60*60*5);for(;tick<end&&p<2*LEN;tick++){stepField([g],all,tick,1/60,false);let d=ph.s-prev;prev=ph.s;d-=LEN*Math.round(d/LEN);p+=d;}await new Promise(r=>setTimeout(r,0));}
+  const ph = createCar(S, TRACK.startIdx * ds - 14, 0), g = mk(ph, level, seed, pm, q), all = [ph]; let tick = 0, p = 0, prev = ph.s;
+  while (tick < 60 * 60 * 5 && p < 2 * LEN) { const end = Math.min(tick + 480, 60 * 60 * 5); for (; tick < end && p < 2 * LEN; tick++) { stepField([g], all, tick, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; } await new Promise(r => setTimeout(r, 0)); }
   return !g.ev;
 }
 /** Async initialization used by the loading screen: each expensive learning attempt yields to the browser. */
-export async function createAiAsync(ph, level, seed, qualifying = false, laps = 0, progress = () => {}) {
-  const {key,pm:cached}=learnSetup(ph.sheet,level,!!qualifying);let pm=cached;
-  if(!pm){pm=new Float32Array(NB).fill(1);PMS.set(key,pm);let done=false,n=0;
-    outer:for(const sd of [3,17,41,59])for(let run=0;run<8;run++){done=await learnRunAsync(ph.sheet,level,!!qualifying,pm,sd);progress(++n,32);if(done)break outer;}
+export async function createAiAsync(ph, level, seed, qualifying = false, laps = 0, progress = () => { }) {
+  const { key, pm: cached } = learnSetup(ph.sheet, level, !!qualifying); let pm = cached;
+  if (!pm) {
+    pm = new Float32Array(NB).fill(1); PMS.set(key, pm); let done = false, n = 0;
+    outer: for (const sd of [3, 17, 41, 59]) for (let run = 0; run < 8; run++) { done = await learnRunAsync(ph.sheet, level, !!qualifying, pm, sd); progress(++n, 32); if (done) break outer; }
   }
-  const a=mk(ph,level,seed,pm,!!qualifying);a.laps=laps;return a;
+  const a = mk(ph, level, seed, pm, !!qualifying); a.laps = laps; return a;
 }
 /** qualifying = true : qualifications (voitures fantômes) → l'IA ignore le trafic et roule seule sur la ligne optimisée. */
 export const createAi = (ph, level, seed, qualifying = false, laps = 0) => { const a = mk(ph, level, seed, learn(ph.sheet, level, !!qualifying), !!qualifying); a.laps = laps; return a; };   // laps > 0 : arrêts au stand possibles
@@ -152,7 +153,7 @@ function pitPlan(a, all, v) {
   else if (a.pit === 2) {
     if (v < 1.2) a.pitT -= .05;
     if (a.pitT <= 0 && (!all.some((o) => { const e = wrapS(o.s - c.s), l = o.lat * sg - ROAD_HALF; return o !== c && !o.gone && !o.ghost && e > -30 && e < 12 && l > 3 && l < 11; }) || (a.pitW += .05) > 6)) {   // on ne ressort que si la voie rapide est libre
-      const D=a.damage;D.grip=D.aero=D.drag=0;for(const k in D.w)D.w[k]=0;if(Math.max(a.engine.motor,a.engine.cooling,(D.w.hood+D.w.nose)*.5)<.5){a.engine.motor=0;a.engine.cooling=0;a.engine.step=0;}a.pit = 3; a.pitN++;
+      const D = a.damage; D.grip = D.aero = D.drag = 0; for (const k in D.w) D.w[k] = 0; if (Math.max(a.engine.motor, a.engine.cooling, (D.w.hood + D.w.nose) * .5) < .5) { a.engine.motor = 0; a.engine.cooling = 0; a.engine.step = 0; } a.pit = 3; a.pitN++;
     }
   } else if ((d > PIT.fwd - PIT.T && !inLane(c)) || d > PIT.fwd) a.pit = 0;
 }
@@ -343,23 +344,34 @@ function collide(all) {
 }
 
 /** Un pas physique pour toutes les IA (décisions échelonnées 1 frame sur 3) puis collisions. all = physiques de toutes les voitures, joueur compris. */
-export function stepField(list, all, tick, dt, collisions = true, qualifying) {
+export function stepField(list, all, tick, dt, collisions = true, qualifying, noDamage = false) {
   if (qualifying !== undefined) for (let k = 0; k < list.length; k++) list[k].q = !!qualifying;
   const t = tick * dt; FIELD = list;
   for (let k = 0; k < list.length; k++) {
     const a = list[k], c = a.ph, d = a.damage;
-    if (c.raceFinished || c.gone) continue;
-    if(a.engine.failed){a.engine.fade+=dt;a.inp.throttle=0;a.inp.brake=.35;stepCar(c,a.inp,dt);if(a.engine.fade>2.8)c.sc0??=c.sc;if(a.engine.fade>2.8)c.gone=true;continue;}
-    if(engineIncrement(a.engine,a.inp.throttle,dt,d.w,inLane(c))){a.engine.failed=true;a.engine.retiredAt=t;c.ghost=true;a.inp.throttle=0;a.inp.brake=0;}
+    if (c.raceFinished || c.gone || a.engine.failed) {
+      if (a.engine.failed) { c.gone = true; c.ghost = true; }
+      continue;
+    }
+
+    if (!noDamage && engineIncrement(a.engine, a.inp.throttle, dt, d.w, inLane(c))) {
+      a.engine.failed = true;
+      a.engine.retiredAt = t;
+      c.ghost = true;
+      c.gone = true;
+      a.inp.throttle = 0;
+      a.inp.brake = 0;
+      continue;
+    }
     if (c.sheet !== a.sheet) c.sheet = a.sheet;   // la fiche de l'IA (bonus de specs éventuel) suit toujours la physique
     d.w ||= { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 };
-    // Les dégâts s’accumulent après les chocs et les sorties, comme pour le joueur.
-    if (c.hv > 2) {
+    // Les dégâts s'accumulent après les chocs et les sorties, comme pour le joueur.
+    if (!noDamage && c.hv > 2) {
       const hit = (c.hv - 2) * .014; d.grip = Math.min(.65, d.grip + hit * .22); d.aero = Math.min(.8, d.aero + hit * .35); d.drag = Math.min(1.2, d.drag + hit * .12);
       d.w.nose = Math.min(1, d.w.nose + hit); d.w.hood = Math.min(1, d.w.hood + hit * .55); d.w.fw = Math.min(1, d.w.fw + hit * .7); d.w.l = Math.min(1, d.w.l + hit * .25); d.w.r = Math.min(1, d.w.r + hit * .25); c.hv = 0;
     }
-    if (c.surf === 2) { d.grip = Math.min(.65, d.grip + dt * .0015); d.w.floor = Math.min(1, d.w.floor + dt * .003); }
-    c.fa = 1 - d.aero; c.fg = 1 - d.grip * .35; c.fd = 1 + d.drag;
+    if (!noDamage && c.surf === 2) { d.grip = Math.min(.65, d.grip + dt * .0015); d.w.floor = Math.min(1, d.w.floor + dt * .003); }
+    c.fa = noDamage ? 1 : 1 - d.aero; c.fg = noDamage ? 1 : 1 - d.grip * .35; c.fd = noDamage ? 1 : 1 + d.drag;
     if ((tick + k) % 3 === 0) decide(a, all, t);
     drive(a, dt); c.bk = a.inp.brake; c.limit = !a.q && inLane(c) ? PIT_LIM : 0; stepCar(c, a.inp, dt);   // c.bk : feux stop (visibles des suiveurs)
     if (c.surf >= 2) {

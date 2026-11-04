@@ -10,7 +10,7 @@ export const fmt = (t) => { if (t == null || !isFinite(t)) return '–'; const m
 
 /** entries[0] = joueur. Chaque entrée : { n, name, ph (physique), start (place de départ 1-based), player? } */
 export function createRace({ laps, entries, waitAll = false, qualifying = false, penaltiesEnabled = true, multi = false, training = false }) {
-  const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0 }; });
+  const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0, dnf: false, dnfReady: false }; });
   const GAP_LAPS = Math.max(2, Math.min(1002, Math.ceil(Number.isFinite(laps) ? laps : 20) + 2));
   const gapTimes = new Float64Array(E.length * GAP_LAPS * GAP_SENSOR_COUNT); gapTimes.fill(NaN);
   const observedS = new Float64Array(E.length), observedP = new Float64Array(E.length), observedT = new Float64Array(E.length);
@@ -46,8 +46,8 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
   const qualCmp = (a, b) => (a.best !== null && b.best !== null ? a.best - b.best : a.best !== null ? -1 : b.best !== null ? 1 : b.maxP - a.maxP);
   // course : les arrivées d'abord (plus de tours terminés, puis meilleur temps avec pénalités), puis progression
   const raceCmp = (a, b) => {
-    if(!!a.dnf!==!!b.dnf)return a.dnf?1:-1;
-    if(a.dnf&&b.dnf)return ((b.fl||0)-(a.fl||0))||((a.fin||0)-(b.fin||0));
+    if (!!a.dnf !== !!b.dnf) return a.dnf ? 1 : -1;
+    if (a.dnf && b.dnf) return ((b.fl || 0) - (a.fl || 0)) || ((a.fin || 0) - (b.fin || 0));
     const fla = a.fin !== null ? (a.fl ?? laps) : Math.max(0, a.k - 1);
     const flb = b.fin !== null ? (b.fl ?? laps) : Math.max(0, b.k - 1);
     if (a.fin !== null && b.fin !== null) {
@@ -61,7 +61,22 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
     return (scb - sca) || (a.fin !== null && b.fin !== null ? a.fin - b.fin : a.fin !== null ? -1 : b.fin !== null ? 1 : 0);
   };
   R.rank = () => [...E].sort((a, b) => qualifying ? qualCmp(a, b) : raceCmp(a, b));
-  R.retire=(entry)=>{const e=typeof entry==='number'?E[entry]:entry;if(!e||e.dnf)return false;e.dnf=true;e.dnfReady=false;e.fin=R.t;e.fl=Math.max(0,e.k-1);e.fp=e.maxP;e.ph.ghost=true;return true;};
+  R.retire = (entry) => {
+    const e = typeof entry === 'number' ? E[entry] : entry;
+    if (!e || e.dnf) return false;
+    e.dnf = true;
+    e.dnfReady = false;
+    e.fin = R.t;
+    e.fl = Math.max(0, e.k - 1);
+    e.fp = e.maxP;
+    e.ph.ghost = true;
+    if (!e.player && !e.human) {
+      e.ph.gone = true;
+      e.ph.dnf = true;
+      e.dnfReady = true;
+    }
+    return true;
+  };
 
   R.addPenalty = (seconds, reason = 'Pénalité') => {
     const next = R.penalties + 1;
@@ -105,7 +120,7 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       if (e.p > e.maxP) {                                                  // seule la progression maximale compte : un demi-tour / aller-retour ne recompte pas
         const old = e.maxP; e.maxP = e.p;
 
-        while (e.maxP >= e.k * LEN) {
+        while (e.fin === null && e.maxP >= e.k * LEN) {
           const tc = R.t - dt * (1 - (e.k * LEN - old) / (e.maxP - old));  // instant de franchissement interpolé
           if (e.k >= 1) {
             e.last = tc - e.lapStart + (e.player ? R.lapPenalty : 0); if (e.best === null || e.last < e.best) e.best = e.last;
@@ -130,12 +145,12 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       }
     }
     if (qualifying) { if (E[0].fin !== null && (!waitAll || E.every((e) => e.fin !== null))) { R.phase = 'finished'; R.msg = ''; R.results = build(); } }
-    else if (E.every((e) => !(e.player || e.human) || e.fin !== null) && E.every((e) => !(e.player || e.human) || !e.dnf || e.dnfReady) && (R.doneT += dt) >= (E.some((e) => e.dnf && (e.player || e.human)) ? 0 : 1.2)) { R.phase = 'finished'; R.msg = ''; R.results = build(); }   // fin quand tous les humains ont terminé
+    else if (E.every((e) => !(e.player || e.human) || e.fin !== null || (e.dnf && e.dnfReady)) && (R.doneT += dt) >= (E.some((e) => e.dnf && (e.player || e.human)) ? 0 : 1.2)) { R.phase = 'finished'; R.msg = ''; R.results = build(); }   // fin quand tous les humains ont terminé ou DNF
   };
 
   function finalizeAll() {
     for (const e of E) {
-      if (e.fin === null) {
+      if (e.fin === null && !e.dnf) {
         const rem = laps * LEN - e.maxP;
         const spd = Math.max(14, (e.maxP - e.p0) / Math.max(R.t, 1));
         const pen = e.player ? R.timePenalty : (e.timePenalty || 0);
@@ -167,9 +182,9 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       let gap;
       if (qualifying) {
         gap = e.best === null ? '–' : i === 0 ? fmt(e.best) : '+' + (e.best - rk[0].best).toFixed(2) + ' s';
-        return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e), dnf:!!e.dnf, laps:Math.max(0,e.fl||0) };
+        return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e), dnf: !!e.dnf, laps: Math.max(0, e.fl || 0) };
       }
-      if(e.dnf)gap='DNF';else if (isD(e)) gap = 'DSQ'; else if (e.fin !== null) gap = i === 0 ? fmt(e.fin) : e.fl < rk[0].fl ? '+' + (rk[0].fl - e.fl) + (rk[0].fl - e.fl > 1 ? ' tours' : ' tour') : '+' + (e.fin - wf).toFixed(2) + ' s';
+      if (e.dnf) gap = 'DNF'; else if (isD(e)) gap = 'DSQ'; else if (e.fin !== null) gap = i === 0 ? fmt(e.fin) : e.fl < rk[0].fl ? '+' + (rk[0].fl - e.fl) + (rk[0].fl - e.fl > 1 ? ' tours' : ' tour') : '+' + (e.fin - wf).toFixed(2) + ' s';
       else {
         const rem = laps * LEN - e.maxP;
         if (rem >= LEN) { const n = Math.floor(rem / LEN); gap = '+' + n + (n > 1 ? ' tours' : ' tour'); }

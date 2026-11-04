@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.52.2026-11-04.3";
+const CACHE_NAME = "mini-games-cache-v1.51.2026-11-04.1";
 
 const ASSETS_TO_CACHE = [
     '',

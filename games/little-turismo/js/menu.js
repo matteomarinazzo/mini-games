@@ -563,6 +563,7 @@ function renderRoom(d) {
   $('roomQualifying').value = String(!!dc.qualifying);
   $('roomAi').value = String(dc.ai || 0); $('roomCarMode').value = dc.carMode === 'same' ? 'same' : 'mixed';
   $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; $('roomDiff').value = dc.diff || 'normal';
+  if ($('roomDamage')) $('roomDamage').checked = dc.damage !== false;
   fitRoomRanges();
   $('roomPlayers').textContent = '';
   for (const [uid, p] of players) {
@@ -646,7 +647,7 @@ async function beginMultiplayer(d) {
     }
     const latest = await Net.getRoom(d.code);
     if (!latest || latest.state !== 'playing' || !latest.players?.[session.uid] || latest.players[session.uid].away) { preparingToken = null; roomStatus('Le départ a été annulé ou le joueur a quitté la room.'); return; }
-    session.going = true; session.hostId = latest.leaderId; session.players = Object.fromEntries(Object.entries(latest.players || {}).map(([uid, player]) => [uid, mappedPlayers[uid] || player])); session.code = latest.code;
+    session.going = true; session.hostId = latest.leaderId; session.players = Object.fromEntries(Object.entries(latest.players || {}).map(([uid, player]) => { const p = { ...(mappedPlayers[uid] || player) }; delete p.dnf; delete p.dnfDone; delete p.carState; delete p.pen; delete p.dt; return [uid, p]; })); session.code = latest.code;
     session.assets={trackId,carId};session.replayConfig=latest.config;try{sessionStorage.setItem('little-turismo-loading','1')}catch(e){}Net.saveSession(session);
     const rc = sanitize({ ...latest.config, circuit:trackId, car:carId }); startSession(rc); location.href = 'game.html';
   } catch (e) {
@@ -667,6 +668,10 @@ $('roomCarMode')?.addEventListener('change', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
   await Net.update(activeRoom, { 'config/carMode': $('roomCarMode').value });
 });
+$('roomDamage')?.addEventListener('change', async () => {
+  if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
+  await Net.update(activeRoom, { 'config/damage': $('roomDamage').checked });
+});
 $('roomAi')?.addEventListener('input', async () => {
   fitRoomRanges();
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
@@ -684,7 +689,7 @@ async function makeRoom() {
   let made = null, sessionSaved = false;
   try {
     if (!(await Net.init())) throw new Error('offline');
-    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff });
+    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff, damage: true });
     for (let i = 0; i < 4 && !made; i++) {
       const c = Net.code();
       const ok = await Net.createRoom(c, {
@@ -764,10 +769,18 @@ $('startRoom').addEventListener('click', async () => {
   if (players < 1 || players + aiCount > 20) return;
   clearInterval(pubTimer); pubOn = false; await Net.setPublic(activeRoom, null);   // plus visible dans la liste une fois lancée
   const qual = $('roomQualifying').value === 'true';
-  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value });
+  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false });
   // Reset ready flags each round; the assets/config remain intact for replay.
   roomLoadNotice = ''; const updates = { config: nextConfig, state:'loading', startedAt:Net.now(), runtime:null };
-  for (const uid of Object.keys(roomData.players || {})) { updates[`players/${uid}/ready`] = false; updates[`players/${uid}/readyError`] = null; }
+  for (const uid of Object.keys(roomData.players || {})) {
+    updates[`players/${uid}/ready`] = false;
+    updates[`players/${uid}/readyError`] = null;
+    updates[`players/${uid}/dnf`] = null;
+    updates[`players/${uid}/dnfDone`] = null;
+    updates[`players/${uid}/pen`] = null;
+    updates[`players/${uid}/dt`] = null;
+    updates[`players/${uid}/carState`] = null;
+  }
   if (!(await Net.update(activeRoom, updates))) { roomStatus('Impossible de préparer la course (droits Firebase ou connexion).'); return; }
   const fresh = await Net.getRoom(activeRoom); if (fresh) monitorRoomPreparation(fresh);
 });

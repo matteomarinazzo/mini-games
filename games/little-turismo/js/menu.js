@@ -234,8 +234,8 @@ function sync(save) {
   $('sumC').textContent = byId(circuitList(), cfg.circuit).name; $('sumV').textContent = carName(cfg.car);
   if (save === true) saveSaved(cfg);
 }
-function launchClm(over = {}) { try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
-function launch() { cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
+function launchClm(over = {}) { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) {} try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
+function launch() { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) {} cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
 $('launch').addEventListener('click', launch);
 addEventListener('keydown', (e) => {
   if ((e.key === 'Escape' || e.key === 'Backspace') && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); back(); }
@@ -626,7 +626,7 @@ async function beginMultiplayer(d) {
   if (!session || !p || session.going || !['loading','playing'].includes(d.state)) return;
   const token = `${d.code}:${d.startedAt || ''}:${d.state}:${session.uid}`;
   if (preparingToken === token) return;
-  preparingToken = token; roomStatus('Chargement et validation des créations…');
+  preparingToken = token; roomStatus('Préparation de la course : chargement et validation des créations…');
   try {
     const trackId = await installAsset(d.assets?.track || assetRef('track', d.config?.circuit), 'track', d.leaderId);
     const mappedPlayers = {};
@@ -647,7 +647,7 @@ async function beginMultiplayer(d) {
     const latest = await Net.getRoom(d.code);
     if (!latest || latest.state !== 'playing' || !latest.players?.[session.uid] || latest.players[session.uid].away) { preparingToken = null; roomStatus('Le départ a été annulé ou le joueur a quitté la room.'); return; }
     session.going = true; session.hostId = latest.leaderId; session.players = Object.fromEntries(Object.entries(latest.players || {}).map(([uid, player]) => [uid, mappedPlayers[uid] || player])); session.code = latest.code;
-    session.assets = { trackId, carId }; session.replayConfig = latest.config; Net.saveSession(session);
+    session.assets={trackId,carId};session.replayConfig=latest.config;try{sessionStorage.setItem('little-turismo-loading','1')}catch(e){}Net.saveSession(session);
     const rc = sanitize({ ...latest.config, circuit:trackId, car:carId }); startSession(rc); location.href = 'game.html';
   } catch (e) {
     preparingToken = null;

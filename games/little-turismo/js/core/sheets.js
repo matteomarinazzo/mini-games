@@ -41,7 +41,7 @@ const L = [
 ];
 for (const S of L) CARS[S.id] = fin(S);
 Object.assign(CARS.serra_gt, { kind: 'gt' });
-export const look = (S) => ({ color: S.color || [.95, .42, .1], sc: S.sc || [1, 1, 1], kind: S.kind || 'gt', accent: S.accent || [.96, .96, .96] });
+export const look = (S) => ({ color: S.color || [.95, .42, .1], sc: S.sc || [1, 1, 1], kind: S.kind || 'gt', accent: S.accent || [.96, .96, .96], liv: Number.isInteger(S.liv) ? S.liv : 1 });
 
 // --- Voitures personnalisées (créées dans le menu Conception, stockées dans localStorage via config.js)
 export const KIND_LIST = [['gt', 'GT'], ['wedge', 'Hypercar'], ['proto', 'Prototype'], ['rally', 'Rallye'], ['open', 'Monoplace'], ['drag', 'Dragster'], ['thrust', 'Supersonique']];
@@ -140,7 +140,7 @@ export function customSheet(d) {
     const mass = val(d, 'mass', kind), grip = val(d, 'grip', kind), bal = val(d, 'bal', kind);
     return fin(car(String(d.id), String(d.name || 'Ma voiture').slice(0, 16), kind, rgb(d.color), {
         ...GEO[kind], mass, grip, vmax: val(d, 'vmax', kind) / 3.6, power: val(d, 'ch', kind) * 735.5, brakeForce: Math.round(mass * grip * 12.5),
-        aero: val(d, 'aero', kind), understeer: 1 - bal, oversteer: bal, accent: rgb(d.accent),
+        aero: val(d, 'aero', kind), understeer: 1 - bal, oversteer: bal, accent: rgb(d.accent), liv: Number.isInteger(d.liv) ? d.liv : 1,
     }));
 }
 export const registerCustom = (d) => (CARS[d.id] = customSheet(d));

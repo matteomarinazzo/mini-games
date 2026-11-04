@@ -21,9 +21,11 @@ const wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI
 // force latérale normalisée : pic à |α| = pk puis perte à 78 %
 const curve = (al, pk) => { const s = Math.abs(al) / pk, y = s < 1 ? Math.sin(1.5708 * s) : .78 + .22 * Math.exp(1 - s); return al < 0 ? -y : y; };
 
+let OVR = 0;   // rapport demande/adhérence du dernier essieu évalué (> 1 : blocage ou patinage), lu par stepCar pour les traces de pneus
 /** Un essieu : charge N, adhérence mu, transfert latéral lt, force longitudinale demandée fx, dérive al. → [Fx, Fy] */
 function axle(N, mu, lt, fx, al, pk, brk) {
   const cap = mu * Math.max(N, 300) * (1 - .15 * lt * lt);
+  OVR = Math.abs(fx) / cap;
   let pen = 1;
   if (Math.abs(fx) > cap) { fx = Math.sign(fx) * cap; if (brk) pen = .8; }          // roues bloquées : on perd du latéral
   const cy = Math.max(Math.sqrt(cap * cap - fx * fx), .22 * cap) * pen;                // cercle de friction
@@ -33,7 +35,7 @@ function axle(N, mu, lt, fx, al, pk, brk) {
 export function createCar(sheet = CARS.serra_gt, s0 = TRACK.startIdx * TRACK.ds - 14, lat = 3) {
   const f = frameAt(s0), c = {
     sheet, x: f.x + f.rx * lat, z: f.z + f.rz * lat, y: f.y, psi: Math.atan2(f.tz, f.tx), pitch: 0, roll: 0,
-    u: 0, w: 0, r: 0, ax: 0, ay: 0, t: 0, shift: 0, gear: 0, rpm: 1100, v: 0, kmh: 0, idx: 0, s: s0, lat, surf: 0, wall: false, rev: false, rt: 0, hv: 0, hnx: 0, hnz: 0, fa: 1, fg: 1, fd: 1, faf: 1, far: 1, fp: 1, fv: 1, fb: 1, fs: 1, pull: 0, limit: 0,
+    u: 0, w: 0, r: 0, ax: 0, ay: 0, t: 0, shift: 0, gear: 0, rpm: 1100, v: 0, kmh: 0, idx: 0, s: s0, lat, surf: 0, wall: false, rev: false, rt: 0, hv: 0, hnx: 0, hnz: 0, fa: 1, fg: 1, fd: 1, faf: 1, far: 1, fp: 1, fv: 1, fb: 1, fs: 1, pull: 0, limit: 0, skF: 0, skR: 0,
   };
   c.idx = locate(c.x, c.z).i; c.prev = { x: c.x, y: c.y, z: c.z, psi: c.psi };
   return c;
@@ -49,6 +51,7 @@ export function stepCar(c, inp, dt) {
   else if (inp.brake > .5 && inp.throttle < .1 && c.u < 1.4) { if ((c.rt += dt) > .3) c.rev = true; }
   else c.rt = 0;
 
+  c.bk = c.rev ? 0 : inp.brake;   // feux stop (cars.js)
   // sol sous les roues (échantillon gauche/droite)
   const l0 = locate(c.x, c.z, c.idx), th0 = c.psi - Math.atan2(l0.tz, l0.tx);
   const hw = .8 * Math.abs(Math.cos(th0)) + 1.35 * Math.abs(Math.sin(th0));
@@ -56,7 +59,7 @@ export function stepCar(c, inp, dt) {
   const mu0 = (SURF_G[sA] + SURF_G[sB]) / 2 * c.fg, qb = (SURF_Q[sA] + SURF_Q[sB]) / 2, qv = (SURF_QV[sA] + SURF_QV[sB]) / 2;
   const kerb = sA === 1 || sB === 1;
 
-  const n = c.u > 220 ? 8 : c.u > 100 ? 5 : 2, h = dt / n; let Fx = 0, Fy = 0;
+  const n = c.u > 220 ? 8 : c.u > 100 ? 5 : 2, h = dt / n; let Fx = 0, Fy = 0, lkF = 0, lkR = 0, spR = 0;
   for (let k = 0; k < n; k++) {
     const u = c.u, w = c.w, r = c.r, speed = Math.hypot(u, w), sgn = cl(u / .6, -1, 1), ue = Math.max(Math.abs(u), 3), su = u < 0 ? -1 : 1;
     const down = Math.min(S.aero * c.fa * speed * speed, m * G * 6);
@@ -64,15 +67,15 @@ export function stepCar(c, inp, dt) {
     const Nf = m * G * b / L + .45 * down * faf - m * c.ax * S.h / L, Nr = m * G * a / L + .55 * down * far + m * c.ax * S.h / L;
     const tr = m * Math.abs(c.ay) * S.h / S.tw * .5, ltf = Math.min(.9, tr / Math.max(Nf / 2, 300)), ltr = Math.min(.9, tr / Math.max(Nr / 2, 300));
     const steerSpeedScale = 1 + (speed / S.steerV) ** 2;
-    const d = (inp.steer * S.steerMax * fs + pull * cl(speed / 20, 0, 1)) / steerSpeedScale, cd = Math.cos(d), sd = Math.sin(d);
+    const d = (inp.steer * S.steerMax * fs + pull * cl(speed / 20, 0, 1)) / steerSpeedScale, cd = Math.cos(d), sd = Math.sin(d); c.sa = d;   // angle de braquage réel (rendu des roues, cars.js)
     // moteur (puissance / vitesse, coupure à vmax, trou de boîte) et freins (répartis selon la charge, léger biais avant)
     let Fd = 0;
     const maxTraction = Math.max(1.2e5, Math.min(3.5e5, S.power * 0.35)) * fp;
     if (c.shift > 0) c.shift -= h; else if (c.rev) Fd = -inp.brake * 7000 * cl((7 + u) / 2, 0, 1); else Fd = inp.throttle * Math.min(S.power * S.eff * fp / Math.max(u, 2.5), maxTraction) * cl((S.vmax * fv - u) / 4, 0, 1) * (c.limit ? cl((c.limit - u) / 1.5, 0, 1) : 1);
     const Fb = c.rev ? 0 : inp.brake * S.brakeForce * fb, sf = Nf / (Nf + Nr) + .10, brk = Fb > 100;
     const af = Math.atan2(w + a * r, ue) - d * su, ar = Math.atan2(w - b * r, ue);
-    const [fxf, fyf] = axle(Nf, S.grip * (1 - .2 * S.understeer) * (1 - .12 * (1 - faf)) * mu0, ltf, -sgn * Fb * sf, af, .12 + .05 * S.understeer, brk);
-    const [fxr, fyr] = axle(Nr, S.grip * (S.rearK || 1) * (1 - .08 * S.oversteer) * (1 - .2 * (1 - far)) * mu0, ltr, Fd - sgn * Fb * (1 - sf), ar, .075 + .02 * S.oversteer, brk);
+    const [fxf, fyf] = axle(Nf, S.grip * (1 - .2 * S.understeer) * (1 - .12 * (1 - faf)) * mu0, ltf, -sgn * Fb * sf, af, .12 + .05 * S.understeer, brk); const ovF = OVR;
+    const [fxr, fyr] = axle(Nr, S.grip * (S.rearK || 1) * (1 - .08 * S.oversteer) * (1 - .2 * (1 - far)) * mu0, ltr, Fd - sgn * Fb * (1 - sf), ar, .075 + .02 * S.oversteer, brk); const ovR = OVR; if (brk) { if (ovF > lkF) lkF = ovF; if (ovR > lkR) lkR = ovR; } else if (ovR > spR) spR = ovR;
     // traînée (+ traînée induite de l'appui), roulement, sol meuble
     const dragFactor = speed > 100 ? Math.max(0.18, 1 - (speed - 100) / 280) : 1;
     const kd = (S.drag + (speed > 100 ? .08 : .12) * S.aero * c.fa * (faf + far) / 2) * c.fd * dragFactor, q = .15 + qb + qv * speed, rs = speed + .5;
@@ -93,6 +96,8 @@ export function stepCar(c, inp, dt) {
     c.x += (cs * c.u - sn * c.w) * h; c.z += (sn * c.u + cs * c.w) * h;
   }
   const f1 = Math.min(1, 8 * dt); c.ax += (Fx / m - c.ax) * f1; c.ay += (Fy / m - c.ay) * f1;
+  // traces de pneus (skidmarks.js) : blocage au freinage (AV / AR) et patinage fort (AR), 0..1
+  c.skF = c.u > 4 ? cl((lkF - 1.03) / .3, 0, 1) : 0; c.skR = Math.max(c.u > 4 ? cl((lkR - 1.03) / .3, 0, 1) : 0, c.u > .5 ? .8 * cl((spR - 2) / 2.5, 0, 1) : 0);
 
   if (!Number.isFinite(c.u) || !Number.isFinite(c.w) || !Number.isFinite(c.r) || !Number.isFinite(c.x) || !Number.isFinite(c.z)) {
     c.u = 0; c.w = 0; c.r = 0; c.ax = 0; c.ay = 0;

@@ -46,6 +46,8 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
   const qualCmp = (a, b) => (a.best !== null && b.best !== null ? a.best - b.best : a.best !== null ? -1 : b.best !== null ? 1 : b.maxP - a.maxP);
   // course : les arrivées d'abord (plus de tours terminés, puis meilleur temps avec pénalités), puis progression
   const raceCmp = (a, b) => {
+    if(!!a.dnf!==!!b.dnf)return a.dnf?1:-1;
+    if(a.dnf&&b.dnf)return ((b.fl||0)-(a.fl||0))||((a.fin||0)-(b.fin||0));
     const fla = a.fin !== null ? (a.fl ?? laps) : Math.max(0, a.k - 1);
     const flb = b.fin !== null ? (b.fl ?? laps) : Math.max(0, b.k - 1);
     if (a.fin !== null && b.fin !== null) {
@@ -59,6 +61,7 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
     return (scb - sca) || (a.fin !== null && b.fin !== null ? a.fin - b.fin : a.fin !== null ? -1 : b.fin !== null ? 1 : 0);
   };
   R.rank = () => [...E].sort((a, b) => qualifying ? qualCmp(a, b) : raceCmp(a, b));
+  R.retire=(entry)=>{const e=typeof entry==='number'?E[entry]:entry;if(!e||e.dnf)return false;e.dnf=true;e.dnfReady=false;e.fin=R.t;e.fl=Math.max(0,e.k-1);e.fp=e.maxP;e.ph.ghost=true;return true;};
 
   R.addPenalty = (seconds, reason = 'Pénalité') => {
     const next = R.penalties + 1;
@@ -82,7 +85,7 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
     if (training) {
       if (R.phase === 'intro' || R.phase === 'lights') { R.phase = 'go'; R.lights = 0; R.goMsg = 1.2; R.t = 0; }
       if (R.phase !== 'go') return;
-      R.t += dt; if (R.goMsg > 0) R.goMsg -= dt;
+      if (R.goMsg > 0) R.goMsg -= dt;
       R.msg = R.goMsg > 0 ? 'GO !' : '';
     } else if (R.phase === 'intro' || R.phase === 'lights') {
       R.clock += dt;
@@ -127,7 +130,7 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       }
     }
     if (qualifying) { if (E[0].fin !== null && (!waitAll || E.every((e) => e.fin !== null))) { R.phase = 'finished'; R.msg = ''; R.results = build(); } }
-    else if (E.every((e) => !(e.player || e.human) || e.fin !== null) && (R.doneT += dt) >= 1.2) { R.phase = 'finished'; R.msg = ''; R.results = build(); }   // fin quand tous les humains ont terminé
+    else if (E.every((e) => !(e.player || e.human) || e.fin !== null) && E.every((e) => !(e.player || e.human) || !e.dnf || e.dnfReady) && (R.doneT += dt) >= (E.some((e) => e.dnf && (e.player || e.human)) ? 0 : 1.2)) { R.phase = 'finished'; R.msg = ''; R.results = build(); }   // fin quand tous les humains ont terminé
   };
 
   function finalizeAll() {
@@ -164,17 +167,17 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       let gap;
       if (qualifying) {
         gap = e.best === null ? '–' : i === 0 ? fmt(e.best) : '+' + (e.best - rk[0].best).toFixed(2) + ' s';
-        return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e) };
+        return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e), dnf:!!e.dnf, laps:Math.max(0,e.fl||0) };
       }
-      if (isD(e)) gap = 'DSQ'; else if (e.fin !== null) gap = i === 0 ? fmt(e.fin) : e.fl < rk[0].fl ? '+' + (rk[0].fl - e.fl) + (rk[0].fl - e.fl > 1 ? ' tours' : ' tour') : '+' + (e.fin - wf).toFixed(2) + ' s';
+      if(e.dnf)gap='DNF';else if (isD(e)) gap = 'DSQ'; else if (e.fin !== null) gap = i === 0 ? fmt(e.fin) : e.fl < rk[0].fl ? '+' + (rk[0].fl - e.fl) + (rk[0].fl - e.fl > 1 ? ' tours' : ' tour') : '+' + (e.fin - wf).toFixed(2) + ' s';
       else {
         const rem = laps * LEN - e.maxP;
         if (rem >= LEN) { const n = Math.floor(rem / LEN); gap = '+' + n + (n > 1 ? ' tours' : ' tour'); }
         else gap = '≈ +' + ((R.t - wf) + rem / Math.max(15, (e.maxP - e.p0) / Math.max(R.t, 1))).toFixed(1) + ' s';
       }
-      return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e) };
+      return { place: i + 1, n: e.n, name: e.name, player: !!e.player, start: e.start, best: e.best, gap, done: e.fin !== null, dsq: isD(e), dnf: !!e.dnf, laps: Math.max(0, e.fl || 0) };
     });
-    return { rows, win: rk[0]?.player === true };
+    return { rows, win: rk[0]?.player === true && !rk[0]?.dnf && !isD(rk[0]) };
   }
   R.build = build;
   return R;

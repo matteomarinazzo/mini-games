@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.52.2026-11-04.1";
+const CACHE_NAME = "mini-games-cache-v1.52.2026-11-04.3";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -643,9 +643,11 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/aids.js',
     'games/little-turismo/js/core/cars.js',
     'games/little-turismo/js/core/circuits.js',
+    'games/little-turismo/js/core/cockpit-f1.js',
     'games/little-turismo/js/core/config.js',
     'games/little-turismo/js/core/damage.js',
     'games/little-turismo/js/core/drive-temp.js',
+    'games/little-turismo/js/core/engine.js',
     'games/little-turismo/js/core/gl.js',
     'games/little-turismo/js/core/input.js',
     'games/little-turismo/js/core/map.js',
@@ -654,6 +656,7 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/race.js',
     'games/little-turismo/js/core/raceline.js',
     'games/little-turismo/js/core/sheets.js',
+    'games/little-turismo/js/core/skidmarks.js',
     'games/little-turismo/js/core/track-editor.js',
     'games/little-turismo/js/core/track-mesh.js',
     'games/little-turismo/js/core/track.js',

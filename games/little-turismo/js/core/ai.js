@@ -4,6 +4,7 @@
 // V11+ : tables de vitesse par fiche voiture (adhérence, appui, vmax), les IA peuvent prendre n'importe quelle voiture.
 import { TRACK, frameAt, PIT, pitExt } from './track.js';
 import { stepCar, createCar } from './physics.js';
+import { engineState, engineIncrement } from './engine.js';
 
 const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, LIM = ROAD_HALF - 2.1;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
 const LNF = 1, KC = Float32Array.from(K, (k) => Math.abs(k) * .85);   // LNF : part de la ligne idéale suivie ; KC : courbure utile de l'axe
@@ -66,16 +67,31 @@ export const brakeTable = (S) => table(S, prof(S), LEVELS.expert.margin);
 // Allure par tronçon de 20 m (pm ≤ 1) : une sortie de piste en vitesse ralentit les 100 m qui précèdent. Apprise une fois par (voiture, niveau)
 // par un tour fantôme au premier createAi, puis mémorisée : les IA n'ont plus à « découvrir » les virages en course.
 const NB = Math.ceil(LEN / 20), PMS = new Map(), bin = (x) => Math.floor((((x % LEN) + LEN) % LEN) / 20) % NB;
+function learnSetup(S, level, q = false) { const key = S.id + '|' + level + (q ? '|q' : ''); return { key, pm: PMS.get(key) }; }
+function learnRun(S, level, q, pm, seed, run) {
+  const ph = createCar(S, TRACK.startIdx * ds - 14, 0), g = mk(ph, level, seed, pm, q), all = [ph];
+  let tick = 0, p = 0, prev = ph.s;
+  while (tick < 60 * 60 * 5 && p < 2 * LEN) { stepField([g], all, tick++, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
+  return !g.ev;
+}
 function learn(S, level, q = false) {
-  const key = S.id + '|' + level + (q ? '|q' : ''); let pm = PMS.get(key); if (pm) return pm;
-  pm = new Float32Array(NB).fill(1); PMS.set(key, pm);
-  for (const seed of [3, 17, 41, 59]) for (let run = 0; run < 8; run++) {   // départ arrêté, 2 tours, jusqu'à un parcours sans sortie de piste (plusieurs graines = bruits de ligne différents)
-    const ph = createCar(S, TRACK.startIdx * ds - 14, 0), g = mk(ph, level, seed, pm, q), all = [ph];
-    let tick = 0, p = 0, prev = ph.s;
-    while (tick < 60 * 60 * 5 && p < 2 * LEN) { stepField([g], all, tick++, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
-    if (!g.ev) break;
-  }
+  const {key,pm:cached}=learnSetup(S,level,q); if(cached)return cached;
+  const pm=new Float32Array(NB).fill(1);PMS.set(key,pm);
+  outer:for(const seed of [3,17,41,59])for(let run=0;run<8;run++)if(learnRun(S,level,q,pm,seed,run))break outer;
   return pm;
+}
+async function learnRunAsync(S, level, q, pm, seed) {
+  const ph=createCar(S,TRACK.startIdx*ds-14,0),g=mk(ph,level,seed,pm,q),all=[ph];let tick=0,p=0,prev=ph.s;
+  while(tick<60*60*5&&p<2*LEN){const end=Math.min(tick+480,60*60*5);for(;tick<end&&p<2*LEN;tick++){stepField([g],all,tick,1/60,false);let d=ph.s-prev;prev=ph.s;d-=LEN*Math.round(d/LEN);p+=d;}await new Promise(r=>setTimeout(r,0));}
+  return !g.ev;
+}
+/** Async initialization used by the loading screen: each expensive learning attempt yields to the browser. */
+export async function createAiAsync(ph, level, seed, qualifying = false, laps = 0, progress = () => {}) {
+  const {key,pm:cached}=learnSetup(ph.sheet,level,!!qualifying);let pm=cached;
+  if(!pm){pm=new Float32Array(NB).fill(1);PMS.set(key,pm);let done=false,n=0;
+    outer:for(const sd of [3,17,41,59])for(let run=0;run<8;run++){done=await learnRunAsync(ph.sheet,level,!!qualifying,pm,sd);progress(++n,32);if(done)break outer;}
+  }
+  const a=mk(ph,level,seed,pm,!!qualifying);a.laps=laps;return a;
 }
 /** qualifying = true : qualifications (voitures fantômes) → l'IA ignore le trafic et roule seule sur la ligne optimisée. */
 export const createAi = (ph, level, seed, qualifying = false, laps = 0) => { const a = mk(ph, level, seed, learn(ph.sheet, level, !!qualifying), !!qualifying); a.laps = laps; return a; };   // laps > 0 : arrêts au stand possibles
@@ -86,7 +102,7 @@ function mk(ph, level, seed, pm, q = false) {
   return {
     ph, L, q, sheet, r, t1: table(sheet, p, L.margin, lane), t2: table(sheet, p, L.margin * .94, lane), skill: 1 + (r() - .5) * (SKILL_SPREAD[level] ?? .025), lane, blk: 0, vf: 0, p1: r() * 6.28, p2: r() * 6.28,
     pm, ev: 0, off: false, wait: Math.min(.1, L.react * .08 * r()), tl: ph.lat, vt: 0, tx: ph.x, tz: ph.z, fault: null, atk: 0, tgt: null, atkT: 0, defDone: false, defT: 0, defSide: 0, calm: 0, gl: null, dist: 0, joined: false, stk: 0, rec: 0, recover: 0,
-    inp: { throttle: 0, brake: 0, steer: 0 }, level, laps: 0, p0: 0, pit: 0, pitD: 0, pitT: 0, pitN: 0, pitChk: false, pitW: 0, pitTO: 0, avgV: 0, damage: { aero: 0, grip: 0, drag: 0, w: { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 } },
+    inp: { throttle: 0, brake: 0, steer: 0 }, level, laps: 0, p0: 0, pit: 0, pitD: 0, pitT: 0, pitN: 0, pitChk: false, pitW: 0, pitTO: 0, avgV: 0, engine: engineState(), damage: { aero: 0, grip: 0, drag: 0, w: { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 } },
   };
 }
 
@@ -126,7 +142,7 @@ function pitPlan(a, all, v) {
     if (FIELD.some((o) => o !== a && o.pit === 1 && Math.abs(wrapS(o.ph.s - c.s)) < 150)) return;   // pas deux IA qui entrent côte à côte : on réessaie un peu plus loin
     a.pitChk = true;
     if (!pitWorth(a, a.laps * LEN - (a.p0 + a.dist))) return;
-    const bx = boxes().find((b) => !FIELD.some((o) => o !== a && reserved(o) && o.pitD === b) && !all.some((o) => o !== c && !o.gone && Math.abs(wrapS(o.s - S0 - b)) < 7 && o.lat * sg - ROAD_HALF > 9));
+    const bx = boxes().find((b) => !FIELD.some((o) => o !== a && reserved(o) && o.pitD === b) && !all.some((o) => o !== c && !o.gone && !o.ghost && Math.abs(wrapS(o.s - S0 - b)) < 7 && o.lat * sg - ROAD_HALF > 9));
     if (bx === undefined) return;
     a.pit = 1; a.pitD = bx; a.pitTO = 0; a.atk = 0; a.tgt = null; return;
   }
@@ -135,8 +151,8 @@ function pitPlan(a, all, v) {
   if (a.pit === 1) { if (dB < 1.8 && dB > -3 && v < 3.2) { a.pit = 2; a.pitT = PIT_FIX + a.r() * .5; a.pitW = 0; } else if (dB <= -3) { a.pit = 3; a.pitN++; } }   // raté : repart sans réparer
   else if (a.pit === 2) {
     if (v < 1.2) a.pitT -= .05;
-    if (a.pitT <= 0 && (!all.some((o) => { const e = wrapS(o.s - c.s), l = o.lat * sg - ROAD_HALF; return o !== c && !o.gone && e > -30 && e < 12 && l > 3 && l < 11; }) || (a.pitW += .05) > 6)) {   // on ne ressort que si la voie rapide est libre
-      const D = a.damage; D.grip = D.aero = D.drag = 0; for (const k in D.w) D.w[k] = 0; a.pit = 3; a.pitN++;
+    if (a.pitT <= 0 && (!all.some((o) => { const e = wrapS(o.s - c.s), l = o.lat * sg - ROAD_HALF; return o !== c && !o.gone && !o.ghost && e > -30 && e < 12 && l > 3 && l < 11; }) || (a.pitW += .05) > 6)) {   // on ne ressort que si la voie rapide est libre
+      const D=a.damage;D.grip=D.aero=D.drag=0;for(const k in D.w)D.w[k]=0;if(Math.max(a.engine.motor,a.engine.cooling,(D.w.hood+D.w.nose)*.5)<.5){a.engine.motor=0;a.engine.cooling=0;a.engine.step=0;}a.pit = 3; a.pitN++;
     }
   } else if ((d > PIT.fwd - PIT.T && !inLane(c)) || d > PIT.fwd) a.pit = 0;
 }
@@ -156,7 +172,7 @@ const follow = (a, gap, lead) => { const st = a.dist < 700, m = st ? 4 : 5; retu
 function free(all, c, ah, s, ga, cand) {
   if (Math.abs(cand) > LIM) return false;
   for (const o of all) {
-    if (o === c || o === ah || o.gone) continue;
+    if (o === c || o === ah || o.gone || o.ghost) continue;
     const d = wrapS(o.s - s);
     // Il faut un couloir libre sur toute la distance nécessaire au dépassement,
     // avec une marge derrière pour ne pas couper la route à une voiture qui arrive.
@@ -177,7 +193,7 @@ function decide(a, all, t) {
   // voisinage : voiture devant dans le couloir (largeur voiture + marge), voiture derrière, poussée latérale, voitures proches
   let ah = null, ga = 1e9, bh = null, gb = 1e9, push = 0, pw = 0, yc = 1e9, near = 0;
   if (!q) for (let k = 0; k < all.length; k++) {
-    const o = all[k]; if (o === c || o.gone) continue;
+    const o = all[k]; if (o === c || o.gone || o.ghost) continue;
     const d = wrapS(o.s - s); if (d > 150 || d < -60) continue;
     const dl = o.lat - c.lat, adl = dl < 0 ? -dl : dl, ad = d < 0 ? -d : d;
     if (ad < 11 && adl < 3.8) { const w = cl((11 - ad) / 8, 0, 1) * cl((3.8 - adl) / 2.7, 0, 1); push += (dl > 0 ? -1 : dl < 0 ? 1 : (c.lat > 0 ? -1 : 1)) * w; pw += w; }
@@ -207,7 +223,7 @@ function decide(a, all, t) {
   } else a.recover = Math.max(0, a.recover - dt);
   if (a.fault && a.fault.k === 1) base += a.fault.s * .35;
   if (pit) { const dl = wrapS(s + look - S0), b = cl((280 + PIT.back + dl) / 200, 0, 1); base = base * (1 - b) + PIT.sg * (ROAD_HALF + pitX(a, dl)) * b; if (pz) { a.recover = 0; a.fault = null; } }   // stands : trajectoire dédiée, rejointe progressivement
-  if (!a.joined) { if (a.dist > 120 && (q || !all.some((o) => o !== c && !o.gone && Math.abs(wrapS(o.s - s)) < 7 && Math.abs(o.lat - base) < 2.1))) a.joined = true; else base = a.gl; }   // 120 m en file, puis ligne si la place est libre
+  if (!a.joined) { if (a.dist > 120 && (q || !all.some((o) => o !== c && !o.gone && !o.ghost && Math.abs(wrapS(o.s - s)) < 7 && Math.abs(o.lat - base) < 2.1))) a.joined = true; else base = a.gl; }   // 120 m en file, puis ligne si la place est libre
   // bloquée : voiture plus lente devant, tout près, alors que la vitesse voulue (sans trafic) est plus haute
   const vfree = a.vf;
   if (!st && ah && ga - 4.6 < 30 + v * .25 && vfree > ah.u + 1.2) a.blk += dt; else a.blk = Math.max(0, a.blk - 2 * dt);
@@ -301,7 +317,7 @@ function drive(a, dt) {
 const HL = 2.25, HW = .93, AX = new Float64Array(8);
 function collide(all) {
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
-    const A = all[i], B = all[j], dx = B.x - A.x, dz = B.z - A.z; if (A.gone || B.gone || dx * dx + dz * dz > 26) continue;
+    const A = all[i], B = all[j], dx = B.x - A.x, dz = B.z - A.z; if (A.gone || B.gone || A.ghost || B.ghost || dx * dx + dz * dz > 26) continue;
     const ca = Math.cos(A.psi), sa = Math.sin(A.psi), cb = Math.cos(B.psi), sb = Math.sin(B.psi);
     AX[0] = ca; AX[1] = sa; AX[2] = -sa; AX[3] = ca; AX[4] = cb; AX[5] = sb; AX[6] = -sb; AX[7] = cb;
     let best = 1e9, nx = 0, nz = 0;
@@ -332,7 +348,9 @@ export function stepField(list, all, tick, dt, collisions = true, qualifying) {
   const t = tick * dt; FIELD = list;
   for (let k = 0; k < list.length; k++) {
     const a = list[k], c = a.ph, d = a.damage;
-    if (c.raceFinished) continue;
+    if (c.raceFinished || c.gone) continue;
+    if(a.engine.failed){a.engine.fade+=dt;a.inp.throttle=0;a.inp.brake=.35;stepCar(c,a.inp,dt);if(a.engine.fade>2.8)c.sc0??=c.sc;if(a.engine.fade>2.8)c.gone=true;continue;}
+    if(engineIncrement(a.engine,a.inp.throttle,dt,d.w,inLane(c))){a.engine.failed=true;a.engine.retiredAt=t;c.ghost=true;a.inp.throttle=0;a.inp.brake=0;}
     if (c.sheet !== a.sheet) c.sheet = a.sheet;   // la fiche de l'IA (bonus de specs éventuel) suit toujours la physique
     d.w ||= { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 };
     // Les dégâts s’accumulent après les chocs et les sorties, comme pour le joueur.

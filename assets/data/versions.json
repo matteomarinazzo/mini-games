@@ -7,6 +7,8 @@
             "date": "2026-11-04",
             "changes": [
                 "Ajout de la mise en ligne de nos cérations + amélioration du multijoueur dans Little Turismo",
+                "Amélioration des graphisme (vue cockpit, vue extérieur, trace de pneus) dans Little Turismo",
+                "Écran de chargement au début d'une course, et DNF possible si moteur trop abimé dans Little Turismo",
                 "Suppression des scripts cloudflare"
             ]
         },

@@ -123,10 +123,11 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
         while (e.fin === null && e.maxP >= e.k * LEN) {
           const tc = R.t - dt * (1 - (e.k * LEN - old) / (e.maxP - old));  // instant de franchissement interpolé
           if (e.k >= 1) {
-            e.last = tc - e.lapStart + (e.player ? R.lapPenalty : 0); if (e.best === null || e.last < e.best) e.best = e.last;
+            const pen = e.player ? R.lapPenalty : (e.lapPenalty || 0);
+            e.last = tc - e.lapStart + pen; if (e.best === null || e.last < e.best) e.best = e.last;
             if (e.player) { R.lapMsg = 'Tour ' + e.k + ' · ' + fmt(e.last) + (e.best === e.last ? ' · Meilleur tour personnel !' : ''); R.lapMsgT = 3.2; }
           }
-          e.lapStart = tc; if (e.player) R.lapPenalty = 0;
+          e.lapStart = tc; if (e.player) R.lapPenalty = 0; else e.lapPenalty = 0;
           // arrivée : tous les tours, ou dès le premier passage de ligne une fois que le premier a fini (course seulement)
           if (e.fin === null && (e.k === laps || (!qualifying && R.firstFin))) {
             const pen = e.player ? R.timePenalty : (e.timePenalty || 0);

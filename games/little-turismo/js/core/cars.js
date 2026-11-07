@@ -1,4 +1,4 @@
-// Voitures GT low poly : carrosseries lissées (sections Catmull-Rom, flancs à 2 pans), roues dynamiques partagées (pneu à flancs, jante à branches, disque + étrier) qui braquent (angle réel de physics.js) puis roulent, feux stop, livrées procédurales (aplats, bandes, numéros). Un seul mesh par carrosserie (couleur par uniforme). La physique/IA est dans physics.js / ai.js (c.ph ajouté par game.js).
+﻿// Voitures GT low poly : carrosseries lissées (sections Catmull-Rom, flancs à 2 pans), roues dynamiques partagées (pneu à flancs, jante à branches, disque + étrier) qui braquent (angle réel de physics.js) puis roulent, feux stop, livrées procédurales (aplats, bandes, numéros). Un seul mesh par carrosserie (couleur par uniforme). La physique/IA est dans physics.js / ai.js (c.ph ajouté par game.js).
 import { builder } from './track-mesh.js';
 import { TRACK } from './track.js';
 import { playerIndex } from './race.js';
@@ -108,26 +108,107 @@ function arches(B, kd) {
 const BODY_S = [[-2.3, .7, .3, .6, .6], [-2, .82, .24, .72, .74], [-1, .84, .22, .76, .78], [.4, .84, .22, .75, .78], [1.4, .8, .22, .6, .7], [2.1, .72, .24, .46, .62], [2.3, .6, .3, .4, .5]];
 const CAB_S = [[-1.2, .78, .72, .95, .58], [-.8, .8, .74, 1.15, .55], [0, .8, .75, 1.15, .55], [.9, .8, .68, .7, .74]];
 
-// --- GT (détaillée)
+/** Tube de section rectangulaire suivant une polyligne de points [[x,y,z]...], half-epaisseur twxth, couleur c. */
+function tube(B, pts, tw, th, c) {
+  const n = pts.length;
+  const frame = (i) => {
+    const p = pts[i];
+    const fwd = i < n - 1 ? [pts[i + 1][0] - p[0], pts[i + 1][1] - p[1], pts[i + 1][2] - p[2]]
+      : [p[0] - pts[i - 1][0], p[1] - pts[i - 1][1], p[2] - pts[i - 1][2]];
+    const fl = Math.hypot(...fwd) || 1, fd = fwd.map(v => v / fl);
+    const wx = -fd[2], wz = fd[0], wl = Math.hypot(wx, wz) || 1;
+    const rx = wx / wl, rz = wz / wl;
+    const ux = -fd[1] * rz, uy = fd[0] * rz - fd[2] * rx, uz = fd[1] * rx;
+    return { p, rx, ry: 0, rz, ux, uy, uz };
+  };
+  const corner = (fr, sw, sh) => [fr.p[0] + fr.rx * sw * tw + fr.ux * sh * th,
+  fr.p[1] + fr.ry * sw * tw + fr.uy * sh * th,
+  fr.p[2] + fr.rz * sw * tw + fr.uz * sh * th];
+  for (let i = 0; i < n - 1; i++) {
+    const a = frame(i), b = frame(i + 1);
+    const a0 = corner(a, -1, -1), a1 = corner(a, 1, -1), a2 = corner(a, 1, 1), a3 = corner(a, -1, 1);
+    const b0 = corner(b, -1, -1), b1 = corner(b, 1, -1), b2 = corner(b, 1, 1), b3 = corner(b, -1, 1);
+    const ctr = [(a.p[0] + b.p[0]) / 2, (a.p[1] + b.p[1]) / 2, (a.p[2] + b.p[2]) / 2];
+    fq(B, a0, a1, b1, b0, c, ctr); fq(B, a1, a2, b2, b1, c, ctr); fq(B, a2, a3, b3, b2, c, ctr); fq(B, a3, a0, b0, b3, c, ctr);
+    fq(B, a0, a1, a2, a3, c, ctr); fq(B, b1, b0, b3, b2, c, ctr);
+  }
+}
+
+// --- GT (détaillée GT3)
 function buildGT() {
   const [B, W, F, ML, MR, TL, DT] = bs();
   loft(B, BODY_S, [0, .5, 0], BODY(1), BODY(1.08), DARK, BODY(.78));
   loft(B, CAB_S, [0, .95, -.2], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
   arches(B, 'gt');
-  bx(W, 0, .98, -2.2, .88, .025, .2, DARK); bx(W, 0, 1.0, -2.2, .84, .012, .13, BODY(.85));
-  for (const x of [-.45, .45]) bx(W, x, .8, -2.2, .03, .17, .05, DARK);
-  for (const x of [-.88, .88]) bx(W, x, 1.02, -2.2, .015, .12, .22, BODY(.8));
-  bx(TL, 0, .55, -2.31, .14, .014, .01, BODY(1));
-  for (const x of [-.42, .42]) { bx(TL, x, .55, -2.31, .28, .04, .012, BODY(1)); bx(B, x, .43, 2.29, .15, .035, .01, LAMP); bx(B, x, .43, 2.27, .19, .055, .02, GLS); bx(B, x * .98, .33, 2.3, .13, .04, .012, DARK); bx(DT, x * 1.2, .3, -2.37, .055, .055, .05, MET); bx(DT, x * 1.2, .3, -2.42, .035, .035, .012, DARK); }
-  bx(F, 0, .25, 2.2, .66, .03, .12, DARK); bx(F, 0, .27, 2.3, .6, .012, .06, BODY(.7));
-  bx(B, 0, .34, 2.315, .34, .11, .012, GLS);
-  for (const x of [-.22, 0, .22]) bx(B, x, .36, 2.33, .012, .065, .014, hex(0x515963));
-  bx(B, 0, .29, -2.33, .48, .06, .06, hex(0x111419));
-  for (const x of [-.3, -.1, .1, .3]) bx(B, x, .3, -2.35, .01, .06, .06, DARK);   // ailettes de diffuseur
-  for (const x of [-.84, .84]) { bx(B, x, .43, .35, .018, .12, .68, GLASS); bx(B, x, .39, -1.34, .018, .08, .43, DARK); bx(x < 0 ? ML : MR, x * 1.07, .84, .72, .07, .045, .08, BODY(.9)); bx(x < 0 ? ML : MR, x * 1.02, .8, .76, .05, .012, .03, DARK); bx(B, x * .99, .27, 0, .02, .04, 1.25, DARK); bx(B, x * .98, .6, .35, .01, .012, .09, MET); }
-  bx(B, 0, .77, .95, .045, .028, .82, hex(0xdce6ee));
-  bx(B, 0, .79, 1.7, .5, .012, .02, hex(0x20262d));
-  for (const x of [-.3, .3]) bx(B, x, .74, 1.45, .13, .01, .22, hex(0x15181c));
+
+  // --- Aileron arrière GT3 (W)
+  bx(W, 0, 1.05, -2.16, .90, .02, .22, DARK);                     // plan principal carbone
+  bx(W, 0, 1.07, -2.16, .86, .012, .14, BODY(.85));               // lame supérieure
+  bx(W, 0, 1.09, -2.26, .86, .018, .008, DARK);                   // gurney flap bord de fuite
+  for (const x of [-.45, .45]) {
+    bx(W, x, .86, -2.18, .025, .18, .06, DARK);                   // mât col de cygne vertical
+    bx(W, x, 1.04, -2.12, .025, .04, .12, DARK);                  // bras supérieur plongeant
+  }
+  for (const x of [-.90, .90]) bx(W, x, 1.05, -2.16, .015, .14, .25, BODY(.8)); // endplates GT3 profilées
+
+  // --- Feux arrière & diffuseur (TL, B, DT)
+  bx(TL, 0, .57, -2.31, .18, .015, .01, BODY(1));                 // bandeau LED central
+  for (const x of [-.44, .44]) {
+    bx(TL, x, .57, -2.31, .30, .035, .012, BODY(1));              // feux stop principaux
+    bx(DT, x * 1.15, .32, -2.37, .055, .055, .06, MET);           // canule échappement chromée
+    bx(DT, x * 1.15, .32, -2.41, .038, .038, .012, hex(0x111111)); // intérieur noir canule
+  }
+  bx(TL, 0, .31, -2.36, .06, .045, .01, hex(0xff1111));           // feu pluie FIA diffuseur
+
+  // --- Splitter avant & aéro (F, DT)
+  bx(F, 0, .24, 2.22, .72, .025, .15, DARK);                      // lame splitter basse
+  bx(F, 0, .26, 2.31, .64, .012, .07, BODY(.7));                  // lèvre aéro couleur carrosserie
+  for (const x of [-.72, .72]) bx(F, x, .30, 2.22, .015, .07, .12, DARK); // dérives latérales splitter
+  for (const x of [-.76, .76]) {
+    bx(F, x, .37, 2.18, .06, .012, .08, DARK);                    // dive plane bas (canard)
+    bx(F, x * .97, .44, 2.14, .05, .012, .07, DARK);              // dive plane haut
+  }
+  for (const x of [-.22, .22]) bx(DT, x, .29, 2.28, .008, .045, .008, MET); // tirants inox de splitter
+
+  // --- Face avant & phares (B, DT)
+  for (const x of [-.43, .43]) {
+    bx(B, x, .43, 2.29, .15, .035, .01, LAMP);                     // projecteurs principaux
+    bx(B, x, .43, 2.27, .19, .055, .02, GLS);                     // masque noir du phare
+    bx(B, x, .47, 2.285, .16, .008, .01, hex(0x99ddff));          // signature DRL LED
+    bx(B, x * .98, .33, 2.30, .13, .04, .012, DARK);              // écope freins avant
+  }
+  bx(B, 0, .35, 2.315, .36, .11, .012, GLS);                      // calandre centrale
+  bx(DT, 0, .38, 2.325, .04, .025, .01, MET);                     // badge central calandre
+  for (const x of [-.22, 0, .22]) bx(B, x, .36, 2.33, .012, .065, .014, hex(0x515963)); // barres verticales calandre
+
+  // --- Diffuseur arrière (B)
+  bx(B, 0, .28, -2.33, .52, .065, .08, hex(0x111419));            // caisson diffuseur
+  for (const x of [-.36, -.18, 0, .18, .36]) bx(B, x, .29, -2.36, .01, .07, .07, DARK); // ailettes de diffuseur
+
+  // --- Flancs, jupes, vitres & rétros (B, ML, MR, DT)
+  for (const x of [-.84, .84]) {
+    bx(B, x, .43, .35, .018, .12, .68, GLASS);                    // vitre latérale
+    bx(B, x, .39, -1.34, .018, .08, .43, DARK);                   // montant custode arrière
+    bx(x < 0 ? ML : MR, x * 1.07, .84, .72, .07, .045, .08, BODY(.9)); // coque rétro
+    bx(x < 0 ? ML : MR, x * 1.01, .80, .74, .04, .014, .03, DARK);     // bras rétro
+    bx(DT, x * 1.06, .84, .67, .055, .035, .008, hex(0xccd8e8));       // miroir
+    bx(B, x * .99, .26, 0, .025, .04, 1.30, DARK);                 // jupe latérale carbone
+    bx(B, x * 1.01, .32, -1.0, .015, .07, .16, DARK);             // dérive latérale arrière
+    bx(B, x * .98, .60, .35, .01, .012, .09, MET);                 // poignée de porte affleurante
+  }
+  bx(DT, .85, .72, -.85, .01, .045, .045, MET);                    // bouchon de réservoir rapide alu
+  bx(DT, .852, .72, -.85, .008, .02, .02, DARK);                  // orifice central bouchon
+
+  // --- Habitacle visible (arceau-cage tubulaire) & toit (B, DT)
+  bx(B, 0, .92, -.2, .62, .018, .018, hex(0xd0d5dc));             // barre transversale arceau
+  for (const x of [-.44, .44]) bx(B, x, .86, -.58, .018, .20, .018, hex(0xd0d5dc)); // montants arrière cage
+  bx(B, 0, 1.16, -.42, .01, .035, .08, DARK);                     // antenne aileron requin toit
+  bx(B, 0, .77, .95, .045, .028, .82, hex(0xdce6ee));             // bandeau central toit
+
+  // --- Capot avant aéré (B, DT)
+  bx(B, 0, .79, 1.66, .48, .012, .24, hex(0x20262d));             // zone d'extraction d'air capot
+  for (let i = 0; i < 3; i++) bx(DT, 0, .80, 1.54 + i * .10, .36, .008, .02, DARK); // ailettes d'extraction capot
+  for (const x of [-.32, .32]) bx(B, x, .74, 1.38, .12, .01, .18, hex(0x15181c)); // ouïes latérales capot
   return pack(B, W, F, ML, MR, TL, DT);
 }
 // --- Hypercar en coin
@@ -138,19 +219,59 @@ function buildWedge() {
   loft(B, WS, [0, .5, 0], BODY(1), BODY(1.08), DARK, BODY(.78));
   loft(B, WC, [0, .8, 0], GLASS, (i) => (i === 1 ? BODY(.9) : GLASS));
   arches(B, 'wedge');
-  bx(W, 0, .98, -2.15, .85, .018, .2, DARK); bx(W, 0, 1.03, -2.1, .8, .012, .12, BODY(.85));
-  for (const x of [-.5, .5]) bx(W, x, .82, -2.1, .02, .18, .05, DARK);
-  for (const x of [-.86, .86]) bx(W, x, .96, -2.15, .015, .1, .24, BODY(.8));
-  bx(F, 0, .22, 2.28, .8, .025, .15, DARK); bx(B, 0, .3, 2.3, .22, .05, .01, GLS);
-  for (const x of [-.9, .9]) { bx(x < 0 ? ML : MR, x, .8, .7, .07, .04, .08, BODY(.9)); bx(B, x * .97, .25, 2.2, .01, .07, .12, DARK); }
-  bx(B, 0, .24, -2.3, .6, .05, .14, DARK);
-  for (const x of [-.3, -.1, .1, .3]) bx(B, x, .26, -2.34, .01, .06, .08, DARK);
-  for (const x of [-.25, .25]) { bx(DT, x, .28, -2.4, .09, .05, .06, MET); bx(DT, x, .28, -2.45, .055, .03, .01, DARK); }
-  for (const x of [-.55, .55]) { bx(B, x, .38, 2.26, .24, .018, .02, LAMP); bx(B, x * 1.5 / 1.1, .52, -.7, .01, .1, .45, GLS); bx(TL, x, .5, -2.29, .26, .028, .01, BODY(1)); }
-  bx(TL, 0, .5, -2.295, .12, .012, .01, BODY(1));
-  bx(B, 0, 1.0, -.1, .02, .015, .9, DARK);
-  for (const x of [-.4, .4]) bx(B, x, .62, 1.0, .14, .01, .3, hex(0x15181c));
-  for (let i = 0; i < 4; i++) bx(B, 0, .6, -1.35 - i * .14, .5, .008, .03, hex(0x15181c));   // persiennes du capot moteur
+
+  // --- Aileron arrière actif (W)
+  bx(W, 0, 1.01, -2.15, .86, .018, .22, DARK);                     // plan principal tranché
+  bx(W, 0, 1.04, -2.12, .82, .012, .13, BODY(.85));               // lame supérieure couleur carrosserie
+  for (const x of [-.5, .5]) bx(W, x, .83, -2.12, .02, .19, .05, DARK); // montants effilés
+  for (const x of [-.86, .86]) bx(W, x, .98, -2.15, .015, .11, .25, BODY(.8)); // endplates biseautées
+
+  // --- Face avant & Splitter flèche (F, B, DT)
+  bx(F, 0, .21, 2.30, .82, .025, .16, DARK);                      // splitter avant en flèche
+  bx(F, 0, .25, 2.34, .02, .07, .09, DARK);                       // quille centrale de nez
+  for (const x of [-.86, .86]) bx(F, x, .23, 2.25, .015, .06, .13, DARK); // ailettes latérales splitter
+  bx(B, 0, .30, 2.30, .22, .05, .01, GLS);                        // prise d'air centrale
+  for (const x of [-.56, .56]) {
+    bx(B, x, .38, 2.27, .22, .018, .02, LAMP);                    // optique principale LED
+    bx(B, x * 1.08, .34, 2.28, .12, .01, .015, hex(0x88ddff));    // branche basse DRL
+    bx(B, x * .94, .42, 2.25, .10, .01, .015, hex(0x88ddff));     // branche haute DRL (signature en Y)
+    bx(B, x * 1.36, .52, -.7, .01, .11, .48, GLS);                // vitre de custode latérale
+  }
+  for (const x of [-.24, .24]) bx(B, x, .54, 1.76, .07, .012, .18, hex(0x111317)); // écopes S-Duct capot avant
+
+  // --- Rétroviseurs & Flancs NACA (B, ML, MR, DT)
+  for (const x of [-.90, .90]) {
+    bx(x < 0 ? ML : MR, x * .96, .78, .72, .04, .014, .03, DARK); // bras de rétro
+    bx(x < 0 ? ML : MR, x, .81, .70, .07, .038, .08, BODY(.9));   // coque rétro
+    bx(DT, x * 1.01, .81, .65, .05, .025, .008, hex(0xd0e0f0));   // miroir
+    bx(B, x * .97, .24, 2.20, .01, .07, .12, DARK);               // canard bas avant
+    bx(B, x * .98, .22, -.1, .02, .04, 1.25, DARK);               // jupe latérale carbone
+    bx(B, x * .92, .50, -.45, .04, .14, .40, hex(0x101318));      // entrée d'air latérale radiateur
+    bx(B, x * .95, .50, -.35, .012, .12, .30, BODY(.95));         // ailette de déviation d'air
+  }
+
+  // --- Toit, prise d'air & essuie-glace (B, DT)
+  bx(B, 0, 1.05, -.30, .11, .07, .40, BODY(.9));                  // roof scoop (prise d'air toit)
+  bx(B, 0, 1.05, -.08, .09, .05, .02, hex(0x0e1014));             // ouverture noire roof scoop
+  bx(B, 0, 1.06, -.75, .015, .05, .42, DARK);                     // arête dorsale aéro
+  bx(DT, 0, .88, .80, .01, .014, .42, DARK);                      // essuie-glace central pare-brise
+  for (const x of [-.40, .40]) bx(B, x, .62, 1.0, .14, .01, .30, hex(0x15181c)); // ouïes avant
+
+  // --- Capot moteur à persiennes & V12 visible (B, DT)
+  for (let i = 0; i < 5; i++) bx(B, 0, .63 - i * .02, -1.18 - i * .15, .48, .008, .035, hex(0x15181c)); // persiennes capot moteur
+  for (const x of [-.13, .13]) bx(DT, x, .52, -1.35, .07, .05, .25, hex(0x9a7b45)); // culasses V12 bronze
+  bx(DT, 0, .58, -1.35, .11, .035, .22, hex(0x22262d));           // plénum central V12
+
+  // --- Échappements quadruples, feux LED & diffuseur (TL, B, DT)
+  bx(TL, 0, .53, -2.31, .66, .015, .01, BODY(1));                 // bandeau LED continu traversant
+  for (const x of [-.66, .66]) bx(TL, x, .50, -2.31, .015, .032, .01, BODY(1)); // crochets latéraux feux
+  bx(DT, 0, .56, -2.32, .14, .065, .018, MET);                    // bouclier thermique échappements
+  for (const [ox, oy] of [[-.045, .58], [.045, .58], [-.045, .53], [.045, .53]]) {
+    bx(DT, ox, oy, -2.36, .028, .028, .04, hex(0x353a42));        // 4 sorties d'échappement groupées
+    bx(DT, ox, oy, -2.40, .018, .018, .01, hex(0x0a0c10));        // trous des sorties
+  }
+  bx(B, 0, .24, -2.31, .62, .055, .14, DARK);                     // caisson de diffuseur
+  for (const x of [-.40, -.24, -.08, .08, .24, .40]) bx(B, x, .26, -2.35, .01, .065, .09, DARK); // 6 ailettes diffuseur
   return pack(B, W, F, ML, MR, TL, DT);
 }
 // --- Prototype d'endurance
@@ -160,18 +281,76 @@ function buildProto() {
   const [B, W, F, ML, MR, TL, DT] = bs();
   loft(B, PS, [0, .5, 0], BODY(1), BODY(1.06), DARK, BODY(.8));
   loft(B, PCB, [0, .8, 0], GLASS, (i) => (i === 1 ? WHT : GLASS));
-  for (const x of [-.88, .88]) { bx(B, x, .6, 1.35, .22, .07, .55, BODY(1.05)); bx(B, x, .68, -1.4, .26, .09, .75, BODY(1.05)); bx(B, x * 1.02, .52, 1.35, .01, .12, .5, DARK); bx(B, x * 1.02, .54, -1.4, .01, .12, .65, DARK); }
-  bx(B, 0, 1.0, -1.9, .025, .38, .65, BODY(.95));
-  bx(W, 0, 1.2, -2.2, .85, .018, .2, DARK); bx(W, 0, 1.0, -2.2, .02, .17, .05, DARK); bx(W, 0, 1.23, -2.2, .8, .01, .1, BODY(.9));
-  for (const x of [-.86, .86]) bx(W, x, 1.12, -2.2, .015, .13, .24, BODY(.8));
-  bx(F, 0, .22, 2.28, .75, .02, .14, DARK); bx(F, 0, .26, 2.2, .7, .01, .08, BODY(.8));
-  for (const x of [-.72, .72]) bx(x < 0 ? ML : MR, x, .8, .6, .06, .04, .08, BODY(.9));
-  for (const x of [-.8, .8]) bx(B, x, .3, 2.0, .015, .09, .2, BODY(.8));
-  for (const x of [-.45, .45]) { bx(B, x, .5, 2.27, .2, .02, .02, LAMP); bx(TL, x * 1.3, .55, -2.29, .13, .02, .01, BODY(1)); bx(DT, x * .6, .34, -2.35, .05, .05, .05, MET); }
-  bx(TL, 0, .5, -2.3, .4, .015, .01, BODY(1));
-  bx(B, 0, .96, -.1, .02, .02, .75, WHT);
-  bx(B, 0, .27, -2.32, .5, .05, .06, hex(0x111419));
-  for (const x of [-.3, 0, .3]) bx(B, x, .62, -1.1, .1, .008, .3, hex(0x15181c));
+
+  // --- Pontons & passages de roues
+  for (const x of [-.88, .88]) {
+    bx(B, x, .60, 1.35, .22, .07, .55, BODY(1.05));
+    bx(B, x, .68, -1.40, .26, .09, .75, BODY(1.05));
+    bx(B, x * 1.02, .52, 1.35, .01, .12, .50, DARK);
+    bx(B, x * 1.02, .54, -1.40, .01, .12, .65, DARK);
+    // Louvres anti-décollage sur les ailes (B)
+    for (let i = 0; i < 3; i++) {
+      bx(B, x * .98, .69, 1.25 + i * .10, .09, .008, .03, DARK);  // fentes avant
+      bx(B, x * .98, .78, -1.25 + i * .10, .11, .008, .03, DARK); // fentes arrière
+    }
+  }
+
+  // --- Aileron requin dorsal (Shark Fin) & Airbox (B, DT)
+  bx(B, 0, 1.04, -1.40, .018, .36, 1.15, BODY(.95));              // grand aileron de requin central
+  bx(B, 0, 1.23, -1.40, .022, .015, 1.15, DARK);                  // arête supérieure de l'aileron requin
+  bx(B, 0, 1.01, -.25, .12, .07, .30, hex(0x181a20));             // prise d'air moteur de toit
+  bx(B, 0, 1.01, -.10, .10, .05, .02, hex(0x0a0c10));             // ouverture d'air
+  bx(DT, 0, 1.17, -.20, .02, .025, .05, hex(0xffee00));           // T-Cam télémétrie jaune fluo
+  bx(DT, 0, .85, .58, .01, .014, .38, DARK);                       // essuie-glace cockpit
+
+  // --- Aileron arrière XXL & dérives Le Mans (W, TL, DT)
+  bx(W, 0, 1.20, -2.22, .88, .02, .24, DARK);                      // plan inférieur carbone
+  bx(W, 0, 1.24, -2.18, .84, .012, .13, BODY(.9));                // plan supérieur couleur carrosserie
+  bx(W, 0, 1.26, -2.32, .84, .02, .008, DARK);                    // gurney flap
+  for (const x of [-.45, .45]) bx(W, x, 1.05, -2.15, .02, .18, .06, DARK); // piliers col de cygne
+  for (const x of [-.88, .88]) {
+    bx(W, x, 1.10, -2.22, .015, .16, .28, BODY(.85));             // endplate supérieure géante
+    bx(W, x, .85, -2.20, .015, .20, .18, BODY(.8));               // dérive inférieure
+    bx(TL, x, 1.05, -2.36, .018, .12, .01, hex(0xff1122));        // feux verticaux arrière d'endplate
+  }
+
+  // --- Museau & Aile avant multi-plans (F, B, DT)
+  bx(F, 0, .28, 2.30, .14, .08, .12, BODY(.9));                   // quille centrale de nez
+  bx(F, 0, .20, 2.30, .80, .02, .16, DARK);                       // plan inférieur
+  bx(F, 0, .25, 2.24, .76, .012, .10, BODY(.85));                 // plan supérieur
+  for (const x of [-.86, .86]) {
+    bx(F, x, .28, 2.25, .02, .12, .24, BODY(.85));                // endplates avant monumentales
+    bx(F, x, .36, 2.22, .06, .01, .10, DARK);                     // dive plane avant
+  }
+  for (const x of [-.72, .72]) {
+    bx(x < 0 ? ML : MR, x * .95, .74, .62, .03, .07, .02, DARK);   // mât rétro
+    bx(x < 0 ? ML : MR, x, .82, .60, .06, .035, .08, BODY(.9));   // coque rétro
+    bx(DT, x * 1.01, .82, .55, .045, .025, .008, hex(0xdde8f5));   // miroir
+  }
+  for (const x of [-.80, .80]) bx(B, x, .30, 2.0, .015, .09, .20, BODY(.8)); // renfort d'aile
+
+  // --- Optiques endurance Le Mans verticales (B)
+  for (const x of [-.48, .48]) {
+    bx(B, x, .48, 2.27, .07, .12, .02, GLS);                      // boîtier noir vertical
+    for (let i = 0; i < 4; i++) bx(B, x, .40 + i * .05, 2.28, .04, .016, .012, LAMP); // 4 spots LED étagés
+    bx(B, x * 1.12, .48, 2.275, .008, .11, .01, hex(0x66ccff));   // liseré DRL vertical
+  }
+
+  // --- Poupe, Échappements hauts, diffuseur & Leader lights (TL, B, DT)
+  for (const x of [-.22, .22]) {
+    bx(DT, x, .76, -1.20, .05, .05, .08, MET);                    // échappement supérieur soufflé
+    bx(DT, x, .77, -1.20, .035, .035, .08, hex(0x111111));
+  }
+  for (const x of [-.85, .85]) {
+    bx(DT, x * 1.02, .56, .20, .005, .06, .04, hex(0x101010));    // boîtier leader lights
+    bx(DT, x * 1.025, .56, .20, .005, .04, .015, hex(0x22ff44));  // LED verte de position
+  }
+  bx(DT, -.30, .24, 2.36, .02, .02, .03, hex(0xee2211));          // anneau remorquage avant
+  bx(DT, .30, .32, -2.40, .02, .02, .03, hex(0xee2211));          // anneau remorquage arrière
+  bx(TL, 0, .50, -2.34, .45, .018, .01, BODY(1));                 // feux arrière horizontaux
+  bx(TL, 0, .32, -2.38, .06, .05, .012, hex(0xff1111));           // feu pluie FIA central
+  bx(B, 0, .28, -2.33, .58, .06, .10, hex(0x111419));             // diffuseur arrière
+  for (const x of [-.36, -.18, 0, .18, .36]) bx(B, x, .30, -2.35, .01, .075, .09, DARK); // ailettes diffuseur
   return pack(B, W, F, ML, MR, TL, DT);
 }
 // --- Rallye
@@ -182,36 +361,143 @@ function buildRally() {
   loft(B, RS, [0, .6, 0], BODY(1), BODY(1.06), DARK, BODY(.8));
   loft(B, RC, [0, 1.2, -.2], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
   arches(B, 'rally');
-  for (const x of [-.93, .93]) { bx(B, x * .98, .34, .0, .03, .05, 1.2, DARK); bx(B, x * 1.0, .2, 1.95, .02, .12, .1, DARK); bx(B, x * 1.0, .2, -1.95, .02, .12, .1, DARK); }   // bas de caisse, bavettes
-  bx(B, 0, 1.58, -.3, .22, .08, .35, DARK);
-  for (const x of [-.45, -.15, .15, .45]) { bx(B, x, 1.56, .12, .09, .08, .08, LAMP); bx(B, x, 1.56, .04, .095, .085, .02, DARK); }
-  bx(B, .72, 1.1, 1.0, .03, .3, .03, DARK);   // prise d'air (snorkel)
-  bx(W, 0, 1.38, -2.2, .85, .03, .25, BODY(.8)); for (const x of [-.6, .6]) bx(W, x, 1.18, -2.1, .03, .22, .05, DARK);
-  bx(F, 0, .3, 2.15, .7, .05, .12, DARK); bx(B, 0, .55, 2.2, .3, .04, .02, hex(0x20242a));
-  for (const x of [-.98, .98]) { bx(x < 0 ? ML : MR, x, 1.15, .75, .07, .05, .09, BODY(.9)); }
-  for (const x of [-.3, .3]) { bx(B, x, .98, 1.3, .2, .015, .3, hex(0x15181c)); bx(B, x * 1.9, .5, 2.2, .14, .06, .02, LAMP); bx(TL, x * 2.4, .6, -2.19, .1, .1, .01, BODY(1)); }
-  bx(TL, 0, .52, -2.19, .3, .03, .01, BODY(1));
-  bx(B, 0, .3, -2.25, .45, .06, .07, hex(0x111419)); bx(DT, .5, .3, -2.3, .06, .06, .06, MET); bx(DT, .5, .3, -2.37, .04, .04, .01, DARK);
-  for (const x of [-.95, .95]) bx(B, x, 1.12, .0, .03, .035, .3, GLASS);
+
+  // --- Protection sous-moteur (Skid plate) & bouclier avant (F, DT)
+  bx(F, 0, .20, 2.18, .55, .016, .15, MET);                       // plaque de protection alu biseautée
+  bx(F, 0, .30, 2.15, .72, .05, .12, DARK);                       // bouclier avant renforcé
+  bx(DT, -.40, .24, 2.26, .025, .025, .03, hex(0xee1111));        // crochet de remorquage rouge
+  bx(B, 0, .55, 2.20, .32, .04, .02, hex(0x20242a));             // calandre avant
+  for (const x of [-.58, .58]) {
+    bx(B, x, .50, 2.22, .15, .065, .02, LAMP);                    // phares principaux
+    bx(B, x, .50, 2.20, .18, .08, .025, GLS);                     // optique
+  }
+
+  // --- Rampe de 4 phares de nuit sur capot (Night Pod WRC) (B, DT)
+  bx(B, 0, .82, 1.70, .46, .055, .12, DARK);                      // coque profilée carbone du pod
+  for (const x of [-.34, -.11, .11, .34]) {
+    bx(B, x, .82, 1.76, .08, .05, .01, LAMP);                     // 4 projecteurs longue portée
+    bx(DT, x, .82, 1.73, .09, .06, .03, hex(0x282c34));           // cerclages métalliques
+  }
+  bx(B, 0, .78, 1.30, .24, .02, .16, hex(0x15181c));              // ouïe d'échangeur capot
+
+  // --- Prise d'air toit WRC, Snorkel & Arceau-cage (B, DT)
+  bx(B, 0, 1.54, -.15, .20, .05, .25, DARK);                      // roof air scoop (écope de toit)
+  for (const x of [-.07, .07]) bx(B, x, 1.54, -.02, .05, .03, .01, hex(0x0e1014)); // entrées d'air cockpit
+  bx(B, .74, 1.05, .95, .035, .32, .035, DARK);                   // tube vertical snorkel
+  bx(B, .74, 1.38, 1.00, .045, .045, .06, DARK);                  // tête de snorkel d'admission
+  bx(B, 0, 1.42, -.10, .70, .018, .018, WHT);                     // arceau principal cage
+  for (const x of [-.55, .55]) bx(B, x, 1.25, -.70, .018, .20, .48, WHT); // montants arrière cage blanche
+
+  // --- Bavettes garde-boue rouges (Mudflaps) & bas de caisse (B)
+  for (const x of [-.93, .93]) {
+    bx(B, x * .98, .34, 0, .03, .05, 1.25, DARK);                  // bas de caisse renforcé
+    bx(B, x * .98, .18, 1.05, .02, .14, .08, hex(0xdd1111));      // bavette garde-boue avant rouge
+    bx(B, x * .98, .18, -1.80, .02, .16, .08, hex(0xdd1111));     // bavette garde-boue arrière rouge
+  }
+
+  // --- Aileron WRC biplan spectaculaire (W, DT)
+  bx(W, 0, 1.32, -2.15, .82, .02, .22, DARK);                      // aile inférieure
+  bx(W, 0, 1.48, -2.25, .86, .025, .20, BODY(.85));               // aile supérieure profilée
+  for (const x of [-.86, .86]) bx(W, x, 1.38, -2.20, .015, .22, .28, BODY(.8)); // grandes dérives extérieures
+  for (const x of [-.40, .40]) bx(W, x, 1.34, -2.18, .02, .18, .12, DARK);      // piliers intérieurs
+  for (const x of [-.98, .98]) bx(x < 0 ? ML : MR, x, 1.15, .75, .07, .05, .09, BODY(.9)); // rétroviseurs
+  for (const x of [-.95, .95]) bx(B, x, 1.12, 0, .03, .035, .30, GLASS);         // custode
+
+  // --- Poupe, Feux, Pare-chaleur & Échappement WRC ALS (TL, B, DT)
+  for (const x of [-.72, .72]) bx(TL, x, 1.05, -2.19, .08, .16, .01, BODY(1));  // feux arrière verticaux
+  bx(TL, 0, 1.30, -2.19, .25, .025, .01, BODY(1));                // 3ème feu stop central haut
+  bx(DT, .52, .32, -2.27, .12, .08, .015, MET);                    // pare-chaleur thermique alu
+  bx(DT, .52, .32, -2.33, .055, .055, .07, MET);                   // canule inox échappement rallye
+  bx(DT, .52, .32, -2.38, .038, .038, .01, hex(0x111111));        // intérieur échappement
+  bx(B, 0, .28, -2.24, .48, .05, .08, hex(0x181a20));             // diffuseur blindé arrière
   return pack(B, W, F, ML, MR, TL, DT);
 }
-// --- Monoplace (roues non carénées : les bras avant sont dynamiques, voir one())
+// --- Monoplace (roues non carenees : les bras avant sont dynamiques, voir one())
 const OS = [[-2.2, .2, .3, .5, .18], [-1.4, .32, .2, .62, .26], [-.4, .36, .2, .58, .3], [.7, .3, .2, .46, .22], [1.7, .14, .22, .34, .1], [2.35, .08, .24, .3, .06]];
+
+function buildHalo(B, col) {
+  const pillar = [[0, .62, .12], [0, .70, .08], [0, .78, .04], [0, .86, -.04], [0, .92, -.16], [0, .96, -.32]];
+  tube(B, pillar, .025, .018, col);
+  for (const sg of [-1, 1]) {
+    const arm = [
+      [0, .96, -.32],
+      [sg * .10, .97, -.18],
+      [sg * .20, .97, .02],
+      [sg * .26, .95, .22],
+      [sg * .28, .92, .40],
+      [sg * .26, .88, .58],
+      [sg * .20, .82, .72],
+      [sg * .10, .76, .84],
+      [0, .72, .90],
+    ];
+    tube(B, arm, .025, .018, col);
+    const foot = [[sg * .10, .76, .84], [sg * .14, .65, .88], [sg * .16, .55, .90]];
+    tube(B, foot, .022, .016, col);
+  }
+  tube(B, [[-0.04, .72, .90], [0, .72, .91], [0.04, .72, .90]], .018, .014, col);
+  for (const sg of [-1, 1]) {
+    tube(B, [[0, .96, -.32], [sg * .16, .72, -.32]], .014, .012, col);
+    tube(B, [[sg * .26, .88, .58], [sg * .28, .64, .62]], .014, .012, col);
+  }
+}
+
 function buildOpen() {
   const [B, W, F, ML, MR, TL, DT] = bs(), D = DARK;
   loft(B, OS, [0, .4, 0], BODY(1), BODY(1.06), D, BODY(.85));
-  for (const x of [-1, 1]) for (const dz of [-.16, .16]) bx(B, x * .64, .32 + dz * .2, -1.3 + dz, .35, .015, .02, D);   // bras de suspension arrière
-  for (const x of [-.58, .58]) { bx(B, x, .38, -.1, .26, .2, .95, BODY(1)); bx(B, x, .42, .9, .2, .12, .02, GLS); bx(B, x * .9, .3, .82, .01, .13, .28, BODY(.8)); }   // pontons, bargeboards
-  bx(B, 0, .8, -.9, .14, .2, .55, BODY(1.05)); bx(B, 0, .85, -.34, .1, .12, .02, GLS);
+  // --- Suspension arriere
+  for (const x of [-1, 1]) for (const dz of [-.16, .16]) bx(B, x * .64, .32 + dz * .2, -1.3 + dz, .35, .015, .02, D);
+  // --- Pontons & bargeboards (plus detailles)
+  for (const x of [-.58, .58]) {
+    bx(B, x, .38, -.1, .26, .2, .95, BODY(1));
+    bx(B, x, .42, .9, .2, .12, .02, GLS);
+    bx(B, x * .9, .3, .82, .01, .13, .28, BODY(.8));
+    bx(B, x * .88, .28, .60, .01, .08, .18, BODY(.75));
+    bx(B, x * .86, .24, .72, .01, .05, .22, BODY(.7));
+    bx(DT, x * .97, .22, .40, .01, .04, .32, D);
+  }
+  // --- Sidepods (entrees d'air)
+  for (const x of [-.58, .58]) {
+    bx(B, x, .50, -.05, .05, .15, .08, D);
+    bx(B, x, .32, -.05, .05, .08, .08, D);
+  }
+  // --- Moteur / boite
   bx(B, 0, .62, -1.8, .02, .18, .5, BODY(.9));
+  bx(DT, 0, .58, -1.6, .10, .10, .05, MET);
+  bx(DT, 0, .62, -1.5, .07, .07, .03, hex(0x2a2d33));
+  // --- Aileron arriere
+  bx(W, 0, 1.0, -2.15, .55, .02, .2, D);
+  bx(W, 0, 1.09, -2.15, .55, .015, .12, BODY(.9));
+  bx(W, 0, .7, -2.1, .02, .3, .03, D);
+  for (const x of [-.56, .56]) {
+    bx(W, x, .96, -2.15, .01, .15, .25, BODY(.85));
+    bx(W, x, .82, -2.15, .01, .24, .15, BODY(.8));
+  }
+  bx(DT, 0, 1.12, -2.1, .38, .008, .08, BODY(1.1));
+  // --- Cockpit : casque + visor
+  bx(B, 0, .8, -.9, .14, .2, .55, BODY(1.05));
+  bx(B, 0, .85, -.34, .1, .12, .02, GLS);
   bx(B, 0, .63, .2, .2, .015, .4, GLS);
-  bx(B, 0, .74, .15, .1, .1, .13, WHT); bx(B, 0, .76, .28, .08, .03, .01, GLS);
-  for (const x of [-.2, .2]) bx(B, x, .84, .1, .015, .015, .6, D); bx(B, 0, .78, .7, .015, .12, .015, D);
-  bx(F, 0, .18, 2.2, 1.0, .015, .2, D); bx(F, 0, .27, 2.1, .9, .01, .12, BODY(.8)); bx(F, 0, .22, 2.28, .8, .01, .06, BODY(.9));
-  for (const x of [-1, 1]) { bx(F, x, .24, 2.2, .01, .1, .25, BODY(.85)); bx(x < 0 ? ML : MR, x * .62, .68, .5, .06, .03, .05, BODY(.9)); }
-  bx(W, 0, 1.0, -2.15, .55, .02, .2, D); bx(W, 0, 1.09, -2.15, .55, .015, .12, BODY(.9)); bx(W, 0, .7, -2.1, .02, .3, .03, D);
-  for (const x of [-.56, .56]) bx(W, x, .96, -2.15, .01, .15, .25, BODY(.85));
-  bx(TL, 0, .45, -2.21, .14, .03, .01, BODY(1)); bx(B, 0, .3, -2.3, .3, .05, .06, hex(0x111419)); bx(DT, 0, .52, -2.3, .05, .05, .07, MET);
+  bx(B, 0, .74, .15, .1, .1, .13, WHT);
+  bx(B, 0, .76, .28, .08, .03, .01, hex(0x1a90ff));
+  bx(DT, 0, .77, .10, .11, .08, .02, hex(0xd0d8e0));
+  // --- Halo F1 realiste
+  buildHalo(B, hex(0x1a1c20));
+  // --- Aileron avant
+  bx(F, 0, .18, 2.2, 1.0, .015, .2, D);
+  bx(F, 0, .24, 2.12, .92, .010, .14, BODY(.8));
+  bx(F, 0, .29, 2.04, .82, .008, .10, BODY(.85));
+  bx(F, 0, .22, 2.28, .8, .01, .06, BODY(.9));
+  for (const x of [-1, 1]) {
+    bx(F, x, .24, 2.2, .01, .1, .25, BODY(.85));
+    bx(F, x, .22, 2.0, .01, .07, .18, BODY(.8));
+    bx(x < 0 ? ML : MR, x * .62, .68, .5, .06, .03, .05, BODY(.9));
+    bx(DT, x * .62, .72, .5, .05, .015, .03, D);
+  }
+  // --- Feux + ERS
+  bx(TL, 0, .45, -2.21, .14, .03, .01, BODY(1));
+  bx(B, 0, .3, -2.3, .3, .05, .06, hex(0x111419));
+  bx(DT, 0, .52, -2.3, .05, .05, .07, MET);
+  for (const x of [-.12, .12]) bx(DT, x, .32, -2.33, .02, .03, .02, hex(0x0044cc));
   return pack(B, W, F, ML, MR, TL, DT);
 }
 // --- Dragster (Top Fuel : longue flèche effilée, compresseur, zoomies, aileron arrière géant, wheelie bar)
@@ -221,23 +507,72 @@ function buildDrag() {
   const [B, W, F, ML, MR, TL, DT] = bs(), D = DARK;
   loft(B, DRAG_S, [0, .4, 0], BODY(1), BODY(1.08), D, BODY(.85));
   loft(B, DRAG_C, [0, .8, -1.3], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
-  bx(B, 0, .22, 2.7, .38, .02, .02, MET); bx(B, 0, .5, -1.5, .9, .04, .04, MET);   // essieux
-  bx(B, 0, .82, -1.25, .1, .1, .12, WHT); bx(B, 0, .84, -1.15, .08, .03, .01, GLS);
-  for (const x of [-.22, .22]) { bx(B, x, .85, -1.25, .02, .2, .02, D); bx(B, x, .95, -1.45, .02, .02, .22, D); }
-  bx(B, 0, 1.05, -1.35, .22, .02, .02, D);
-  bx(B, 0, .54, -.5, .32, .22, .35, hex(0x3a4048)); bx(B, 0, .80, -.5, .18, .12, .28, MET);
-  bx(B, 0, .96, -.45, .22, .08, .18, hex(0xd01010));
-  for (const x of [-.12, 0, .12]) bx(B, x, .96, -.35, .04, .05, .02, hex(0x111111));
-  for (const x of [-1, 1]) for (let i = 0; i < 4; i++) bx(DT, x * .46, .52 + i * .06, -.7 + i * .14, .035, .12, .035, MET);   // zoomies
-  for (const x of [-.28, .28]) { bx(B, x, .22, -2.75, .02, .02, .55, MET); bx(B, x, .35, -2.70, .02, .02, .50, MET); cyl(B, x, .12, -3.3, .10, .06); }
-  for (const x of [-.16, .16]) { bx(B, x, .62, -2.25, .12, .1, .1, hex(0x1e2025)); bx(B, x, .62, -2.31, .09, .07, .02, hex(0xee3322)); }
-  bx(TL, 0, .42, -2.4, .12, .03, .01, BODY(1));
-  for (const x of [-.45, .45]) { bx(W, x, 1.25, -2.1, .025, .55, .06, D); bx(W, x, 1.15, -1.8, .02, .45, .03, D); }
-  bx(W, 0, 1.78, -2.15, 1.15, .03, .38, D); bx(W, 0, 1.86, -2.05, 1.1, .02, .25, BODY(.9));
-  for (const x of [-1.15, 1.15]) bx(W, x, 1.75, -2.15, .02, .32, .52, BODY(.85));
-  bx(W, 0, 1.45, -2.15, .015, .32, .35, D);
-  bx(F, 0, .14, 2.95, .65, .02, .18, D); for (const x of [-.65, .65]) bx(F, x, .18, 2.95, .015, .08, .22, BODY(.9));
-  for (const x of [-.56, .56]) bx(x < 0 ? ML : MR, x, .62, -1.0, .04, .08, .16, BODY(.9));
+
+  // --- Essieux et châssis tubulaire apparent
+  bx(B, 0, .22, 2.70, .38, .02, .02, MET);                        // essieu avant
+  bx(B, 0, .50, -1.50, .90, .04, .04, MET);                       // essieu arrière
+  for (const x of [-.18, .18]) bx(B, x, .30, .80, .015, .015, 1.60, MET); // longerons chromoly
+  for (let i = 0; i < 4; i++) bx(DT, 0, .28 + (i % 2) * .04, .20 + i * .45, .16, .012, .012, MET); // treillis diagonal
+
+  // --- Arceau-cage pilote & cockpit (B, DT)
+  bx(B, 0, .82, -1.25, .10, .10, .12, WHT);                       // casque pilote blanc
+  bx(B, 0, .84, -1.15, .08, .03, .01, hex(0x2288ee));              // visière bleue iridium
+  bx(B, 0, 1.08, -1.35, .24, .02, .02, D);                        // tube supérieur arceau
+  for (const x of [-.22, .22]) {
+    bx(B, x, .85, -1.25, .022, .22, .022, D);                     // montants arceau verticaux
+    bx(B, x, .96, -1.48, .02, .02, .24, D);                       // jambes arceau arrière
+  }
+  bx(DT, 0, .72, -1.05, .08, .04, .015, MET);                      // volant papillon dragster
+
+  // --- Moteur Supercharged V8 Hemi & Blower (B, DT)
+  bx(B, 0, .54, -.50, .34, .22, .38, hex(0x3a4048));              // bloc V8 massif
+  for (const x of [-.24, .24]) bx(B, x, .68, -.50, .10, .08, .34, MET); // culasses chromées
+  bx(B, 0, .82, -.50, .20, .14, .30, MET);                        // boîtier supercharger 14-71
+  bx(DT, 0, .75, -.18, .16, .18, .03, hex(0x1a1a1a));             // courroie crantée blower
+  bx(DT, 0, .84, -.16, .08, .08, .04, MET);                       // poulie supérieure blower
+  bx(DT, 0, .54, -.16, .09, .09, .04, MET);                       // poulie vilebrequin
+  bx(B, 0, 1.02, -.45, .22, .09, .22, hex(0xdd1515));             // bugcatcher scoop rouge
+  for (const x of [-.09, 0, .09]) {
+    bx(B, x, 1.02, -.34, .035, .035, .01, hex(0x111111));         // 3 papillons d'injection
+    bx(DT, x, 1.02, -.33, .025, .025, .01, hex(0xff2222));
+  }
+
+  // --- 8 Zoomies inclinés crachant le nitrométhane (DT)
+  for (const x of [-1, 1]) for (let i = 0; i < 4; i++) {
+    bx(DT, x * .46, .52 + i * .06, -.72 + i * .14, .04, .14, .04, MET); // tube zoomie
+    bx(DT, x * .46, .64 + i * .06, -.72 + i * .14, .025, .03, .025, hex(0x111111)); // intérieur
+  }
+
+  // --- Wheelie bar allongée triangulée avec roulettes (B, DT)
+  for (const x of [-.28, .28]) {
+    bx(B, x, .22, -2.85, .02, .02, .65, MET);                     // barres basses
+    bx(B, x, .42, -2.78, .02, .02, .58, MET);                     // barres hautes
+    bx(B, x, .30, -3.20, .015, .12, .015, MET);                    // liaison verticale
+    cyl(B, x, .12, -3.45, .11, .06);                              // roulettes métal
+  }
+
+  // --- Doubles parachutes de freinage (B, DT, TL)
+  for (const x of [-.16, .16]) {
+    bx(B, x, .65, -2.28, .12, .11, .12, hex(0x22262d));           // packs de parachutes noirs
+    bx(B, x, .65, -2.36, .09, .08, .02, hex(0xee3322));           // sangles de sécurité rouges
+    bx(DT, x, .65, -2.38, .02, .02, .02, MET);                    // goupilles
+  }
+  bx(TL, 0, .42, -2.40, .12, .03, .01, BODY(1));                  // feu stop
+
+  // --- Aileron arrière géant Top Fuel (W)
+  for (const x of [-.45, .45]) {
+    bx(W, x, 1.30, -2.10, .025, .60, .08, D);                     // montants verticaux géants
+    bx(W, x, 1.20, -1.75, .02, .48, .04, D);                      // jambes diagonales
+  }
+  bx(W, 0, 1.84, -2.15, 1.20, .035, .42, D);                       // plan principal XXL
+  bx(W, 0, 1.92, -2.05, 1.15, .02, .28, BODY(.9));                // lame supérieure
+  for (const x of [-1.20, 1.20]) bx(W, x, 1.80, -2.15, .02, .38, .58, BODY(.85)); // flasques latérales géantes
+  bx(W, 0, 1.50, -2.15, .015, .34, .38, D);                       // flap stabilisateur central
+
+  // --- Aileron avant & déflecteurs (F, ML, MR)
+  bx(F, 0, .14, 3.00, .70, .02, .20, D);                          // aileron avant rasant
+  for (const x of [-.70, .70]) bx(F, x, .18, 3.00, .015, .09, .24, BODY(.9)); // dérives avant
+  for (const x of [-.56, .56]) bx(x < 0 ? ML : MR, x, .62, -1.0, .04, .08, .16, BODY(.9)); // carénages latéraux
   return pack(B, W, F, ML, MR, TL, DT);
 }
 // --- Supersonique ThrustSSC
@@ -247,20 +582,45 @@ function buildThrust() {
   const [B, W, F, ML, MR, TL, DT] = bs(), D = DARK;
   loft(B, THRUST_S, [0, .45, 0], BODY(1), BODY(1.06), D, BODY(.85));
   loft(B, THRUST_C, [0, .8, .2], GLASS, (i) => (i === 1 ? BODY(.95) : GLASS));
+
+  // --- Double réacteurs Rolls-Royce Spey Turbofan (B, DT)
   for (const x of [-1.02, 1.02]) {
-    bx(B, x, .46, -.2, .38, .36, 1.85, BODY(1.02)); bx(B, x, .46, 1.66, .37, .35, .04, MET); bx(B, x, .46, 1.60, .12, .12, .15, D);
-    bx(B, x, .46, -2.15, .35, .33, .12, hex(0x282c34)); bx(B, x, .46, -2.28, .32, .30, .04, hex(0x181a20));
-    bx(B, x, .46, -2.31, .22, .20, .01, hex(0xff5511)); bx(B, x, .46, -2.31, .12, .10, .01, hex(0xffee88));
-    bx(B, x * .5, .56, .85, .02, .3, .1, D); bx(B, x * .5, .3, -1.85, .02, .08, .1, D);   // jambes de roue
+    bx(B, x, .46, -.20, .38, .36, 1.90, BODY(1.02));              // corps des turboréacteurs
+    bx(B, x, .46, 1.70, .39, .37, .05, MET);                      // lèvre d'entrée d'air titane
+    bx(B, x, .46, 1.76, .10, .10, .16, MET);                      // cône d'ogive central (shock cone)
+    bx(B, x, .46, 1.92, .04, .04, .12, MET);                      // pointe du cône supersonique
+    bx(B, x, .46, 1.55, .20, .20, .10, D);                        // entrée turbine noire
+
+    // Tuyères de post-combustion arrière (Afterburners)
+    bx(B, x, .46, -2.18, .36, .34, .14, hex(0x282c34));           // anneau extérieur tuyère
+    bx(B, x, .46, -2.32, .32, .30, .05, hex(0x181a20));           // rétreint tuyère
+    bx(B, x, .46, -2.35, .24, .22, .01, hex(0xff5511));           // flamme externe incandescente
+    bx(B, x, .46, -2.36, .14, .12, .01, hex(0xffee88));           // cœur de flamme blanc/jaune
+
+    // Jambages de train d'atterrissage carénés
+    bx(B, x * .51, .56, .85, .025, .32, .12, D);
+    bx(B, x * .51, .30, -1.85, .025, .10, .12, D);
   }
-  bx(W, 0, 1.15, -2.1, .025, .48, .45, BODY(1)); bx(W, 0, 1.25, -2.35, .02, .50, .22, D); bx(W, 0, 1.72, -2.0, .01, .01, .15, MET);
-  bx(F, 0, .20, 3.85, .018, .018, .32, MET); bx(F, 0, .20, 4.12, .008, .008, .12, MET);
-  bx(B, 0, .66, -2.62, .16, .08, .06, hex(0x1a1a20));
-  for (const x of [-.07, .07]) bx(TL, x, .66, -2.66, .05, .06, .02, BODY(1));
-  for (const x of [-1.02, 1.02]) bx(x < 0 ? ML : MR, x * 1.38, .44, -.4, .08, .02, .45, BODY(1));
+
+  // --- Dérive arrière verticale monumentale & Parachutes haute vitesse (W, B, TL, DT)
+  bx(W, 0, 1.18, -2.10, .025, .52, .48, BODY(1));                 // voilure dérive verticale
+  bx(W, 0, 1.28, -2.38, .02, .54, .24, D);                        // gouverne de direction
+  bx(W, 0, 1.76, -2.00, .01, .01, .18, MET);                      // sonde de télémesure en tête
+  bx(B, 0, .68, -2.65, .18, .10, .08, hex(0x1a1a20));             // caisson parachute haute vitesse
+  bx(DT, 0, .74, -2.70, .04, .02, .04, hex(0xee2211));            // câbles de largage parachutes
+  for (const x of [-.08, .08]) bx(TL, x, .68, -2.70, .05, .06, .02, BODY(1)); // feux de signalisation
+
+  // --- Nez supersonique Mach 1 & Sonde Pitot (F, DT)
+  bx(F, 0, .20, 3.85, .018, .018, .35, MET);                      // aiguille sonde Pitot
+  bx(F, 0, .20, 4.22, .008, .008, .18, MET);                      // pointe ultra effilée
+  for (const x of [-.24, .24]) bx(F, x, .22, 3.40, .15, .012, .18, BODY(.85)); // ailettes canard delta de nez
+
+  // --- Cockpit verrière blindée & stabilisateurs (B, ML, MR, DT)
+  bx(B, 0, .82, .20, .02, .03, .65, MET);                         // montant central verrière titane
+  bx(DT, 0, .88, .50, .03, .04, .06, DARK);                       // périscope pilote
+  for (const x of [-1.02, 1.02]) bx(x < 0 ? ML : MR, x * 1.38, .44, -.40, .08, .02, .50, BODY(1)); // carénages latéraux de roues
   return pack(B, W, F, ML, MR, TL, DT);
 }
-// st : tronçons du capot / coffre où courent les bandes ; dn : z du numéro de portière ; sb : étendue de la bande latérale
 const KINDS = {
   gt: { build: buildGT, S: sub(BODY_S), y: 1.15, z: -.4, k: 1, st: [[.95, 1.4, 2.1, 2.25], [-2.25, -2, -1.25]], dn: .3, sb: [-1.8, 1.8] },
   wedge: { build: buildWedge, S: sub(WS), y: 1.0, z: 0, k: 1, st: [[1.25, 1.8, 2.25], [-2.2, -1.9, -1.4]], dn: .15, sb: [-1.5, 1.5] },

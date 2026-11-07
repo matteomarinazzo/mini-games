@@ -1,4 +1,4 @@
-﻿import { createGL, createCamera } from './core/gl.js';
+import { createGL, createCamera } from './core/gl.js';
 import { createF1Cockpit } from './core/cockpit-f1.js';
 import { groundAt, locate, TRACK, inPitBox, PIT, pitExt } from './core/track.js';
 import { buildTrackMesh } from './core/track-mesh.js';
@@ -13,6 +13,8 @@ import { buildLine, buildZone, buildLamp, drawBrake, drawLights } from './core/a
 import { createMap } from './core/map.js';
 import { createDamage, drawWear } from './core/damage.js';
 import { createSkids } from './core/skidmarks.js';
+import { createSmoke } from './core/smoke.js';
+import { createRain } from './core/rain.js';
 import { circuitList, CAR_LIST, sessionConfig, queryConfig, saveRec, saveClm, loadSet, saveSet, startSession } from './core/config.js';
 import * as Net from './net.js';
 
@@ -32,8 +34,19 @@ const live = readLive();
 const online = Net.readSession();
 const multiplayer = !!(online?.going && online?.code && online?.uid && online?.players);
 const localUid = online?.uid || null;
-// Une session réseau est sa propre source de vérité : une ancienne sauvegarde solo ne peut pas la remplacer.
-const cfg = multiplayer ? (sessionConfig() || queryConfig()) : (live?.cfg || sessionConfig() || queryConfig()), sheet = CARS[cfg.car] || CARS.serra_gt;
+// Une session active (menu ou URL) est prioritaire sur un vieil état persisté.
+const sc = sessionConfig(), qc = queryConfig();
+const hasUrlWeather = new URLSearchParams(location.search).has('weather');
+const cfg = multiplayer ? (sc || qc) : (hasUrlWeather ? qc : (sc || live?.cfg || qc)), sheet = CARS[cfg.car] || CARS.serra_gt;
+// Résoudre la météo aléatoire une seule fois (tous les clients multi reçoivent la même valeur via cfg.weather)
+const resolvedWeather = (() => {
+  if (cfg.weather === 'random') {
+    const opts = ['dry', 'light_rain', 'heavy_rain'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  return cfg.weather || 'dry';
+})();
+const wetFactor = resolvedWeather === 'heavy_rain' ? 1.0 : (resolvedWeather === 'light_rain' ? 0.65 : 0);
 const set = loadSet();
 const humanPlayers = multiplayer ? Object.entries(online.players).filter(([, p]) => !p.away) : [];
 const sortedHumans = humanPlayers.sort(([, a], [, b]) => (a.joined || 0) - (b.joined || 0));
@@ -53,11 +66,11 @@ let hostWaitTime = 0;
 const trackName = (circuitList().find((c) => c.id === cfg.circuit) || circuitList()[0]).name; $('hud').querySelector('b').textContent = trackName; if (loading) { $('loadingTrack').textContent = trackName; loadUpdate('Génération de la piste…', 4) }
 const track = R.mesh(buildTrackMesh()), field = createCars(R, cfg.ai + remotePlayers.length, sheet, myStartPos, cfg.qualifying ? null : cfg.gridOrder), me = field.player;
 const input = createInput({ steerZone: $('steerZone'), accelBtn: $('accelBtn'), brakeBtn: $('brakeBtn') });
-const drv = createCar(sheet, field.playerSlot.s, field.playerSlot.lat), playerEngine = engineState(), cam = createCamera(65, .5, 5000);
+const drv = createCar(sheet, field.playerSlot.s, field.playerSlot.lat, wetFactor), playerEngine = engineState(), cam = createCamera(65, .5, 5000);
 const menuLink = $('results').querySelector('a.btn');   // lien Menu de la fenêtre de résultats (masqué pendant et après les qualifications)
 
 // IA et voitures humaines distantes : seul l'hôte simule la grille entière.
-const place = (c, slot) => { c.slot = slot; c.ph = createCar(c.sheet, slot.s, slot.lat); if (c.ai) { c.ai.ph = c.ph; c.ph.sheet = c.ai.sheet; c.ai.tl = c.ph.lat; } };   // sheet : fiche de l'IA (bonus de specs expert / difficile)
+const place = (c, slot) => { c.slot = slot; c.ph = createCar(c.sheet, slot.s, slot.lat, wetFactor); if (c.ai) { c.ai.ph = c.ph; c.ph.sheet = c.ai.sheet; c.ai.tl = c.ph.lat; } };   // sheet : fiche de l'IA (bonus de specs expert / difficile)
 const humanCars = field.cars.slice(0, remotePlayers.length), aiCars = field.cars.slice(remotePlayers.length);
 for (let i = 0; i < humanCars.length; i++) {
   const c = humanCars[i], [uid, player] = remotePlayers[i], choice = CARS[player.car] || sheet;
@@ -68,7 +81,7 @@ for (let i = 0; i < humanCars.length; i++) {
   if (multiplayer && !cfg.qualifying && !cfg.gridOrder) {
     place(c, gridSlot(getMultiSlotK(uid)));
   } else {
-    c.ph = createCar(choice, c.slot.s, c.slot.lat);
+    c.ph = createCar(choice, c.slot.s, c.slot.lat, wetFactor);
   }
 }
 // En multijoueur, « same » désigne la voiture du créateur pour que tous les
@@ -81,7 +94,7 @@ for (let i = 0; i < aiCars.length; i++) {
   const lk = look(choice);
   c.body = lk.color;
   c.sc = lk.sc;
-  c.ph = createCar(choice, c.slot.s, c.slot.lat);
+  c.ph = createCar(choice, c.slot.s, c.slot.lat, wetFactor);
   c.ai = null;
   c.netKey = 'ai:' + i;
 }
@@ -107,7 +120,21 @@ for (const c of field.cars) {
 }
 drv.entry = race.E[0];
 const NOGAS = { throttle: 0, brake: 0, steer: 0, rev: true }, IDLE = { throttle: 0, brake: .6, steer: 0, rev: false };
-const dmg = createDamage($('dmg')), mp = createMap($('map')), skids = createSkids(R, field.cars.length + 1);
+const dmg = createDamage($('dmg')), mp = createMap($('map')), skids = createSkids(R, field.cars.length + 1), smoke = createSmoke(R);
+// Pluie : initialisation après buildTrackMesh (setWeather écrase les couleurs de ciel du circuit)
+const rain = createRain(R, resolvedWeather, $('cockpitDrops'));
+R.setWeather(resolvedWeather);
+smoke.wet = R.weather.wet;
+drv.wet = R.weather.wet;
+field.cars.forEach((c) => { if (c.ph) c.ph.wet = R.weather.wet; });
+// Indicateur météo dans le HUD
+const hudWeather = $('hudWeather');
+if (hudWeather && resolvedWeather !== 'dry') {
+  hudWeather.textContent = resolvedWeather === 'light_rain' ? '🌦️' : '🌧️';
+  hudWeather.hidden = false;
+}
+// Classe CSS sur body pour l'opacité du canvas de gouttes pare-brise
+document.body.classList.toggle('rain', resolvedWeather !== 'dry');
 let lineMesh = null, zoneMesh = null, lampMesh = null;
 for (const [id, k] of [['sLine', 'line'], ['sBrake', 'brake'], ['sMap', 'map']]) {
   const el = $(id); el.checked = set[k];
@@ -137,6 +164,7 @@ const setView = (step = 0) => {
 $('viewPrev').addEventListener('click', () => setView(-1)); $('viewNext').addEventListener('click', () => setView(1)); setView();
 
 const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+let gameTime = 0;   // temps continu pour animer les nuages / pluie
 let tick = 0, acc = 0, last = 0, sensorClock = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
 function startPlayerDnf() { if (dnfActive) return; dnfActive = true; dnfElapsed = 0; dnfStopElapsed = 0; dnfHold = 0; playerEngine.failed = true; playerEngine.fade = 0; playerEngine.retiredAt = race.t; race.retire(race.E[0]); drv.ghost = true; pitMsg = ''; pitMsgT = 0; }
 const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
@@ -379,6 +407,8 @@ if (btnEditor && testInfo) {
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.repeat) setPause(!paused); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && !multiplayer) setPause(true); });
 const restored = restoreLive(multiplayer ? null : live);
+drv.wet = wetFactor;
+for (const c of field.cars) if (c.ph) c.ph.wet = wetFactor;
 if (restored && race.phase !== 'finished') setPause(true);
 else if (!restored && !go && !multiplayer && nav && nav.type === 'reload') setPause(true);
 if (restored && race.phase === 'finished') persistLive();
@@ -568,7 +598,7 @@ if (multiplayer) {
   });
 }
 function showResults() {
-  const r = race.results; shown = true; skids.clear(); input.reset(); $('pause').hidden = true; paused = false;
+  const r = race.results; shown = true; skids.clear(); smoke.clear(); input.reset(); $('pause').hidden = true; paused = false;
   $('again').hidden = false; menuLink.hidden = race.qualifying;
   if (race.qualifying) {
     const playerRow = r.rows.find(isMine);
@@ -628,6 +658,7 @@ $('again').addEventListener('click', () => {
 function frame(ts) {
   requestAnimationFrame(frame);
   const dt = (paused && !multiplayer) ? 0 : Math.min(.1, (ts - last) / 1000 || 0); last = ts;
+  gameTime += dt;
   if (multiplayer && hostMode && !multiReady) {
     const allGuestsReady = humanCars.every((c) => c.gameReady || online.players?.[c.humanUid]?.away);
     hostWaitTime += dt;
@@ -782,9 +813,9 @@ function frame(ts) {
   }
   if (set.view === 'cockpit') cockpitTick();
   cam.look(cx, cy, cz, tx, ty, tz);
-  if (!shown) skids.begin(dt, cam), skids.car(0, drv, me);   // traces de pneus : joueur (pose interpolée) + autres voitures (qualifs : joueur seul)
-  if (!shown && !race.qualifying) for (let i = 0; i < field.cars.length; i++) { const o = field.cars[i].ph; if (!o.gone) skids.car(i + 1, o); }
-  R.begin(cam); R.draw(track);
+  if (!shown) { smoke.low = skids.low; skids.begin(dt, cam); smoke.begin(dt, cam); skids.car(0, drv, me); smoke.car(0, drv, me, dt); }
+  if (!shown && !race.qualifying) for (let i = 0; i < field.cars.length; i++) { const o = field.cars[i].ph; if (!o.gone) { skids.car(i + 1, o); smoke.car(i + 1, o, null, dt); } }
+  R.begin(cam, gameTime); R.draw(track);
   if (set.line) R.draw(lineMesh || (lineMesh = R.mesh(buildLine())));
   if (set.brake) drawBrake(R, zoneMesh || (zoneMesh = R.mesh(buildZone())), drv);
   drawLights(R, lampMesh || (lampMesh = R.mesh(buildLamp())), race.lights);
@@ -802,5 +833,9 @@ function frame(ts) {
   }
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
+  const isCockpit = set.view === 'cockpit';
+  rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);
+  rain.draw(cam);
+  smoke.draw(cam);
 }
 requestAnimationFrame(frame);

@@ -79,54 +79,99 @@ body {
     pointer-events: none
 }
 
+.pads {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent
+}
+
+/* Volant tactile : toute la moitié gauche est la zone de braquage. On pose le doigt n'importe où puis on glisse à gauche / à droite
+   (le point de départ suit le doigt : pas de bouton à viser). Le volant dessiné tourne avec la direction. */
 .steer {
     pointer-events: auto;
     touch-action: none;
-    width: 46%;
+    width: 52%;
     height: 100%;
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 18px;
-    color: rgba(255, 255, 255, .55);
-    font-size: 16px;
-    letter-spacing: 1px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 0 12% 12px 0;
+    color: rgba(255, 255, 255, .5);
+    font-size: 14px;
+    letter-spacing: .5px;
     text-shadow: 0 1px 4px #000
+}
+
+.steer .tw {
+    width: 112px;
+    height: 112px;
+    flex: none;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .7));
+    transition: color .15s;
+    will-change: transform
+}
+
+.steer .tw svg {
+    display: block;
+    width: 100%;
+    height: 100%
+}
+
+.steer .hint {
+    transition: opacity .25s
+}
+
+.steer.on {
+    color: rgba(255, 255, 255, .9)
+}
+
+.steer.on .hint {
+    opacity: 0
 }
 
 .pedals {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     align-items: flex-end;
-    pointer-events: auto
+    pointer-events: auto;
+    margin-right: clamp(8px, 7vw, 90px)
 }
 
 .pedal {
     touch-action: none;
     -webkit-touch-callout: none;
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: 24px;
+    border: 2px solid rgba(255, 255, 255, .35);
     color: #fff;
-    font: 700 18px inherit;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .25);
     background: rgba(10, 14, 26, .5);
-    backdrop-filter: blur(4px)
+    backdrop-filter: blur(4px);
+    transition: transform .06s, filter .06s
 }
 
 .pedal.gas {
-    width: 92px;
+    width: 112px;
     height: 150px;
-    background: rgba(40, 160, 80, .5)
+    background: linear-gradient(165deg, rgba(70, 205, 110, .68), rgba(22, 120, 58, .68))
 }
 
 .pedal.brake {
-    width: 76px;
-    height: 100px;
-    background: rgba(200, 50, 50, .5)
+    width: 90px;
+    height: 104px;
+    background: linear-gradient(165deg, rgba(235, 80, 80, .68), rgba(160, 30, 30, .68))
 }
 
 .pedal.active {
-    transform: scale(.95);
-    filter: brightness(1.4)
+    transform: scale(.94);
+    filter: brightness(1.45);
+    box-shadow: 0 0 18px rgba(255, 255, 255, .35), inset 0 2px 8px rgba(0, 0, 0, .35)
 }
 
 @media (pointer:coarse),
@@ -175,7 +220,7 @@ body {
 
 .banner {
     position: fixed;
-    top: 30%;
+    top: 14%;
     left: 0;
     right: 0;
     z-index: 12;
@@ -338,8 +383,7 @@ button.exit {
 .map {
     position: fixed;
     left: max(10px, env(safe-area-inset-left, 0px));
-    top: 50%;
-    transform: translateY(-50%);
+    top: 200px;
     z-index: 11;
     pointer-events: none
 }
@@ -350,10 +394,10 @@ button.exit {
 
 .dmg {
     position: fixed;
-    right: max(10px, env(safe-area-inset-right, 0px));
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    width: 140px;
-    height: 233px;
+    left: max(10px, env(safe-area-inset-left, 0px));
+    top: calc(200px + 180px + 12px);
+    width: 110px;
+    height: 183px;
     z-index: 11;
     pointer-events: none;
     border-radius: 8px;
@@ -362,10 +406,15 @@ button.exit {
 
 @media (pointer:coarse),
 (max-width:700px) {
+    .map {
+        top: max(46px, calc(10px + env(safe-area-inset-top, 0px)));
+        width: 115px !important;
+        height: auto !important;
+    }
+
     .dmg {
-        width: 104px;
-        height: 173px;
-        bottom: calc(180px + env(safe-area-inset-bottom, 0px))
+        width: 64px;
+        height: 106px;
     }
 }
 
@@ -1351,9 +1400,9 @@ html.compact .exit {
 }
 
 html.compact .board {
-    top: calc(44px + env(safe-area-inset-top, 0px));
-    left: var(--sl);
-    width: 150px;
+    top: max(6px, env(safe-area-inset-top, 0px));
+    left: calc(var(--sl) + 120px);
+    width: 142px;
     font-size: 11px;
     padding: 3px;
     border-radius: 10px
@@ -1367,10 +1416,10 @@ html.compact .board div {
 
 html.compact .map {
     left: var(--sl);
-    top: auto;
-    bottom: var(--sb);
+    top: calc(44px + env(safe-area-inset-top, 0px));
+    bottom: auto;
     transform: none;
-    width: 128px !important;
+    width: 112px !important;
     height: auto !important
 }
 
@@ -1439,34 +1488,42 @@ html.compact .pads {
 }
 
 html.compact .steer {
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     font-size: 12px
 }
 
+html.compact .steer .tw {
+    width: 84px;
+    height: 84px
+}
+
 html.compact .pedals {
-    gap: 10px
+    gap: 12px;
+    margin-right: 84px;
+    /* pédales décalées vers le centre pour une meilleure prise en main mobile */
 }
 
 html.compact .pedal {
-    border-radius: 16px;
+    border-radius: 18px;
     font-size: 14px
 }
 
 html.compact .pedal.gas {
-    width: 74px;
-    height: 106px
+    width: 88px;
+    height: 120px
 }
 
 html.compact .pedal.brake {
-    width: 62px;
-    height: 72px
+    width: 72px;
+    height: 86px
 }
 
 html.compact .dmg {
-    right: calc(var(--sr) + 164px);
-    bottom: var(--sb);
-    width: 68px;
-    height: 113px
+    right: auto;
+    top: calc(134px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    width: 58px;
+    height: 96px;
 }
 
 html.compact .lights {
@@ -1589,28 +1646,22 @@ html.tiny .hud-speed b {
 }
 
 html.tiny .board {
-    width: 136px;
-    font-size: 10px
+    width: 128px;
+    font-size: 10px;
 }
 
+html.tiny .steer .tw {
+    width: 68px;
+}
+
+html.tiny .pedals {}
+
 html.tiny .pedal.gas {
-    width: 66px;
-    height: 90px
+    width: 76px;
 }
 
 html.tiny .pedal.brake {
-    width: 54px;
-    height: 62px
-}
-
-html.tiny .dmg {
-    right: calc(var(--sr) + 148px);
-    width: 60px;
-    height: 100px
-}
-
-html.tiny .map {
-    width: 112px !important
+    width: 62px;
 }
 
 /* Overlay d'initialisation — panneau de contrôle course */
@@ -1746,4 +1797,29 @@ html.tiny .map {
     opacity: .48 !important;
     color: #9ca3a8 !important;
     filter: grayscale(1)
+}
+
+/* ── Météo : gouttes sur le pare-brise / visière (vue cockpit) ── */
+.cockpit-drops {
+    position: absolute;
+    inset: 0 0 16% 0;
+    width: 100%;
+    height: 84%;
+    z-index: 8;
+    pointer-events: none;
+    border-radius: 0 0 35% 35%/0 0 10% 10%;
+    opacity: 0;
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .45));
+    transition: opacity .6s;
+}
+body.rain .cockpit-drops {
+    opacity: 1;
+}
+
+/* Indicateur météo dans le HUD */
+.hud-weather {
+    font-size: 14px;
+    margin-left: 6px;
+    opacity: .85;
+    vertical-align: middle;
 }

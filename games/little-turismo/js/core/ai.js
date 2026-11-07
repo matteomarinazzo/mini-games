@@ -3,7 +3,7 @@
 // niveaux (erreur de ligne, marge de freinage, réaccélération, fautes), attaque / défense par décalage latéral, collisions boîtes.
 // V11+ : tables de vitesse par fiche voiture (adhérence, appui, vmax), les IA peuvent prendre n'importe quelle voiture.
 import { TRACK, frameAt, PIT, pitExt } from './track.js';
-import { stepCar, createCar } from './physics.js';
+import { stepCar, createCar, getCarWetGripFactor } from './physics.js';
 import { engineState, engineIncrement } from './engine.js';
 
 const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, LIM = ROAD_HALF - 2.1;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
@@ -43,65 +43,67 @@ const YG = .8, CK = .8, BMU = .75, RM = .85;   // CK : crédit d'appui, BMU : ad
 const CMS = { serra_gt: .65, titan: .65, nebula: .65, vipere: .61, comete: .59, spectre: .59, aigle: .57, prototype: .57, f1: .57, lame: .57, zephyr: .57, foudre: .55, mistral: .53, rallye: .49, safari: .49, baroudeur: .49, top_fuel: .68, thrust_ssc: .72 };
 const cmOf = (S) => CMS[S.id] ?? .53;
 /** Décélération maximale (m/s²) à la vitesse v : pneus (charge + appui) ou freins, + traînée. */
-export const decelAt = (S, v) => { const kd = (S.drag + .12 * S.aero) * v * v / S.mass; return Math.min(S.grip * BMU * (9.81 + S.aero * v * v / S.mass), S.brakeForce / S.mass * .95) + kd; };
-function prof(S, lane = 0) {
-  let p = PR.get(S);
-  if (!p) { const MA = S.grip * Math.min(1 - .2 * S.understeer, (S.rearK || 1) * (1 - .08 * S.oversteer)) * cmOf(S), KA = MA * S.aero / S.mass * CK; p = { MA, KA, TB: {}, VA: {}, KL: {} }; PR.set(S, p); }
+export const decelAt = (S, v, wet = 0) => { const wg = getCarWetGripFactor(S.kind || 'gt', wet), g = S.grip * wg, kd = (S.drag + .12 * S.aero) * v * v / S.mass; return Math.min(g * BMU * (9.81 + S.aero * v * v / S.mass), S.brakeForce / S.mass * .95) + kd; };
+function prof(S, lane = 0, wet = 0) {
+  const key = (S.id || 'car') + '|' + (S._spec || 0) + '|' + Math.round(wet * 100);
+  let p = PR.get(key);
+  if (!p) { const wg = getCarWetGripFactor(S.kind || 'gt', wet), g = S.grip * wg, MA = g * Math.min(1 - .2 * S.understeer, (S.rearK || 1) * (1 - .08 * S.oversteer)) * cmOf(S), KA = MA * S.aero / S.mass * CK; p = { MA, KA, TB: {}, VA: {}, KL: {} }; PR.set(key, p); }
   if (!p.VA[lane]) { const KLn = p.KL[lane] = KLof(lineOf(lane)), VA = new Float32Array(N); for (let i = 0; i < N; i++) { const d = KLn[i] - p.KA; VA[i] = d > 1e-5 ? Math.min(S.vmax, Math.sqrt(p.MA * 9.81 / d)) : S.vmax; } p.VA[lane] = VA; }
   return p;
 }
-function table(S, p, margin, lane = 0) {
+function table(S, p, margin, lane = 0, wet = 0) {
   const key = margin + '|' + lane; if (p.TB[key]) return p.TB[key];
   const KLn = p.KL[lane], t = Float32Array.from(p.VA[lane]);
   const q = RM / cmOf(S);   // capacité latérale réelle / capacité utilisée par la table : cercle de friction pendant le freinage (trail-braking)
   for (let r = 0; r < 2; r++) for (let i = N - 1; i >= 0; i--) {
     const vn = t[(i + 1) % N], ay = vn * vn * KLn[i], am = (p.MA * 9.81 + p.KA * vn * vn) * q, f = Math.sqrt(Math.max(.04, 1 - (ay / am) ** 2));
-    const v = Math.sqrt(vn * vn + 2 * decelAt(S, vn) * f / margin * ds); if (v < t[i]) t[i] = v;
+    const v = Math.sqrt(vn * vn + 2 * decelAt(S, vn, wet) * f / margin * ds); if (v < t[i]) t[i] = v;
   }
   return (p.TB[key] = t);
 }
-export const vlOf = (S) => prof(S).VA[0];
+export const vlOf = (S, wet = 0) => prof(S, 0, wet).VA[0];
 /** Table de vitesses cibles du niveau expert : sert aux zones de freinage affichées au joueur. */
-export const brakeTable = (S) => table(S, prof(S), LEVELS.expert.margin);
+export const brakeTable = (S, wet = 0) => table(S, prof(S, 0, wet), LEVELS.expert.margin, 0, wet);
 
 // Allure par tronçon de 20 m (pm ≤ 1) : une sortie de piste en vitesse ralentit les 100 m qui précèdent. Apprise une fois par (voiture, niveau)
 // par un tour fantôme au premier createAi, puis mémorisée : les IA n'ont plus à « découvrir » les virages en course.
 const NB = Math.ceil(LEN / 20), PMS = new Map(), bin = (x) => Math.floor((((x % LEN) + LEN) % LEN) / 20) % NB;
-function learnSetup(S, level, q = false) { const key = S.id + '|' + level + (q ? '|q' : ''); return { key, pm: PMS.get(key) }; }
-function learnRun(S, level, q, pm, seed, run) {
-  const ph = createCar(S, TRACK.startIdx * ds - 14, 0), g = mk(ph, level, seed, pm, q), all = [ph];
+function learnSetup(S, level, q = false, wet = 0) { const key = S.id + '|' + level + (q ? '|q' : '') + (wet ? '|w' + Math.round(wet * 100) : ''); return { key, pm: PMS.get(key) }; }
+function learnRun(S, level, q, pm, seed, run, wet = 0) {
+  const ph = createCar(S, TRACK.startIdx * ds - 14, 0, wet), g = mk(ph, level, seed, pm, q), all = [ph];
   let tick = 0, p = 0, prev = ph.s;
   while (tick < 60 * 60 * 5 && p < 2 * LEN) { stepField([g], all, tick++, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
   return !g.ev;
 }
-function learn(S, level, q = false) {
-  const { key, pm: cached } = learnSetup(S, level, q); if (cached) return cached;
+function learn(S, level, q = false, wet = 0) {
+  const { key, pm: cached } = learnSetup(S, level, q, wet); if (cached) return cached;
   const pm = new Float32Array(NB).fill(1); PMS.set(key, pm);
-  outer: for (const seed of [3, 17, 41, 59]) for (let run = 0; run < 8; run++)if (learnRun(S, level, q, pm, seed, run)) break outer;
+  outer: for (const seed of [3, 17, 41, 59]) for (let run = 0; run < 8; run++)if (learnRun(S, level, q, pm, seed, run, wet)) break outer;
   return pm;
 }
-async function learnRunAsync(S, level, q, pm, seed) {
-  const ph = createCar(S, TRACK.startIdx * ds - 14, 0), g = mk(ph, level, seed, pm, q), all = [ph]; let tick = 0, p = 0, prev = ph.s;
+async function learnRunAsync(S, level, q, pm, seed, wet = 0) {
+  const ph = createCar(S, TRACK.startIdx * ds - 14, 0, wet), g = mk(ph, level, seed, pm, q), all = [ph]; let tick = 0, p = 0, prev = ph.s;
   while (tick < 60 * 60 * 5 && p < 2 * LEN) { const end = Math.min(tick + 480, 60 * 60 * 5); for (; tick < end && p < 2 * LEN; tick++) { stepField([g], all, tick, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; } await new Promise(r => setTimeout(r, 0)); }
   return !g.ev;
 }
 /** Async initialization used by the loading screen: each expensive learning attempt yields to the browser. */
 export async function createAiAsync(ph, level, seed, qualifying = false, laps = 0, progress = () => { }) {
-  const { key, pm: cached } = learnSetup(ph.sheet, level, !!qualifying); let pm = cached;
+  const wet = ph.wet || 0;
+  const { key, pm: cached } = learnSetup(ph.sheet, level, !!qualifying, wet); let pm = cached;
   if (!pm) {
     pm = new Float32Array(NB).fill(1); PMS.set(key, pm); let done = false, n = 0;
-    outer: for (const sd of [3, 17, 41, 59]) for (let run = 0; run < 8; run++) { done = await learnRunAsync(ph.sheet, level, !!qualifying, pm, sd); progress(++n, 32); if (done) break outer; }
+    outer: for (const sd of [3, 17, 41, 59]) for (let run = 0; run < 8; run++) { done = await learnRunAsync(ph.sheet, level, !!qualifying, pm, sd, wet); progress(++n, 32); if (done) break outer; }
   }
   const a = mk(ph, level, seed, pm, !!qualifying); a.laps = laps; return a;
 }
 /** qualifying = true : qualifications (voitures fantômes) → l'IA ignore le trafic et roule seule sur la ligne optimisée. */
-export const createAi = (ph, level, seed, qualifying = false, laps = 0) => { const a = mk(ph, level, seed, learn(ph.sheet, level, !!qualifying), !!qualifying); a.laps = laps; return a; };   // laps > 0 : arrêts au stand possibles
+export const createAi = (ph, level, seed, qualifying = false, laps = 0) => { const wet = ph.wet || 0, a = mk(ph, level, seed, learn(ph.sheet, level, !!qualifying, wet), !!qualifying); a.laps = laps; return a; };   // laps > 0 : arrêts au stand possibles
 // Voies fixes des IA (m, + = droite), espacées de 1,9 m : deux voitures voisines ne roulent jamais côte à côte sur la même trajectoire.
 const LW = 1.1, laneOf = (lat, seed) => (lat > .5 ? LW : lat < -.5 ? -LW : seed % 2 ? LW : -LW);
 function mk(ph, level, seed, pm, q = false) {
-  const L = LEVELS[level] || LEVELS.normal, r = rng(seed * 7919 + 13), sheet = ph.sheet = withSpec(ph.sheet, L.spec), lane = q ? 0 : laneOf(ph.lat, seed), p = prof(sheet, lane);
+  const wet = ph.wet || 0, L = LEVELS[level] || LEVELS.normal, r = rng(seed * 7919 + 13), sheet = ph.sheet = withSpec(ph.sheet, L.spec), lane = q ? 0 : laneOf(ph.lat, seed), p = prof(sheet, lane, wet);
   return {
-    ph, L, q, sheet, r, t1: table(sheet, p, L.margin, lane), t2: table(sheet, p, L.margin * .94, lane), skill: 1 + (r() - .5) * (SKILL_SPREAD[level] ?? .025), lane, blk: 0, vf: 0, p1: r() * 6.28, p2: r() * 6.28,
+    ph, L, q, sheet, r, t1: table(sheet, p, L.margin, lane, wet), t2: table(sheet, p, L.margin * .94, lane, wet), skill: 1 + (r() - .5) * (SKILL_SPREAD[level] ?? .025), lane, blk: 0, vf: 0, p1: r() * 6.28, p2: r() * 6.28,
     pm, ev: 0, off: false, wait: Math.min(.1, L.react * .08 * r()), tl: ph.lat, vt: 0, tx: ph.x, tz: ph.z, fault: null, atk: 0, tgt: null, atkT: 0, defDone: false, defT: 0, defSide: 0, calm: 0, gl: null, dist: 0, joined: false, stk: 0, rec: 0, recover: 0,
     inp: { throttle: 0, brake: 0, steer: 0 }, level, laps: 0, p0: 0, pit: 0, pitD: 0, pitT: 0, pitN: 0, pitChk: false, pitW: 0, pitTO: 0, avgV: 0, engine: engineState(), damage: { aero: 0, grip: 0, drag: 0, w: { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 } },
   };
@@ -187,7 +189,7 @@ function free(all, c, ah, s, ga, cand) {
 function decide(a, all, t) {
   const c = a.ph, L = a.L, r = a.r, v = Math.max(c.u, 0), s = c.s, idx = c.idx, dt = .05, q = a.q, st = a.dist < STD;
   if (a.wait > 0) a.wait -= dt;
-  if (a.gl === null) { a.gl = c.lat; a.p0 = wrapS(s - S0); a.lane = q ? 0 : laneOf(c.lat, a.lane > 0 ? 1 : 0); if (c.sheet !== a.sheet) c.sheet = a.sheet; const pp = prof(a.sheet, a.lane); a.t1 = table(a.sheet, pp, L.margin, a.lane); a.t2 = table(a.sheet, pp, L.margin * .94, a.lane); }   // file de grille
+  if (a.gl === null) { a.gl = c.lat; a.p0 = wrapS(s - S0); a.lane = q ? 0 : laneOf(c.lat, a.lane > 0 ? 1 : 0); if (c.sheet !== a.sheet) c.sheet = a.sheet; const pp = prof(a.sheet, a.lane, c.wet || 0); a.t1 = table(a.sheet, pp, L.margin, a.lane, c.wet || 0); a.t2 = table(a.sheet, pp, L.margin * .94, a.lane, c.wet || 0); }   // file de grille
   a.dist += v * dt;
   pitPlan(a, all, v); const pit = a.pit > 0, pz = pit && wrapS(s - S0) > -PIT.back - 30;   // pz : dans la zone des stands (rampe comprise) ; avant, conduite normale fondue vers la trajectoire des stands
   if (a.wait <= 0 && a.rec <= 0 && v < 1.5 && a.vt > 5) { if ((a.stk += dt) > 2) { a.rec = 1.6; a.stk = 0; } } else a.stk = 0;   // plantée : marche arrière de dégagement
@@ -229,7 +231,7 @@ function decide(a, all, t) {
   const vfree = a.vf;
   if (!st && ah && ga - 4.6 < 30 + v * .25 && vfree > ah.u + 1.2) a.blk += dt; else a.blk = Math.max(0, a.blk - 2 * dt);
   let ov = null, cap = 1e9, late = false;
-  const am = Math.max(6, decelAt(a.sheet, v)), g0 = (st ? 3 : 1.2) + .03 * v;
+  const am = Math.max(6, decelAt(a.sheet, v, c.wet || 0)), g0 = (st ? 3 : 1.2) + .03 * v;
   if (ah) {
     const gap = ga - 4.6, clo = v - ah.u, forced = a.blk > 2;
     // Dépassement : choisir une voie complète et la tenir jusqu'à être devant. Normal : ligne droite dégagée ; forcé (bloquée > 2 s) : dès que le virage n'est pas serré.

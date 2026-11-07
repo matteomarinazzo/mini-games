@@ -11,14 +11,14 @@
     <script>(function () { var r = document.documentElement, m = matchMedia('(pointer:coarse)'), f = function () { var p = m.matches && innerHeight > innerWidth, e = p ? innerWidth : innerHeight, c = m.matches && e <= 540; r.classList.toggle('rot', p); r.classList.toggle('compact', c); r.classList.toggle('tiny', c && e <= 350); r.style.setProperty('--eh', e + 'px') }; f(); addEventListener('resize', f); addEventListener('orientationchange', f) })()</script>
 
     <meta name="description"
-        content="Jouez gratuitement à Little Turismo sur Mini‑Games. Course 3D : 24 circuits, 24 voitures, multijoueur en ligne, contre-la-montre et éditeurs de voiture et de circuit.">
+        content="Jouez gratuitement à Little Turismo sur Mini‑Games. Course 3D : 32 circuits, 22 voitures, multijoueur en ligne, contre-la-montre et éditeurs de voiture et de circuit.">
 
     <link rel="canonical" href="https://mini-games.ch/games/little-turismo/" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Little Turismo – Course 3D multijoueur gratuite | Mini‑Games">
     <meta property="og:description"
-        content="Course 3D gratuite : 24 circuits, 24 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
+        content="Course 3D gratuite : 32 circuits, 22 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mini-games.ch/games/little-turismo/">
     <meta property="og:image" content="https://mini-games.ch/assets/logos/little-turismo.webp">
@@ -29,7 +29,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Little Turismo – Course 3D multijoueur gratuite | Mini‑Games">
     <meta name="twitter:description"
-        content="Course 3D gratuite : 24 circuits, 24 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
+        content="Course 3D gratuite : 32 circuits, 22 voitures, multijoueur en ligne, contre-la-montre, éditeurs de voiture et de circuit.">
     <meta name="twitter:image" content="https://mini-games.ch/assets/logos/little-turismo.webp">
 
     <!-- Schema.org -->
@@ -39,7 +39,7 @@
       "@type": "VideoGame",
       "name": "Little Turismo",
       "url": "https://mini-games.ch/games/little-turismo/",
-      "description": "Jeu de course 3D gratuit : 24 circuits, 24 voitures, course contre l'IA, qualifications, contre-la-montre, multijoueur en ligne jusqu'à 20 pilotes, éditeur de voitures et éditeur de circuits.",
+      "description": "Jeu de course 3D gratuit : 32 circuits, 22 voitures, course contre l'IA, qualifications, contre-la-montre, multijoueur en ligne jusqu'à 20 pilotes, éditeur de voitures et éditeur de circuits.",
       "applicationCategory": "Game",
       "operatingSystem": "Any",
       "genre": ["Racing Game", "Simulation Game", "Singleplayer", "Multiplayer"],
@@ -130,6 +130,9 @@
                 </label>
                 <label>Difficulté de l'IA
                     <select class="theme-select" id="roomDiff"></select>
+                </label>
+                <label>Météo
+                    <select class="theme-select" id="roomWeather"></select>
                 </label>
                 <label class="tg room-damage-label"
                     style="display:flex;flex-direction:row;align-items:center;gap:8px;grid-column:1/-1;margin-top:4px;cursor:pointer">
@@ -344,6 +347,9 @@
                     </div>
                     <div class="lbl">Difficulté
                         <select class="theme-select" id="diff"></select>
+                    </div>
+                    <div class="lbl">Météo
+                        <select class="theme-select" id="weather"></select>
                     </div>
                 </div>
                 <button class="btn" id="launch" type="button">Lancer</button>

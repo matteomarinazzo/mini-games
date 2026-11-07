@@ -234,8 +234,8 @@ function sync(save) {
   $('sumC').textContent = byId(circuitList(), cfg.circuit).name; $('sumV').textContent = carName(cfg.car);
   if (save === true) saveSaved(cfg);
 }
-function launchClm(over = {}) { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) {} try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
-function launch() { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) {} cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
+function launchClm(over = {}) { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) { } try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
+function launch() { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) { } cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
 $('launch').addEventListener('click', launch);
 addEventListener('keydown', (e) => {
   if ((e.key === 'Escape' || e.key === 'Backspace') && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); back(); }
@@ -294,7 +294,7 @@ function dzSave() {
 }
 $('designer').addEventListener('input', () => { if (dz) { dzRead(); dzDraw(); } });
 $('dzSave').addEventListener('click', () => { if (dzSave()) { mine = true; carTab = 'mine'; location.replace('#cars'); } });
-$('dzTest').addEventListener('click', () => { if (dzSave()) launchClm({ circuit: $('dzCircuit').value, car: dz.id }); });
+$('dzTest').addEventListener('click', () => { if (dzSave()) { try { sessionStorage.setItem('little-turismo-test', JSON.stringify({ type: 'car', id: dz.id })); } catch { } launchClm({ circuit: $('dzCircuit').value, car: dz.id }); } });
 $('dzDel').addEventListener('click', async () => {
   const old = loadCustom().find(c => c.id === dz.id); if (old?.pubId) { if (!await notify.confirm({ title: 'Dépublier et supprimer', message: 'Cette voiture publiée sera retirée avant sa suppression. Continuer ?' })) return; try { await unpublishItem('car', old.pubId) } catch (e) { notify.show({ type: 'error', title: 'Dépublication impossible', message: publicationError(e) }); return } }
   saveCustom(loadCustom().filter((c) => c.id !== dz.id)); delete CARS[dz.id];
@@ -302,7 +302,21 @@ $('dzDel').addEventListener('click', async () => {
   mine = true; carTab = 'mine'; location.replace('#cars');
 });
 $('newCar').addEventListener('click', () => openDz(null, 'cars'));
-$('btnDesign').addEventListener('click', () => openDz(null, 'home'));
+$('btnDesign').addEventListener('click', async () => {
+  const custom = loadCustom();
+  if (!custom.length) return openDz(null, 'home');
+  const action = await notify.choice({
+    title: 'Concevoir une voiture',
+    message: 'Souhaitez-vous concevoir une nouvelle voiture ou modifier une voiture existante ?',
+    buttons: [
+      { label: 'Annuler', value: null },
+      { label: '✎ Modifier existante', value: 'edit' },
+      { label: '＋ Créer nouvelle', value: 'new', primary: true }
+    ]
+  });
+  if (action === 'new') openDz(null, 'home');
+  else if (action === 'edit') { carTab = 'mine'; location.hash = 'cars'; }
+});
 $('tabStock').addEventListener('click', () => { carTab = 'stock'; mine = false; show(); });
 $('tabMine').addEventListener('click', () => { carTab = 'mine'; mine = true; show(); });
 $('tabPub').addEventListener('click', () => { carTab = 'published'; show(); loadPublishedCards('car', true) }); $('moreCars').addEventListener('click', () => loadPublishedCards('car', false));
@@ -351,14 +365,28 @@ $('tkCorner').addEventListener('change', (e) => { if (TK) TK.setCorner(e.target.
 $('tkRadius').addEventListener('input', (e) => { $('tkRadiusV').textContent = e.target.value + ' m'; if (TK) TK.setCorner($('tkCorner').value, +e.target.value); });
 $('tkZi').addEventListener('click', () => TK.zoom(1.3)); $('tkZo').addEventListener('click', () => TK.zoom(1 / 1.3)); $('tkFit').addEventListener('click', () => TK.fit()); $('tkDelPt').addEventListener('click', () => TK.del());
 $('tkSave').addEventListener('click', () => { if (tkSave()) { mineT = true; trackTab = 'mine'; location.replace('#circuits'); } });
-$('tkTest').addEventListener('click', () => { const o = tkSave(); if (o) launchClm({ circuit: o.id, car: $('tkCar').value }); });
+$('tkTest').addEventListener('click', () => { const o = tkSave(); if (o) { try { sessionStorage.setItem('little-turismo-test', JSON.stringify({ type: 'track', id: o.id })); } catch { } launchClm({ circuit: o.id, car: $('tkCar').value }); } });
 $('tkDel').addEventListener('click', async () => {
   const id = TK.def.id, old = loadTracks().find(t => t.id === id); if (old?.pubId) { if (!await notify.confirm({ title: 'Dépublier et supprimer', message: 'Ce circuit publié sera retiré avant sa suppression. Continuer ?' })) return; try { await unpublishItem('track', old.pubId) } catch (e) { notify.show({ type: 'error', title: 'Dépublication impossible', message: publicationError(e) }); return } } saveTracks(loadTracks().filter((c) => c.id !== id));
   if (cfg.circuit === id) { cfg.circuit = 'serra-nova'; saveSaved(cfg); }
   mineT = true; trackTab = 'mine'; location.replace('#circuits');
 });
 $('newTrack').addEventListener('click', () => openTk(null, 'circuits'));
-$('btnTrack').addEventListener('click', () => openTk(null, 'home'));
+$('btnTrack').addEventListener('click', async () => {
+  const custom = loadTracks();
+  if (!custom.length) return openTk(null, 'home');
+  const action = await notify.choice({
+    title: 'Concevoir un circuit',
+    message: 'Souhaitez-vous concevoir un nouveau circuit ou modifier un circuit existant ?',
+    buttons: [
+      { label: 'Annuler', value: null },
+      { label: '✎ Modifier existant', value: 'edit' },
+      { label: '＋ Créer nouveau', value: 'new', primary: true }
+    ]
+  });
+  if (action === 'new') openTk(null, 'home');
+  else if (action === 'edit') { trackTab = 'mine'; location.hash = 'circuits'; }
+});
 $('tabCStock').addEventListener('click', () => { trackTab = 'stock'; mineT = false; show(); });
 $('tabCMine').addEventListener('click', () => { trackTab = 'mine'; mineT = true; show(); });
 $('tabCPub').addEventListener('click', () => { trackTab = 'published'; show(); loadPublishedCards('track', true) }); $('moreTracks').addEventListener('click', () => loadPublishedCards('track', false));
@@ -373,14 +401,14 @@ function renderMineT() {
   }
 }
 
-function pubLocalControl(kind, d) { const b = document.createElement('button'); b.type = 'button'; b.className = 'bk'; const key = kind + ':' + d.id; const owner = Net.N.cfg?.auth?.currentUser?.uid; b.textContent = d.pubId ? (d.pubOwner === owner ? '↗ Publié · Dépublier' : '↗ Publié') : '🌐 Publier'; b.disabled = pubBusy.has(key); b.addEventListener('click', async () => { if (pubBusy.has(key)) return; pubBusy.add(key); b.disabled = true; try { await Net.publicationReady(); const uid = Net.N.cfg?.auth?.currentUser?.uid; if (d.pubId) { if (d.pubOwner !== uid) throw Error('Cette publication ne vous appartient pas.'); if (!await notify.confirm({ title: 'Dépublier', message: 'Retirer cette création de la liste publique ?' })) return; await unpublishItem(kind, d.pubId); delete d.pubId; delete d.pubOwner; delete d.published; saveLocal(kind, d); notify.show({ type: 'success', title: 'Dépublication effectuée', message: 'La création n’est plus visible publiquement.' }); } else { await publishItem(kind, d); d.pubOwner = uid; saveLocal(kind, d); notify.show({ type: 'success', title: 'Publication effectuée', message: 'Votre création est maintenant visible par les joueurs.' }); } show(); } catch (e) { notify.show({ type: 'error', title: 'Publication impossible', message: publicationError(e) }); } finally { pubBusy.delete(key); b.disabled = false } }); return b }
+function pubLocalControl(kind, d) { const b = document.createElement('button'); b.type = 'button'; b.className = 'bk'; const key = kind + ':' + d.id; const owner = Net.N.cfg?.auth?.currentUser?.uid; b.textContent = d.pubId ? (d.pubOwner === owner ? '↗ Publié · Dépublier' : '↗ Publié') : '🌐 Publier'; b.disabled = pubBusy.has(key); b.addEventListener('click', async () => { if (pubBusy.has(key)) return; pubBusy.add(key); b.disabled = true; try { await Net.publicationReady(); const uid = Net.N.cfg?.auth?.currentUser?.uid; if (d.pubId) { if (d.pubOwner !== uid) throw Error('Cette publication ne vous appartient pas.'); if (!await notify.confirm({ title: 'Dépublier', message: 'Retirer cette création de la liste publique ?' })) return; await unpublishItem(kind, d.pubId); delete d.pubId; delete d.pubOwner; delete d.published; saveLocal(kind, d); notify.show({ type: 'success', title: 'Dépublication effectuée', message: 'La création n’est plus visible publiquement.' }); } else { await publishItem(kind, d); d.pubOwner = uid; saveLocal(kind, d); notify.show({ type: 'success', title: 'Publication effectuée', message: 'Votre création est maintenant visible par les joueurs.' }); } } catch (e) { notify.show({ type: 'error', title: 'Publication impossible', message: publicationError(e) }); } finally { pubBusy.delete(key); b.disabled = false; show(); } }); return b }
 function saveLocal(k, d) { if (k === 'car') { const a = loadCustom(), i = a.findIndex(x => x.id === d.id); if (i >= 0) a[i] = d; saveCustom(a) } else { const a = loadTracks(), i = a.findIndex(x => x.id === d.id); if (i >= 0) a[i] = d; saveTracks(a) } }
 function publicationError(e) { const m = String(e?.message || e || 'Erreur réseau'); if (/permission_denied|permission denied|PERMISSION_DENIED/i.test(m)) return 'Permission refusée par Firebase. Vérifiez les règles de publication et votre connexion.'; if (/60|minute|rate/i.test(m)) return '1 publication maximum par minute.'; if (/network|offline|connexion|unavailable/i.test(m)) return 'Connexion réseau indisponible. Réessayez lorsque vous serez en ligne.'; return m }
 function localHas(k, id) { return (k === 'car' ? loadCustom() : loadTracks()).some(x => x.id === id) }
 async function refreshPublishedCount(k) { const el = $(k === 'car' ? 'cntPub' : 'cntCPub'); if (!el) return; const token = ++pubCountToken[k], seen = new Set(); let before = null; try { while (true) { const items = await listPublished(k, { before, reset: before === null }); if (!items.length) break; for (const item of items) if (item?.id) seen.add(item.id); const next = items[items.length - 1]?.id; if (!next || next === before || items.length < 20) break; before = next; } if (pubCountToken[k] === token) el.textContent = String(seen.size) } catch (e) { if (pubCountToken[k] === token) el.textContent = '–' } }
 async function loadPublishedCards(k, reset) { if (pubLoading.has(k)) return; pubLoading.add(k); const el = $(k === 'car' ? 'vpgrid' : 'tpgrid'), more = $(k === 'car' ? 'moreCars' : 'moreTracks'); if (reset) { pubSeen[k].clear(); el.textContent = ''; if (k === 'car') { pubCars = []; pubCarCursor = null } else { pubTracks = []; pubTrackCursor = null } } const existing = pubSeen[k]; try { const items = await listPublished(k, { before: reset ? null : (k === 'car' ? pubCarCursor : pubTrackCursor), reset }); const clean = []; for (const it of items) { if (!it?.id || existing.has(it.id)) continue; existing.add(it.id); clean.push(it) } for (const it of clean) appendPubCardOnce(k, it, el); const all = k === 'car' ? pubCars : pubTracks; all.push(...clean); if (clean.length) { if (k === 'car') pubCarCursor = clean.at(-1).id; else pubTrackCursor = clean.at(-1).id } more.hidden = items.length < 20; if (!all.length && !items.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.textContent = 'Aucune création publiée pour le moment.'; el.append(p) } } catch (e) { notify.show({ type: 'error', title: 'Erreur réseau', message: publicationError(e) }) } finally { pubLoading.delete(k); refreshPublishedCount(k) } }
 function appendPubCardOnce(k, it, el) { // le document d/{id} n'est chargé que lorsque l'aperçu entre dans le viewport.
-  const wrap = document.createElement('div'); wrap.className = 'mcell'; const b = document.createElement('button'); b.type = 'button'; b.className = 'gcard'; b.dataset.id = it.id; b.dataset.pubKind = k; b.dataset.previewState = 'loading'; b.innerHTML = '<canvas width="300" height="220" aria-label="Aperçu en chargement"></canvas><h3></h3><p></p><small>Créé par un joueur</small><div class="pub-preview-stats"></div>'; b.querySelector('h3').textContent = it.name; b.querySelector('p').textContent = 'par ' + it.author; drawPubPlaceholder(b.querySelector('canvas').getContext('2d'), 'Chargement de l’aperçu…'); b.addEventListener('click', async () => { b.disabled = true; try { const o = await loadPubData(k, it.id); if (!o) throw Error('Création publiée introuvable.'); if (k === 'car') { o.id = 'pubcar_' + it.id; sessionStorage.setItem('little-turismo-pub-car', JSON.stringify(o)); registerCustom(o); cfg.car = o.id; saveSaved(cfg); location.hash = 'race' } else { o.id = 'pubtrack_' + it.id; sessionStorage.setItem('little-turismo-pub-track', JSON.stringify(o)); cfg.circuit = o.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); if (create) makeRoom(); } else location.hash = 'cars' } } catch (e) { notify.show({ type: 'error', title: 'Chargement impossible', message: publicationError(e) }) } finally { b.disabled = false } }); wrap.append(b); el.append(wrap); if (pubPreviewObserver) pubPreviewObserver.observe(b.querySelector('canvas')); else queuePubPreview(b.querySelector('canvas'))
+  const wrap = document.createElement('div'); wrap.className = 'mcell'; const b = document.createElement('button'); b.type = 'button'; b.className = 'gcard'; b.dataset.id = it.id; b.dataset.pubKind = k; b.dataset.previewState = 'loading'; b.innerHTML = '<canvas width="300" height="220" aria-label="Aperçu en chargement"></canvas><h3></h3><p></p><small>Créé par un joueur</small><div class="pub-preview-stats"></div>'; b.querySelector('h3').textContent = it.name; b.querySelector('p').textContent = 'par ' + it.author; drawPubPlaceholder(b.querySelector('canvas').getContext('2d'), 'Chargement de l’aperçu…'); b.addEventListener('click', async () => { b.disabled = true; try { const o = await loadPubData(k, it.id); if (!o) throw Error('Création publiée introuvable.'); if (k === 'car') { o.id = 'pubcar_' + it.id; sessionStorage.setItem('little-turismo-pub-car', JSON.stringify(o)); registerCustom(o); cfg.car = o.id; saveSaved(cfg); if (gameMode === 'clm') return launchClm(); location.hash = 'race'; } else { o.id = 'pubtrack_' + it.id; sessionStorage.setItem('little-turismo-pub-track', JSON.stringify(o)); cfg.circuit = o.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); if (create) makeRoom(); } else location.hash = 'cars' } } catch (e) { notify.show({ type: 'error', title: 'Chargement impossible', message: publicationError(e) }) } finally { b.disabled = false } }); wrap.append(b); el.append(wrap); if (pubPreviewObserver) pubPreviewObserver.observe(b.querySelector('canvas')); else queuePubPreview(b.querySelector('canvas'))
 }
 function drawPubPlaceholder(x, label) { if (!x) return; x.clearRect(0, 0, 300, 220); x.fillStyle = '#111827'; x.fillRect(0, 0, 300, 220); x.fillStyle = '#8290a8'; x.font = '14px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(label, 150, 110) }
 function queuePubPreview(canvas) { const card = canvas.closest('.gcard'); if (!card || card.dataset.previewQueued) return; card.dataset.previewQueued = '1'; pubPreviewQueue.push({ canvas, card, kind: card.dataset.pubKind, id: card.dataset.id }); pumpPubPreviews() }
@@ -390,48 +418,62 @@ function pumpPubPreviews() { while (pubPreviewActive < 3 && pubPreviewQueue.leng
 async function renderPubPreview({ canvas, card, kind, id }) { const key = kind + ':' + id, cached = pubPreviewCache.get(key); if (cached) { const image = new Image(); await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = cached.image }); if (!canvas.isConnected) return; const x = canvas.getContext('2d'); x.clearRect(0, 0, 300, 220); x.drawImage(image, 0, 0, 300, 220); canvas.setAttribute('aria-label', kind === 'car' ? 'Aperçu de la voiture publiée' : 'Aperçu du circuit publié'); card.dataset.previewState = 'ready'; pubPreviewCache.delete(key); pubPreviewCache.set(key, cached); appendPubPreviewStats(card, cached.rows); return } const d = await loadPubData(kind, id); if (!d) throw Error('Aperçu indisponible'); if (!canvas.isConnected) return; const x = canvas.getContext('2d'); x.clearRect(0, 0, 300, 220); let rows = []; if (kind === 'car') { const sheet = customSheet(d); carPreview(x, { sheet }); rows = statsOf(sheet) } else { const t = buildTrack({ ...d, ec: true }, 'pubtrack_' + id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); const st = stats(t); rows = [['Longueur', (st.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', st.turns], ['Dénivelé', Math.round(st.climb) + ' m']] } card.dataset.previewState = 'ready'; canvas.setAttribute('aria-label', kind === 'car' ? 'Aperçu de la voiture publiée' : 'Aperçu du circuit publié'); pubPreviewCache.set(key, { image: canvas.toDataURL('image/png'), rows }); while (pubPreviewCache.size > PUB_PREVIEW_CACHE_MAX) pubPreviewCache.delete(pubPreviewCache.keys().next().value); appendPubPreviewStats(card, rows) }
 function appendPubPreviewStats(card, rows) { const box = card.querySelector('.pub-preview-stats'); if (!box || box.childElementCount) return; for (const [name, value] of rows) { const row = document.createElement('div'); row.className = 'st'; row.innerHTML = '<span></span><b></b>'; row.firstChild.textContent = name; row.lastChild.textContent = value; box.appendChild(row) } }
 
+try {
+  const retRaw = sessionStorage.getItem('little-turismo-return-editor');
+  if (retRaw) {
+    sessionStorage.removeItem('little-turismo-return-editor');
+    const ret = JSON.parse(retRaw);
+    if (ret && ret.type === 'car') {
+      const c = loadCustom().find(x => x.id === ret.id) || null;
+      openDz(c, 'home');
+    } else if (ret && ret.type === 'track') {
+      const t = loadTracks().find(x => x.id === ret.id) || null;
+      openTk(t, 'home');
+    }
+  }
+} catch { }
 sync(false); show();
 
 // Asset exchange: published items are represented only by Firebase ID; local items use a bounded compact payload.
 const ASSET_MAX = 14000;
 const packedBytes = value => new TextEncoder().encode(JSON.stringify(value)).byteLength;
 const safeName = (v, max = 24) => typeof v === 'string' && v.length <= max;
-const validTrack = d => d && typeof d === 'object' && safeName(d.name, 24) && Number.isFinite(d.start) && d.start >= 0 && d.start <= 12000 && ['temperate','forest','snow','desert','tropical','autumn','volcano','dusk'].includes(d.theme) &&
+const validTrack = d => d && typeof d === 'object' && safeName(d.name, 24) && Number.isFinite(d.start) && d.start >= 0 && d.start <= 12000 && ['temperate', 'forest', 'snow', 'desert', 'tropical', 'autumn', 'volcano', 'dusk'].includes(d.theme) &&
   Array.isArray(d.pts) && d.pts.length >= 6 && d.pts.length <= 96 && d.pts.every(p => Array.isArray(p) && p.length === 2 && p.every(v => Number.isFinite(v) && Math.abs(v) <= 2000)) &&
   Array.isArray(d.elev) && d.elev.length === d.pts.length && d.elev.every(v => Number.isFinite(v) && v >= -200 && v <= 300) &&
-  (!d.corners || (Array.isArray(d.corners) && (d.corners.length === 0 || d.corners.length === d.pts.length) && d.corners.length <= 96 && d.corners.every(c => c && ['smooth','sharp','round','hairpin'].includes(c.type) && Number.isFinite(c.radius) && c.radius >= 0 && c.radius <= 250)));
-const validCar = d => d && typeof d === 'object' && safeName(d.name, 32) && ['gt','wedge','proto','rally','open','drag','thrust'].includes(d.kind) &&
+  (!d.corners || (Array.isArray(d.corners) && (d.corners.length === 0 || d.corners.length === d.pts.length) && d.corners.length <= 96 && d.corners.every(c => c && ['smooth', 'sharp', 'round', 'hairpin'].includes(c.type) && Number.isFinite(c.radius) && c.radius >= 0 && c.radius <= 250)));
+const validCar = d => d && typeof d === 'object' && safeName(d.name, 32) && ['gt', 'wedge', 'proto', 'rally', 'open', 'drag', 'thrust'].includes(d.kind) &&
   /^#[0-9a-f]{6}$/i.test(d.color) && /^#[0-9a-f]{6}$/i.test(d.accent) &&
-  ['vmax','ch','mass','grip','aero','bal'].every(k => { const [lo,hi] = getSpecRange(d.kind,k); return Number.isFinite(d[k]) && d[k] >= lo && d[k] <= hi; });
+  ['vmax', 'ch', 'mass', 'grip', 'aero', 'bal'].every(k => { const [lo, hi] = getSpecRange(d.kind, k); return Number.isFinite(d[k]) && d[k] >= lo && d[k] <= hi; });
 function packLocal(kind, d) {
   if (kind === 'track') {
     if (!validTrack(d)) throw Error('Le circuit local contient des données invalides.');
-    return { n:d.name, s:Math.round(d.start), p:d.pts.map(p=>p.map(v=>Math.round(v*10)/10)), e:d.elev.map(v=>Math.round(v*10)/10), h:d.theme, c:(d.corners||[]).map(x=>({t:x.type,r:Math.round(x.radius*10)/10})) };
+    return { n: d.name, s: Math.round(d.start), p: d.pts.map(p => p.map(v => Math.round(v * 10) / 10)), e: d.elev.map(v => Math.round(v * 10) / 10), h: d.theme, c: (d.corners || []).map(x => ({ t: x.type, r: Math.round(x.radius * 10) / 10 })) };
   }
   if (!validCar(d)) throw Error('La voiture locale contient des données invalides.');
-  return { n:d.name, k:d.kind, c:d.color, a:d.accent, v:d.vmax, ch:d.ch, m:d.mass, g:d.grip, ae:d.aero, b:d.bal };
+  return { n: d.name, k: d.kind, c: d.color, a: d.accent, v: d.vmax, ch: d.ch, m: d.mass, g: d.grip, ae: d.aero, b: d.bal };
 }
 function unpackLocal(kind, d) {
-  if (kind === 'track') return { name:d.n, start:d.s, pts:d.p, elev:d.e, theme:d.h, corners:(d.c||[]).map(x=>({type:x.t,radius:x.r})) };
-  return { name:d.n, kind:d.k, color:d.c, accent:d.a, vmax:d.v, ch:d.ch, mass:d.m, grip:d.g, aero:d.ae, bal:d.b };
+  if (kind === 'track') return { name: d.n, start: d.s, pts: d.p, elev: d.e, theme: d.h, corners: (d.c || []).map(x => ({ type: x.t, radius: x.r })) };
+  return { name: d.n, kind: d.k, color: d.c, accent: d.a, vmax: d.v, ch: d.ch, mass: d.m, grip: d.g, aero: d.ae, bal: d.b };
 }
 function assetRef(kind, id, uid = Net.N.uid) {
-  let d = kind === 'track' ? loadTracks().find(x=>x.id===id) : loadCustom().find(x=>x.id===id);
+  let d = kind === 'track' ? loadTracks().find(x => x.id === id) : loadCustom().find(x => x.id === id);
   if (!d && (id.startsWith(kind === 'track' ? 'pubtrack_' : 'pubcar_') || id.startsWith('mp' + (kind === 'track' ? 't_' : 'c_')))) {
-    try { d = JSON.parse(sessionStorage.getItem(kind === 'track' ? 'little-turismo-pub-track' : 'little-turismo-pub-car')); } catch {}
+    try { d = JSON.parse(sessionStorage.getItem(kind === 'track' ? 'little-turismo-pub-track' : 'little-turismo-pub-car')); } catch { }
     if (d?.id !== id) d = null;
   }
   // Un pubId valide est un digest SHA-256 sur 20 octets = 40 chars hex (ou au moins /^[a-f0-9]{20}$/ selon publish.js).
   // Si pubId vaut l'ID local (ex: 'c_mw13nnnd'), on l'ignore : la voiture est locale, pas publiée.
   const rawPubId = d?.pubId || (id.startsWith(kind === 'track' ? 'pubtrack_' : 'pubcar_') ? id.slice(kind === 'track' ? 9 : 7) : null);
   const pubId = typeof rawPubId === 'string' && /^[a-f0-9]{20}$/.test(rawPubId) ? rawPubId : null;
-  if (pubId) return { type:'published', id:pubId };
-  if (kind === 'track' && !d && [...CIRCUITS, ...loadTracks()].some(x=>x.id===id)) return { type:'stock', id };
-  if (kind === 'car' && !d && CAR_LIST.some(x=>x.id===id)) return { type:'stock', id };
+  if (pubId) return { type: 'published', id: pubId };
+  if (kind === 'track' && !d && [...CIRCUITS, ...loadTracks()].some(x => x.id === id)) return { type: 'stock', id };
+  if (kind === 'car' && !d && CAR_LIST.some(x => x.id === id)) return { type: 'stock', id };
   if (!d) throw Error(`Création ${kind === 'track' ? 'de circuit' : 'de voiture'} introuvable : ${id}`);
-  const data = packLocal(kind,d), text = JSON.stringify(data);
+  const data = packLocal(kind, d), text = JSON.stringify(data);
   if (packedBytes(data) > ASSET_MAX) throw Error('Création locale trop volumineuse (maximum 14 Ko).');
-  return { type:'local', id:d.id, data:text };
+  return { type: 'local', id: d.id, data: text };
 }
 function publishedAssetId(ref, kind) {
   if (typeof ref?.id !== 'string') return null;
@@ -451,9 +493,9 @@ function unpackAssetLocal(ref, kind) {
   return compact ? unpackLocal(kind, payload) : payload;
 }
 function validAssetRef(ref, kind) {
-  if (!ref || typeof ref !== 'object' || !['track','car'].includes(kind)) return false;
+  if (!ref || typeof ref !== 'object' || !['track', 'car'].includes(kind)) return false;
   if (ref.type === 'published') return !!publishedAssetId(ref, kind);
-  if (ref.type === 'stock') return typeof ref.id === 'string' && (kind === 'track' ? CIRCUITS.some(x=>x.id===ref.id) : CAR_LIST.some(x=>x.id===ref.id));
+  if (ref.type === 'stock') return typeof ref.id === 'string' && (kind === 'track' ? CIRCUITS.some(x => x.id === ref.id) : CAR_LIST.some(x => x.id === ref.id));
   if (ref.type !== 'local' || typeof ref.id !== 'string' || ref.id.length > 80 || typeof ref.data !== 'string') return false;
   try {
     if (new TextEncoder().encode(ref.data).byteLength > ASSET_MAX) return false;
@@ -470,7 +512,7 @@ async function installAsset(ref, kind, owner = 'guest') {
     if (kind === 'car' && CAR_LIST.some(x => x.id === rawId)) return rawId;
     throw Error(`Ref de publication invalide (ID non-Firebase : "${rawId}"). Recréez la room pour appliquer le correctif.`);
   }
-  if (!validAssetRef(ref,kind)) throw Error(`Données de ${kind === 'track' ? 'circuit' : 'voiture'} invalides.`);
+  if (!validAssetRef(ref, kind)) throw Error(`Données de ${kind === 'track' ? 'circuit' : 'voiture'} invalides.`);
   if (ref.type === 'stock') return ref.id;
   let d;
   if (ref.type === 'published') {
@@ -493,15 +535,15 @@ async function installAsset(ref, kind, owner = 'guest') {
     if (!d) throw Error(`Publication ${ref.id} introuvable ou inaccessible. Vérifiez la connexion Firebase.`);
   } else d = unpackAssetLocal(ref, kind);
   if (!(kind === 'track' ? validTrack(d) : validCar(d))) throw Error(`Publication: données de ${kind} invalides.`);
-  const suffix = `${String(owner).replace(/[^a-zA-Z0-9]/g,'').slice(0,40)}_${ref.type === 'published' ? ref.id : ref.id.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,36)}`;
+  const suffix = `${String(owner).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40)}_${ref.type === 'published' ? ref.id : ref.id.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 36)}`;
   const id = (kind === 'track' ? 'mpt_' : 'mpc_') + suffix;
   if (kind === 'track') {
     // Stocker dans la liste MP séparée : n'apparaît PAS dans "Mes Créations"
-    const list = loadMpTracks(); if (!list.some(x=>x.id===id)) { list.push({ ...d, id }); saveMpTracks(list); }
+    const list = loadMpTracks(); if (!list.some(x => x.id === id)) { list.push({ ...d, id }); saveMpTracks(list); }
   } else {
     const installed = { ...d, id };
     // Stocker dans la liste MP séparée : n'apparaît PAS dans "Mes Créations"
-    const list = loadMpCars(); if (!list.some(x=>x.id===id)) { list.push(installed); saveMpCars(list); }
+    const list = loadMpCars(); if (!list.some(x => x.id === id)) { list.push(installed); saveMpCars(list); }
     registerCustom(installed);
   }
   return id;
@@ -624,7 +666,7 @@ function enterRoom(code, d) {
 let preparingToken = null;
 async function beginMultiplayer(d) {
   const session = Net.readSession(), p = d.players?.[session?.uid];
-  if (!session || !p || session.going || !['loading','playing'].includes(d.state)) return;
+  if (!session || !p || session.going || !['loading', 'playing'].includes(d.state)) return;
   const token = `${d.code}:${d.startedAt || ''}:${d.state}:${session.uid}`;
   if (preparingToken === token) return;
   preparingToken = token; roomStatus('Préparation de la course : chargement et validation des créations…');
@@ -634,7 +676,7 @@ async function beginMultiplayer(d) {
     for (const [uid, player] of Object.entries(d.players || {})) {
       if (player.away) { mappedPlayers[uid] = player; continue; }
       const playerCar = await installAsset(player.carAsset || assetRef('car', player.car || d.config?.car), 'car', uid);
-      mappedPlayers[uid] = { ...player, car:playerCar };
+      mappedPlayers[uid] = { ...player, car: playerCar };
     }
     const carId = mappedPlayers[session.uid]?.car || await installAsset(p.carAsset || assetRef('car', p.car || d.config?.car), 'car', session.uid);
     if (d.state === 'loading') {
@@ -648,12 +690,12 @@ async function beginMultiplayer(d) {
     const latest = await Net.getRoom(d.code);
     if (!latest || latest.state !== 'playing' || !latest.players?.[session.uid] || latest.players[session.uid].away) { preparingToken = null; roomStatus('Le départ a été annulé ou le joueur a quitté la room.'); return; }
     session.going = true; session.hostId = latest.leaderId; session.players = Object.fromEntries(Object.entries(latest.players || {}).map(([uid, player]) => { const p = { ...(mappedPlayers[uid] || player) }; delete p.dnf; delete p.dnfDone; delete p.carState; delete p.pen; delete p.dt; return [uid, p]; })); session.code = latest.code;
-    session.assets={trackId,carId};session.replayConfig=latest.config;try{sessionStorage.setItem('little-turismo-loading','1')}catch(e){}Net.saveSession(session);
-    const rc = sanitize({ ...latest.config, circuit:trackId, car:carId }); startSession(rc); location.href = 'game.html';
+    session.assets = { trackId, carId }; session.replayConfig = latest.config; try { sessionStorage.setItem('little-turismo-loading', '1') } catch (e) { } Net.saveSession(session);
+    const rc = sanitize({ ...latest.config, circuit: trackId, car: carId }); startSession(rc); location.href = 'game.html';
   } catch (e) {
     preparingToken = null;
     roomStatus(`Chargement impossible : ${e.message || 'données incorrectes'}`);
-    if (Net.N.uid) await Net.update(d.code, { [`players/${session.uid}/ready`]: false, [`players/${session.uid}/readyError`]: String(e.message || e).slice(0,180) });
+    if (Net.N.uid) await Net.update(d.code, { [`players/${session.uid}/ready`]: false, [`players/${session.uid}/readyError`]: String(e.message || e).slice(0, 180) });
   }
 }
 
@@ -746,12 +788,12 @@ function monitorRoomPreparation(initial) {
   prepMonitor = setInterval(async () => {
     const d = await Net.getRoom(code);
     if (!d || d.state !== 'loading') { clearInterval(prepMonitor); prepMonitor = null; return; }
-    const players = Object.entries(d.players || {}).filter(([,p]) => !p.away);
-    const bad = players.find(([,p]) => p.readyError);
+    const players = Object.entries(d.players || {}).filter(([, p]) => !p.away);
+    const bad = players.find(([, p]) => p.readyError);
     if (bad) { await abortRoomLoad(code, `Échec du chargement (${bad[1].name || 'un joueur'}) : ${bad[1].readyError}`); return; }
-    if (players.length && players.every(([,p]) => p.ready === true)) {
+    if (players.length && players.every(([, p]) => p.ready === true)) {
       clearInterval(prepMonitor); prepMonitor = null;
-      await Net.update(code, { state:'playing', startedAt:Net.now() }); return;
+      await Net.update(code, { state: 'playing', startedAt: Net.now() }); return;
     }
     if (Date.now() >= deadline) await abortRoomLoad(code, 'Délai dépassé (45 s) : un pilote n’a pas chargé les créations. Réessayez ou retirez-le de la room.');
   }, 700);
@@ -759,7 +801,7 @@ function monitorRoomPreparation(initial) {
 async function abortRoomLoad(code, message) {
   clearInterval(prepMonitor); prepMonitor = null;
   const d = await Net.getRoom(code); if (d?.state !== 'loading') return;
-  const updates = { state:'waiting', startedAt:null };
+  const updates = { state: 'waiting', startedAt: null };
   for (const [uid] of Object.entries(d.players || {})) { updates[`players/${uid}/ready`] = false; updates[`players/${uid}/readyError`] = null; }
   await Net.update(code, updates); roomLoadNotice = message; roomStatus(message); const note = $('roomNote'); if (note) note.textContent = message;
 }
@@ -771,7 +813,7 @@ $('startRoom').addEventListener('click', async () => {
   const qual = $('roomQualifying').value === 'true';
   const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false });
   // Reset ready flags each round; the assets/config remain intact for replay.
-  roomLoadNotice = ''; const updates = { config: nextConfig, state:'loading', startedAt:Net.now(), runtime:null };
+  roomLoadNotice = ''; const updates = { config: nextConfig, state: 'loading', startedAt: Net.now(), runtime: null };
   for (const uid of Object.keys(roomData.players || {})) {
     updates[`players/${uid}/ready`] = false;
     updates[`players/${uid}/readyError`] = null;

@@ -1,4 +1,4 @@
-// Réseau Little Turismo : rooms Firebase et état de course autoritaire côté créateur.
+﻿// Réseau Little Turismo : rooms Firebase et état de course autoritaire côté créateur.
 // Les rendus clients interpolent les snapshots publiés par l'hôte.
 const PREFIX = 'racing_';
 export const ROOM_KEY = 'little-turismo-room';
@@ -102,7 +102,11 @@ const NL = 20, TA = new Float64Array(NL), TB = new Float64Array(NL), TWO_PI = 6.
 function reck(o, a, e) {   // a = [x y z psi pitch roll u w r s …] ; vitesse corps constante, lacet constant (point milieu)
   o.set(a); if (e <= 0) return;
   const dp = Math.max(-.6, Math.min(.6, a[8] * e)), m = a[3] + dp * .5, cs = Math.cos(m), sn = Math.sin(m);
-  o[0] = a[0] + (cs * a[6] - sn * a[7]) * e; o[2] = a[2] + (sn * a[6] + cs * a[7]) * e; o[3] = a[3] + dp; o[9] = a[9] + a[6] * e;
+  o[0] = a[0] + (cs * a[6] - sn * a[7]) * e;
+  o[1] = a[1] + Math.sin(a[4]) * a[6] * e;
+  o[2] = a[2] + (sn * a[6] + cs * a[7]) * e;
+  o[3] = a[3] + dp;
+  o[9] = a[9] + a[6] * e;
 }
 /** Canal = un émetteur (hôte pour les invités ; un invité pour l'hôte). */
 export const newChan = () => ({ t: 0, at: 0, age: 0, base: 1e9, cars: new Map() });

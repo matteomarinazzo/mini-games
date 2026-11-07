@@ -1,20 +1,62 @@
-// Couche WebGL2 maison : contexte, shaders (pos/normale/couleur + lumière directionnelle + brouillard), ciel, caméra, perte de contexte.
+// Couche WebGL2 maison : contexte, shaders (pos/normale/couleur + lumière directionnelle + brouillard + météo/pluie), ciel, caméra, perte de contexte.
 const VS = `#version 300 es
+precision mediump float;
 layout(location=0) in vec3 aP; layout(location=1) in vec3 aN; layout(location=2) in vec3 aC;
 uniform mat4 uVP, uM; uniform vec3 uCam, uSun, uSunC, uAmb, uBody;
-out vec3 vC; out float vD;
-void main(){ vec4 w=uM*vec4(aP,1.); vec3 n=normalize(mat3(uM)*aN);
- vec3 c=aC.r<0.?uBody*(-aC.r):aC; vC=c*(uAmb+uSunC*max(dot(n,uSun),0.)); vD=distance(w.xyz,uCam); gl_Position=uVP*w; }`;
+uniform float uWet;
+out vec3 vC; out float vD; out vec3 vWPos; out vec3 vNorm;
+void main(){
+  vec4 w = uM * vec4(aP, 1.); vec3 n = normalize(mat3(uM) * aN);
+  vec3 c = aC.r < 0. ? uBody * (-aC.r) : aC;
+  if (uWet > 0. && n.y > 0.45 && aC.r >= 0.) c = mix(c, c * 0.55, uWet);
+  vC = c * (uAmb + uSunC * max(dot(n, uSun), 0.));
+  vD = distance(w.xyz, uCam);
+  vWPos = w.xyz; vNorm = n;
+  gl_Position = uVP * w;
+} `;
 const FS = `#version 300 es
-precision mediump float; in vec3 vC; in float vD; uniform vec3 uFog; uniform float uFogD, uAl; out vec4 o;
-void main(){ o=vec4(mix(vC,uFog,1.-exp(-vD*uFogD)),uAl); }`;
+precision mediump float;
+in vec3 vC; in float vD; in vec3 vWPos; in vec3 vNorm;
+uniform vec3 uFog; uniform float uFogD, uAl;
+uniform vec3 uCam, uSun; uniform float uWet;
+out vec4 o;
+void main(){
+  vec3 col=vC;
+  if (uWet > 0.0 && vNorm.y > 0.40) {
+    vec3 v = normalize(uCam - vWPos);
+    vec3 h = normalize(uSun + v);
+    float ndotv = max(dot(vNorm, v), 0.0);
+    float ndoth = max(dot(vNorm, h), 0.0);
+
+    // Piste & asphalte mouillés : flaques d'eau, miroir de Fresnel rasant et spéculaire étiré
+    float puddle = sin(vWPos.x * 0.09) * cos(vWPos.z * 0.09) * 0.5 + 0.5;
+    float roadFresnel = pow(1.0 - ndotv, 3.5) * (0.48 * uWet * (0.7 + 0.3 * puddle));
+    float roadSpec = pow(ndoth, 20.0) * (0.32 * uWet * (0.6 + 0.4 * puddle));
+    vec3 waterTint = vec3(0.68, 0.77, 0.90);
+    col += waterTint * (roadSpec + roadFresnel);
+  }
+  o=vec4(mix(col,uFog,1.-exp(-vD*uFogD)),uAl);
+}`;
 const SVS = `#version 300 es
 out vec2 vP; void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2)); vP=p*2.-1.; gl_Position=vec4(vP,1.,1.); }`;
 const SFS = `#version 300 es
-precision mediump float; in vec2 vP; uniform vec3 uF,uR,uU,uSun,uHor,uZen; uniform float uT,uA; out vec4 o;
-void main(){ vec3 d=normalize(uF+uR*vP.x*uT*uA+uU*vP.y*uT);
- vec3 c=mix(uHor,uZen,pow(clamp(d.y,0.,1.),.55)); float s=max(dot(d,uSun),0.);
- c+=vec3(1.,.85,.6)*(pow(s,300.)*.9+pow(s,10.)*.18); o=vec4(c,1.); }`;
+precision mediump float; in vec2 vP;
+uniform vec3 uF, uR, uU, uSun, uHor, uZen, uCloudC;
+uniform float uT, uA, uSunStr, uCloud, uTime;
+out vec4 o;
+void main(){
+  vec3 d = normalize(uF + uR * vP.x * uT * uA + uU * vP.y * uT);
+  vec3 c = mix(uHor, uZen, pow(clamp(d.y, 0., 1.), .55));
+  if (uCloud > 0. && d.y > 0.02) {
+    vec2 cuv = (d.xz / max(d.y + 0.12, 0.05)) * 1.6 + vec2(uTime * 0.012, uTime * 0.008);
+    float n = sin(cuv.x * 2.2 + sin(cuv.y * 1.8)) * cos(cuv.y * 2.0 + sin(cuv.x * 1.4));
+    float cl = smoothstep(-0.25, 0.55, n) * uCloud * smoothstep(0.02, 0.28, d.y);
+    c = mix(c, uCloudC, cl * 0.78);
+  }
+  float s = max(dot(d, uSun), 0.);
+  c += vec3(1., .85, .6) * (pow(s, 300.) * .9 + pow(s, 10.) * .18) * uSunStr;
+  o = vec4(c, 1.);
+} `;
 
 const SUN = (() => { const v = [.45, .75, .35], l = Math.hypot(...v); return v.map((x) => x / l); })();
 export const SKY = { hor: [.72, .82, .92], zen: [.2, .42, .78] };
@@ -72,16 +114,67 @@ export function createGL(canvas, { onLost, onRestored } = {}) {
     R.w = canvas.width = Math.max(2, Math.round((canvas.offsetWidth || r.width) * scale)); R.h = canvas.height = Math.max(2, Math.round((canvas.offsetHeight || r.height) * scale));
     gl.viewport(0, 0, R.w, R.h); return R.w / R.h;
   };
+
+  R.weather = {
+    type: 'dry',
+    wet: 0,
+    fogD: 0.0006,
+    fogC: null,
+    sunC: [0.85, 0.78, 0.65],
+    amb: [0.42, 0.48, 0.58],
+    sunStr: 1.0,
+    cloud: 0.0,
+    cloudC: [0.38, 0.42, 0.48],
+  };
+
+  R.setWeather = (wType) => {
+    R.weather.type = wType;
+    if (wType === 'light_rain') {
+      R.weather.wet = 0.65;
+      R.weather.fogD = 0.0013;
+      R.weather.fogC = [0.55, 0.60, 0.66];
+      R.weather.sunC = [0.36, 0.36, 0.40];
+      R.weather.amb = [0.34, 0.38, 0.44];
+      R.weather.sunStr = 0.25;
+      R.weather.cloud = 0.72;
+      R.weather.cloudC = [0.46, 0.50, 0.56];
+      SKY.hor = [0.55, 0.60, 0.66];
+      SKY.zen = [0.26, 0.32, 0.42];
+    } else if (wType === 'heavy_rain') {
+      R.weather.wet = 1.0;
+      R.weather.fogD = 0.0024;
+      R.weather.fogC = [0.36, 0.40, 0.46];
+      R.weather.sunC = [0.15, 0.16, 0.18];
+      R.weather.amb = [0.25, 0.28, 0.33];
+      R.weather.sunStr = 0.04;
+      R.weather.cloud = 0.95;
+      R.weather.cloudC = [0.28, 0.31, 0.36];
+      SKY.hor = [0.36, 0.40, 0.46];
+      SKY.zen = [0.15, 0.18, 0.24];
+    } else {
+      R.weather.wet = 0;
+      R.weather.fogD = 0.0006;
+      R.weather.fogC = null;
+      R.weather.sunC = [0.85, 0.78, 0.65];
+      R.weather.amb = [0.42, 0.48, 0.58];
+      R.weather.sunStr = 1.0;
+      R.weather.cloud = 0.0;
+      R.weather.cloudC = [0.38, 0.42, 0.48];
+    }
+  };
+
   /** Efface, dessine le ciel, prépare le programme principal. */
-  R.begin = (cam) => {
+  R.begin = (cam, time = 0) => {
     gl.viewport(0, 0, R.w, R.h); gl.clear(gl.DEPTH_BUFFER_BIT);
     gl.useProgram(S.p); gl.disable(gl.DEPTH_TEST);
     const u = S.u; gl.uniform3fv(u.uF, cam.f); gl.uniform3fv(u.uR, cam.r); gl.uniform3fv(u.uU, cam.u); gl.uniform3fv(u.uSun, SUN);
     gl.uniform3fv(u.uHor, SKY.hor); gl.uniform3fv(u.uZen, SKY.zen); gl.uniform1f(u.uT, Math.tan(cam.fov * Math.PI / 360)); gl.uniform1f(u.uA, cam.aspect);
+    gl.uniform1f(u.uSunStr, R.weather.sunStr); gl.uniform1f(u.uCloud, R.weather.cloud); gl.uniform3fv(u.uCloudC, R.weather.cloudC); gl.uniform1f(u.uTime, time);
     gl.bindVertexArray(R.vaoE); gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.enable(gl.DEPTH_TEST); gl.useProgram(M.p);
     const m = M.u; gl.uniformMatrix4fv(m.uVP, false, cam.vp); gl.uniform3fv(m.uCam, cam.pos); gl.uniform3fv(m.uSun, SUN);
-    gl.uniform3f(m.uSunC, .85, .78, .65); gl.uniform3f(m.uAmb, .42, .48, .58); gl.uniform3fv(m.uFog, SKY.hor); gl.uniform1f(m.uFogD, .0006); gl.uniform1f(m.uAl, 1);
+    gl.uniform3fv(m.uSunC, R.weather.sunC); gl.uniform3fv(m.uAmb, R.weather.amb); gl.uniform3fv(m.uFog, R.weather.fogC || SKY.hor); gl.uniform1f(m.uFogD, R.weather.fogD); gl.uniform1f(m.uAl, 1);
+    gl.uniform1f(m.uWet, R.weather.wet);
   };
   R.draw = (mesh, model = IDENT, body = WHITE) => {
     gl.uniformMatrix4fv(M.u.uM, false, model); gl.uniform3fv(M.u.uBody, body); gl.bindVertexArray(mesh.vao); gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0);

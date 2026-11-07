@@ -43,6 +43,7 @@
     <script>(function () { try { if (sessionStorage.getItem('little-turismo-loading') === '1') { document.getElementById('loading').hidden = false; sessionStorage.removeItem('little-turismo-loading') } } catch (e) { } })()</script>
     <canvas id="gameCanvas" aria-label="Vue 3D du circuit Serra Nova"></canvas>
     <div class="cockpit" id="cockpit" data-kind="gt" hidden aria-hidden="true">
+        <canvas id="cockpitDrops" class="cockpit-drops"></canvas>
         <div class="cockpit-glass"></div>
         <div class="cockpit-pillar left"></div>
         <div class="cockpit-pillar right"></div>
@@ -201,7 +202,8 @@
     <div class="msg" id="ctxLost" hidden>Contexte graphique perdu… restauration en cours.</div>
     <div class="msg" id="noGl" hidden>WebGL2 n'est pas disponible sur cet appareil.</div>
     <div class="hud" id="hud">
-        <div class="hud-track"><span>Circuit</span><b>Serra Nova</b></div>
+        <div class="hud-track"><span>Circuit</span><b>Serra Nova</b><span class="hud-weather" id="hudWeather"
+                hidden></span></div>
         <div class="hud-speed"><b id="hSpd">0</b><small>km/h</small><em id="hGear">1</em></div>
         <div class="hud-rpm"><i id="hRpm"></i></div>
         <div class="hud-grid">
@@ -266,7 +268,15 @@
         </div>
     </div>
     <div class="pads" id="pads">
-        <div class="steer" id="steerZone"><span>◀ Braquer ▶</span></div>
+        <div class="steer" id="steerZone">
+            <div class="tw" aria-hidden="true"><svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="43" fill="none" stroke="currentColor" stroke-width="8" />
+                    <path d="M50 50 L9 63 M50 50 L91 63 M50 50 L50 93" stroke="currentColor" stroke-width="8"
+                        stroke-linecap="round" />
+                    <circle cx="50" cy="50" r="10" fill="currentColor" />
+                    <path d="M41 7 h18" stroke="#ff5a4d" stroke-width="9" stroke-linecap="round" />
+                </svg></div><span class="hint">Touche et glisse ◀ ▶</span>
+        </div>
         <div class="pedals">
             <button class="pedal brake" id="brakeBtn" aria-label="Frein">Frein</button>
             <button class="pedal gas" id="accelBtn" aria-label="Accélérateur">Gaz</button>

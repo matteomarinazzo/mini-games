@@ -16,28 +16,29 @@ function ribbon(col, w, dy) {
 export const buildLine = () => ribbon([.6, .88, 1], .2, .07);
 export const buildZone = () => ribbon([-1, 0, 0], .32, .12);   // r < 0 : couleur uniforme (voir shader)
 
-// virages (par fiche voiture) = minima locaux de la table de vitesses des IA experts ; sT = point d'inflexion (fin du freinage), v = vitesse visée.
+// virages (par fiche voiture et météo) = minima locaux de la table de vitesses des IA experts ; sT = point d'inflexion (fin du freinage), v = vitesse visée.
 // Le freinage affiché est donc exactement celui des IA : aussi tard que la voiture le permet, avec une légère marge.
 const CNS = new Map();
-function cnOf(S) {
-  let out = CNS.get(S); if (out) return out;
-  out = []; const T = brakeTable(S), th = S.vmax * .88;
+function cnOf(S, wet = 0) {
+  const key = (S.id || 'car') + '|' + Math.round(wet * 100);
+  let out = CNS.get(key); if (out) return out;
+  out = []; const T = brakeTable(S, wet), th = S.vmax * .88;
   for (let m = 0; m < N; m++) {
     if (T[m] >= th) continue;
     let low = true; for (let d = -25; d <= 25 && low; d++) if (T[(m + d + N) % N] < T[m] || (T[(m + d + N) % N] === T[m] && d < 0)) low = false;
     if (low) out.push({ sT: m * ds, v: T[m] });
   }
-  CNS.set(S, out); return out;
+  CNS.set(key, out); return out;
 }
 const M = new Float32Array(16), COL = [[1, .85, .1], [1, .5, .05], [.95, .1, .1]];
 
 /** Zone de freinage du prochain virage = tronçon de la ligne, du point de freinage (celui des IA) à la fin du freinage.
  *  Marge = distance au virage − distance de freinage : > 35 m jaune, > 0 orange, ≤ 0 rouge (trop tard / trop vite : la zone démarre devant la voiture). */
 export function drawBrake(R, zone, c) {
-  const sp = c.s, v = Math.max(c.u, 0); let d = 1e9, k = null;
-  for (const q of cnOf(c.sheet)) { const x = (((q.sT - sp) % LEN) + LEN) % LEN; if (x > 8 && x < 500 && x < d) { d = x; k = q; } }
+  const sp = c.s, v = Math.max(c.u, 0), wet = c.wet || 0; let d = 1e9, k = null;
+  for (const q of cnOf(c.sheet, wet)) { const x = (((q.sT - sp) % LEN) + LEN) % LEN; if (x > 8 && x < 500 && x < d) { d = x; k = q; } }
   if (!k) return;
-  const BRP = decelAt(c.sheet, (v + k.v) / 2) / 1.2, bd = v > k.v ? (v * v - k.v * k.v) / (2 * BRP) : 0,   // décélération réelle de la voiture, marge 1,2
+  const BRP = decelAt(c.sheet, (v + k.v) / 2, wet) / 1.2, bd = v > k.v ? (v * v - k.v * k.v) / (2 * BRP) : 0,   // décélération réelle de la voiture, marge 1,2
      mg = d - bd, r0 = Math.max(d - Math.min(Math.max(bd, 25), 250), 6);
   if (d - r0 < 2) return;
   const a0 = Math.floor((sp + r0) / ds), n = Math.ceil((sp + d) / ds) - a0, st = ((a0 % N) + N) % N, n1 = Math.min(n, N - st), col = COL[mg > 35 ? 0 : mg > 0 ? 1 : 2];

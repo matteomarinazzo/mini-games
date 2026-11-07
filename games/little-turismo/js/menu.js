@@ -1,4 +1,4 @@
-import { CIRCUITS, circuitList, loadTracks, saveTracks, CAR_LIST, DIFFS, loadSaved, loadRec, loadClm, saveSaved, sanitize, startSession, loadCustom, saveCustom, loadMpCars, saveMpCars, loadMpTracks, saveMpTracks } from './core/config.js';
+import { CIRCUITS, CIRCUIT_CATS, circuitList, loadTracks, saveTracks, CAR_LIST, DIFFS, WEATHERS, loadSaved, loadRec, loadClm, saveSaved, sanitize, startSession, loadCustom, saveCustom, loadMpCars, saveMpCars, loadMpTracks, saveMpTracks } from './core/config.js';
 import { trackOf, buildTrack } from './core/track.js';
 import { drawTrack, startMark, stats } from './core/map.js';
 import { CARS } from './core/physics.js';
@@ -113,7 +113,7 @@ function cardEl(it, preview, stats, pick) {
 const cPrev = (x, c) => { const t = trackOf(c.id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); };
 const cStats = (c) => { const s = stats(trackOf(c.id)); return [['Longueur', (s.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', s.turns], ['Dénivelé', Math.round(s.climb) + ' m']]; };
 const cPick = (c) => { cfg.circuit = c.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
-grid($('cgrid'), CIRCUITS, cPrev, cStats, cPick);
+for (const [k, n] of CIRCUIT_CATS) { const l = CIRCUITS.filter((c) => c.cat === k); if (!l.length) continue; const h = document.createElement('h2'); h.textContent = n + ' (' + l.length + ')'; h.style.cssText = 'grid-column:1/-1;flex:0 0 100%;width:100%;margin:14px 0 2px;font-size:15px;opacity:.85'; $('cgrid').appendChild(h); grid($('cgrid'), l, cPrev, cStats, cPick); }
 
 // Voitures : aperçu vectoriel (vue de dessus, sans image, livrée et proportions de la fiche) et stats lues dans les fiches physiques
 const rr = (x, a, b, w, h, r) => { x.beginPath(); x.roundRect ? x.roundRect(a, b, w, h, r) : x.rect(a, b, w, h); x.fill(); };
@@ -202,7 +202,7 @@ function carPreview(x, c) {
 const bal = (S) => { const r = (S.rearK || 1) * (1 - .08 * S.oversteer) / (1 - .2 * S.understeer); return r > 1.35 ? 'Sous-virage' : r > 1.2 ? 'Stable' : r > 1.05 ? 'Neutre' : 'Survirage'; };
 const statsOf = (s) => [['Vitesse max', Math.round(s.vmax * 3.6) + ' km/h'], ['Puissance', Math.round(s.power / 735.5) + ' ch'], ['Masse', s.mass + ' kg'], ['Adhérence', s.grip.toFixed(2)], ['Appui', s.aero.toFixed(1)], ['Équilibre', bal(s)]];
 const pickCar = (c) => { cfg.car = c.id; saveSaved(cfg); if (gameMode === 'clm') return launchClm(); location.hash = 'race'; };
-grid($('vgrid'), CAR_LIST, (x, c) => carPreview(x, { sheet: CARS[c.id] }), (c) => statsOf(CARS[c.id]), pickCar);
+for (const [k, n] of KIND_LIST) { const l = CAR_LIST.filter((c) => look(CARS[c.id]).kind === k); if (!l.length) continue; const h = document.createElement('h2'); h.textContent = n + ' (' + l.length + ')'; h.style.cssText = 'grid-column:1/-1;flex:0 0 100%;width:100%;margin:14px 0 2px;font-size:15px;opacity:.85'; $('vgrid').appendChild(h); grid($('vgrid'), l, (x, c) => carPreview(x, { sheet: CARS[c.id] }), (c) => statsOf(CARS[c.id]), pickCar); }
 
 // Écran de course : menus déroulants thémés et curseurs pour les valeurs continues.
 function options(el, entries) {
@@ -211,20 +211,22 @@ function options(el, entries) {
 }
 const CAR_MODES = [['same', 'Toutes identiques à ma voiture'], ['mixed', 'Voitures variées']];
 options($('diff'), DIFFS);
+options($('weather'), WEATHERS);
 // Solo et multijoueur partagent exactement les mêmes valeurs et libellés.
 const fillCarMode = (el) => options(el, CAR_MODES);
 fillCarMode($('carMode'));
 fillCarMode($('roomCarMode'));
 options($('roomDiff'), DIFFS);
+options($('roomWeather'), WEATHERS);
 const upd = (k, v) => { cfg = sanitize({ ...cfg, [k]: k === 'qualifying' ? v === 'true' : v }); sync(true); };
 $('laps').addEventListener('input', (e) => upd('laps', e.target.value));
-for (const key of ['qualifying', 'carMode', 'diff']) $(key).addEventListener('change', (e) => upd(key, e.target.value));
+for (const key of ['qualifying', 'carMode', 'diff', 'weather']) $(key).addEventListener('change', (e) => upd(key, e.target.value));
 $('ai').addEventListener('input', (e) => upd('ai', e.target.value));
 $('startPosition').addEventListener('input', (e) => upd('startPosition', e.target.value));
 function sync(save) {
   cfg.startPosition = Math.min(cfg.startPosition, cfg.ai + 1);
   $('qualifying').value = String(cfg.qualifying); $('carMode').value = cfg.carMode;
-  $('laps').value = String(cfg.laps); $('lapsValue').value = String(cfg.laps); $('lapsValue').textContent = String(cfg.laps); $('diff').value = cfg.diff;
+  $('laps').value = String(cfg.laps); $('lapsValue').value = String(cfg.laps); $('lapsValue').textContent = String(cfg.laps); $('diff').value = cfg.diff; $('weather').value = cfg.weather;
   $('ai').value = String(cfg.ai); $('aiValue').value = String(cfg.ai); $('aiValue').textContent = String(cfg.ai);
   $('startPosition').max = String(cfg.ai + 1); $('startPosition').value = String(cfg.startPosition);
   $('startPositionValue').value = cfg.startPosition === 0 ? (cfg.ai === 0 ? 'Seul en piste' : 'Milieu de grille') : 'Position ' + cfg.startPosition;
@@ -598,13 +600,14 @@ function renderRoom(d) {
   if (!d) { $('roomOverlay').hidden = true; return; }
   const session = Net.readSession(), host = d.leaderId === session?.uid, players = Object.entries(d.players || {});
   $('roomCodeLabel').textContent = d.code || activeRoom;
-  $('roomNote').textContent = d.state === 'loading' ? 'Chargement des créations avant le départ…' : (roomLoadNotice && host ? roomLoadNotice : host ? 'Tu choisis les qualifications, les tours, la difficulté et les IA en plus.' : 'En attente que le créateur lance la course…');
+  $('roomNote').textContent = d.state === 'loading' ? 'Chargement des créations avant le départ…' : (roomLoadNotice && host ? roomLoadNotice : host ? 'Tu choisis les qualifications, les tours, la difficulté, la météo et les IA en plus.' : 'En attente que le créateur lance la course…');
   $('hostSettings').hidden = !host;
   $('guestWaiting').hidden = host;
   const dc = d.config || cfg;
   $('roomQualifying').value = String(!!dc.qualifying);
   $('roomAi').value = String(dc.ai || 0); $('roomCarMode').value = dc.carMode === 'same' ? 'same' : 'mixed';
   $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; $('roomDiff').value = dc.diff || 'normal';
+  if ($('roomWeather')) $('roomWeather').value = dc.weather || 'dry';
   if ($('roomDamage')) $('roomDamage').checked = dc.damage !== false;
   fitRoomRanges();
   $('roomPlayers').textContent = '';
@@ -720,7 +723,7 @@ $('roomAi')?.addEventListener('input', async () => {
   await Net.update(activeRoom, { 'config/ai': +$('roomAi').value });
 });
 
-for (const [id, key] of [['roomLaps', 'laps'], ['roomDiff', 'diff']]) $(id)?.addEventListener('change', async () => {
+for (const [id, key] of [['roomLaps', 'laps'], ['roomDiff', 'diff'], ['roomWeather', 'weather']]) $(id)?.addEventListener('change', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
   await Net.update(activeRoom, { ['config/' + key]: key === 'laps' ? +$(id).value : $(id).value });
 });
@@ -731,7 +734,7 @@ async function makeRoom() {
   let made = null, sessionSaved = false;
   try {
     if (!(await Net.init())) throw new Error('offline');
-    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff, damage: true });
+    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff, damage: true, weather: cfg.weather || 'dry' });
     for (let i = 0; i < 4 && !made; i++) {
       const c = Net.code();
       const ok = await Net.createRoom(c, {
@@ -811,7 +814,7 @@ $('startRoom').addEventListener('click', async () => {
   if (players < 1 || players + aiCount > 20) return;
   clearInterval(pubTimer); pubOn = false; await Net.setPublic(activeRoom, null);   // plus visible dans la liste une fois lancée
   const qual = $('roomQualifying').value === 'true';
-  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false });
+  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false, weather: $('roomWeather')?.value || 'dry' });
   // Reset ready flags each round; the assets/config remain intact for replay.
   roomLoadNotice = ''; const updates = { config: nextConfig, state: 'loading', startedAt: Net.now(), runtime: null };
   for (const uid of Object.keys(roomData.players || {})) {
@@ -850,4 +853,3 @@ document.addEventListener('click', (e) => {
   document.querySelectorAll('[data-rl]').forEach((x) => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on); });
   document.querySelectorAll('.rpage').forEach((p) => p.classList.toggle('on', p.dataset.p === b.dataset.rl));
 });
-

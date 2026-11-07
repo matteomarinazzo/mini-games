@@ -14,7 +14,12 @@
                 "Prise en charge du contre-la-montre avec les voitures publiées",
                 "Bouton pour retourner à l'éditeur depuis le menu pause lors d'un test",
                 "Boutons concevoir une voiture / un circuit : choix entre création et modification",
-                "Suppression du délai d'attente pour la dépublication"
+                "Suppression du délai d'attente pour la dépublication",
+                "Fumée dynamique des pneus selon la sollicitation (blocage en ligne droite, roue extérieure en virage, drift et tête-à-queue)",
+                "Amélioration de l'UI mobile de Little Turismo",
+                "Sélection météo en solo et multijoueur sur Little Turismo (sec / pluie légère / forte pluie / aléatoire)",
+                "Effets visuels pluie avancés : carrosseries des voitures vernies/mouillées avec reflets spéculaires et Fresnel, asphalte avec flaques miroitantes, panaches de spray d'eau (rooster tails) volumineux, ruissellement et impacts d'eau biconvexes sur pare-brise/visière",
+                "Physique adaptée sous la pluie : adhérence réduite par catégorie (F1, GT, Rallye, Dragster), aquaplaning à haute vitesse, patinage, comportement IA et ligne d'assistance de freinage adaptés"
             ]
         },
         {

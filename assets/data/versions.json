@@ -1,7 +1,24 @@
 {
-    "currentVersion": "1.53.2026-11-09",
+    "currentVersion": "1.54.2026-11-09",
     "lastUpdate": "2026-11-09",
     "history": [
+        {
+            "version": "1.54.2026-11-09",
+            "date": "2026-11-09",
+            "changes": [
+                "Little Turismo : traînées de gouttes pare-brise suivent le chemin réel de la goutte, effacement progressif depuis la queue",
+                "Little Turismo : vue visière casque F1 (open/wedge) avec bordure casque réaliste, reflet de visière et champ de vision réaliste",
+                "Little Turismo : météo (sec / pluie légère / forte / aléatoire) disponible en contre-la-montre",
+                "Little Turismo : bouton Dégâts déplacé dans la configuration de course et CLM ; retiré du panneau Paramètres (pause)",
+                "Little Turismo : minimap de proximité (radar type Le Mans Ultimate) en haut au centre de l'écran avec vue orientée joueur, alertes de proximité critique (< 9m) et option dans les paramètres",
+                "Little Turismo : fumée de dégât moteur dynamique avec le système de particules billboards réalistes (identique à la fumée des pneus)",
+                "Little Turismo : traces de pneus persistantes protégées contre l'effacement dans le champ de vision et buffer étendu à 16 000 segments",
+                "Little Turismo : aperçu 2D des voitures dans le menu entièrement redessiné avec les formes aérodynamiques fidèles (F1, GT, Wedge, Prototype, Rallye)",
+                "Little Turismo : agrandissement du widget de l'état des dégâts sur PC (+20%) tout en préservant la taille compacte sur mobile",
+                "Little Turismo : suppression des dégâts de pare-brise et des flancs sur le Dragster (carrosserie ouverte et fuselage tubulaire étroit)",
+                "Little Turismo : amélioration graphique du décor avec des arbres polygonaux réalistes (sapins effilés étagés, palmiers à palmes arquées, feuillus en dômes, cactus) et tribunes profilées en gradins de stade (sièges individuels, auvent incliné, garde-corps)"
+            ]
+        },
         {
             "version": "1.53.2026-11-09",
             "date": "2026-11-09",

@@ -3,7 +3,7 @@
 // Glissement : latéral cinématique (u, w, r, braquage) pour toutes les voitures ; blocage / patinage lus dans ph.skF / ph.skR (posés par physics.js, 0 pour les voitures distantes).
 import { SKY } from './gl.js';
 import { TRACK, surface } from './track.js';
-export const SK = { CAP: 8000, MIN_P: 1.1, MIN_AI: 2.6, FAR_AI: 140, FAR_LOW: 60, LIFE_P: 1e5, LIFE_AI: 1e5, FADE: 7, LOW_DT: 1 / 45, AI_FRAME: 10, AI_FRAME_LOW: 4 };
+export const SK = { CAP: 16000, MIN_P: 1.1, MIN_AI: 3.8, FAR_AI: 45, FAR_LOW: 30, LIFE_P: 1e5, LIFE_AI: 1e5, FADE: 7, LOW_DT: 1 / 45, AI_FRAME: 3, AI_FRAME_LOW: 2 };
 const VS = `#version 300 es
 layout(location=0) in vec3 aP; layout(location=1) in vec4 aA;
 uniform mat4 uVP; uniform vec3 uCam, uFog, uCol[4]; uniform float uT, uFogD;
@@ -36,7 +36,22 @@ export function createSkids(R, nCars) {
   try { init(); } catch (e) { ok = false; console.warn('Traces de pneus désactivées', e); }
   R.canvas.addEventListener('webglcontextrestored', () => { if (!ok) return; try { init(); } catch (e) { ok = false; } });
   function seg(lx0, lz0, rx0, rz0, y0, lx1, lz1, rx1, rz1, y1, a0, a1, col, life) {
-    const o = (head % CAP) * VPS, t1 = clock + life, t0 = t1 - SK.FADE; if (t1 > maxDeath) maxDeath = t1;
+    let slot = head % CAP;
+    if (head >= CAP) {
+      // Protection anti-disparition visuelle : si ce segment est à moins de 50m de la caméra,
+      // chercher un slot distant/hors champ pour ne pas voir de trace disparaître sous les yeux
+      const sx = V[slot * VPS], sz = V[slot * VPS + 2];
+      const dx = sx - camX, dz = sz - camZ;
+      if (dx * dx + dz * dz < 2500) {
+        for (let s = 1; s < 120; s++) {
+          const tSlot = (slot + s) % CAP;
+          const tx = V[tSlot * VPS], tz = V[tSlot * VPS + 2];
+          const tdx = tx - camX, tdz = tz - camZ;
+          if (tdx * tdx + tdz * tdz >= 3600) { slot = tSlot; break; }
+        }
+      }
+    }
+    const o = slot * VPS, t1 = clock + life, t0 = t1 - SK.FADE; if (t1 > maxDeath) maxDeath = t1;
     V[o] = lx0; V[o + 1] = y0; V[o + 2] = lz0; V[o + 3] = a0; V[o + 4] = t0; V[o + 5] = t1; V[o + 6] = col;
     V[o + 7] = rx0; V[o + 8] = y0; V[o + 9] = rz0; V[o + 10] = a0; V[o + 11] = t0; V[o + 12] = t1; V[o + 13] = col;
     V[o + 14] = rx1; V[o + 15] = y1; V[o + 16] = rz1; V[o + 17] = a1; V[o + 18] = t0; V[o + 19] = t1; V[o + 20] = col;
@@ -48,7 +63,8 @@ export function createSkids(R, nCars) {
     const on = st[o] > 0;
     geo(o, k, ph, p, S, cs, sn, csF, snF);
     if (mv && G.sf >= 2 && I < .55) I = .55;   // roue sur gravier / herbe : trace dès le contact, sans glissement requis
-    if (!(I > (on ? .08 : .16))) {
+    const minSlip = ai ? (on ? .25 : .40) : (on ? .08 : .16);
+    if (!(I > minSlip)) {
       if (!on) return; st[o] = 0;
       return tail(o, ai);
     }

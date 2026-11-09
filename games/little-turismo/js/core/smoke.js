@@ -53,7 +53,7 @@ const DUST_COL = [0.58, 0.50, 0.38];
 const GRASS_COL = [0.52, 0.55, 0.38];
 const tmp = { lat: 0, i: 0, s: 0 };
 
-export function createSmoke(R, maxParticles = 1400) {
+export function createSmoke(R, maxParticles = 1000) {
     const gl = R.gl, MAX = maxParticles;
     const px = new Float32Array(MAX), py = new Float32Array(MAX), pz = new Float32Array(MAX);
     const vx = new Float32Array(MAX), vy = new Float32Array(MAX), vz = new Float32Array(MAX);
@@ -64,6 +64,7 @@ export function createSmoke(R, maxParticles = 1400) {
 
     const instV = new Float32Array(MAX * 10);
     const accum = new Float32Array(64 * 4);
+    const accumEngine = new Float32Array(64);
     let count = 0;
     let ok = true, prog = null, U = null, vao = null, quadVbo = null, instVbo = null;
     let camX = 0, camZ = 0, low = false, wet = 0;
@@ -136,7 +137,7 @@ export function createSmoke(R, maxParticles = 1400) {
     }
 
     return {
-      clear() { count = 0; accum.fill(0); },
+      clear() { count = 0; accum.fill(0); accumEngine.fill(0); },
       get low() { return low; },
       set low(v) { low = !!v; },
       get wet() { return wet; },
@@ -285,15 +286,11 @@ export function createSmoke(R, maxParticles = 1400) {
             }
           }
 
-          // Piste mouillée : les roues projettent de spectaculaires panaches d'eau pulvérisée (tyre spray) proportionnels à la vitesse
-          if (wet > 0 && sp > 4.5) {
-            if (!isFront) {
-              const sprayR = Math.min(1.0, (sp - 4.5) / 22.0) * wet;
-              if (sprayR > 0.1) intensity = Math.max(intensity, sprayR);
-            } else if (sp > 8.0) {
-              const sprayF = Math.min(0.65, (sp - 8.0) / 26.0) * wet;
-              if (sprayF > 0.1) intensity = Math.max(intensity, sprayF);
-            }
+          // Piste mouillée : les roues projettent des panaches d'eau (tyre spray)
+          // PERF : seuil relevé, roues avant exclues (peu visibles), cap d'intensité réduit
+          if (wet > 0 && sp > 6.0 && !isFront) {
+            const sprayR = Math.min(0.72, (sp - 6.0) / 24.0) * wet;
+            if (sprayR > 0.15) intensity = Math.max(intensity, sprayR);
           }
 
           const accIdx = bSlot + k;
@@ -316,7 +313,7 @@ export function createSmoke(R, maxParticles = 1400) {
 
             const cy = p.y + YO[sf] + 0.12;
 
-            accum[accIdx] += dt * (low ? 12 + intensity * 20 : 18 + intensity * 32);
+            accum[accIdx] += dt * (low ? 10 + intensity * 16 : 14 + intensity * 24); // PERF : taux réduit
             if (accum[accIdx] > 2.0) accum[accIdx] = 2.0;
 
             while (accum[accIdx] >= 1.0) {
@@ -337,7 +334,7 @@ export function createSmoke(R, maxParticles = 1400) {
 
               const duration = isSpray ? (0.75 + Math.random() * 0.45) : (0.75 + Math.random() * 0.35);
               const size0 = isSpray ? (0.35 + Math.random() * 0.1) : (0.22 + Math.random() * 0.08);
-              const size1 = isSpray ? (2.4 + Math.random() * 0.8) : (1.25 + Math.random() * 0.4);
+              const size1 = isSpray ? (1.8 + Math.random() * 0.6) : (1.25 + Math.random() * 0.4); // PERF : panache spray moins large
               const alpha = isSpray ? Math.min(0.38, 0.12 + intensity * 0.26) : Math.min(0.55, 0.28 + intensity * 0.25);
 
               spawn(cx, cy, cz, pvx, pvy, pvz, size0, size1, alpha, duration, col[0], col[1], col[2]);
@@ -345,6 +342,56 @@ export function createSmoke(R, maxParticles = 1400) {
           } else {
             accum[accIdx] = Math.max(0, accum[accIdx] - dt * 20);
           }
+        }
+      },
+      engine(slot, ph, pose, engLevel, dt = 1 / 60) {
+        if (!ok || slot >= accumEngine.length || engLevel <= 0.05) return;
+        const p = pose || ph, ai = slot > 0;
+        const dx = p.x - camX, dz = p.z - camZ;
+        const far = low ? 60 : 130;
+        if (ai && dx * dx + dz * dz > far * far) return;
+
+        const S = ph.sheet || DEF;
+        const u = ph.u || 0, w = ph.w || 0;
+        const cs = Math.cos(p.psi), sn = Math.sin(p.psi);
+
+        const isRear = S.kind === 'wedge' || S.kind === 'proto';
+        const isOpen = S.kind === 'open';
+        const fwdM = isOpen ? 0.9 : (isRear ? -0.4 : (S.a ? S.a * 0.85 : 1.25));
+        const upM = isOpen ? 0.45 : 0.65;
+
+        const mx = p.x + cs * fwdM + (Math.random() - 0.5) * 0.35;
+        const mz = p.z + sn * fwdM + (Math.random() - 0.5) * 0.35;
+        const my = p.y + upM;
+
+        const rate = (low ? 8 : 14) * Math.min(2.0, engLevel * 1.6);
+        accumEngine[slot] += dt * rate;
+        if (accumEngine[slot] > 2.0) accumEngine[slot] = 2.0;
+
+        while (accumEngine[slot] >= 1.0) {
+          accumEngine[slot] -= 1.0;
+
+          const vx0 = cs * u - sn * w;
+          const vz0 = sn * u + cs * w;
+          const pvx = vx0 * 0.4 + (Math.random() - 0.5) * 0.5;
+          const pvz = vz0 * 0.4 + (Math.random() - 0.5) * 0.5;
+          const pvy = 0.95 + Math.random() * 1.1;
+
+          let col;
+          if (engLevel >= 0.75) {
+            const dark = Math.random() < 0.65;
+            col = dark ? [0.28 + Math.random() * 0.1, 0.28 + Math.random() * 0.1, 0.30 + Math.random() * 0.1]
+                       : [0.60 + Math.random() * 0.1, 0.62 + Math.random() * 0.1, 0.65 + Math.random() * 0.1];
+          } else {
+            col = [0.84 + Math.random() * 0.08, 0.86 + Math.random() * 0.08, 0.90 + Math.random() * 0.08];
+          }
+
+          const duration = 0.9 + Math.random() * 0.6;
+          const size0 = 0.22 + Math.random() * 0.08;
+          const size1 = 1.6 + Math.random() * 0.8 + engLevel * 0.8;
+          const alpha = Math.min(0.68, 0.22 + engLevel * 0.38);
+
+          spawn(mx, my, mz, pvx, pvy, pvz, size0, size1, alpha, duration, col[0], col[1], col[2]);
         }
       },
       draw(cam) {

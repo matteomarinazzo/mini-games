@@ -49,8 +49,8 @@ const wr = (o) => { try { localStorage.setItem(KEY, JSON.stringify({ ...rd(), ..
 export function loadSaved() { const o = rd(); return sanitize(o.cfg || o); }
 export function saveSaved(c) { wr({ cfg: c }); }
 /** Aides (pause > Paramètres) : ligne idéale, points de freinage, minimap. */
-export function loadSet() { const s = rd().set || {}; return { line: s.line === true, brake: s.brake === true, map: s.map !== false, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' }; }
-export function saveSet(s) { wr({ set: { line: !!s.line, brake: !!s.brake, map: !!s.map, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' } }); }
+export function loadSet() { const s = rd().set || {}; return { line: s.line === true, brake: s.brake === true, map: s.map !== false, radar: s.radar !== false, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' }; }
+export function saveSet(s) { wr({ set: { line: !!s.line, brake: !!s.brake, map: !!s.map, radar: s.radar !== false, penalties: s.penalties !== false, damage: s.damage !== false, view: ['rear', 'close', 'cockpit', 'front'].includes(s.view) ? s.view : 'rear' } }); }
 /** Records par circuit (Serra Nova garde l'ancienne clé `rec`, les autres sont dans `recs`) : { lap: secondes | null, place: rang d'arrivée | null }. */
 export function loadRec(id = DEFAULTS.circuit) {
   const o = rd(), r = (id === DEFAULTS.circuit ? o.rec : (o.recs || {})[id]) || {};

@@ -77,6 +77,7 @@ const PR = {
   proto: { hood: [[.8, .55, .58], [1.6, .4, .44], [2.25, .29, .3]], ws: [[.3, .98, .4], [1.1, .6, .62]], noseTop: [[1.6, .4, .45], [2.3, .28, .3]], nose: [2.31, .24, .28, .3], tail: [-2.31, .3, .5, .5], tailTop: [[-2.3, .5, .5], [-1.8, .78, .7]], side: [.9, .24, .6, -1.6, 1.6], wing: [1.1, -2.2], front: [.22, 2.28], flap: 1 },
   rally: { hood: [[1, .97, .88], [1.7, .79, .83], [2.2, .61, .73]], ws: [[.2, 1.5, .7], [.9, 1.1, .8]], noseTop: [[1.7, .79, .83], [2.2, .61, .73]], nose: [2.21, .4, .6, .78], tail: [-2.21, .4, .78, .8], tailTop: [[-2.2, .78, .82], [-1.9, .95, .88]], side: [.94, .36, .9, -1.8, 1.8], wing: [1.3, -2.2], front: [.3, 2.15], flap: 1 },
   open: { hood: [[.7, .47, .2], [1.7, .35, .09], [2.3, .31, .06]], noseTop: [[1.7, .35, .1], [2.3, .31, .06]], nose: [2.36, .26, .3, .06], tail: [-2.21, .3, .5, .18], tailTop: [[-2.2, .5, .18], [-1.4, .62, .26]], side: [.85, .22, .52, -.9, 1], wing: [.9, -2.15], front: [.22, 2.15] },
+  drag: { hood: [[.2, .32, .18], [1.4, .24, .14], [2.5, .18, .12]], noseTop: [[1.4, .24, .14], [3.0, .14, .10]], nose: [3.01, .14, .22, .10], tail: [-2.21, .3, .5, .25], tailTop: [[-2.2, .5, .22], [-1.4, .45, .24]], wing: [.98, -2.1], front: [.22, 2.7] },
 };
 const nrm = (v) => { const l = Math.hypot(...v) || 1; return v.map((x) => x / l); };
 const rnd = (i) => { const s = Math.sin(i * 91.7) * 43758.5; return s - Math.floor(s); };
@@ -111,14 +112,12 @@ function buildOv(R, kd) {
   mk('hood', (B) => patches(B, hood, 4, 4, 1));
   mk('nose', (B) => patches(B, stn(K.noseTop), 2, 4, 20) + patches(B, face(...K.nose, 1), 2, 4, 40));
   mk('tail', (B) => patches(B, face(...K.tail, -1), 3, 4, 60) + patches(B, stn(K.tailTop), 3, 4, 80));
-  mk('sl', (B) => patches(B, sidef(-1, ...K.side), 3, 6, 100)); mk('sr', (B) => patches(B, sidef(1, ...K.side), 3, 6, 120));
+  if (K.side) { mk('sl', (B) => patches(B, sidef(-1, ...K.side), 3, 6, 100)); mk('sr', (B) => patches(B, sidef(1, ...K.side), 3, 6, 120)); }
   if (ws) { mk('cr', (B) => cracks(B, ws)); mk('sh', (B) => patches(B, ws, 3, 4, 140, .02, [.02, .025, .03])); }
   if (K.flap) {
     mk('hole', (B) => { for (const [a, b] of [[.1, .55], [.55, 1]]) B.quad(hood.P(a, -.8, .02), hood.P(a, .8, .02), hood.P(b, .8, .02), hood.P(b, -.8, .02), [.03, .03, .03], hood.N(.5)); return 2; });
     mk('flap', (B) => { for (const [a, b] of [[.1, .55], [.55, 1]]) B.quad(hood.P(a, -.9, .035), hood.P(a, .9, .035), hood.P(b, .9, .035), hood.P(b, -.9, .035), [-1.1, 0, 0], hood.N(.5)); return 2; });
   }
-  // fumée : cube unique, gris clair (moins contrasté = moins opaque visuellement)
-  mk('smoke', (B) => { obox(B, 0, 0, 0, 0, 1, .12, .12, .12, [.5, .52, .55]); return 1; });
   return O;
 }
 const CM = new Float32Array(16), LM = new Float32Array(16), MM = new Float32Array(16), SM = new Float32Array(16);
@@ -141,20 +140,11 @@ export function drawWear(R, w, q) {
     if (fw > 0 && fw < .65) R.draw(P.front, mul(MM, CM, lm(K.front[0], K.front[1], -fw * .5, -fw * .35, -fw * .08, 0)), top);
   }
   const dr = (o, f) => { const c = Math.ceil(Math.min(1, f) * o.n); if (f > .03 && c > 0) R.drawRange(o.m, CM, top, 0, c * 6); };
-  dr(O.hood, hd * 1.2); dr(O.nose, ns * 1.2); dr(O.tail, rw * 1.1); dr(O.sl, L * 1.3); dr(O.sr, Rr * 1.3);
-  if (O.cr) { const cw = Math.min(1, (hd + ns) * .7 + (L + Rr) * .15); dr(O.cr, cw * 1.1); dr(O.sh, (cw - .6) * 2.5); }
-  if (O.hole && hd > .5) { R.draw(O.hole.m, CM, top); R.draw(O.flap.m, mul(MM, CM, lm(K.hood[0][1], K.hood[0][0], Math.min(.9, (hd - .5) * 1.8), 0, 0, 0)), top); }
-  const eng = Math.min(1, hd * .6 + ns * .5);
-  if (own && eng > .5) {
-    // fumée moteur : plusieurs bouffées éparpillées (position, taille et dérive propres à chacune), qui montent, se dispersent puis s'effacent
-    const t = performance.now() / 1000, n = 5 + Math.round(eng * 8);
-    for (let k = 0; k < n; k++) {
-      const ph = (t * .6 + k / n) % 1, g = rnd(k + 31), sz = (.6 + g * .7) * (.5 + ph * 1.8 * eng) * (1 - ph * .4) * (ph < .1 ? ph * 10 : 1);
-      const x = (rnd(k + 7) - .5) * .9 + Math.sin(ph * 3 + k) * ph * .5;
-      const z = K.hood[1][0] - ph * (1.6 + g * 1) + (rnd(k + 13) - .5) * .4;
-      const y = K.hood[1][1] + .1 + ph * (1.8 + g * 1.2);
-      SM.set([sz, 0, 0, 0, 0, sz, 0, 0, 0, 0, sz, 0, x, y, z, 1]);
-      R.drawAlpha(O.smoke.m, mul(MM, CM, SM), top, .5);
-    }
+  dr(O.hood, hd * 1.2); dr(O.nose, ns * 1.2); dr(O.tail, rw * 1.1);
+  if (kk !== 'drag') {
+    if (O.sl) dr(O.sl, L * 1.3);
+    if (O.sr) dr(O.sr, Rr * 1.3);
+    if (O.cr) { const cw = Math.min(1, (hd + ns) * .7 + (L + Rr) * .15); dr(O.cr, cw * 1.1); dr(O.sh, (cw - .6) * 2.5); }
   }
+  if (O.hole && hd > .5) { R.draw(O.hole.m, CM, top); R.draw(O.flap.m, mul(MM, CM, lm(K.hood[0][1], K.hood[0][0], Math.min(.9, (hd - .5) * 1.8), 0, 0, 0)), top); }
 }

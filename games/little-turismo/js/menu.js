@@ -43,10 +43,14 @@ function show() {
   }
   if (id === 'race') {
     const isMulti = gameMode === 'multi';
-    if ($('soloConfig')) $('soloConfig').hidden = isMulti;
+    const isClm = gameMode === 'clm';
+    if ($('soloConfig')) $('soloConfig').hidden = isMulti || isClm;
+    if ($('clmConfig')) $('clmConfig').hidden = !isClm;
     if ($('multiConfig')) $('multiConfig').hidden = !isMulti;
-    if ($('raceScreenTitle')) $('raceScreenTitle').textContent = isMulti ? 'Multijoueur' : 'Course';
+    if ($('raceScreenTitle')) $('raceScreenTitle').textContent = isMulti ? 'Multijoueur' : isClm ? 'Contre la montre' : 'Course';
     $('sumC').parentElement.hidden = isMulti;
+    
+    syncClm();
     sync();
   }
   if (id === 'records') renderRecords();
@@ -118,35 +122,226 @@ for (const [k, n] of CIRCUIT_CATS) { const l = CIRCUITS.filter((c) => c.cat === 
 // Voitures : aperçu vectoriel (vue de dessus, sans image, livrée et proportions de la fiche) et stats lues dans les fiches physiques
 const rr = (x, a, b, w, h, r) => { x.beginPath(); x.roundRect ? x.roundRect(a, b, w, h, r) : x.rect(a, b, w, h); x.fill(); };
 function carPreview(x, c) {
-  const lk = look(c.sheet || CARS[c.id]), rgb = (v) => 'rgb(' + v.map((q) => Math.round(q * 255)).join() + ')', col = rgb(lk.color), ac = rgb(lk.accent), k = lk.kind, D = '#14161a', G = '#1b2530';
-  const wh = (l) => { x.fillStyle = D; for (const [dx, dy, w, h] of l) rr(x, dx - w / 2, dy - h / 2, w, h, 4); };
-  x.save(); x.translate(150, 110); x.scale(lk.sc[2], lk.sc[0]);
-  x.fillStyle = 'rgba(0,0,0,.3)'; rr(x, -104, -36, 214, 92, 26);
+  const lk = look(c.sheet || CARS[c.id]), rgb = (v) => 'rgb(' + v.map((q) => Math.round(q * 255)).join() + ')';
+  const col = rgb(lk.color), ac = rgb(lk.accent), k = lk.kind;
+  const D = '#101216', G = '#1c2634', MET = '#c8d2de', WHT = '#f0f4f8';
+
+  const wh = (l) => {
+    for (const [dx, dy, w, h] of l) {
+      x.fillStyle = '#0a0c10'; rr(x, dx - w / 2, dy - h / 2, w, h, 4);
+      x.fillStyle = '#222834'; rr(x, dx - w / 4, dy - h / 3, w / 2, (h * 2) / 3, 2);
+      x.fillStyle = '#8a99ad'; x.beginPath(); x.arc(dx, dy, Math.min(w, h) * 0.16, 0, 6.28); x.fill();
+    }
+  };
+
+  x.save();
+  x.translate(150, 110);
+  x.scale(lk.sc[2], lk.sc[0]);
+
+  // Ombre portée douce sous le véhicule
+  x.fillStyle = 'rgba(0,0,0,.35)';
+  rr(x, -108, -44, 220, 88, 28);
+
   if (k === 'open') {
-    wh([[64, -44, 34, 22], [64, 44, 34, 22], [-62, -44, 42, 28], [-62, 44, 42, 28]]);
-    x.fillStyle = D; rr(x, 90, -54, 12, 108, 2); rr(x, -114, -38, 14, 76, 2);
-    x.fillStyle = col; rr(x, -100, -9, 196, 18, 9); rr(x, -62, -26, 86, 52, 12); rr(x, -114, -38, 4, 76, 1);
-    x.fillStyle = D; rr(x, -16, -10, 36, 20, 9); x.fillStyle = '#fff'; x.beginPath(); x.arc(2, 0, 7, 0, 6.3); x.fill();
-    x.fillStyle = ac; x.fillRect(30, -3, 60, 6);
+    // ─── MONOPLACE F1 ───
+    // Triangles de suspension en carbone reliant les 4 roues au châssis
+    x.strokeStyle = '#1e222a'; x.lineWidth = 2.5; x.lineCap = 'round';
+    // Suspension avant
+    x.beginPath();
+    x.moveTo(64, -40); x.lineTo(38, -14); x.moveTo(64, -36); x.lineTo(76, -12);
+    x.moveTo(64, 40); x.lineTo(38, 14); x.moveTo(64, 36); x.lineTo(76, 12);
+    // Suspension arrière
+    x.moveTo(-62, -36); x.lineTo(-38, -15); x.moveTo(-62, -40); x.lineTo(-80, -10);
+    x.moveTo(-62, 36); x.lineTo(-38, 15); x.moveTo(-62, 40); x.lineTo(-80, 10);
+    x.stroke();
+
+    // 4 roues slicks larges F1
+    wh([[64, -44, 34, 22], [64, 44, 34, 22], [-62, -45, 42, 28], [-62, 45, 42, 28]]);
+
+    // Aileron avant complet avec flaps et dérives latérales (endplates)
+    x.fillStyle = D; rr(x, 88, -55, 16, 110, 2);
+    x.fillStyle = ac; rr(x, 93, -53, 9, 106, 1);
+    x.fillStyle = col; rr(x, 89, -56, 14, 4, 1); rr(x, 89, 52, 14, 4, 1); // endplates
+
+    // Museau / nez effilé F1
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(102, -7); x.lineTo(102, 7); x.lineTo(26, 16); x.lineTo(-24, 38);
+    x.lineTo(-65, 20); x.lineTo(-94, 12); x.lineTo(-94, -12); x.lineTo(-65, -20);
+    x.lineTo(-24, -38); x.lineTo(26, -16);
+    x.closePath(); x.fill();
+
+    // Pontons latéraux sculptés (sidepods en taille de guêpe)
+    x.fillStyle = D;
+    rr(x, 14, -36, 12, 14, 2); rr(x, 14, 22, 12, 14, 2); // entrées d'air radiateur
+    x.fillStyle = col;
+    rr(x, -25, -36, 42, 16, 4); rr(x, -25, 20, 42, 16, 4);
+
+    // Liseré / livrée accent sur le museau
+    x.fillStyle = ac;
+    x.beginPath();
+    x.moveTo(96, -3); x.lineTo(96, 3); x.lineTo(28, 4); x.lineTo(28, -3);
+    x.closePath(); x.fill();
+
+    // Cockpit, casque du pilote et arceau Halo
+    x.fillStyle = D; rr(x, -16, -11, 40, 22, 10); // ouverture baquet
+    x.fillStyle = WHT; x.beginPath(); x.arc(2, 0, 7.5, 0, 6.28); x.fill(); // casque
+    x.fillStyle = '#1884f0'; rr(x, 3, -4, 4, 8, 1); // visière iridium
+    // Structure Halo en Y au-dessus de la tête
+    x.strokeStyle = '#121418'; x.lineWidth = 3;
+    x.beginPath();
+    x.moveTo(16, 0); x.lineTo(4, 0);
+    x.moveTo(4, 0); x.lineTo(-12, -9);
+    x.moveTo(4, 0); x.lineTo(-12, 9);
+    x.stroke();
+
+    // Prise d'air moteur triangulaire (Airbox)
+    x.fillStyle = D; rr(x, -8, -5, 8, 10, 2);
+
+    // Dérive dorsale (Shark Fin)
+    x.fillStyle = ac; rr(x, -76, -1.5, 52, 3, 1);
+
+    // Aileron arrière F1 avec dérives latérales et flap DRS
+    x.fillStyle = D; rr(x, -116, -38, 15, 76, 2);
+    x.fillStyle = col; rr(x, -114, -36, 11, 72, 1);
+    x.fillStyle = ac; rr(x, -112, -34, 7, 68, 1);
+    x.fillStyle = D; rr(x, -117, -39, 17, 4, 1); rr(x, -117, 35, 17, 4, 1); // endplates AR
   } else if (k === 'wedge') {
-    wh([[60, -43, 32, 16], [60, 43, 32, 16], [-62, -44, 36, 18], [-62, 44, 36, 18]]);
-    x.fillStyle = col; rr(x, -104, -40, 208, 80, 36); x.fillStyle = ac; x.fillRect(-96, -4, 192, 8);
-    x.fillStyle = G; rr(x, -48, -27, 84, 54, 24); x.fillStyle = col; rr(x, -28, -20, 46, 40, 14);
-    x.fillStyle = D; rr(x, -116, -38, 10, 76, 2); rr(x, 98, -32, 8, 64, 2);
+    // ─── SUPERCAR EN COIN (WEDGE) ───
+    wh([[60, -43, 32, 16], [60, 43, 32, 16], [-62, -45, 36, 18], [-62, 45, 36, 18]]);
+
+    // Carrosserie biseautée ultra agressive en flèche
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(104, 0); x.lineTo(92, -26); x.lineTo(60, -42); x.lineTo(20, -40);
+    x.lineTo(-15, -44); x.lineTo(-80, -45); x.lineTo(-106, -38); x.lineTo(-106, 38);
+    x.lineTo(-80, 45); x.lineTo(-15, 44); x.lineTo(20, 40); x.lineTo(60, 42);
+    x.lineTo(92, 26);
+    x.closePath(); x.fill();
+
+    // Splitter et prises d'air avant
+    x.fillStyle = D;
+    rr(x, 90, -20, 8, 40, 2);
+    // Phares escamotables acérés
+    x.fillStyle = D;
+    rr(x, 65, -24, 14, 12, 2); rr(x, 65, 12, 14, 12, 2);
+    x.fillStyle = '#ffeaa0';
+    rr(x, 70, -22, 6, 8, 1); rr(x, 70, 14, 6, 8, 1);
+
+    // Pare-brise facetté et vitres latérales
+    x.fillStyle = G;
+    x.beginPath();
+    x.moveTo(42, -26); x.lineTo(42, 26); x.lineTo(-18, 30); x.lineTo(-44, 24);
+    x.lineTo(-44, -24); x.lineTo(-18, -30);
+    x.closePath(); x.fill();
+
+    // Toit profilé avec prise d'air centrale
+    x.fillStyle = col; rr(x, -26, -20, 40, 40, 10);
+    x.fillStyle = D; rr(x, -12, -7, 18, 14, 3); // écope de toit
+
+    // Persiennes horizontales du capot moteur arrière (louvered slats)
+    x.fillStyle = D;
+    for (let i = 0; i < 6; i++) {
+      rr(x, -52 - i * 8, -26 + i * 1.5, 4, 52 - i * 3, 1);
+    }
+
+    // Écopes de refroidissement latérales NACA
+    x.fillStyle = D;
+    rr(x, -10, -41, 24, 6, 2); rr(x, -10, 35, 24, 6, 2);
+
+    // Aileron arrière intégré et dérives
+    x.fillStyle = D; rr(x, -114, -40, 10, 80, 2);
+    x.fillStyle = col; rr(x, -112, -38, 7, 76, 1);
+    x.fillStyle = ac; x.fillRect(-96, -3, 192, 6); // bande de livrée
   } else if (k === 'proto') {
-    wh([[62, -40, 32, 18], [62, 40, 32, 18], [-66, -41, 38, 22], [-66, 41, 38, 22]]);
-    x.fillStyle = col; rr(x, -112, -34, 218, 68, 32); x.fillStyle = ac; rr(x, -104, -3, 76, 6, 2);
-    x.fillStyle = G; rr(x, -40, -22, 72, 44, 20); x.fillStyle = col; rr(x, -22, -15, 36, 30, 10);
-    x.fillStyle = D; rr(x, -120, -42, 10, 84, 2); rr(x, 96, -30, 8, 60, 2);
+    // ─── PROTOTYPE D'ENDURANCE (LMP / HYPERCAR) ───
+    wh([[62, -42, 34, 18], [62, 42, 34, 18], [-66, -43, 38, 22], [-66, 43, 38, 22]]);
+
+    // Ailes avant et arrière volumineuses avec pontons
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(102, -18); x.lineTo(102, 18); x.lineTo(84, 42); x.lineTo(44, 43);
+    x.lineTo(26, 36); x.lineTo(-24, 37); x.lineTo(-44, 44); x.lineTo(-94, 44);
+    x.lineTo(-112, 36); x.lineTo(-112, -36); x.lineTo(-94, -44); x.lineTo(-44, -44);
+    x.lineTo(-24, -37); x.lineTo(26, -36); x.lineTo(44, -43); x.lineTo(84, -42);
+    x.closePath(); x.fill();
+
+    // Ouïes d'extraction d'air avant (louvres sur ailes)
+    x.fillStyle = D;
+    for (let i = 0; i < 4; i++) {
+      rr(x, 50 + i * 6, -39, 3, 12, 1);
+      rr(x, 50 + i * 6, 27, 3, 12, 1);
+    }
+
+    // Splitter avant en carbone et feux 4 points LED
+    x.fillStyle = D; rr(x, 96, -32, 8, 64, 2);
+    x.fillStyle = '#a0e4ff';
+    rr(x, 90, -32, 4, 8, 1); rr(x, 90, 24, 4, 8, 1);
+
+    // Fentes aérodynamiques profondes entre habitacle et pontons
+    x.fillStyle = D;
+    rr(x, -2, -28, 38, 6, 2); rr(x, -2, 22, 38, 6, 2);
+
+    // Bulle cockpit centrale profilée (goutte d'eau)
+    x.fillStyle = G;
+    x.beginPath();
+    x.moveTo(40, 0); x.bezierCurveTo(36, -20, -10, -20, -34, -14);
+    x.lineTo(-34, 14); x.bezierCurveTo(-10, 20, 36, 20, 40, 0);
+    x.closePath(); x.fill();
+    x.fillStyle = col; rr(x, -16, -13, 34, 26, 8); // sommet cabine
+
+    // Grand aileron de requin dorsal (Shark Fin)
+    x.fillStyle = D; rr(x, -106, -2, 78, 4, 1);
+    x.fillStyle = ac; rr(x, -104, -1, 74, 2, 1);
+
+    // Énorme aileron arrière double plan
+    x.fillStyle = D; rr(x, -120, -44, 12, 88, 2);
+    x.fillStyle = col; rr(x, -118, -42, 8, 84, 1);
+    x.fillStyle = ac; rr(x, -116, -38, 4, 76, 1);
   } else if (k === 'rally') {
-    wh([[62, -45, 34, 16], [62, 45, 34, 16], [-62, -45, 34, 16], [-62, 45, 34, 16]]);
-    x.fillStyle = col; rr(x, -102, -39, 206, 78, 10); x.fillStyle = ac; x.fillRect(-98, -5, 196, 10);
-    x.fillStyle = G; rr(x, -52, -31, 98, 62, 8); x.fillStyle = col; rr(x, -42, -26, 72, 52, 6);
-    x.fillStyle = '#ffe9a0'; for (const dy of [-20, -7, 7, 20]) rr(x, 40, dy - 4, 6, 8, 2);
+    // ─── VOITURE DE RALLYE WRC ───
+    wh([[62, -45, 34, 18], [62, 45, 34, 18], [-62, -45, 34, 18], [-62, 45, 34, 18]]);
+
+    // Caisse compacte WRC avec kit carrosserie large (ailes bombées carrées)
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(96, -30); x.lineTo(96, 30); x.lineTo(82, 45); x.lineTo(44, 45);
+    x.lineTo(34, 38); x.lineTo(-34, 38); x.lineTo(-44, 45); x.lineTo(-84, 45);
+    x.lineTo(-100, 36); x.lineTo(-100, -36); x.lineTo(-84, -45); x.lineTo(-44, -45);
+    x.lineTo(-34, -38); x.lineTo(34, -38); x.lineTo(44, -45); x.lineTo(82, -45);
+    x.closePath(); x.fill();
+
+    // Bavettes garde-boue arrière
+    x.fillStyle = '#cc1818';
+    rr(x, -76, -46, 5, 4, 1); rr(x, -76, 42, 5, 4, 1);
+
+    // Vitrage rallye teinté avec pare-brise plat
+    x.fillStyle = G; rr(x, -52, -31, 98, 62, 8);
+    x.fillStyle = col; rr(x, -42, -26, 74, 52, 6); // toit
+
+    // Écope de toit dynamique (Roof scoop)
+    x.fillStyle = D; rr(x, 14, -8, 12, 16, 3);
+    x.fillStyle = WHT; rr(x, 18, -6, 4, 12, 1);
+
+    // Rampe de 4 phares additionnels de rallye sur le capot
+    x.fillStyle = D; rr(x, 82, -28, 10, 56, 4);
+    x.fillStyle = '#fff4b8';
+    for (const dy of [-20, -7, 7, 20]) {
+      x.beginPath(); x.arc(87, dy, 4.5, 0, 6.28); x.fill();
+      x.strokeStyle = '#d4aa20'; x.lineWidth = 1; x.stroke();
+    }
+
+    // Aileron arrière biplan de rallye
+    x.fillStyle = D; rr(x, -106, -38, 14, 76, 2);
+    x.fillStyle = col; rr(x, -104, -36, 10, 72, 1);
+    x.fillStyle = ac; rr(x, -102, -34, 6, 68, 1);
+    x.fillStyle = ac; x.fillRect(-96, -4, 180, 8); // bande de course
   } else if (k === 'drag') {
+    // ─── TOP FUEL DRAGSTER ───
     wh([[96, -26, 22, 10], [96, 26, 22, 10], [-65, -46, 52, 28], [-65, 46, 52, 28]]);
-    x.strokeStyle = D; x.lineWidth = 3; x.beginPath(); x.moveTo(-90, -12); x.lineTo(-124, -8); x.moveTo(-90, 12); x.lineTo(-124, 8); x.stroke();
-    x.fillStyle = '#ee3322'; rr(x, -127, -10, 5, 4, 1); rr(x, -127, 6, 5, 4, 1);
+    x.strokeStyle = D; x.lineWidth = 3;
+    x.beginPath(); x.moveTo(-90, -12); x.lineTo(-124, -8); x.moveTo(-90, 12); x.lineTo(-124, 8); x.stroke();
+    x.fillStyle = '#ee3322'; rr(x, -127, -10, 5, 4, 1); rr(x, -127, 6, 5, 4, 1); // parachutes
     x.fillStyle = col;
     x.beginPath();
     x.moveTo(116, 0); x.lineTo(95, -12); x.lineTo(-38, -16); x.lineTo(-65, -28); x.lineTo(-94, -28); x.lineTo(-98, -20);
@@ -154,27 +349,23 @@ function carPreview(x, c) {
     x.fill();
     x.fillStyle = ac; x.fillRect(-35, -4, 138, 8);
     x.fillStyle = G; rr(x, -38, -11, 36, 22, 6); x.fillStyle = col; rr(x, -28, -7, 20, 14, 3);
-    x.fillStyle = D; rr(x, 2, -14, 28, 28, 4);
-    x.fillStyle = '#ee2211'; rr(x, 14, -8, 14, 16, 2);
+    x.fillStyle = D; rr(x, 2, -14, 28, 28, 4); // compresseur blower
+    x.fillStyle = '#ee2211'; rr(x, 14, -8, 14, 16, 2); // papillon scoop rouge
     x.fillStyle = '#ff7722'; for (let i = 0; i < 4; i++) { x.fillRect(4 + i * 5, -17, 3, 3); x.fillRect(4 + i * 5, 14, 3, 3); }
     x.fillStyle = D; rr(x, 100, -28, 8, 56, 2);
     x.fillStyle = D; rr(x, -88, -48, 24, 96, 3);
     x.fillStyle = col; rr(x, -86, -46, 20, 92, 2);
     x.fillStyle = ac; rr(x, -92, -49, 30, 4, 2); rr(x, -92, 45, 30, 4, 2); rr(x, -82, -2, 22, 4, 1);
   } else if (k === 'thrust') {
-    // ThrustSSC : double réacteurs Spey latéraux, fuselage aiguille, roues pleines alu, grand empennage arrière
+    // ─── THRUST SSC ───
     wh([[44, -46, 26, 11], [44, 46, 26, 11], [-84, -14, 26, 11], [-84, 14, 26, 11]]);
-    x.fillStyle = '#dde3ea';
-    rr(x, 32, -50, 24, 8, 2); rr(x, 32, 42, 24, 8, 2); rr(x, -96, -17, 24, 6, 2); rr(x, -96, 11, 24, 6, 2);
-    // Fuselage aiguille central
+    x.fillStyle = '#dde3ea'; rr(x, 32, -50, 24, 8, 2); rr(x, 32, 42, 24, 8, 2); rr(x, -96, -17, 24, 6, 2); rr(x, -96, 11, 24, 6, 2);
     x.fillStyle = col;
     x.beginPath();
     x.moveTo(135, 0); x.lineTo(95, -10); x.lineTo(-105, -16); x.lineTo(-120, -12);
     x.lineTo(-120, 12); x.lineTo(-105, 16); x.lineTo(95, 10); x.closePath();
     x.fill();
-    // Sonde pitot supersonique
-    x.fillStyle = '#cfd4dc'; x.fillRect(135, -2, 22, 4);
-    // Double turboréacteurs Rolls-Royce Spey
+    x.fillStyle = '#cfd4dc'; x.fillRect(135, -2, 22, 4); // pitot
     for (const dy of [-38, 38]) {
       x.fillStyle = col; rr(x, -95, dy - 14, 168, 28, 8);
       x.fillStyle = '#b0b8c4'; rr(x, 68, dy - 13, 8, 26, 3);
@@ -183,25 +374,71 @@ function carPreview(x, c) {
       x.fillStyle = '#ff5511'; rr(x, -114, dy - 9, 7, 18, 2);
       x.fillStyle = '#ffee44'; rr(x, -112, dy - 5, 4, 10, 1);
     }
-    // Cockpit
     x.fillStyle = G; rr(x, 0, -8, 42, 16, 5); x.fillStyle = col; rr(x, 10, -5, 22, 10, 3);
-    // Bande de fuselage
     x.fillStyle = ac; x.fillRect(-85, -3, 175, 6);
-    // Empennage vertical arrière
     x.fillStyle = D; rr(x, -118, -4, 45, 8, 2); x.fillStyle = col; rr(x, -114, -2, 38, 4, 1);
-    // Parachutes
     x.fillStyle = '#ee3322'; rr(x, -122, -6, 4, 4, 1); rr(x, -122, 2, 4, 4, 1);
   } else {
-    wh([[59, -41, 30, 14], [59, 41, 30, 14], [-57, -41, 30, 14], [-57, 41, 30, 14]]);
-    x.fillStyle = D; rr(x, -108, -40, 10, 80, 2); rr(x, 92, -32, 10, 64, 2);
-    x.fillStyle = col; rr(x, -100, -35, 200, 70, 24); x.fillStyle = ac; x.fillRect(-98, -4, 196, 8);
-    x.fillStyle = G; rr(x, -52, -24, 92, 48, 14); x.fillStyle = col; rr(x, -28, -18, 40, 36, 8);
+    // ─── GRAND TOURISME (GT / STANDARD) ───
+    wh([[59, -41, 30, 15], [59, 41, 30, 15], [-57, -42, 32, 16], [-57, 42, 32, 16]]);
+
+    // Silhouette GT athlétique : ailes sculptées, hanches galbées
+    x.fillStyle = col;
+    x.beginPath();
+    x.moveTo(98, -24); x.lineTo(98, 24); x.lineTo(82, 39); x.lineTo(42, 42);
+    x.lineTo(24, 37); x.lineTo(-32, 37); x.lineTo(-44, 42); x.lineTo(-84, 42);
+    x.lineTo(-102, 34); x.lineTo(-102, -34); x.lineTo(-84, -42); x.lineTo(-44, -42);
+    x.lineTo(-32, -37); x.lineTo(24, -37); x.lineTo(42, -42); x.lineTo(82, -39);
+    x.closePath(); x.fill();
+
+    // Splitter avant en carbone
+    x.fillStyle = D; rr(x, 92, -34, 9, 68, 2);
+
+    // Phares profilés modernes LED
+    x.fillStyle = '#d0efff';
+    rr(x, 82, -34, 10, 8, 2); rr(x, 82, 26, 10, 8, 2);
+    x.fillStyle = '#ffffff';
+    rr(x, 85, -32, 6, 4, 1); rr(x, 85, 28, 6, 4, 1);
+
+    // Extracteurs d'air sur le capot
+    x.fillStyle = D;
+    rr(x, 46, -18, 14, 8, 2); rr(x, 46, 10, 14, 8, 2);
+
+    // Rétroviseurs extérieurs profilés
+    x.fillStyle = col;
+    rr(x, 26, -48, 6, 10, 2); rr(x, 26, 38, 6, 10, 2);
+
+    // Vitrage aérodynamique galbé (pare-brise bombé, vitres latérales fuyantes)
+    x.fillStyle = G;
+    x.beginPath();
+    x.moveTo(38, -26); x.lineTo(38, 26); x.lineTo(-14, 30); x.lineTo(-58, 24);
+    x.lineTo(-58, -24); x.lineTo(-14, -30);
+    x.closePath(); x.fill();
+
+    // Toit profilé avec double bossage
+    x.fillStyle = col; rr(x, -32, -22, 52, 44, 10);
+    x.fillStyle = D; rr(x, -26, -2, 40, 4, 1); // fente de toit
+
+    // Double canules d'échappement arrière
+    x.fillStyle = MET;
+    rr(x, -105, -20, 5, 5, 1); rr(x, -105, 15, 5, 5, 1);
+
+    // Aileron arrière GT sur mâts en col de cygne
+    x.fillStyle = D;
+    rr(x, -108, -40, 12, 80, 2); // lame principale
+    x.fillStyle = col;
+    rr(x, -106, -38, 8, 76, 1);
+    x.fillStyle = ac;
+    rr(x, -104, -34, 4, 68, 1);
+    // Bande de livrée centrale
+    x.fillRect(-96, -3, 188, 6);
   }
+
   x.restore();
 }
 const bal = (S) => { const r = (S.rearK || 1) * (1 - .08 * S.oversteer) / (1 - .2 * S.understeer); return r > 1.35 ? 'Sous-virage' : r > 1.2 ? 'Stable' : r > 1.05 ? 'Neutre' : 'Survirage'; };
 const statsOf = (s) => [['Vitesse max', Math.round(s.vmax * 3.6) + ' km/h'], ['Puissance', Math.round(s.power / 735.5) + ' ch'], ['Masse', s.mass + ' kg'], ['Adhérence', s.grip.toFixed(2)], ['Appui', s.aero.toFixed(1)], ['Équilibre', bal(s)]];
-const pickCar = (c) => { cfg.car = c.id; saveSaved(cfg); if (gameMode === 'clm') return launchClm(); location.hash = 'race'; };
+const pickCar = (c) => { cfg.car = c.id; saveSaved(cfg); location.hash = 'race'; };
 for (const [k, n] of KIND_LIST) { const l = CAR_LIST.filter((c) => look(CARS[c.id]).kind === k); if (!l.length) continue; const h = document.createElement('h2'); h.textContent = n + ' (' + l.length + ')'; h.style.cssText = 'grid-column:1/-1;flex:0 0 100%;width:100%;margin:14px 0 2px;font-size:15px;opacity:.85'; $('vgrid').appendChild(h); grid($('vgrid'), l, (x, c) => carPreview(x, { sheet: CARS[c.id] }), (c) => statsOf(CARS[c.id]), pickCar); }
 
 // Écran de course : menus déroulants thémés et curseurs pour les valeurs continues.
@@ -212,6 +449,16 @@ function options(el, entries) {
 const CAR_MODES = [['same', 'Toutes identiques à ma voiture'], ['mixed', 'Voitures variées']];
 options($('diff'), DIFFS);
 options($('weather'), WEATHERS);
+if ($('clmWeather')) options($('clmWeather'), WEATHERS);
+// clm config sync
+function syncClm() {
+  const cw = $('clmWeather'); if (cw) cw.value = cfg.weather;
+  const cd = $('clmDamage'); if (cd) cd.checked = cfg.damage !== false;
+  const sd = $('soloDamage'); if (sd) sd.checked = cfg.damage !== false;
+}
+if ($('clmWeather')) $('clmWeather').addEventListener('change', (e) => { cfg = sanitize({ ...cfg, weather: e.target.value }); saveSaved(cfg); });
+if ($('clmDamage')) $('clmDamage').addEventListener('change', (e) => { cfg = sanitize({ ...cfg, damage: e.target.checked }); saveSaved(cfg); });
+if ($('soloDamage')) $('soloDamage').addEventListener('change', (e) => { cfg = sanitize({ ...cfg, damage: e.target.checked }); saveSaved(cfg); });
 // Solo et multijoueur partagent exactement les mêmes valeurs et libellés.
 const fillCarMode = (el) => options(el, CAR_MODES);
 fillCarMode($('carMode'));
@@ -235,13 +482,15 @@ function sync(save) {
   $('startField').style.display = cfg.qualifying ? 'none' : '';
   $('sumC').textContent = byId(circuitList(), cfg.circuit).name; $('sumV').textContent = carName(cfg.car);
   if (save === true) saveSaved(cfg);
+  const sd2 = $('soloDamage'); if (sd2) sd2.checked = cfg.damage !== false;
 }
-function launchClm(over = {}) { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) { } try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null })); location.href = 'game.html'; }
+function launchClm(over = {}) { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) { } try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } const clmW = $('clmWeather'); const clmD = $('clmDamage'); const weather = (clmW && clmW.value) || cfg.weather || 'dry'; const damage = clmD ? clmD.checked : cfg.damage !== false; startSession(sanitize({ ...cfg, ...over, mode: 'clm', ai: 0, qualifying: false, startPosition: 0, carMode: 'same', gridOrder: null, weather, damage })); location.href = 'game.html'; }
 function launch() { try { sessionStorage.setItem('little-turismo-loading', '1'); } catch (e) { } cfg.gridOrder = null; saveSaved(cfg); try { localStorage.removeItem('little-turismo-live-v1'); } catch (e) { /* stockage indisponible */ } startSession(cfg); location.href = 'game.html'; }
 $('launch').addEventListener('click', launch);
+$('clmLaunch')?.addEventListener('click', () => launchClm());
 addEventListener('keydown', (e) => {
   if ((e.key === 'Escape' || e.key === 'Backspace') && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); back(); }
-  else if (e.key === 'Enter' && cur() === 'race' && e.target.tagName !== 'BUTTON') launch();
+  else if (e.key === 'Enter' && cur() === 'race' && e.target.tagName !== 'BUTTON') { if (gameMode === 'clm') launchClm(); else launch(); }
 });
 // ── Conception de voiture : création / édition (stockée dans localStorage), test sur le circuit choisi (contre la montre).
 const MAX_CUSTOM = 12;

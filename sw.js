@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.52.2026-11-07.9";
+const CACHE_NAME = "mini-games-cache-v1.54.2026-11-09.14";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -650,6 +650,7 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/gl.js',
     'games/little-turismo/js/core/input.js',
     'games/little-turismo/js/core/map.js',
+    'games/little-turismo/js/core/radar.js',
     'games/little-turismo/js/core/physics.js',
     'games/little-turismo/js/core/publish.js',
     'games/little-turismo/js/core/race.js',

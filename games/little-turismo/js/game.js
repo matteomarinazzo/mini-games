@@ -11,6 +11,7 @@ import { engineState, engineIncrement, repairEngine } from './core/engine.js';
 import { createRace, fmt } from './core/race.js';
 import { buildLine, buildZone, buildLamp, drawBrake, drawLights } from './core/aids.js';
 import { createMap } from './core/map.js';
+import { createRadar } from './core/radar.js';
 import { createDamage, drawWear } from './core/damage.js';
 import { createSkids } from './core/skidmarks.js';
 import { createSmoke } from './core/smoke.js';
@@ -120,7 +121,7 @@ for (const c of field.cars) {
 }
 drv.entry = race.E[0];
 const NOGAS = { throttle: 0, brake: 0, steer: 0, rev: true }, IDLE = { throttle: 0, brake: .6, steer: 0, rev: false };
-const dmg = createDamage($('dmg')), mp = createMap($('map')), skids = createSkids(R, field.cars.length + 1), smoke = createSmoke(R);
+const dmg = createDamage($('dmg')), mp = createMap($('map')), skids = createSkids(R, field.cars.length + 1), smoke = createSmoke(R), radar = createRadar($('radar'));
 // Pluie : initialisation après buildTrackMesh (setWeather écrase les couleurs de ciel du circuit)
 const rain = createRain(R, resolvedWeather, $('cockpitDrops'));
 R.setWeather(resolvedWeather);
@@ -136,22 +137,21 @@ if (hudWeather && resolvedWeather !== 'dry') {
 // Classe CSS sur body pour l'opacité du canvas de gouttes pare-brise
 document.body.classList.toggle('rain', resolvedWeather !== 'dry');
 let lineMesh = null, zoneMesh = null, lampMesh = null;
-for (const [id, k] of [['sLine', 'line'], ['sBrake', 'brake'], ['sMap', 'map']]) {
-  const el = $(id); el.checked = set[k];
-  el.addEventListener('change', () => { set[k] = el.checked; saveSet(set); $('map').hidden = !set.map; });
+for (const [id, k] of [['sLine', 'line'], ['sBrake', 'brake'], ['sMap', 'map'], ['sRadar', 'radar']]) {
+  const el = $(id); if (!el) continue; el.checked = !!set[k];
+  el.addEventListener('change', () => {
+    set[k] = el.checked; saveSet(set);
+    if (k === 'map') $('map').hidden = !set.map;
+    if (k === 'radar') $('radar').hidden = !set.radar;
+  });
 }
 $('sPenalties').checked = set.penalties;
 $('sPenalties').addEventListener('change', () => { set.penalties = $('sPenalties').checked; race.penaltiesEnabled = set.penalties; saveSet(set); });
 $('map').hidden = !set.map;
+$('radar').hidden = !set.radar;
 // Dégâts : effectif = config room en multi, réglage perso sinon ; en multi la case est grisée (l'hôte décide)
-const damageEnabled = multiplayer ? cfg.damage !== false : set.damage !== false;
-$('sDamage').checked = damageEnabled;
-if (multiplayer) $('sDamage').closest('label').classList.add('disabled');
-else $('sDamage').addEventListener('change', () => { set.damage = $('sDamage').checked; saveSet(set); });
-
-$('sPenalties').checked = set.penalties;
-$('sPenalties').addEventListener('change', () => { set.penalties = $('sPenalties').checked; race.penaltiesEnabled = set.penalties; saveSet(set); });
-$('map').hidden = !set.map;
+// dégâts : cfg.damage (vient du menu, solo ou CLM) prime sur set.damage ; en multi c'est l'hôte qui décide
+const damageEnabled = cfg.damage !== false;
 $('setBtn').addEventListener('click', () => { $('setPanel').hidden = !$('setPanel').hidden; });
 const views = [['rear', '3e personne'], ['close', '3e personne rapprochée'], ['cockpit', 'Cockpit'], ['front', 'Avant']];
 const setView = (step = 0) => {
@@ -400,7 +400,7 @@ if (btnEditor && testInfo) {
       sessionStorage.removeItem('little-turismo-test');
       sessionStorage.removeItem('little-turismo-loading');
       localStorage.removeItem(LIVE_KEY);
-    } catch {}
+    } catch { }
     location.href = 'index.html#' + (testInfo.type === 'car' ? 'designer' : 'tdesigner');
   });
 }
@@ -655,8 +655,19 @@ $('again').addEventListener('click', () => {
   location.reload();
 });
 
+let fpsCount = 0, fpsLast = performance.now();
+//const fpsEl = $('fpsLog');
+
 function frame(ts) {
   requestAnimationFrame(frame);
+  fpsCount++;
+  const fpsNow = performance.now();
+  if (fpsNow - fpsLast >= 250) {
+    const curFps = Math.round((fpsCount * 1000) / (fpsNow - fpsLast));
+    //if (fpsEl) fpsEl.textContent = curFps + ' FPS';
+    fpsCount = 0;
+    fpsLast = fpsNow;
+  }
   const dt = (paused && !multiplayer) ? 0 : Math.min(.1, (ts - last) / 1000 || 0); last = ts;
   gameTime += dt;
   if (multiplayer && hostMode && !multiReady) {
@@ -780,6 +791,9 @@ function frame(ts) {
     }
     mp.draw(drv, mapCars);
   }
+  if (set.radar && !race.qualifying) {
+    radar.draw(drv, field.cars);
+  }
   const a = acc / DT, p = drv.prev;
   let camCar = drv;
   me.x = p.x + ((camCar === drv ? drv.x : camCar.x) - p.x) * a; me.y = camCar === drv ? p.y + (drv.y - p.y) * a : camCar.y; me.z = camCar === drv ? p.z + (drv.z - p.z) * a : camCar.z; me.psi = camCar === drv ? p.psi + wrap(drv.psi - p.psi) * a : camCar.psi;
@@ -813,8 +827,22 @@ function frame(ts) {
   }
   if (set.view === 'cockpit') cockpitTick();
   cam.look(cx, cy, cz, tx, ty, tz);
-  if (!shown) { smoke.low = skids.low; skids.begin(dt, cam); smoke.begin(dt, cam); skids.car(0, drv, me); smoke.car(0, drv, me, dt); }
-  if (!shown && !race.qualifying) for (let i = 0; i < field.cars.length; i++) { const o = field.cars[i].ph; if (!o.gone) { skids.car(i + 1, o); smoke.car(i + 1, o, null, dt); } }
+  if (!shown) {
+    smoke.low = skids.low; skids.begin(dt, cam); smoke.begin(dt, cam);
+    skids.car(0, drv, me); smoke.car(0, drv, me, dt);
+    const pEng = playerEngine.failed ? 1.0 : Math.min(1, (dmg.w.hood || 0) * .6 + (dmg.w.nose || 0) * .5);
+    if (pEng > 0.35 || playerEngine.failed) smoke.engine(0, drv, me, pEng, dt);
+  }
+  if (!shown && !race.qualifying) for (let i = 0; i < field.cars.length; i++) {
+    const c = field.cars[i], o = c.ph;
+    if (!o.gone) {
+      skids.car(i + 1, o); smoke.car(i + 1, o, null, dt);
+      const w = c.ai ? c.ai.damage?.w : o.dmo;
+      const isFailed = !!(c.ai?.engine?.failed || c.entry?.dnf);
+      const aiEng = isFailed ? 1.0 : (w ? Math.min(1, (w.hood || 0) * .6 + (w.nose || 0) * .5) : 0);
+      if (aiEng > 0.35 || isFailed) smoke.engine(i + 1, o, null, aiEng, dt);
+    }
+  }
   R.begin(cam, gameTime); R.draw(track);
   if (set.line) R.draw(lineMesh || (lineMesh = R.mesh(buildLine())));
   if (set.brake) drawBrake(R, zoneMesh || (zoneMesh = R.mesh(buildZone())), drv);
@@ -834,8 +862,8 @@ function frame(ts) {
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
   const isCockpit = set.view === 'cockpit';
-  rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);
   rain.draw(cam);
   smoke.draw(cam);
+  rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);   // en dernier : les gouttes du pare-brise lisent la scène 3D déjà complète
 }
 requestAnimationFrame(frame);

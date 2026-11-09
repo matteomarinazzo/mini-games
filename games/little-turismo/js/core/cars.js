@@ -1,4 +1,4 @@
-﻿// Voitures GT low poly : carrosseries lissées (sections Catmull-Rom, flancs à 2 pans), roues dynamiques partagées (pneu à flancs, jante à branches, disque + étrier) qui braquent (angle réel de physics.js) puis roulent, feux stop, livrées procédurales (aplats, bandes, numéros). Un seul mesh par carrosserie (couleur par uniforme). La physique/IA est dans physics.js / ai.js (c.ph ajouté par game.js).
+// Voitures GT low poly : carrosseries lissées (sections Catmull-Rom, flancs à 2 pans), roues dynamiques partagées (pneu à flancs, jante à branches, disque + étrier) qui braquent (angle réel de physics.js) puis roulent, feux stop, livrées procédurales (aplats, bandes, numéros). Un seul mesh par carrosserie (couleur par uniforme). La physique/IA est dans physics.js / ai.js (c.ph ajouté par game.js).
 import { builder } from './track-mesh.js';
 import { TRACK } from './track.js';
 import { playerIndex } from './race.js';
@@ -703,7 +703,11 @@ function one(R, c, q, cam, ph, dt) {
   tg = Math.max(-lim, Math.min(lim, tg)); c.vs += (tg - c.vs) * Math.min(1, dt * 22);
   const fw = (q.x - c.lx) * Math.cos(q.psi) + (q.z - c.lz) * Math.sin(q.psi); if (c.lp && Math.abs(fw) < 20) c.wd += fw; c.lx = q.x; c.lz = q.z; c.lp = 1;
   let bk; if (typeof ph.bk === 'number') bk = ph.bk > .12; else { if (dt > .002) c.bl += (((c.lu - u) / dt > 5 ? 1 : 0) - c.bl) * Math.min(1, dt * 6); c.lu = u; bk = c.bl > .5; }
-  carMatrix(M, q.x, q.y, q.z, q.psi, q.pitch, q.roll, c.sc); R.draw(P.main, M, c.body); R.draw(c.mesh, M); R.draw(P.tl, M, bk ? TLB : TLD);
+  const isWet = (ph.wet || c.wet || R.weather?.wet || 0) > 0.05;
+  const phase = (c.n || 0) * 0.17;
+  const rainFlash = ((performance.now() * 0.001 * 3.6 + phase) % 1) < 0.52;
+  const tlCol = bk ? TLB : (isWet && rainFlash ? TLB : TLD);
+  carMatrix(M, q.x, q.y, q.z, q.psi, q.pitch, q.roll, c.sc); R.draw(P.main, M, c.body); R.draw(c.mesh, M); R.draw(P.tl, M, tlCol);
   if (!c.wr) R.draw(P.wing, M, c.body); if (!c.wf) R.draw(P.front, M, c.body);   // flags posés par drawWear (joueur)
   const near = d2 < 4900;   // LOD : au-delà de 70 m, plus de rétros, étriers, bras ni détails
   if (near) { if (!c.xl) R.draw(P.ml, M, c.body); if (!c.xr) R.draw(P.mr, M, c.body); R.draw(P.det, M); }

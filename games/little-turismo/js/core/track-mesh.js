@@ -33,6 +33,47 @@ export function obox(B, cx, cy, cz, ux, uz, hw, hh, hl, col) {
   }
 }
 
+
+function frustum(B, cx, cz, y0, y1, r0, r1, sides, col) {
+  const step = 6.283185 / sides;
+  for (let k = 0; k < sides; k++) {
+    const a0 = k * step, a1 = (k + 1) * step;
+    const c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
+    const p0 = [cx + r0 * c0, y0, cz + r0 * s0];
+    const p1 = [cx + r0 * c1, y0, cz + r0 * s1];
+    const p2 = [cx + r1 * c1, y1, cz + r1 * s1];
+    const p3 = [cx + r1 * c0, y1, cz + r1 * s0];
+    const cm = (c0 + c1) * 0.5, sm = (s0 + s1) * 0.5;
+    const dy = y1 - y0, dr = r0 - r1;
+    B.quad(p0, p1, p2, p3, col, [cm * dy, dr, sm * dy]);
+  }
+}
+
+function dome(B, cx, cz, yBase, r, h, sides, col) {
+  frustum(B, cx, cz, yBase, yBase + h * 0.55, r * 0.72, r, sides, col);
+  frustum(B, cx, cz, yBase + h * 0.55, yBase + h, r, 0.08, sides, col);
+}
+
+function rockPoly(B, cx, cz, yBase, sc, col) {
+  frustum(B, cx, cz, yBase, yBase + 1.2 * sc, 1.4 * sc, 0.9 * sc, 5, col);
+  frustum(B, cx, cz, yBase + 1.2 * sc, yBase + 2.0 * sc, 0.9 * sc, 0.15 * sc, 5, col);
+}
+
+function palmTree(B, cx, cz, yBase, sc, woodCol, leafCol) {
+  frustum(B, cx, cz, yBase, yBase + 5.2 * sc, 0.28 * sc, 0.16 * sc, 5, woodCol);
+  const nPalms = 6;
+  const tipY = yBase + 4.9 * sc, dropY = yBase + 3.8 * sc;
+  for (let k = 0; k < nPalms; k++) {
+    const a = k * (6.283185 / nPalms);
+    const c = Math.cos(a), s = Math.sin(a);
+    const midX = cx + c * 1.5 * sc, midZ = cz + s * 1.5 * sc;
+    const endX = cx + c * 2.8 * sc, endZ = cz + s * 2.8 * sc;
+    const px = -s * 0.25 * sc, pz = c * 0.25 * sc;
+    B.quad([cx, yBase + 5.3 * sc, cz], [midX - px, tipY, midZ - pz], [midX + px, tipY, midZ + pz], [cx, yBase + 5.3 * sc, cz], leafCol, [0, 1, 0]);
+    B.quad([midX - px, tipY, midZ - pz], [endX, dropY, endZ], [endX, dropY, endZ], [midX + px, tipY, midZ + pz], leafCol, [c * 0.5, 0.5, s * 0.5]);
+  }
+}
+
 export function buildTrackMesh() {
   const { N, P, T, ds, kerbL, kerbR } = TRACK, B = builder(), H = TRACK.half, G = H + GRAVEL;
   // Largeur max des bandes herbe/terre : on ne recouvre jamais une autre portion du circuit (dn = distance à la portion la plus proche, hors voisinage)
@@ -103,10 +144,27 @@ export function buildTrackMesh() {
   obox(B, f.x, f.y + 7.2, f.z, f.tx, f.tz, H + 1.8, .55, .5, beam);
   // décor : tribunes au départ, bannières sur le mur de la ligne droite, arbres / rochers / cactus en bordure
   const stand = (o, sg) => {
-    const base = frameAt(S0 - 20), ux = base.tx, uz = base.tz, cx = base.x + base.rx * sg * o, cz = base.z + base.rz * sg * o;
-    for (let r = 0; r < 4; r++) { const off = o + r * 2.2; obox(B, base.x + base.rx * sg * off + ux * 0, base.y + 1.2 + r * 1.3, base.z + base.rz * sg * off, ux, uz, 1.1, 1.3 + r * .65, 38, hex(r & 1 ? 0xc9272d : 0x2c5aa8)); }
-    obox(B, base.x + base.rx * sg * (o + 5), base.y + 8.2, base.z + base.rz * sg * (o + 5), ux, uz, 5.5, .18, 40, hex(0xe9ecef));
-    for (const e of [-38, 38]) obox(B, base.x + base.rx * sg * (o + 9) + ux * e, base.y + 4, base.z + base.rz * sg * (o + 9) + uz * e, ux, uz, .25, 4, .25, hex(0x30343a));
+    const base = frameAt(S0 - 20), ux = base.tx, uz = base.tz, rx = base.rx * sg, rz = base.rz * sg;
+    const hl = 38, conc = hex(0x8a929e), darkP = hex(0x282c34);
+    // Rampe / soubassement arrière incliné de la tribune (au lieu d'un cube)
+    for (let r = 0; r < 5; r++) {
+      const dist = o + r * 1.7;
+      const yPlat = base.y + 0.6 + r * 1.1;
+      const colSeat = hex(r % 2 === 0 ? 0xc9272d : 0x2c5aa8);
+      // Marche en béton
+      obox(B, base.x + rx * dist, yPlat, base.z + rz * dist, ux, uz, 0.9, 0.25, hl, conc);
+      // Rangée de sièges profilés (dossier + assise)
+      obox(B, base.x + rx * (dist + 0.2), yPlat + 0.45, base.z + rz * (dist + 0.2), ux, uz, 0.35, 0.35, hl - 0.5, colSeat);
+    }
+    // Toit en auvent incliné vers la piste (angle d'auvent aérodynamique)
+    const roofX = base.x + rx * (o + 4.2), roofZ = base.z + rz * (o + 4.2);
+    obox(B, roofX, base.y + 7.8, roofZ, ux, uz, 5.2, 0.16, hl + 1.5, hex(0xe9ecef));
+    // Bandeau frontal publicitaire sur l'auvent
+    obox(B, base.x + rx * (o - 0.6), base.y + 7.4, base.z + rz * (o - 0.6), ux, uz, 0.1, 0.45, hl + 1.5, hex(0xc9272d));
+    // Poteaux arrière fins en acier
+    for (const e of [-hl + 2, 0, hl - 2]) {
+      obox(B, base.x + rx * (o + 8.8) + ux * e, base.y + 4.0, base.z + rz * (o + 8.8) + uz * e, ux, uz, 0.22, 4.0, 0.22, darkP);
+    }
   };
   for (const sd of [-1, 1]) if (sd !== PIT.sg) stand(G + 7, sd);   // pas de tribune du côté des stands
   // gradins aux virages serrés : côté extérieur, seulement si la place est libre
@@ -120,9 +178,20 @@ export function buildTrackMesh() {
       if (!top || dd < 250 || s - last < 350 || o + 12 > Math.min(70, lim(i, sg))) continue;
       last = s; n++;
       const b = frameAt(s), ux = b.tx, uz = b.tz, hl = 24, at = (f) => [b.x + b.rx * sg * f, b.z + b.rz * sg * f];
-      for (let r = 0; r < 3; r++) { const [x, z] = at(o + r * 2.2); obox(B, x, b.y + .9 + r * 1.2, z, ux, uz, 1.1, 1 + r * .6, hl, hex((r + n) & 1 ? 0xc9272d : 0x2c5aa8)); }
-      const [rx, rz] = at(o + 4.4); obox(B, rx, b.y + 6.6, rz, ux, uz, 3.6, .16, hl + 1, hex(0xe9ecef));
-      for (const e of [-hl, hl]) { const [x, z] = at(o + 6.5); obox(B, x + ux * e, b.y + 3.3, z + uz * e, ux, uz, .2, 3.3, .2, hex(0x30343a)); }
+      const conc = hex(0x8a929e), darkP = hex(0x282c34);
+      for (let r = 0; r < 4; r++) {
+        const [x, z] = at(o + r * 1.6);
+        const yP = b.y + 0.5 + r * 0.95;
+        obox(B, x, yP, z, ux, uz, 0.85, 0.22, hl, conc);
+        obox(B, x + b.rx * sg * 0.2, yP + 0.38, z + b.rz * sg * 0.2, ux, uz, 0.32, 0.32, hl - 0.4, hex((r + n) % 2 === 0 ? 0xc9272d : 0x2c5aa8));
+      }
+      const [rx, rz] = at(o + 3.6);
+      obox(B, rx, b.y + 6.4, rz, ux, uz, 3.8, 0.14, hl + 0.8, hex(0xe9ecef));
+      obox(B, at(o - 0.2)[0], b.y + 6.0, at(o - 0.2)[1], ux, uz, 0.1, 0.38, hl + 0.8, hex(0x2c5aa8));
+      for (const e of [-hl + 1, hl - 1]) {
+        const [px, pz] = at(o + 6.2);
+        obox(B, px + ux * e, b.y + 3.2, pz + uz * e, ux, uz, 0.18, 3.2, 0.18, darkP);
+      }
     }
   }
   {   // stands : rangée de garages, box du joueur (vert), panneaux d'entrée / sortie
@@ -151,12 +220,25 @@ export function buildTrackMesh() {
     const hs = hash(i * 3 + sg * 11); if (hs < .3 || (sg === PIT.sg && pitExt(i * ds) > 0)) continue;
     const o = G + 3 + hs * 7; if (o + 5 > Math.min(70, lim(i, sg))) continue;
     const g = frameAt(i * ds), cx = g.x + g.rx * sg * o, cz = g.z + g.rz * sg * o, y = P[i * 3 + 1] - .1 - S[i] * (o - G - .5), sc = .8 + hash(i + 5) * .8, tc = hex(TH.tc), tr = hex(0x5a3d22);
-    const bxy = (h, w, yy, c, ux = 0, uz = 1) => obox(B, cx, y + yy, cz, ux, uz, w, h, w, c);
-    if (TH.tree === 'rock') bxy(.9 * sc, 1.3 * sc, .8 * sc, tc, .8, .6);
-    else if (TH.tree === 'cactus') { bxy(1.8 * sc, .3 * sc, 1.8 * sc, tc); obox(B, cx + .6 * sc, y + 2 * sc, cz, 0, 1, .22 * sc, .7 * sc, .22 * sc, tc); }
-    else if (TH.tree === 'palm') { bxy(3 * sc, .18 * sc, 3 * sc, hex(0x8a6a3a)); for (let a = 0; a < 3; a++) obox(B, cx, y + 6.2 * sc, cz, Math.cos(a * 1.05), Math.sin(a * 1.05), .08, .08, 2 * sc, tc); }
-    else if (TH.tree === 'round') { bxy(1.2 * sc, .2 * sc, 1.2 * sc, tr); bxy(1.8 * sc, 1.6 * sc, 3.2 * sc, tc, .7, .7); }
-    else { bxy(1 * sc, .2 * sc, 1 * sc, tr); bxy(1.5 * sc, 1.7 * sc, 2.4 * sc, tc); bxy(1.3 * sc, 1.2 * sc, 4.2 * sc, tc); bxy(1.1 * sc, .7 * sc, 5.9 * sc, TH.tree === 'snow' ? hex(0xf4f8fb) : tc); }
+    if (TH.tree === 'rock') {
+      rockPoly(B, cx, cz, y, sc, tc);
+    } else if (TH.tree === 'cactus') {
+      frustum(B, cx, cz, y, y + 3.6 * sc, 0.34 * sc, 0.28 * sc, 6, tc);
+      frustum(B, cx + 0.7 * sc, cz, y + 1.4 * sc, y + 2.8 * sc, 0.20 * sc, 0.16 * sc, 6, tc);
+      obox(B, cx + 0.35 * sc, y + 1.4 * sc, cz, 0, 1, 0.18 * sc, 0.18 * sc, 0.35 * sc, tc);
+    } else if (TH.tree === 'palm') {
+      palmTree(B, cx, cz, y, sc, hex(0x7a5a32), tc);
+    } else if (TH.tree === 'round') {
+      frustum(B, cx, cz, y, y + 2.0 * sc, 0.32 * sc, 0.22 * sc, 6, tr);
+      dome(B, cx, cz, y + 1.6 * sc, 1.9 * sc, 2.9 * sc, 7, tc);
+      dome(B, cx + 0.35 * sc, cz - 0.25 * sc, y + 2.7 * sc, 1.4 * sc, 2.2 * sc, 6, sh(tc, 1.15));
+    } else {
+      // Sapins (pine, snow, temperate, forest, dusk) : tronc hexagonal + 3 étages de cônes étagés effilés
+      frustum(B, cx, cz, y, y + 1.8 * sc, 0.26 * sc, 0.18 * sc, 6, tr);
+      frustum(B, cx, cz, y + 1.2 * sc, y + 3.4 * sc, 2.1 * sc, 0.85 * sc, 7, sh(tc, 0.85));
+      frustum(B, cx, cz, y + 2.8 * sc, y + 5.0 * sc, 1.65 * sc, 0.55 * sc, 7, tc);
+      frustum(B, cx, cz, y + 4.4 * sc, y + 6.8 * sc, 1.15 * sc, 0.06 * sc, 7, TH.tree === 'snow' ? hex(0xf4f8fb) : sh(tc, 1.2));
+    }
   }
   const Y = -45, E = 6000, ym = [0, 1, 0], g = hex(TH.far);
   B.quad([-E, Y, -E], [E, Y, -E], [E, Y, E], [-E, Y, E], g, ym);

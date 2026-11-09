@@ -3,7 +3,7 @@
 // niveaux (erreur de ligne, marge de freinage, réaccélération, fautes), attaque / défense par décalage latéral, collisions boîtes.
 // V11+ : tables de vitesse par fiche voiture (adhérence, appui, vmax), les IA peuvent prendre n'importe quelle voiture.
 import { TRACK, frameAt, PIT, pitExt } from './track.js';
-import { stepCar, createCar, getCarWetGripFactor } from './physics.js';
+import { stepCar, createCar, getCarWetGripFactor, WET_PROFILES } from './physics.js';
 import { engineState, engineIncrement } from './engine.js';
 
 const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, LIM = ROAD_HALF - 2.1;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
@@ -48,16 +48,27 @@ function prof(S, lane = 0, wet = 0) {
   const key = (S.id || 'car') + '|' + (S._spec || 0) + '|' + Math.round(wet * 100);
   let p = PR.get(key);
   if (!p) { const wg = getCarWetGripFactor(S.kind || 'gt', wet), g = S.grip * wg, MA = g * Math.min(1 - .2 * S.understeer, (S.rearK || 1) * (1 - .08 * S.oversteer)) * cmOf(S), KA = MA * S.aero / S.mass * CK; p = { MA, KA, TB: {}, VA: {}, KL: {} }; PR.set(key, p); }
-  if (!p.VA[lane]) { const KLn = p.KL[lane] = KLof(lineOf(lane)), VA = new Float32Array(N); for (let i = 0; i < N; i++) { const d = KLn[i] - p.KA; VA[i] = d > 1e-5 ? Math.min(S.vmax, Math.sqrt(p.MA * 9.81 / d)) : S.vmax; } p.VA[lane] = VA; }
+  if (!p.VA[lane]) {
+    const KLn = p.KL[lane] = KLof(lineOf(lane)), VA = new Float32Array(N);
+    const profKind = WET_PROFILES[S.kind || 'gt'] || WET_PROFILES.gt;
+    const aquaLimit = wet > 0.05 ? (profKind.aquaKmh / 3.6) * 1.05 : S.vmax;
+    for (let i = 0; i < N; i++) {
+      const d = KLn[i] - p.KA;
+      const vc = d > 1e-5 ? Math.min(S.vmax, Math.sqrt(p.MA * 9.81 / d)) : S.vmax;
+      VA[i] = Math.min(vc, aquaLimit);
+    }
+    p.VA[lane] = VA;
+  }
   return p;
 }
 function table(S, p, margin, lane = 0, wet = 0) {
-  const key = margin + '|' + lane; if (p.TB[key]) return p.TB[key];
+  const effMargin = margin * (1 + (wet || 0) * 0.22);
+  const key = Math.round(effMargin * 1000) + '|' + lane; if (p.TB[key]) return p.TB[key];
   const KLn = p.KL[lane], t = Float32Array.from(p.VA[lane]);
   const q = RM / cmOf(S);   // capacité latérale réelle / capacité utilisée par la table : cercle de friction pendant le freinage (trail-braking)
   for (let r = 0; r < 2; r++) for (let i = N - 1; i >= 0; i--) {
     const vn = t[(i + 1) % N], ay = vn * vn * KLn[i], am = (p.MA * 9.81 + p.KA * vn * vn) * q, f = Math.sqrt(Math.max(.04, 1 - (ay / am) ** 2));
-    const v = Math.sqrt(vn * vn + 2 * decelAt(S, vn, wet) * f / margin * ds); if (v < t[i]) t[i] = v;
+    const v = Math.sqrt(vn * vn + 2 * decelAt(S, vn, wet) * f / effMargin * ds); if (v < t[i]) t[i] = v;
   }
   return (p.TB[key] = t);
 }
@@ -68,31 +79,80 @@ export const brakeTable = (S, wet = 0) => table(S, prof(S, 0, wet), LEVELS.exper
 // Allure par tronçon de 20 m (pm ≤ 1) : une sortie de piste en vitesse ralentit les 100 m qui précèdent. Apprise une fois par (voiture, niveau)
 // par un tour fantôme au premier createAi, puis mémorisée : les IA n'ont plus à « découvrir » les virages en course.
 const NB = Math.ceil(LEN / 20), PMS = new Map(), bin = (x) => Math.floor((((x % LEN) + LEN) % LEN) / 20) % NB;
-function learnSetup(S, level, q = false, wet = 0) { const key = S.id + '|' + level + (q ? '|q' : '') + (wet ? '|w' + Math.round(wet * 100) : ''); return { key, pm: PMS.get(key) }; }
+
+function getCachedPm(key) {
+  let pm = PMS.get(key);
+  if (pm) return pm;
+  try {
+    const raw = localStorage.getItem('lt_ai_pm_' + key);
+    if (raw) {
+      const arr = raw.split(',').map(Number);
+      if (arr.length === NB && !arr.some(Number.isNaN)) {
+        pm = new Float32Array(arr);
+        PMS.set(key, pm);
+        return pm;
+      }
+    }
+  } catch {}
+  return null;
+}
+
+function saveCachedPm(key, pm) {
+  PMS.set(key, pm);
+  try {
+    const raw = Array.from(pm).map((v) => Math.round(v * 1000) / 1000).join(',');
+    localStorage.setItem('lt_ai_pm_' + key, raw);
+  } catch {}
+}
+
+function learnSetup(S, level, q = false, wet = 0) {
+  const trk = TRACK.id || 'trk';
+  const key = `${trk}|${S.id}|${level}${q ? '|q' : ''}${wet > 0 ? '|w' + Math.round(wet * 100) : ''}`;
+  return { key, pm: getCachedPm(key) };
+}
+
 function learnRun(S, level, q, pm, seed, run, wet = 0) {
   const ph = createCar(S, TRACK.startIdx * ds - 14, 0, wet), g = mk(ph, level, seed, pm, q), all = [ph];
   let tick = 0, p = 0, prev = ph.s;
-  while (tick < 60 * 60 * 5 && p < 2 * LEN) { stepField([g], all, tick++, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
-  return !g.ev;
+  const maxDist = (wet > 0 ? 1.25 : 2) * LEN;
+  while (tick < 60 * 60 * 3 && p < maxDist) { stepField([g], all, tick++, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
+  return g.ev === 0;
 }
+
 function learn(S, level, q = false, wet = 0) {
   const { key, pm: cached } = learnSetup(S, level, q, wet); if (cached) return cached;
   const pm = new Float32Array(NB).fill(1); PMS.set(key, pm);
-  outer: for (const seed of [3, 17, 41, 59]) for (let run = 0; run < 8; run++)if (learnRun(S, level, q, pm, seed, run, wet)) break outer;
+  outer: for (const seed of [3, 17]) for (let run = 0; run < 2; run++) if (learnRun(S, level, q, pm, seed, run, wet)) break outer;
+  saveCachedPm(key, pm);
   return pm;
 }
+
 async function learnRunAsync(S, level, q, pm, seed, wet = 0) {
   const ph = createCar(S, TRACK.startIdx * ds - 14, 0, wet), g = mk(ph, level, seed, pm, q), all = [ph]; let tick = 0, p = 0, prev = ph.s;
-  while (tick < 60 * 60 * 5 && p < 2 * LEN) { const end = Math.min(tick + 480, 60 * 60 * 5); for (; tick < end && p < 2 * LEN; tick++) { stepField([g], all, tick, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; } await new Promise(r => setTimeout(r, 0)); }
-  return !g.ev;
+  const maxDist = (wet > 0 ? 1.25 : 2) * LEN;
+  while (tick < 60 * 60 * 3 && p < maxDist) {
+    const end = Math.min(tick + 720, 60 * 60 * 3);
+    for (; tick < end && p < maxDist; tick++) { stepField([g], all, tick, 1 / 60, false); let d = ph.s - prev; prev = ph.s; d -= LEN * Math.round(d / LEN); p += d; }
+    await new Promise(r => setTimeout(r, 0));
+  }
+  return g.ev === 0;
 }
+
 /** Async initialization used by the loading screen: each expensive learning attempt yields to the browser. */
 export async function createAiAsync(ph, level, seed, qualifying = false, laps = 0, progress = () => { }) {
   const wet = ph.wet || 0;
   const { key, pm: cached } = learnSetup(ph.sheet, level, !!qualifying, wet); let pm = cached;
   if (!pm) {
     pm = new Float32Array(NB).fill(1); PMS.set(key, pm); let done = false, n = 0;
-    outer: for (const sd of [3, 17, 41, 59]) for (let run = 0; run < 8; run++) { done = await learnRunAsync(ph.sheet, level, !!qualifying, pm, sd, wet); progress(++n, 32); if (done) break outer; }
+    const seeds = [3, 17], maxRuns = wet > 0 ? 2 : 3, totalRuns = seeds.length * maxRuns;
+    outer: for (const sd of seeds) for (let run = 0; run < maxRuns; run++) {
+      done = await learnRunAsync(ph.sheet, level, !!qualifying, pm, sd, wet);
+      progress(++n, totalRuns);
+      if (done) break outer;
+    }
+    saveCachedPm(key, pm);
+  } else {
+    progress(1, 1);
   }
   const a = mk(ph, level, seed, pm, !!qualifying); a.laps = laps; return a;
 }
@@ -274,12 +334,20 @@ function decide(a, all, t) {
   const slip = Math.abs(Math.atan2(c.w, Math.max(Math.abs(c.u), 2)));
   frameAt(s, F); const headingError = Math.abs(wrap(c.psi - Math.atan2(F.tz, F.tx)));
   // allure apprise : une sortie de piste en vitesse ralentit les 100 m qui précèdent — seulement si la sortie est « propre » (aucune voiture autour : pas de faute due au trafic)
-  if (c.surf >= 2) { if (!a.off && v > 8) { if (near === 0) for (let d = -140; d <= 20; d += 20) { const b = bin(s + d); a.pm[b] = Math.max(.7, a.pm[b] - .08); } a.ev++; } a.off = true; } else a.off = false;
+  if (c.surf >= 2) { if (!a.off && v > 8) { if (near === 0) for (let d = -140; d <= 20; d += 20) { const b = bin(s + d); a.pm[b] = Math.max(.65, a.pm[b] - (c.wet > 0 ? .12 : .08)); } a.ev++; } a.off = true; } else a.off = false;
   let vt = (late ? a.t2 : a.t1)[ti]; vt *= (L.speed * a.skill) * (1 - (1 - a.pm[bin(ti * ds)]) * cl((.98 * a.sheet.vmax - vt) / (.15 * a.sheet.vmax), 0, 1));
   vt *= 1 - Math.min(.48, failure.grip * .42 + failure.aero * .08 + cl(slip - .12, 0, .8) * .22 + cl(headingError - .25, 0, 1.2) * .2);
   const sharp = cl((kmx - .0035) / .0025, 0, 1); vt *= 1 - (L.speed >= 1 ? .035 : .07) * sharp;   // virage serré : vitesse un peu plus basse pour garder l'adhérence
+  if (c.wet > 0) {
+    vt *= 1 - (c.wet || 0) * (sharp > 0 ? .08 : .03);
+    if (slip > .06 || headingError > .15) {
+      vt *= 1 - Math.min(.35, cl(slip - .06, 0, .4) * .8 + cl(headingError - .15, 0, .6) * .5);
+    }
+  }
   if (st) { vt *= 1 - .1 * cl(1 - a.dist / 700, 0, 1) * cl(kf * 250, 0, 1); vt *= 1 - Math.min(.3, near * .06) * cl(kmx * 180, 0, 1); }   // départ : en virage dans le peloton, on garde de la marge
-  const sat = Math.abs(a.inp.steer); if (sat > .7) vt *= 1 - Math.min(.35, (sat - .7) * 1.3);   // sous-virage : volant presque à fond = on lève le pied
+  const sat = Math.abs(a.inp.steer);
+  const satThresh = c.wet > 0 ? .55 : .7;
+  if (sat > satThresh) vt *= 1 - Math.min(.4, (sat - satThresh) * (c.wet > 0 ? 1.6 : 1.3));   // sous-virage : volant presque à fond = on lève le pied
   if (c.surf === 2) vt = Math.min(vt * .54, 13);
   if (!pz && (c.surf === 3 || Math.abs(c.lat) > ROAD_HALF - .6)) vt = Math.min(vt, 8);
   if (a.recover > 0) vt = Math.min(vt, 12 + Math.max(0, 5 - Math.abs(headingError) * 5));
@@ -290,30 +358,58 @@ function decide(a, all, t) {
 /** Pilotage à chaque pas physique : pure pursuit + pédales vers vt. */
 function drive(a, dt) {
   const c = a.ph, S = c.sheet, L = a.L, i = a.inp, v = Math.max(c.u, 0);
+  const wet = c.wet || 0;
   const dx = a.tx - c.x, dz = a.tz - c.z, ang = wrap(Math.atan2(dz, dx) - c.psi), dist = Math.max(4, Math.hypot(dx, dz));
   // Pure pursuit avec correction de cap : le terme d'angle évite le cas sin(pi)=0
   // qui laissait une voiture tournée vers l'arrière tourner en rond sans correction.
   const heading = cl(ang, -1.6, 1.6), curvature = 2 * Math.sin(ang) / dist + .72 * heading / dist;
   // Retour de lacet : si la voiture tourne moins que demandé (sous-virage), on demande davantage de braquage au lieu de dériver vers l'extérieur.
-  const yawFix = v > 8 && !(a.guard > 0) && a.recover <= 0 && !a.atk && c.surf < 2 ? cl(curvature - c.r / v, -.04, .04) * YG : 0;
+  const yawFix = v > 8 && !(a.guard > 0) && a.recover <= 0 && !a.atk && c.surf < 2 ? cl(curvature - c.r / v, -.04, .04) * (wet > 0 ? YG * .7 : YG) : 0;
   const roadAngle = Math.atan((S.a + S.b) * (curvature + yawFix)), speedScale = 1 + (v / S.steerV) ** 2;
   const slipAngle = Math.atan2(c.w, Math.max(Math.abs(c.u), 2));
   // Contre-braquage et amortissement du lacet, surtout utiles quand les pneus
   // retrouvent soudainement de l'adhérence à la sortie du gravier.
-  const stabilise = cl(slipAngle * .62 - c.r * .07, -.32, .32);
+  const stabilise = cl(slipAngle * (wet > 0 ? .85 : .62) - c.r * (wet > 0 ? .12 : .07), -.38, .38);
   let st = (a.rec > 0 ? -1 : 1) * cl((roadAngle + stabilise) * speedScale / S.steerMax, -1, 1);
   if (a.recover > 0) st = cl(st, -.62, .62); // pas de coup de volant quand les roues retrouvent le bitume
-  i.steer += cl(st - i.steer, -14 * dt, 14 * dt);
+  const steerRate = wet > 0 ? Math.max(9, 14 - wet * 4) : 14;
+  i.steer += cl(st - i.steer, -steerRate * dt, steerRate * dt);
   const e = a.vt - v, slip = Math.abs(Math.atan2(c.w, Math.max(c.u, 3)));
   let th = 0, br = 0;
   if (e < -.5) br = cl(-e / 1.2, 0, 1); else th = a.vt >= S.vmax * .96 ? 1 : cl(.15 + e / 3, 0, 1);   // ligne droite : plein gaz jusqu'à la vitesse max
-  th *= (1 - (1 - L.aggr) * cl(Math.abs(i.steer) * 3, 0, 1)) * cl(1 - (slip - .1) * 4, .12, 1);
+
+  // ABS & modulation de freinage sous la pluie
+  if (wet > 0 && br > 0) {
+    const maxBrake = Math.max(.66, 1 - wet * .24);
+    br = Math.min(br, maxBrake);
+    const steerMag = Math.abs(i.steer);
+    if (steerMag > .12) br *= Math.max(.48, 1 - steerMag * .5 * wet);
+    if (slip > .07) br *= Math.max(.42, 1 - (slip - .07) * 4 * wet);
+  }
+
+  // Antipatinage (TCS) sous la pluie
+  if (wet > 0) {
+    const steerMag = Math.abs(i.steer);
+    if (steerMag > .1) th *= Math.max(.35, 1 - steerMag * 1.3 * wet);
+    const slipThresh = .045;
+    if (slip > slipThresh) {
+      th *= Math.max(.2, 1 - (slip - slipThresh) * 7 * wet);
+    }
+  } else {
+    th *= (1 - (1 - L.aggr) * cl(Math.abs(i.steer) * 3, 0, 1)) * cl(1 - (slip - .1) * 4, .12, 1);
+  }
+
   if (a.wait > 0) { a.wait = Math.max(0, a.wait - dt); th *= .65; }
   if (a.vt < .5 && v < 2 && a.rec <= 0) { th = .22; br = 0; }
   if (a.pit === 2) { th = 0; br = 1; }   // arrêté au box
   if (a.recover > 0 && v > a.vt + .4) { th = 0; br = Math.max(br, cl((v - a.vt) / 2.2, .25, .9)); }
+  if (c.surf >= 2 && wet > 0) th = Math.min(th, .3);
   i.rev = a.rec > 0; if (i.rev) { a.rec -= dt; th = 0; br = 1; }
-  i.throttle += cl(th - i.throttle, -8 * dt, 6 * dt); i.brake += cl(br - i.brake, -9 * dt, 9 * dt);
+
+  const thRate = wet > 0 ? Math.max(2.8, 6 - wet * 3) : 6;
+  const brRate = wet > 0 ? Math.max(4.5, 9 - wet * 3.5) : 9;
+  i.throttle += cl(th - i.throttle, -8 * dt, thRate * dt);
+  i.brake += cl(br - i.brake, -9 * dt, brRate * dt);
 }
 
 // collisions voitures : boîtes orientées (SAT), séparation, choc inélastique (perte de vitesse), petite rotation si choc de côté

@@ -351,10 +351,21 @@
                     <div class="lbl">Météo
                         <select class="theme-select" id="weather"></select>
                     </div>
+                    <label class="damage-toggle"><input type="checkbox" id="soloDamage" checked><span>Dégâts</span></label>
                 </div>
                 <button class="btn" id="launch" type="button">Lancer</button>
             </div>
-            <!-- Configuration Multijoueur -->
+            <!-- Configuration Contre la montre -->
+            <div id="clmConfig" hidden>
+                <div class="form">
+                    <div class="lbl">Météo
+                        <select class="theme-select" id="clmWeather"></select>
+                    </div>
+                    <label class="damage-toggle"><input type="checkbox" id="clmDamage" checked><span>Dégâts</span></label>
+                </div>
+                <button class="btn" id="clmLaunch" type="button">Lancer</button>
+            </div>
+                        <!-- Configuration Multijoueur -->
             <div id="multiConfig" hidden>
                 <p class="multi-intro" style="margin-bottom: 16px; color: var(--pale);">Crée une room (tu choisiras le
                     circuit) avec

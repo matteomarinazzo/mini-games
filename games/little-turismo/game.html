@@ -47,7 +47,54 @@
         <div class="cockpit-glass"></div>
         <div class="cockpit-pillar left"></div>
         <div class="cockpit-pillar right"></div>
-        <div class="cockpit-mirror"></div>
+        <div class="cockpit-helmet" aria-hidden="true">
+            <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="helmGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#040608" />
+                        <stop offset="15%" stop-color="#090c12" />
+                        <stop offset="85%" stop-color="#090c12" />
+                        <stop offset="100%" stop-color="#040608" />
+                    </linearGradient>
+                    <linearGradient id="zylonGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(8,12,18,0.96)" />
+                        <stop offset="100%" stop-color="rgba(18,24,36,0.75)" />
+                    </linearGradient>
+                </defs>
+                <!-- Remplissage complet du casque avec ouverture de visière affinée et panoramique -->
+                <path fill="url(#helmGrad)" fill-rule="evenodd" d="
+                    M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z
+                    M 70 75
+                    C 250 60, 750 60, 930 75
+                    C 960 78, 970 105, 965 140
+                    L 965 860
+                    C 965 905, 935 935, 890 940
+                    C 750 930, 250 930, 110 940
+                    C 65 935, 35 905, 35 860
+                    L 35 140
+                    C 30 105, 40 78, 70 75 Z
+                " />
+                <!-- Joint d'étanchéité fin noir mat autour de la visière -->
+                <path fill="none" stroke="#161c26" stroke-width="3" d="
+                    M 70 75
+                    C 250 60, 750 60, 930 75
+                    C 960 78, 970 105, 965 140
+                    L 965 860
+                    C 965 905, 935 935, 890 940
+                    C 750 930, 250 930, 110 940
+                    C 65 935, 35 905, 35 860
+                    L 35 140
+                    C 30 105, 40 78, 70 75 Z
+                " />
+                <!-- Bandeau pare-soleil Zylon F1 très fin en haut de l'ouverture -->
+                <path fill="url(#zylonGrad)" stroke="rgba(255,255,255,0.18)" stroke-width="1" d="
+                    M 72 75
+                    C 250 60, 750 60, 928 75
+                    L 925 102
+                    C 750 87, 250 87, 75 102 Z
+                " />
+            </svg>
+        </div>
         <div class="cp-front">
             <i class="cp-wheel l"></i><i class="cp-wheel r"></i>
             <div class="cp-body"></div>
@@ -199,6 +246,7 @@
         </div>
     </div>
     <button class="exit" id="pauseBtn" type="button" title="Pause" aria-label="Pause">❚❚</button>
+    <!--<div class="fps-log" id="fpsLog" aria-label="FPS en temps réel">-- FPS</div>-->
     <div class="msg" id="ctxLost" hidden>Contexte graphique perdu… restauration en cours.</div>
     <div class="msg" id="noGl" hidden>WebGL2 n'est pas disponible sur cet appareil.</div>
     <div class="hud" id="hud">
@@ -216,6 +264,7 @@
     </div>
     <div class="board" id="board" aria-label="Classement"></div>
     <canvas class="map" id="map" aria-label="Plan du circuit"></canvas>
+    <canvas class="radar" id="radar" width="136" height="136" aria-label="Minimap de proximité"></canvas>
     <canvas class="dmg" id="dmg" width="104" height="168" aria-label="État de la voiture"></canvas>
     <div class="lights" id="lightsWrap">
         <div id="lights"><i></i><i></i><i></i><i></i><i></i></div>
@@ -252,8 +301,8 @@
                 <div id="setPanel" hidden>
                     <label class="tg"><input type="checkbox" id="sLine"> Ligne idéale</label>
                     <label class="tg"><input type="checkbox" id="sBrake"> Zone de freinage</label>
-                    <label class="tg"><input type="checkbox" id="sDamage"> Dégâts</label>
                     <label class="tg"><input type="checkbox" id="sMap"> Minimap</label>
+                    <label class="tg"><input type="checkbox" id="sRadar"> Minimap de proximité</label>
                     <label class="tg"><input type="checkbox" id="sPenalties"> Pénalités</label>
                     <div class="view-picker"><span>Point de vue</span>
                         <div><button type="button" id="viewPrev" aria-label="Point de vue précédent">◀</button><b

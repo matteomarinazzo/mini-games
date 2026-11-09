@@ -392,12 +392,28 @@ button.exit {
     display: none
 }
 
+.radar {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 136px;
+    height: 136px;
+    z-index: 15;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+.radar[hidden] {
+    display: none;
+}
+
 .dmg {
     position: fixed;
     left: max(10px, env(safe-area-inset-left, 0px));
     top: calc(200px + 180px + 12px);
-    width: 110px;
-    height: 183px;
+    width: 132px;
+    height: 220px;
     z-index: 11;
     pointer-events: none;
     border-radius: 8px;
@@ -410,6 +426,11 @@ button.exit {
         top: max(46px, calc(10px + env(safe-area-inset-top, 0px)));
         width: 115px !important;
         height: auto !important;
+    }
+    .radar {
+        top: max(6px, env(safe-area-inset-top, 0px));
+        width: 110px !important;
+        height: 110px !important;
     }
 
     .dmg {
@@ -1192,7 +1213,8 @@ tr.me td {
     aspect-ratio: 1;
     transform: translateX(-50%);
     filter: drop-shadow(0 4px 8px #000);
-    will-change: transform
+    will-change: transform;
+    z-index: 9;
 }
 
 .wheel svg {
@@ -1243,7 +1265,7 @@ tr.me td {
 }
 
 /* monoplace (vue F1) : halo + pylône, carrosserie aux couleurs de la voiture, gros pneus, grand volant */
-.cockpit[data-kind=open] :is(.cockpit-glass, .cockpit-pillar, .cockpit-mirror, .dial, .dash-info) {
+.cockpit[data-kind=open] :is(.cockpit-glass, .cockpit-pillar, .dial, .dash-info) {
     display: none
 }
 
@@ -1412,6 +1434,12 @@ html.compact .board div {
     grid-template-columns: 14px 1fr auto;
     gap: 4px;
     padding: 1px 4px
+}
+
+html.compact .radar {
+    width: 105px !important;
+    height: 105px !important;
+    top: max(4px, env(safe-area-inset-top, 0px));
 }
 
 html.compact .map {
@@ -1654,8 +1682,6 @@ html.tiny .steer .tw {
     width: 68px;
 }
 
-html.tiny .pedals {}
-
 html.tiny .pedal.gas {
     width: 76px;
 }
@@ -1799,6 +1825,8 @@ html.tiny .pedal.brake {
     filter: grayscale(1)
 }
 
+
+
 /* ── Météo : gouttes sur le pare-brise / visière (vue cockpit) ── */
 .cockpit-drops {
     position: absolute;
@@ -1809,11 +1837,20 @@ html.tiny .pedal.brake {
     pointer-events: none;
     border-radius: 0 0 35% 35%/0 0 10% 10%;
     opacity: 0;
-    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .45));
     transition: opacity .6s;
 }
+
 body.rain .cockpit-drops {
     opacity: 1;
+}
+
+/* Vue visière (open/wedge) : le canvas couvre toute la hauteur visible (pas de pare-brise) */
+.cockpit[data-kind=open] .cockpit-drops,
+.cockpit[data-kind=wedge] .cockpit-drops {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 
 /* Indicateur météo dans le HUD */
@@ -1822,4 +1859,186 @@ body.rain .cockpit-drops {
     margin-left: 6px;
     opacity: .85;
     vertical-align: middle;
+}
+
+/* CLM config dans l'écran race */
+#clmConfig .form {
+    margin-bottom: 10px;
+}
+#clmConfig .tg {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+
+/* ── Météo : gouttes sur le pare-brise / visière (vue cockpit) ── */
+.cockpit-drops {
+    position: absolute;
+    inset: 0 0 16% 0;
+    width: 100%;
+    height: 84%;
+    z-index: 8;
+    pointer-events: none;
+    border-radius: 0 0 35% 35%/0 0 10% 10%;
+    opacity: 0;
+    transition: opacity .6s;
+}
+
+body.rain .cockpit-drops {
+    opacity: 1;
+}
+
+/* Vue visière (open/wedge) : le canvas couvre toute la hauteur visible (pas de pare-brise) */
+.cockpit[data-kind=open] .cockpit-drops,
+.cockpit[data-kind=wedge] .cockpit-drops {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+/* Indicateur météo dans le HUD */
+.hud-weather {
+    font-size: 14px;
+    margin-left: 6px;
+    opacity: .85;
+    vertical-align: middle;
+}
+
+/* CLM config dans l'écran race */
+#clmConfig .form {
+    margin-bottom: 10px;
+}
+#clmConfig .tg {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+/* ─── Vue Casque F1 : EXCLUSIF aux monoplaces (open) ─── */
+/* Pour toutes les autres voitures (GT, Rallye, Proto, etc.) : casque strictement masqué, pare-brise d'origine préservé */
+.cockpit-helmet {
+    display: none !important;
+}
+
+/* Monoplace F1 uniquement :
+   Le casque et la visière (donc les gouttes de pluie) sont la PREMIÈRE couche (devant le volant et le halo) */
+.cockpit[data-kind=open] .cockpit-helmet {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 13 !important;
+    overflow: hidden;
+}
+
+.cockpit[data-kind=open] .cockpit-helmet svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Reflet subtil et transparent de la visière en polycarbonate */
+.cockpit[data-kind=open] .cockpit-helmet::after {
+    content: "";
+    position: absolute;
+    inset: 6% 3.5% 6% 3.5%;
+    background: linear-gradient(118deg, transparent 25%, rgba(255, 255, 255, 0.03) 30%, rgba(200, 230, 255, 0.05) 34%, transparent 38%);
+    pointer-events: none;
+    border-radius: 16px;
+}
+
+/* ── Hiérarchie des z-index pour TOUTES les voitures fermées (GT, Rallye, etc.) :
+   Le pare-brise et les gouttes sont derrière tous les éléments intérieurs ── */
+.cockpit-glass {
+    z-index: 2 !important;
+}
+
+.cockpit-drops {
+    position: absolute;
+    inset: 0 0 16% 0;
+    width: 100%;
+    height: 84%;
+    z-index: 3 !important;
+    pointer-events: none;
+    border-radius: 0 0 35% 35%/0 0 10% 10%;
+    opacity: 0;
+    transition: opacity .6s;
+}
+
+body.rain .cockpit-drops {
+    opacity: 1;
+}
+
+.cockpit-pillar {
+    z-index: 6 !important;
+}
+
+.cockpit-mirror {
+    z-index: 6 !important;
+}
+
+.dashboard {
+    z-index: 7 !important;
+}
+
+.cluster, .dial, .dash-info {
+    z-index: 9 !important;
+}
+
+.wheel {
+    z-index: 10 !important;
+}
+
+/* ── Hiérarchie des z-index pour MONOPLACE F1 :
+   Ordre de l'arrière vers l'avant : Pneus/Nez (4) -> Halo (5) -> Dashboard (6) -> Volant (7) -> Visière/Gouttes (12) -> Casque (13) ── */
+.cockpit[data-kind=open] :is(.cp-front, .f1gl) {
+    z-index: 4 !important;
+}
+
+.cockpit[data-kind=open] :is(.cockpit-halo, .cp-pylon) {
+    z-index: 5 !important;
+}
+
+.cockpit[data-kind=open] .dashboard {
+    z-index: 6 !important;
+}
+
+.cockpit[data-kind=open] :is(.wheel, .cluster) {
+    z-index: 7 !important;
+}
+
+/* Gouttes sur la visière en F1 : PREMIÈRE COUCHE avec le casque, devant le volant et le halo */
+.cockpit[data-kind=open] .cockpit-drops {
+    inset: 5.5% 3% 5.5% 3%;
+    width: 94%;
+    height: 89%;
+    border-radius: 24px;
+    z-index: 12 !important;
+}
+
+/* Log FPS en temps réel sur l'écran */
+.fps-log {
+    position: fixed;
+    top: 14px;
+    left: 56px;
+    z-index: 25;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(10, 14, 24, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #4ade80;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }

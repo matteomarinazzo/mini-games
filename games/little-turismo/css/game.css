@@ -1192,7 +1192,8 @@ tr.me td {
     aspect-ratio: 1;
     transform: translateX(-50%);
     filter: drop-shadow(0 4px 8px #000);
-    will-change: transform
+    will-change: transform;
+    z-index: 9;
 }
 
 .wheel svg {
@@ -1654,8 +1655,6 @@ html.tiny .steer .tw {
     width: 68px;
 }
 
-html.tiny .pedals {}
-
 html.tiny .pedal.gas {
     width: 76px;
 }
@@ -1809,9 +1808,9 @@ html.tiny .pedal.brake {
     pointer-events: none;
     border-radius: 0 0 35% 35%/0 0 10% 10%;
     opacity: 0;
-    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .45));
     transition: opacity .6s;
 }
+
 body.rain .cockpit-drops {
     opacity: 1;
 }

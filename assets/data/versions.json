@@ -1,7 +1,17 @@
 {
-    "currentVersion": "1.52.2026-11-07",
-    "lastUpdate": "2026-11-07",
+    "currentVersion": "1.53.2026-11-09",
+    "lastUpdate": "2026-11-09",
     "history": [
+        {
+            "version": "1.53.2026-11-09",
+            "date": "2026-11-09",
+            "changes": [
+                "Little Turismo : Amélioration du pilotage des IA sous la pluie (ABS pour éviter le blocage des roues, contrôle de traction TCS évitant le patinage en virage, contre-braquage renforcé)",
+                "Little Turismo : Mise en cache persistante (localStorage) de l'apprentissage des IA par circuit, voiture, météo et difficulté pour des relances de course immédiates",
+                "Little Turismo : Accélération majeure de l'entraînement des IA (itérations réduites et par blocs optimisés)",
+                "Little Turismo : Feux arrière de sécurité clignotants sous la pluie (cadence FIA 3.6 Hz) pour toutes les voitures, allumés en fixe lors du freinage"
+            ]
+        },
         {
             "version": "1.52.2026-11-07",
             "date": "2026-11-07",

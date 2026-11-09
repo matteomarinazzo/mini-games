@@ -400,7 +400,7 @@ if (btnEditor && testInfo) {
       sessionStorage.removeItem('little-turismo-test');
       sessionStorage.removeItem('little-turismo-loading');
       localStorage.removeItem(LIVE_KEY);
-    } catch {}
+    } catch { }
     location.href = 'index.html#' + (testInfo.type === 'car' ? 'designer' : 'tdesigner');
   });
 }
@@ -834,8 +834,8 @@ function frame(ts) {
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
   const isCockpit = set.view === 'cockpit';
-  rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);
   rain.draw(cam);
   smoke.draw(cam);
+  rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);   // en dernier : les gouttes du pare-brise lisent la scène 3D déjà complète
 }
 requestAnimationFrame(frame);

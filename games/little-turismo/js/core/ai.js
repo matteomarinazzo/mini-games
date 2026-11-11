@@ -6,7 +6,7 @@ import { TRACK, frameAt, PIT, pitExt } from './track.js';
 import { stepCar, createCar, getCarWetGripFactor, WET_PROFILES } from './physics.js';
 import { engineState, engineIncrement } from './engine.js';
 
-const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, LIM = ROAD_HALF - 2.1;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
+const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, KT = ROAD_HALF < 5, WS = KT ? .58 : 1, LS = KT ? .48 : 1, LIM = ROAD_HALF - (KT ? 1.15 : 2.1);   // KT : piste étroite (karting) → distances latérales (WS) et longitudinales (LS) réduites ;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
 const LNF = 1, KC = Float32Array.from(K, (k) => Math.abs(k) * .85);   // LNF : part de la ligne idéale suivie ; KC : courbure utile de l'axe
 /** Ligne de course suivie par les IA (décalage latéral, + = droite) : c'est aussi celle affichée au joueur. */
 export const aiLine = TRACK.qualifyingLine || Float32Array.from(ideal, (v) => Math.max(-(LIM - .2), Math.min(LIM - .2, v * LNF)));
@@ -159,7 +159,7 @@ export async function createAiAsync(ph, level, seed, qualifying = false, laps = 
 /** qualifying = true : qualifications (voitures fantômes) → l'IA ignore le trafic et roule seule sur la ligne optimisée. */
 export const createAi = (ph, level, seed, qualifying = false, laps = 0) => { const wet = ph.wet || 0, a = mk(ph, level, seed, learn(ph.sheet, level, !!qualifying, wet), !!qualifying); a.laps = laps; return a; };   // laps > 0 : arrêts au stand possibles
 // Voies fixes des IA (m, + = droite), espacées de 1,9 m : deux voitures voisines ne roulent jamais côte à côte sur la même trajectoire.
-const LW = 1.1, laneOf = (lat, seed) => (lat > .5 ? LW : lat < -.5 ? -LW : seed % 2 ? LW : -LW);
+const LW = 1.1 * WS, laneOf = (lat, seed) => (lat > .5 ? LW : lat < -.5 ? -LW : seed % 2 ? LW : -LW);
 function mk(ph, level, seed, pm, q = false) {
   const wet = ph.wet || 0, L = LEVELS[level] || LEVELS.normal, r = rng(seed * 7919 + 13), sheet = ph.sheet = withSpec(ph.sheet, L.spec), lane = q ? 0 : laneOf(ph.lat, seed), p = prof(sheet, lane, wet);
   return {
@@ -229,9 +229,9 @@ function pitSpeed(a, vt, v, am, d) {
   return m;
 }
 
-const F = {}, COR = 1.95, AVD = 1.2, THR = 2.3, DV = 2, STD = 700;   // COR : demi-largeur du couloir « voiture devant » (m) ; AVD : poussée latérale d'évitement ; THR : TTC (s) sous lequel on freine ; DV : écart de vitesse (m/s) justifiant un dépassement ; STD : distance de la phase de départ (m)
+const F = {}, COR = 1.95 * WS, AVD = 1.2 * WS, THR = 2.3, DV = 2, STD = 700;   // COR : demi-largeur du couloir « voiture devant » (m) ; AVD : poussée latérale d'évitement ; THR : TTC (s) sous lequel on freine ; DV : écart de vitesse (m/s) justifiant un dépassement ; STD : distance de la phase de départ (m)
 /** Vitesse max derrière `lead` à `gap` m (pare-chocs) : v telle qu'on freine jusqu'à sa vitesse avant la marge. Départ : suivi plus serré. */
-const follow = (a, gap, lead) => { const st = a.dist < 700, m = st ? 4 : 5; return lead.u + (gap > m ? Math.sqrt(2 * (st ? 6 : 5.5) * (gap - m)) : -(m - gap) * 1.6); };
+const follow = (a, gap, lead) => { const st = a.dist < 700, m = (st ? 4 : 5) * LS; return lead.u + (gap > m ? Math.sqrt(2 * (st ? 6 : 5.5) * (gap - m)) : -(m - gap) * 1.6); };
 function free(all, c, ah, s, ga, cand) {
   if (Math.abs(cand) > LIM) return false;
   for (const o of all) {
@@ -239,7 +239,7 @@ function free(all, c, ah, s, ga, cand) {
     const d = wrapS(o.s - s);
     // Il faut un couloir libre sur toute la distance nécessaire au dépassement,
     // avec une marge derrière pour ne pas couper la route à une voiture qui arrive.
-    if (d > -9 && d < Math.max(ga + 8, 26) && Math.abs(o.lat - cand) < 2.25) return false;
+    if (d > -9 && d < Math.max(ga + 8, 26) && Math.abs(o.lat - cand) < 2.25 * WS) return false;
   }
   return true;
 }
@@ -259,11 +259,11 @@ function decide(a, all, t) {
     const o = all[k]; if (o === c || o.gone || o.ghost) continue;
     const d = wrapS(o.s - s); if (d > 150 || d < -60) continue;
     const dl = o.lat - c.lat, adl = dl < 0 ? -dl : dl, ad = d < 0 ? -d : d;
-    if (ad < 11 && adl < 3.8) { const w = cl((11 - ad) / 8, 0, 1) * cl((3.8 - adl) / 2.7, 0, 1); push += (dl > 0 ? -1 : dl < 0 ? 1 : (c.lat > 0 ? -1 : 1)) * w; pw += w; }
-    if (ad < 16 && adl < 5) near++;
-    if (d > .3 && d < 5.5 && adl < 2.2 && a.dist > 150 && !(a.atk && o === a.tgt)) yc = Math.min(yc, Math.max(o.u - .5, v - .9));   // côte à côte légèrement devant : celle de derrière lève le pied
+    if (ad < 11 * LS && adl < 3.8 * WS) { const w = cl((11 * LS - ad) / (8 * LS), 0, 1) * cl((3.8 * WS - adl) / (2.7 * WS), 0, 1); push += (dl > 0 ? -1 : dl < 0 ? 1 : (c.lat > 0 ? -1 : 1)) * w; pw += w; }
+    if (ad < 16 * LS && adl < 5 * WS) near++;
+    if (d > .3 && d < 5.5 * LS && adl < 2.2 * WS && a.dist > 150 && !(a.atk && o === a.tgt)) yc = Math.min(yc, Math.max(o.u - .5, v - .9));   // côte à côte légèrement devant : celle de derrière lève le pied
     if (d > 0 && d < ga && adl < COR) { ga = d; ah = o; }
-    if (d < 0 && -d < gb && adl < 2.6) { gb = -d; bh = o; }
+    if (d < 0 && -d < gb && adl < 2.6 * WS) { gb = -d; bh = o; }
   }
   let kmx = 0; for (let k = 0; k < 14; k++) kmx = Math.max(kmx, Math.abs(K[(idx + k) % N]));   // courbure max sur ~55 m
   let kf = 0; for (let k = 0, n = Math.min(60, Math.round((25 + v * 1.6) / ds)); k < n; k++) kf = Math.max(kf, Math.abs(K[(idx + k) % N]));   // courbure max sur la distance de dépassement
@@ -286,14 +286,14 @@ function decide(a, all, t) {
   } else a.recover = Math.max(0, a.recover - dt);
   if (a.fault && a.fault.k === 1) base += a.fault.s * .35;
   if (pit) { const dl = wrapS(s + look - S0), b = cl((280 + PIT.back + dl) / 200, 0, 1); base = base * (1 - b) + PIT.sg * (ROAD_HALF + pitX(a, dl)) * b; if (pz) { a.recover = 0; a.fault = null; } }   // stands : trajectoire dédiée, rejointe progressivement
-  if (!a.joined) { if (a.dist > 120 && (q || !all.some((o) => o !== c && !o.gone && !o.ghost && Math.abs(wrapS(o.s - s)) < 7 && Math.abs(o.lat - base) < 2.1))) a.joined = true; else base = a.gl; }   // 120 m en file, puis ligne si la place est libre
+  if (!a.joined) { if (a.dist > 120 && (q || !all.some((o) => o !== c && !o.gone && !o.ghost && Math.abs(wrapS(o.s - s)) < 7 * LS && Math.abs(o.lat - base) < 2.1 * WS))) a.joined = true; else base = a.gl; }   // 120 m en file, puis ligne si la place est libre
   // bloquée : voiture plus lente devant, tout près, alors que la vitesse voulue (sans trafic) est plus haute
   const vfree = a.vf;
-  if (!st && ah && ga - 4.6 < 30 + v * .25 && vfree > ah.u + 1.2) a.blk += dt; else a.blk = Math.max(0, a.blk - 2 * dt);
+  if (!st && ah && ga - 4.6 * LS < 30 + v * .25 && vfree > ah.u + 1.2) a.blk += dt; else a.blk = Math.max(0, a.blk - 2 * dt);
   let ov = null, cap = 1e9, late = false;
-  const am = Math.max(6, decelAt(a.sheet, v, c.wet || 0)), g0 = (st ? 3 : 1.2) + .03 * v;
+  const am = Math.max(6, decelAt(a.sheet, v, c.wet || 0)), g0 = (st ? 3 : 1.2) * LS + .03 * v;
   if (ah) {
-    const gap = ga - 4.6, clo = v - ah.u, forced = a.blk > 2;
+    const gap = ga - 4.6 * LS, clo = v - ah.u, forced = a.blk > 2;
     // Dépassement : choisir une voie complète et la tenir jusqu'à être devant. Normal : ligne droite dégagée ; forcé (bloquée > 2 s) : dès que le virage n'est pas serré.
     if (!pit && !a.atk && L.attack && a.wait <= 0 && a.joined && a.dist > 260 && (forced ? kmx < .0055 && kf < .007 : !noPassZone && kmx < .0045 && kf < .0055)) {
       const slower = ah.u < vfree - (forced ? 1.5 : DV);
@@ -302,10 +302,10 @@ function decide(a, all, t) {
       if (slower && dStr > v * ((gap + 9) / Math.max(1.2, clo) + 1) + 50 && gap > Math.max(0, clo * (ah.u < 8 ? .35 : .6)) && gap < (ah.u < 8 ? 120 : Math.max(40, clo * 3.5))) {
         const sides = [cs || 1, -(cs || 1)];
         const choices = sides.map((side) => {
-          const cand = cl(ah.lat + side * 2.9, -LIM, LIM), edge = ROAD_HALF - Math.abs(cand);
+          const cand = cl(ah.lat + side * 2.9 * WS, -LIM, LIM), edge = ROAD_HALF - Math.abs(cand);
           const lineCost = Math.abs(cand - aiLine[j]);
-          return { side, cand, score: lineCost + Math.max(0, 2.1 - edge) * 5 + (side === (cs || 1) ? 0 : .35) };
-        }).filter((q2) => Math.abs(q2.cand - ah.lat) > 2.15 && free(all, c, ah, s, ga, q2.cand)).sort((x, y) => x.score - y.score);
+          return { side, cand, score: lineCost + Math.max(0, 2.1 * WS - edge) * 5 + (side === (cs || 1) ? 0 : .35) };
+        }).filter((q2) => Math.abs(q2.cand - ah.lat) > 2.15 * WS && free(all, c, ah, s, ga, q2.cand)).sort((x, y) => x.score - y.score);
         if (choices.length) { a.atk = choices[0].side; a.tgt = ah; a.atkT = 8; a.passLat = choices[0].cand; a.blk = 0; }
       }
     }
@@ -317,10 +317,10 @@ function decide(a, all, t) {
   if (a.atk && !pit) {
     const d = wrapS(a.tgt.s - s); a.atkT -= dt;
     if (d < -7 || d > 48 || a.atkT <= 0 || (d > 1 && noPassZone)) { a.atk = 0; a.tgt = null; }   // abandon : freinage à venir et pas encore à hauteur
-    else { ov = cl(a.passLat ?? a.tgt.lat + a.atk * 2.9, -LIM, LIM); late = false; if (a.tgt.u < 8) cap = Math.min(cap, 18 + Math.sqrt(2 * 9 * Math.max(0, d - 4.6))); }   // voiture arrêtée : on la dépasse à vitesse réduite, freinage progressif
+    else { ov = cl(a.passLat ?? a.tgt.lat + a.atk * 2.9 * WS, -LIM, LIM); late = false; if (a.tgt.u < 8) cap = Math.min(cap, 18 + Math.sqrt(2 * 9 * Math.max(0, d - 4.6 * LS))); }   // voiture arrêtée : on la dépasse à vitesse réduite, freinage progressif
   }
   if (!bh || gb > 40) { if ((a.calm += dt) > 3) a.defDone = false; } else a.calm = 0;
-  const avoid = pz ? 0 : pw > 0 ? cl(push / pw * Math.min(1.4, pw) * (a.atk ? .55 : AVD), -1.8, 1.8) : 0;
+  const avoid = pz ? 0 : pw > 0 ? cl(push / pw * Math.min(1.4, pw) * (a.atk ? .55 : AVD), -1.8 * WS, 1.8 * WS) : 0;
   cap = Math.min(cap, yc);
   // Garde-fou de bord : position latérale prévue dans ~0,5 s. Trop près du bord → retour vers le centre, visée courte, on lève le pied.
   frameAt(s, F); const he = wrap(c.psi - Math.atan2(F.tz, F.tx)), pred = c.lat + (c.u * Math.sin(he) + c.w * Math.cos(he)) * .5;
@@ -413,16 +413,17 @@ function drive(a, dt) {
 }
 
 // collisions voitures : boîtes orientées (SAT), séparation, choc inélastique (perte de vitesse), petite rotation si choc de côté
-const HL = 2.25, HW = .93, AX = new Float64Array(8);
+const HL = 2.25, HW = .93, KHL = 1, KHW = .62, AX = new Float64Array(8);
 function collide(all) {
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
     const A = all[i], B = all[j], dx = B.x - A.x, dz = B.z - A.z; if (A.gone || B.gone || A.ghost || B.ghost || dx * dx + dz * dz > 26) continue;
     const ca = Math.cos(A.psi), sa = Math.sin(A.psi), cb = Math.cos(B.psi), sb = Math.sin(B.psi);
     AX[0] = ca; AX[1] = sa; AX[2] = -sa; AX[3] = ca; AX[4] = cb; AX[5] = sb; AX[6] = -sb; AX[7] = cb;
+    const kA = A.sheet?.kind === 'kart', kB = B.sheet?.kind === 'kart', hlA = kA ? KHL : HL, hwA = kA ? KHW : HW, hlB = kB ? KHL : HL, hwB = kB ? KHW : HW;
     let best = 1e9, nx = 0, nz = 0;
     for (let k = 0; k < 8; k += 2) {
       const ux = AX[k], uz = AX[k + 1];
-      const pa = HL * Math.abs(ca * ux + sa * uz) + HW * Math.abs(-sa * ux + ca * uz), pb = HL * Math.abs(cb * ux + sb * uz) + HW * Math.abs(-sb * ux + cb * uz);
+      const pa = hlA * Math.abs(ca * ux + sa * uz) + hwA * Math.abs(-sa * ux + ca * uz), pb = hlB * Math.abs(cb * ux + sb * uz) + hwB * Math.abs(-sb * ux + cb * uz);
       const d = dx * ux + dz * uz, pen = pa + pb - Math.abs(d); if (pen <= 0) { best = -1; break; }
       if (pen < best) { best = pen; nx = d < 0 ? -ux : ux; nz = d < 0 ? -uz : uz; }
     }

@@ -1920,7 +1920,7 @@ body.rain .cockpit-drops {
     font-size: 14px;
 }
 
-/* ─── Vue Casque F1 : EXCLUSIF aux monoplaces (open) ─── */
+/* ─── Vue Casque F1 : monoplaces (open) et karts (kart) ─── */
 /* Pour toutes les autres voitures (GT, Rallye, Proto, etc.) : casque strictement masqué, pare-brise d'origine préservé */
 .cockpit-helmet {
     display: none !important;
@@ -1928,7 +1928,7 @@ body.rain .cockpit-drops {
 
 /* Monoplace F1 uniquement :
    Le casque et la visière (donc les gouttes de pluie) sont la PREMIÈRE couche (devant le volant et le halo) */
-.cockpit[data-kind=open] .cockpit-helmet {
+.cockpit:is([data-kind=open], [data-kind=kart]) .cockpit-helmet {
     display: block !important;
     position: absolute;
     inset: 0;
@@ -1937,7 +1937,7 @@ body.rain .cockpit-drops {
     overflow: hidden;
 }
 
-.cockpit[data-kind=open] .cockpit-helmet svg {
+.cockpit:is([data-kind=open], [data-kind=kart]) .cockpit-helmet svg {
     display: block;
     width: 100%;
     height: 100%;
@@ -1945,7 +1945,7 @@ body.rain .cockpit-drops {
 }
 
 /* Reflet subtil et transparent de la visière en polycarbonate */
-.cockpit[data-kind=open] .cockpit-helmet::after {
+.cockpit:is([data-kind=open], [data-kind=kart]) .cockpit-helmet::after {
     content: "";
     position: absolute;
     inset: 6% 3.5% 6% 3.5%;

@@ -9,7 +9,7 @@ export const playerIndex = (total) => (total <= 6 ? total - 1 : Math.floor(total
 export const fmt = (t) => { if (t == null || !isFinite(t)) return '–'; const ms = Math.round(t * 1000), m = Math.floor(ms / 60000), s = (ms - m * 60000) / 1000; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(3); };
 
 /** entries[0] = joueur. Chaque entrée : { n, name, ph (physique), start (place de départ 1-based), player? } */
-export function createRace({ laps, entries, waitAll = false, qualifying = false, penaltiesEnabled = true, multi = false, training = false }) {
+export function createRace({ laps, entries, waitAll = false, qualifying = false, penaltiesEnabled = true, multi = false, training = false, noPit = false }) {
   const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0, dnf: false, dnfReady: false }; });
   const GAP_LAPS = Math.max(2, Math.min(1002, Math.ceil(Number.isFinite(laps) ? laps : 20) + 2));
   const gapTimes = new Float64Array(E.length * GAP_LAPS * GAP_SENSOR_COUNT); gapTimes.fill(NaN);
@@ -107,7 +107,7 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
       if (R.clock < 1) { R.phase = 'intro'; R.lights = 0; R.msg = 'Préparez-vous'; return; }
       const STEP = .7, all = 1 + 4 * STEP;                                  // un feu toutes les 0,7 s, puis attente variable
       R.phase = 'lights'; R.lights = Math.min(5, Math.floor((R.clock - 1) / STEP) + 1); R.msg = '';
-      if (thr > .3 && !R.falseStart) { R.falseStart = true; if (!qualifying) { R.dt = true; R.penaltyMsg = 'Faux départ : drive-through à effectuer'; R.penaltyMsgT = 4; } }  // en qualif : noté mais pas de DT
+      if (thr > .3 && !R.falseStart) { R.falseStart = true; if (!qualifying) { if (noPit) R.addPenalty(10, 'Faux départ'); else { R.dt = true; R.penaltyMsg = 'Faux départ : drive-through à effectuer'; R.penaltyMsgT = 4; } } }  // en qualif : noté mais pas de DT ; noPit (kart, pas de stands) : +10 s au lieu du drive-through
       if (R.clock >= all + R.hold) { R.phase = 'go'; R.lights = 0; R.goMsg = 1.2; }
       return;
     } else if (R.phase !== 'go') return;

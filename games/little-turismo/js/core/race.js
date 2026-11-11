@@ -6,11 +6,13 @@ const LEN = TRACK.length, S0 = TRACK.startIdx * TRACK.ds, GAP_SENSOR_COUNT = Mat
 const wrapS = (d) => d - LEN * Math.round(d / LEN);
 /** Rang de grille du joueur (0 = pole) : milieu de grille, dernier s'il y a peu d'IA. */
 export const playerIndex = (total) => (total <= 6 ? total - 1 : Math.floor(total / 2));
+/** Chrono par défaut des classements : tirets à la place des chiffres tant qu'aucun tour n'est terminé. */
+export const fmtDash = (t) => (t == null || !isFinite(t) ? '-:--.---' : fmt(t));
 export const fmt = (t) => { if (t == null || !isFinite(t)) return '–'; const ms = Math.round(t * 1000), m = Math.floor(ms / 60000), s = (ms - m * 60000) / 1000; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(3); };
 
 /** entries[0] = joueur. Chaque entrée : { n, name, ph (physique), start (place de départ 1-based), player? } */
 export function createRace({ laps, entries, waitAll = false, qualifying = false, penaltiesEnabled = true, multi = false, training = false, noPit = false }) {
-  const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0, dnf: false, dnfReady: false }; });
+  const E = entries.map((e) => { const p = e.ph.s - S0; return { ...e, p0: p, p, maxP: p, prevS: e.ph.s, k: 0, lapStart: null, best: null, last: null, fin: null, fl: 0, fp: 0, dnf: false, dnfReady: false, penBase: 0 }; });
   const GAP_LAPS = Math.max(2, Math.min(1002, Math.ceil(Number.isFinite(laps) ? laps : 20) + 2));
   const gapTimes = new Float64Array(E.length * GAP_LAPS * GAP_SENSOR_COUNT); gapTimes.fill(NaN);
   const observedS = new Float64Array(E.length), observedP = new Float64Array(E.length), observedT = new Float64Array(E.length);
@@ -123,11 +125,11 @@ export function createRace({ laps, entries, waitAll = false, qualifying = false,
         while (e.fin === null && e.maxP >= e.k * LEN) {
           const tc = R.t - dt * (1 - (e.k * LEN - old) / (e.maxP - old));  // instant de franchissement interpolé
           if (e.k >= 1) {
-            const pen = e.player ? R.lapPenalty : (e.lapPenalty || 0);
+            const pen = e.player ? R.lapPenalty : e.human ? Math.max(0, (e.timePenalty || 0) - (e.penBase || 0)) : (e.lapPenalty || 0);   // humain distant : pénalités reçues pendant CE tour = écart du cumul reçu (pas de report d'un tour sur l'autre)
             e.last = tc - e.lapStart + pen; if (e.best === null || e.last < e.best) e.best = e.last;
             if (e.player) { R.lapMsg = 'Tour ' + e.k + ' · ' + fmt(e.last) + (e.best === e.last ? ' · Meilleur tour personnel !' : ''); R.lapMsgT = 3.2; }
           }
-          e.lapStart = tc; if (e.player) R.lapPenalty = 0; else e.lapPenalty = 0;
+          e.lapStart = tc; if (e.player) R.lapPenalty = 0; else if (e.human) e.penBase = e.timePenalty || 0; else e.lapPenalty = 0;
           // arrivée : tous les tours, ou dès le premier passage de ligne une fois que le premier a fini (course seulement)
           if (e.fin === null && (e.k === laps || (!qualifying && R.firstFin))) {
             const pen = e.player ? R.timePenalty : (e.timePenalty || 0);

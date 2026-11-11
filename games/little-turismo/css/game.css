@@ -2042,3 +2042,76 @@ body.rain .cockpit-drops {
     user-select: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
+
+/* Plaques de nom des pilotes en multi : position + nom au-dessus de la voiture (style F1) */
+.tags {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    overflow: hidden;
+    pointer-events: none
+}
+.tag {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    display: none;
+    will-change: transform
+}
+.tag .pill {
+    position: absolute;
+    left: 0;
+    bottom: 7px;
+    display: flex;
+    align-items: stretch;
+    height: 22px;
+    border-radius: 4px;
+    color: #fff;
+    background: rgba(10, 14, 26, .78);
+    border: 1px solid rgba(255, 255, 255, .25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+    font: 700 13px/22px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%) scale(var(--k, 1));
+    transform-origin: 50% 100%
+}
+.tag .pill::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: rgba(10, 14, 26, .78);
+    border-bottom: 0
+}
+.tag b {
+    min-width: 22px;
+    padding: 0 6px;
+    text-align: center;
+    color: #0b0f1a;
+    background: #ff7a1a;
+    border-radius: 3px 0 0 3px
+}
+.tag.f b {
+    color: #fff;
+    background: #e5382a
+}
+.tag.r b {
+    background: #34c759
+}
+.tag span {
+    max-width: 170px;
+    padding: 0 9px 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+@media (max-width: 700px) {
+    .tag .pill {
+        height: 19px;
+        font-size: 11px;
+        line-height: 19px
+    }
+}

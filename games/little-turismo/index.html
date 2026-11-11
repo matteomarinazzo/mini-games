@@ -128,8 +128,8 @@
                 <label>Tours <output id="roomLapsValue">3</output>
                     <input type="range" id="roomLaps" min="1" max="20" step="1" value="3">
                 </label>
-                <label>Difficulté de l'IA
-                    <select class="theme-select" id="roomDiff"></select>
+                <label>Difficulté de l'IA <output id="roomDiffValue">Moyen</output>
+                    <input type="range" id="roomDiff" min="1" max="4" step="1" value="2">
                 </label>
                 <label>Météo
                     <select class="theme-select" id="roomWeather"></select>
@@ -345,13 +345,16 @@
                         <input id="ai" type="range" min="0" max="19" step="1">
                         <div class="range-ends"><span>0</span><span>19</span></div>
                     </div>
-                    <div class="lbl">Difficulté
-                        <select class="theme-select" id="diff"></select>
+                    <div class="lbl"><span class="setting-label">Difficulté <output class="range-value"
+                                id="diffValue">Moyen</output></span>
+                        <input id="diff" type="range" min="1" max="4" step="1" value="2">
+                        <div class="range-ends"><span>Facile</span><span>Expert</span></div>
                     </div>
                     <div class="lbl">Météo
                         <select class="theme-select" id="weather"></select>
                     </div>
-                    <label class="damage-toggle"><input type="checkbox" id="soloDamage" checked><span>Dégâts</span></label>
+                    <label class="damage-toggle"><input type="checkbox" id="soloDamage"
+                            checked><span>Dégâts</span></label>
                 </div>
                 <button class="btn" id="launch" type="button">Lancer</button>
             </div>
@@ -361,11 +364,12 @@
                     <div class="lbl">Météo
                         <select class="theme-select" id="clmWeather"></select>
                     </div>
-                    <label class="damage-toggle"><input type="checkbox" id="clmDamage" checked><span>Dégâts</span></label>
+                    <label class="damage-toggle"><input type="checkbox" id="clmDamage"
+                            checked><span>Dégâts</span></label>
                 </div>
                 <button class="btn" id="clmLaunch" type="button">Lancer</button>
             </div>
-                        <!-- Configuration Multijoueur -->
+            <!-- Configuration Multijoueur -->
             <div id="multiConfig" hidden>
                 <p class="multi-intro" style="margin-bottom: 16px; color: var(--pale);">Crée une room (tu choisiras le
                     circuit) avec
@@ -422,7 +426,7 @@
                 </div>
                 <div class="rcard"><i>🌱</i>
                     <div><b>Pistes</b>
-                        <p>Le <strong>gravier</strong> et l’herbe ralentissent. Vibreurs : léger bruit, usure du fond.
+                        <p>Le <strong>gravier</strong> ralentit. Vibreurs : léger bruit, usure du fond.
                         </p>
                     </div>
                 </div>
@@ -463,7 +467,8 @@
                 </div>
                 <div class="rcard"><i>⚙️</i>
                     <div><b>Paramètres</b>
-                        <p>Dans la pause : ligne idéale, zone de freinage, minimap, pénalités et point de vue.</p>
+                        <p>Dans el menu pause : ligne idéale, zone de freinage, minimap, minimap de proximité (radar),
+                            pénalités, étiquettes des pilotes et point de vue.</p>
                     </div>
                 </div>
             </div>

@@ -25,6 +25,16 @@ const f3 = (t) => { const m = Math.floor(t / 60), s = t - m * 60; return m + ':'
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 // entrée choisie : bordure d'accent sur la carte (circuits, voitures)
 const markCards = (el, id) => { for (const b of el.querySelectorAll('.gcard')) { const on = b.dataset.id === id; b.style.borderColor = on ? 'var(--acc)' : ''; b.style.boxShadow = on ? '0 0 0 2px var(--acc)' : ''; b.setAttribute('aria-pressed', on); } };
+// Karting : circuit karting → karts uniquement ; circuit intérieur → pas de météo ; kart ou circuit karting → pas de dégâts (coches masquées)
+const kcat = (id) => String((CIRCUITS.find((c) => c.id === id) || {}).cat || '');
+const isKartCar = (id) => !!CARS[id] && CARS[id].kind === 'kart';
+function applyKarting() {
+  const kt = kcat(cfg.circuit).startsWith('karting'), ind = kcat(cfg.circuit) === 'karting', dm = kt || isKartCar(cfg.car);
+  for (const [id, off] of [['weather', ind], ['clmWeather', ind]]) { const e = $(id); if (!e) continue; e.disabled = off; (e.closest('label, .field') || e).style.display = off ? 'none' : ''; }
+  for (const e of document.querySelectorAll('input[id*="amage"]')) { e.disabled = dm; (e.closest('label') || e.parentElement).style.setProperty('display', dm ? 'none' : '', 'important'); } for (const g of [$('vgrid'), $('mgrid')]) for (const b of g.querySelectorAll('.gcard')) b.style.display = kt && !isKartCar(b.dataset.id) ? 'none' : '';
+  for (const h of $('vgrid').querySelectorAll('h2')) h.style.display = kt && !/^Kart/.test(h.textContent) ? 'none' : '';
+  $('tabPub').style.display = kt ? 'none' : '';
+}
 function show() {
   const id = cur();
   if (id !== 'circuits') multiCreatePending = false;
@@ -49,11 +59,12 @@ function show() {
     if ($('multiConfig')) $('multiConfig').hidden = !isMulti;
     if ($('raceScreenTitle')) $('raceScreenTitle').textContent = isMulti ? 'Multijoueur' : isClm ? 'Contre la montre' : 'Course';
     $('sumC').parentElement.hidden = isMulti;
-    
+
     syncClm();
     sync();
   }
   if (id === 'records') renderRecords();
+  applyKarting();
 }
 // --- Records : onglets Contre la montre (par circuit, toutes voitures) / Course (tour + place par circuit) / Meilleurs tours (meilleure voiture par circuit)
 let recTab = 'clm', recCircuit = null;
@@ -116,7 +127,7 @@ function cardEl(it, preview, stats, pick) {
 // Circuits : aperçu dessiné depuis la spline de chaque circuit (intégrés et perso)
 const cPrev = (x, c) => { const t = trackOf(c.id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); };
 const cStats = (c) => { const s = stats(trackOf(c.id)); return [['Longueur', (s.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', s.turns], ['Dénivelé', Math.round(s.climb) + ' m']]; };
-const cPick = (c) => { cfg.circuit = c.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
+const cPick = (c) => { cfg.circuit = c.id; cfg = sanitize(cfg); saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
 for (const [k, n] of CIRCUIT_CATS) { const l = CIRCUITS.filter((c) => c.cat === k); if (!l.length) continue; const h = document.createElement('h2'); h.textContent = n + ' (' + l.length + ')'; h.style.cssText = 'grid-column:1/-1;flex:0 0 100%;width:100%;margin:14px 0 2px;font-size:15px;opacity:.85'; $('cgrid').appendChild(h); grid($('cgrid'), l, cPrev, cStats, cPick); }
 
 // Voitures : aperçu vectoriel (vue de dessus, sans image, livrée et proportions de la fiche) et stats lues dans les fiches physiques
@@ -356,6 +367,18 @@ function carPreview(x, c) {
     x.fillStyle = D; rr(x, -88, -48, 24, 96, 3);
     x.fillStyle = col; rr(x, -86, -46, 20, 92, 2);
     x.fillStyle = ac; rr(x, -92, -49, 30, 4, 2); rr(x, -92, 45, 30, 4, 2); rr(x, -82, -2, 22, 4, 1);
+  } else if (k === 'kart') {
+    // ─── KART ───
+    wh([[34, -34, 24, 16], [34, 34, 24, 16], [-30, -38, 30, 22], [-30, 38, 30, 22]]);
+    x.fillStyle = D; rr(x, -52, -14, 18, 28, 3); rr(x, 38, -4, 18, 8, 2);                 // moteur, colonne
+    x.fillStyle = col; rr(x, 30, -24, 42, 48, 10);                                          // nez
+    rr(x, -22, -34, 50, 14, 5); rr(x, -22, 20, 50, 14, 5);                                  // pontons
+    x.fillStyle = ac; rr(x, 52, -6, 18, 12, 3);                                             // plaque
+    x.fillStyle = '#23262d'; rr(x, -26, -16, 40, 32, 8);                                    // baquet
+    x.fillStyle = WHT; x.beginPath(); x.arc(-8, 0, 9, 0, 6.28); x.fill();                   // casque
+    x.fillStyle = '#1884f0'; rr(x, -2, -5, 4, 10, 1);
+    x.fillStyle = D; rr(x, 20, -12, 4, 24, 1);                                              // volant
+    x.fillStyle = '#c8d2de'; rr(x, 74, -30, 5, 60, 2); rr(x, -64, -32, 5, 64, 2);          // pare-chocs
   } else if (k === 'thrust') {
     // ─── THRUST SSC ───
     wh([[44, -46, 26, 11], [44, 46, 26, 11], [-84, -14, 26, 11], [-84, 14, 26, 11]]);
@@ -693,7 +716,7 @@ const validTrack = d => d && typeof d === 'object' && safeName(d.name, 24) && Nu
   Array.isArray(d.pts) && d.pts.length >= 6 && d.pts.length <= 96 && d.pts.every(p => Array.isArray(p) && p.length === 2 && p.every(v => Number.isFinite(v) && Math.abs(v) <= 2000)) &&
   Array.isArray(d.elev) && d.elev.length === d.pts.length && d.elev.every(v => Number.isFinite(v) && v >= -200 && v <= 300) &&
   (!d.corners || (Array.isArray(d.corners) && (d.corners.length === 0 || d.corners.length === d.pts.length) && d.corners.length <= 96 && d.corners.every(c => c && ['smooth', 'sharp', 'round', 'hairpin'].includes(c.type) && Number.isFinite(c.radius) && c.radius >= 0 && c.radius <= 250)));
-const validCar = d => d && typeof d === 'object' && safeName(d.name, 32) && ['gt', 'wedge', 'proto', 'rally', 'open', 'drag', 'thrust'].includes(d.kind) &&
+const validCar = d => d && typeof d === 'object' && safeName(d.name, 32) && ['gt', 'wedge', 'proto', 'rally', 'open', 'drag', 'thrust', 'kart'].includes(d.kind) &&
   /^#[0-9a-f]{6}$/i.test(d.color) && /^#[0-9a-f]{6}$/i.test(d.accent) &&
   ['vmax', 'ch', 'mass', 'grip', 'aero', 'bal'].every(k => { const [lo, hi] = getSpecRange(d.kind, k); return Number.isFinite(d[k]) && d[k] >= lo && d[k] <= hi; });
 function packLocal(kind, d) {
@@ -858,6 +881,7 @@ function renderRoom(d) {
   $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; $('roomDiff').value = dc.diff || 'normal';
   if ($('roomWeather')) $('roomWeather').value = dc.weather || 'dry';
   if ($('roomDamage')) $('roomDamage').checked = dc.damage !== false;
+  for (const [id, off] of [['roomWeather', kcat(dc.circuit) === 'karting'], ['roomDamage', kcat(dc.circuit).startsWith('karting')]]) { const e = $(id); if (e) { e.disabled = off; (e.closest('label, .field') || e).style.display = off ? 'none' : ''; } }
   fitRoomRanges();
   $('roomPlayers').textContent = '';
   for (const [uid, p] of players) {
@@ -1018,13 +1042,15 @@ $('joinRoom').addEventListener('click', async () => {
     if (!d || d.state !== 'waiting') throw new Error('missing');
     if (d.players?.[Net.N.uid]) {
       if (token !== roomJoinToken) return;
-      const updated = await Net.update(code, { [`players/${Net.N.uid}/car`]: cfg.car, [`players/${Net.N.uid}/carAsset`]: assetRef('car', cfg.car) });
+      const jc = kcat(d.config?.circuit).startsWith('karting') && !isKartCar(cfg.car) ? 'kart_frelon' : cfg.car;   // salon karting : kart obligatoire
+      const updated = await Net.update(code, { [`players/${Net.N.uid}/car`]: jc, [`players/${Net.N.uid}/carAsset`]: assetRef('car', jc) });
       if (!updated) throw new Error('join');
       if (token !== roomJoinToken) return;
       Net.saveSession({ code, uid: Net.N.uid, going: false }); enterRoom(code, await Net.getRoom(code)); return;
     }
     if (Object.keys(d.players || {}).length >= (d.maxHumans || 20)) throw new Error('full');
-    const r = await Net.join(code, { name, score: 0, car: cfg.car, carAsset: assetRef('car', cfg.car), joined: Net.now(), lastSeen: Net.now(), away: false });
+    const jc = kcat(d.config?.circuit).startsWith('karting') && !isKartCar(cfg.car) ? 'kart_frelon' : cfg.car;
+    const r = await Net.join(code, { name, score: 0, car: jc, carAsset: assetRef('car', jc), joined: Net.now(), lastSeen: Net.now(), away: false });
     if (r !== true) throw new Error('join');
     if (token !== roomJoinToken) { await Net.leave(code, false); return; }
     Net.saveSession({ code, uid: Net.N.uid, going: false });

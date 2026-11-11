@@ -53,6 +53,7 @@ const WH = {
   rally: { f: [.84, 1.4, .38, .32], r: [.84, -1.35, .38, .32], rc: [.85, .65, .25], cc: [.9, .1, .1], s: 0 },
   open: { f: [.98, 1.5, .33, .36], r: [.98, -1.3, .37, .46], rc: [.62, .64, .68], cc: [.25, .25, .28], s: 0, a: 1 },
   drag: { f: [.38, 2.7, .22, .12], r: [.95, -1.5, .5, .48], rc: [.7, .7, .72], cc: [.5, .5, .5], s: 1, a: 1 },
+  kart: { f: [.56, .55, .13, .13], r: [.6, -.5, .15, .2], rc: [.78, .8, .84], cc: [.3, .3, .32], s: 1 },
   thrust: { f: [1.02, .85, .28, .15], r: [.3, -1.85, .28, .16], rc: [.86, .88, .92], cc: [.6, .6, .6], s: 1 },
 };
 const DEFS = { a: 1.25, b: 1.45, steerMax: .5 };
@@ -616,6 +617,29 @@ function buildThrust() {
   for (const x of [-1.02, 1.02]) bx(x < 0 ? ML : MR, x * 1.38, .44, -.40, .08, .02, .50, BODY(1)); // carénages latéraux de roues
   return pack(B, W, F, ML, MR, TL, DT);
 }
+// --- Kart (≈ 2 m : châssis tubulaire, nez avant, pontons, baquet, volant, moteur arrière, pare-chocs, pilote casqué)
+const KART_S = [[-.9, .3, .1, .2, .25], [.45, .34, .1, .33, .3], [.95, .28, .1, .33, .2]];
+function buildKart() {
+  const [B, W, F, ML, MR, TL, DT] = bs(), D = DARK, OV = hex(0x23262d);
+  bx(B, 0, .09, 0, .3, .02, .78, D);                                   // plancher
+  bx(B, 0, .22, .68, .34, .11, .28, BODY(1));                          // nez / carénage avant (plaque numéro dessus)
+  bx(B, 0, .16, .42, .22, .04, .08, BODY(.8));
+  for (const x of [-.43, .43]) bx(B, x, .2, -.05, .09, .1, .46, BODY(1));   // pontons
+  bx(B, 0, .22, -.22, .22, .08, .22, OV);                              // baquet
+  bx(B, 0, .4, -.42, .21, .17, .035, OV);                              // dossier
+  bx(B, 0, .5, -.2, .17, .2, .09, hex(0x2d3340));                      // pilote (combinaison)
+  bx(B, 0, .8, -.2, .11, .11, .11, WHT);                               // casque
+  bx(B, 0, .8, -.09, .09, .04, .015, GLS);                             // visière
+  for (const x of [-.14, .14]) bx(DT, x, .62, -.09, .03, .03, .1, hex(0x2d3340));   // bras
+  bx(DT, 0, .36, .3, .012, .13, .012, D); bx(DT, 0, .49, .24, .1, .014, .05, D);    // colonne + volant
+  bx(DT, .13, .24, -.62, .1, .11, .1, MET); bx(DT, .13, .12, -.66, .02, .02, .22, hex(0x6c7078));   // moteur + échappement
+  bx(DT, -.12, .21, -.62, .06, .08, .06, hex(0x2a2d33));
+  bx(F, 0, .17, .98, .46, .025, .02, D); bx(F, 0, .26, .96, .3, .03, .02, BODY(.9));   // pare-chocs avant (cassable)
+  bx(W, 0, .2, -.9, .5, .03, .02, D); bx(W, 0, .3, -.82, .22, .05, .02, BODY(.9));      // pare-chocs arrière
+  for (const x of [-.62, .62]) { bx(x < 0 ? ML : MR, x, .18, .05, .03, .04, .38, BODY(.9)); }   // barres latérales
+  bx(TL, 0, .32, -.92, .09, .02, .01, BODY(1));
+  return pack(B, W, F, ML, MR, TL, DT);
+}
 const KINDS = {
   gt: { build: buildGT, S: sub(BODY_S), y: 1.15, z: -.4, k: 1, st: [[.95, 1.4, 2.1, 2.25], [-2.25, -2, -1.25]], dn: .3, sb: [-1.8, 1.8] },
   wedge: { build: buildWedge, S: sub(WS), y: 1.0, z: 0, k: 1, st: [[1.25, 1.8, 2.25], [-2.2, -1.9, -1.4]], dn: .15, sb: [-1.5, 1.5] },
@@ -623,6 +647,7 @@ const KINDS = {
   rally: { build: buildRally, S: sub(RS), y: 1.5, z: -.4, k: 1, st: [[1.0, 1.5, 2.15], [-2.15, -1.6]], dn: .1, sb: [-1.8, 1.8] },
   open: { build: buildOpen, S: sub(OS), y: .405, z: 1.2, k: .5, st: [[1.75, 2.3], [-2.15, -1.5]] },
   drag: { build: buildDrag, S: sub(DRAG_S), y: .68, z: .5, k: .65, st: [[.4, 1.2, 2.0, 2.8], [-2.0, -1.4]] },
+  kart: { build: buildKart, S: sub(KART_S), y: .335, z: .72, k: .32, st: [[.45, .95]] },
   thrust: { build: buildThrust, S: sub(THRUST_S), y: .80, z: .2, k: .7, st: [[.8, 1.6, 2.6], [-2.2, -1.4]] },
 };
 
@@ -671,7 +696,7 @@ export function carMatrix(m, x, y, z, psi, pitch, roll, sc) {
 }
 
 /** Case de grille k (0 = pole) : 2 colonnes, 8 m entre rangées, derrière la ligne de départ. */
-export function gridSlot(k) { return { k, s: TRACK.startIdx * TRACK.ds - 8 - (k >> 1) * 8 - (k & 1) * 4, lat: k & 1 ? 2.6 : -2.6 }; }
+export function gridSlot(k) { const kt = TRACK.half < 5; return { k, s: TRACK.startIdx * TRACK.ds - 8 - (k >> 1) * (kt ? 5 : 8) - (k & 1) * (kt ? 2.5 : 4), lat: (k & 1 ? 1 : -1) * (kt ? 1.15 : 2.6) }; }   // piste étroite (karting) : grille centrée et resserrée
 
 const MESHES = {};
 /** Meshes d'une carrosserie : main + pièces cassables (aileron AR, aile AV, rétros G/D) + tl (feux AR) + det (détails LOD). */

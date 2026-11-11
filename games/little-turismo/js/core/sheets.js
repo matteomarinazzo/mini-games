@@ -6,7 +6,7 @@ const car = (id, name, kind, color, o) => ({
     id, name, kind, color, mass: 1250, vmax: 85, power: 440000, brakeForce: 21000, grip: 1.5, understeer: .3, oversteer: .3, aero: 1.1, drag: .55,
     a: 1.25, b: 1.45, h: .5, tw: 1.6, iz: 0, eff: .9, steerMax: .5, steerV: 30, rearK: 1.15, sc: [1, 1, 1], ...o,
 });
-const fin = (S) => { S.iz = S.iz || Math.round(S.mass * 2.24); S.gears = [.28, .46, .63, .78, .91, 1.06].map((k) => Math.round(k * S.vmax)); return S; };
+const fin = (S) => { S.iz = S.iz || Math.round(S.mass * 2.24); S.gears = S.kind === 'kart' ? [Math.round(.58 * S.vmax), Math.round(S.vmax)] : [.28, .46, .63, .78, .91, 1.06].map((k) => Math.round(k * S.vmax)); if (S.kind === 'kart') S.nodmg = true; return S; };   // kart : 2 rapports, pas de dégâts/moteur (nodmg)
 const L = [
     // GT
     car('tempete', 'Tempête', 'gt', [.75, .1, .1], { mass: 1480, vmax: 90, power: 520000, brakeForce: 24000, grip: 1.35, understeer: .2, oversteer: .8, aero: .6, drag: .6, a: 1.3, b: 1.4, h: .54, rearK: 1.05, sc: [1.05, 1.04, 1.03], accent: [.1, .1, .1] }),
@@ -36,13 +36,18 @@ const L = [
     car('top_fuel', 'Top Fuel Drag', 'drag', [.1, .1, .12], { mass: 980, vmax: 165, power: 5500000, brakeForce: 42000, grip: 3.2, aero: 4.8, drag: .36, a: .7, b: 2.6, h: .32, tw: 1.9, eff: .96, steerMax: .36, steerV: 44, rearK: 1.5, understeer: .45, oversteer: .1, accent: [.95, .18, .05], sc: [1, 1, 1] }),
     // concept car supersonique
     car('thrust_ssc', 'ThrustSSC', 'thrust', [.08, .09, .11], { mass: 10500, vmax: 341.1, power: 77963000, brakeForce: 180000, grip: 2.5, aero: 3.5, drag: .16, a: 1.2, b: 3.8, h: .35, tw: 2.8, eff: .98, steerMax: .26, steerV: 55, rearK: 1.35, understeer: .2, oversteer: .1, accent: [.85, .88, .92], sc: [1.3, .9, 1.55] }),
+    // karts (indoor) : ~170 kg, 28-35 m/s, freinage ~21 m/s², grip direct, survirage en sortie de virage
+    car('kart_frelon', 'Frelon', 'kart', [.92, .15, .1], { mass: 170, vmax: 30, power: 24000, brakeForce: 3500, grip: 1.7, understeer: .08, oversteer: .7, aero: .1, drag: .4, a: .5, b: .55, h: .2, tw: 1.05, iz: 56, eff: .93, steerMax: .5, steerV: 18, rearK: 1, sc: [1, 1, 1], accent: [.96, .96, .96] }),
+    car('kart_pepite', 'Pépite', 'kart', [.98, .8, .1], { mass: 160, vmax: 28, power: 21000, brakeForce: 3350, grip: 1.8, understeer: .08, oversteer: .6, aero: .1, drag: .4, a: .5, b: .55, h: .2, tw: 1.05, iz: 53, eff: .93, steerMax: .52, steerV: 18, rearK: 1, sc: [1, 1, 1], accent: [.08, .08, .1] }),
+    car('kart_cobalt', 'Cobalt', 'kart', [.1, .3, .85], { mass: 185, vmax: 32, power: 27000, brakeForce: 3900, grip: 1.65, understeer: .15, oversteer: .45, aero: .1, drag: .4, a: .5, b: .55, h: .2, tw: 1.05, iz: 61, eff: .93, steerMax: .5, steerV: 18, rearK: 1.08, sc: [1, 1, 1], accent: [.95, .95, .95] }),
+    car('kart_vipere', 'Vipère', 'kart', [.15, .72, .25], { mass: 165, vmax: 35, power: 30000, brakeForce: 3600, grip: 1.75, understeer: .08, oversteer: .8, aero: .1, drag: .4, a: .5, b: .55, h: .2, tw: 1.05, iz: 54, eff: .93, steerMax: .5, steerV: 18, rearK: .98, sc: [1, 1, 1], accent: [.05, .05, .05] }),
 ];
 for (const S of L) CARS[S.id] = fin(S);
 Object.assign(CARS.serra_gt, { kind: 'gt' });
 export const look = (S) => ({ color: S.color || [.95, .42, .1], sc: S.sc || [1, 1, 1], kind: S.kind || 'gt', accent: S.accent || [.96, .96, .96], liv: Number.isInteger(S.liv) ? S.liv : 1 });
 
 // --- Voitures personnalisées (créées dans le menu Conception, stockées dans localStorage via config.js)
-export const KIND_LIST = [['gt', 'GT'], ['wedge', 'Hypercar'], ['proto', 'Prototype'], ['rally', 'Rallye'], ['open', 'Monoplace'], ['drag', 'Dragster'], ['thrust', 'Supersonique']];
+export const KIND_LIST = [['gt', 'GT'], ['wedge', 'Hypercar'], ['proto', 'Prototype'], ['rally', 'Rallye'], ['open', 'Monoplace'], ['drag', 'Dragster'], ['thrust', 'Supersonique'], ['kart', 'Kart']];
 
 export const SPEC_DEFS = [
     ['vmax', 'Vitesse max', ' km/h'],
@@ -103,6 +108,7 @@ export const KIND_RANGES = {
         aero: [2.0, 7.0, .1],
         bal: [0, 1, .05],
     },
+    kart: { vmax: [80, 140, 5], ch: [10, 50, 1], mass: [130, 230, 5], grip: [1.3, 2.2, .05], aero: [.1, .6, .1], bal: [0, 1, .05] },
     thrust: {
         vmax: [600, 1228, 1],
         ch: [20000, 106000, 500],
@@ -124,6 +130,7 @@ const GEO = {
     rally: { a: 1.3, b: 1.42, h: .62, tw: 1.7, drag: .62, steerMax: .5, steerV: 28 },
     open: { a: 1.05, b: 1.55, h: .38, tw: 1.8, drag: .48, steerMax: .48, steerV: 32, eff: .92 },
     drag: { a: .7, b: 2.6, h: .32, tw: 1.9, drag: .35, steerMax: .38, steerV: 42, eff: .96, rearK: 1.48 },
+    kart: { a: .5, b: .55, h: .2, tw: 1.05, drag: .4, steerMax: .5, steerV: 18, eff: .93, rearK: 1 },
     thrust: { a: 1.2, b: 3.8, h: .35, tw: 2.8, drag: .16, steerMax: .26, steerV: 55, eff: .98, rearK: 1.35 },
 };
 const rgb = (h) => (/^#[0-9a-f]{6}$/i.test(h) ? [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255) : [.9, .2, .1]);
@@ -137,7 +144,7 @@ export function customSheet(d) {
     const kind = GEO[d.kind] ? d.kind : 'gt';
     const mass = val(d, 'mass', kind), grip = val(d, 'grip', kind), bal = val(d, 'bal', kind);
     return fin(car(String(d.id), String(d.name || 'Ma voiture').slice(0, 16), kind, rgb(d.color), {
-        ...GEO[kind], mass, grip, vmax: val(d, 'vmax', kind) / 3.6, power: val(d, 'ch', kind) * 735.5, brakeForce: Math.round(mass * grip * 12.5),
+        ...GEO[kind], iz: kind === 'kart' ? Math.round(mass * .33) : 0, mass, grip, vmax: val(d, 'vmax', kind) / 3.6, power: val(d, 'ch', kind) * 735.5, brakeForce: Math.round(mass * grip * 12.5),
         aero: val(d, 'aero', kind), understeer: 1 - bal, oversteer: bal, accent: rgb(d.accent), liv: Number.isInteger(d.liv) ? d.liv : 1,
     }));
 }

@@ -12,7 +12,7 @@ export const CARS = {
   },
 };
 
-const G = 9.81, WALL_LAT = TRACK.half + GRAVEL;
+const G = 9.81, WALL_LAT = TRACK.half + TRACK.gravel;   // = half + GRAVEL (10 m) sur les circuits classiques ; karting : face du mur affiché
 const SURF_G = [1, .93, .55, .42];       // asphalte, vibreur, gravier, herbe : adhérence
 const SURF_Q = [0, 0, 1.8, 3];           // décélération de base (m/s²)
 const SURF_QV = [0, 0, .06, .1];         // + terme en vitesse
@@ -161,7 +161,7 @@ if (!Number.isFinite(c.u) || !Number.isFinite(c.w) || !Number.isFinite(c.r) || !
 // mur (limite extérieure du gravier) : contact inélastique, on longe en perdant de la vitesse
 let l = locate(c.x, c.z, c.idx);
 if (!l || !Number.isFinite(l.lat)) l = { i: 0, s: 0, lat: 0, y: 0, tx: 1, tz: 0, cx: 0, cz: 0 };
-const th = c.psi - Math.atan2(l.tz, l.tx), ext = .94 * Math.abs(Math.cos(th)) + 2.3 * Math.abs(Math.sin(th)), sg0 = Math.sign(l.lat) || 1, aa = Math.abs(l.lat), pit = sg0 === PIT.sg;
+const th = c.psi - Math.atan2(l.tz, l.tx), ext = (S.kind === 'kart' ? .6 : .94) * Math.abs(Math.cos(th)) + (S.kind === 'kart' ? 1.1 : 2.3) * Math.abs(Math.sin(th)), sg0 = Math.sign(l.lat) || 1, aa = Math.abs(l.lat), pit = sg0 === PIT.sg;
 let over = aa + ext - (pit ? Math.max(WALL_LAT, TRACK.half + pitExt(l.s)) : WALL_LAT), flip = 1;   // côté stands : la limite suit la zone goudronnée
 const pw = pit && over <= 0 ? pitWall(l.s) : null;                                                 // muret piste / voie rapide
 if (pw && aa + ext > pw[0] && aa - ext < pw[1]) { if (aa < (pw[0] + pw[1]) / 2) over = aa + ext - pw[0]; else { over = pw[1] - (aa - ext); flip = -1; } }

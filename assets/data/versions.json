@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.54.2026-11-09",
+    "currentVersion": "1.55.2026-11-09",
     "lastUpdate": "2026-11-09",
     "history": [
+        {
+            "version": "1.55.2026-11-09",
+            "date": "2026-11-09",
+            "changes": [
+                "Little Turismo : ajout des karts (Frelon, Pépite, Cobalt, Vipère) : légers, directs, avec un survirage marqué en sortie de virage",
+                "Little Turismo : ajout de la catégorie de circuits Karting (intérieur) avec 4 pistes : Arène, Hangar, Usine et Entrepôt, dans un hall fermé avec murs, éclairage néon et sol béton",
+                "Little Turismo : ajout de la catégorie de circuits Karting (extérieur)"
+            ]
+        },
         {
             "version": "1.54.2026-11-09",
             "date": "2026-11-09",

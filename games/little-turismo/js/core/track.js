@@ -3,7 +3,8 @@ import { sessionConfig, queryConfig, loadTracks, loadMpTracks } from './config.j
 import { NEW } from './circuits.js';
 import { racingLine } from './raceline.js';
 
-export const H = 6, KERB_W = 1.5, GRAVEL = 10, WALL = H + GRAVEL + .5, DS_TARGET = 4;
+export const H = 6, KERB_W = 1.5, GRAVEL = 10, DS_TARGET = 4;
+const WALL0 = H + GRAVEL + .5;
 const SN = [
   [-500, 0], [-400, 0], [0, 0], [400, 0], [500, 0],
   [590, -10], [655, -60], [675, -140],
@@ -86,10 +87,10 @@ function build(D, id) {
   }
   const ks = new Float32Array(N);
   for (let i = 0; i < N; i++) { let s = 0; for (let d = -3; d <= 3; d++) s += K[(i + d + N) % N]; ks[i] = s / 7; }
-  const kerbL = new Float32Array(N), kerbR = new Float32Array(N), ideal = new Float32Array(N);
+  const kerbL = new Float32Array(N), kerbR = new Float32Array(N), ideal = new Float32Array(N), KW = D.theme === 'indoor' ? 0 : KERB_W;   // salle : pas de vibreurs
   for (let i = 0; i < N; i++) {
     let m = 0; for (let d = -4; d <= 4; d++) if (Math.abs(ks[(i + d + N) % N]) > .0055) m = ks[(i + d + N) % N];
-    if (m > 0) kerbR[i] = KERB_W; else if (m < 0) kerbL[i] = KERB_W;
+    if (m > 0) kerbR[i] = KW; else if (m < 0) kerbL[i] = KW;
     let w = 0; for (let d = -10; d <= 10; d++) w += ks[(i + d + N) % N] * (1 - Math.abs(d) / 11);
     ideal[i] = Math.max(-4.5, Math.min(4.5, w * 90)); // décalage latéral de la ligne idéale (+ = droite)
   }
@@ -144,7 +145,7 @@ function build(D, id) {
     return qualifyingLine;
   };
   let ql = null, qlDone = false;
-  return { id, name: D.name, theme: D.theme || 'temperate', N, ds, length, half: D.half || H, wall: WALL, gravel: GRAVEL, P, T, K: ks, kerbL, kerbR, ideal, get qualifyingLine() { if (!qlDone) { qlDone = true; ql = qualLine(); } return ql; }, startIdx: Math.round(D.start / ds) };
+  return { id, name: D.name, theme: D.theme || 'temperate', kart: !!D.kart, N, ds, length, half: D.half || H, wall: D.gravel ? (D.half || H) + D.gravel : WALL0, gravel: D.gravel || GRAVEL, P, T, K: ks, kerbL, kerbR, ideal, get qualifyingLine() { if (!qlDone) { qlDone = true; ql = qualLine(); } return ql; }, startIdx: Math.round(D.start / ds) };
 }
 /** Offset de bord partagé par le rendu. Les joints utilisent la bissectrice des
  * normales adjacentes (miter limité) ; l’offset intérieur est borné par le rayon
@@ -183,6 +184,7 @@ export { build as buildTrack };
 export const trackOf = (id) => { const D = DEFS[id] || custom(id); if (!D) id = 'serra-nova'; return CACHE[id] || (CACHE[id] = build(D || DEFS[id], id)); };
 export const TRACK = trackOf((sessionConfig() || queryConfig()).circuit);
 const { N, ds, P, T } = TRACK;
+export const WALL = TRACK.wall;   // mur de collision du circuit chargé (16,5 m sur les circuits classiques, bord du mur visible en karting)
 
 /** Repère interpolé à l'abscisse s (m) d'un circuit donné : x,y,z, tx,tz, rx,rz. */
 export function frameIn(t, s, o = {}) {
@@ -226,13 +228,13 @@ export function surface(l) {
   const a = Math.abs(l.lat), k = (l.lat > 0 ? TRACK.kerbR : TRACK.kerbL)[l.i];
   const h = TRACK.half;
   if (l.lat * PIT.sg > 0 && a > h && a <= h + pitExt(l.s !== undefined ? l.s : l.i * ds)) return 0;   // voie des stands : asphalte 
-  return a <= h ? 0 : a <= h + k ? 1 : a <= h + GRAVEL ? 2 : 3; // 0 asphalte, 1 kerb, 2 gravier, 3 herbe
+  return a <= h ? 0 : a <= h + k ? 1 : a <= h + TRACK.gravel ? (TRACK.theme === 'indoor' ? 0 : 2) : 3; // 0 asphalte, 1 kerb, 2 gravier, 3 herbe (salle : sol lisse jusqu'au mur)
 }
 
 // --- Stands : voie des stands le long de la ligne de départ, du côté libre (extérieur du circuit). Partagé par le rendu, la physique et la réparation.
 // Repère : d = distance (m) à la ligne de départ, a = écart latéral (m) positif du côté des stands. Voie rapide a ∈ [h+3.5, h+10.5], voie des box jusqu'à h+16.5, garages derrière.
 const wrapD = (d) => d - TRACK.length * Math.round(d / TRACK.length);
-export const PIT = (() => {
+export const PIT = TRACK.theme === 'indoor' || TRACK.kart ? { sg: 1, S0: TRACK.startIdx * ds, back: 0, fwd: 0, T: 0, FULL: 16.5, boxD: 20 } : (() => {   // karting (salle ou extérieur) : pas de stands
   const { K } = TRACK, S0 = TRACK.startIdx * ds, h = TRACK.half;
   const run = (dir) => { let m = 0; while (m < 320) { const i = (((Math.round(S0 / ds) + dir * Math.round(m / ds)) % N) + N) % N; if (Math.abs(K[i]) > .003) break; m += ds; } return m; };
   const back = Math.max(80, Math.min(240, run(-1) - 20)), fwd = Math.max(80, Math.min(200, run(1) - 20)), T = Math.min(80, (back + fwd) / 5);
@@ -248,6 +250,7 @@ export const PIT = (() => {
 })();
 /** Largeur (m, depuis le bord de piste) de la zone goudronnée des stands à l'abscisse s : 0 hors zone, rampes d'entrée / sortie, puis plein. */
 export function pitExt(s) {
+  if (!PIT.back && !PIT.fwd) return 0;
   const d = wrapD(s - PIT.S0); if (d < -PIT.back || d > PIT.fwd) return 0;
   return PIT.FULL * Math.max(0, Math.min((d + PIT.back) / PIT.T, (PIT.fwd - d) / PIT.T, 1));
 }

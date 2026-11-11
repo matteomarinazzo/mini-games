@@ -129,6 +129,7 @@ function lm(py, pz, ax, az, dy, dz) {
 }
 /** À appeler après drawCars. w = createDamage().w ; q = pose (joueur : objet persistant de createCars → pilote aussi les flags aileron/rétros de cars.js). */
 export function drawWear(R, w, q) {
+  if (q.kind === 'kart' || (q.sheet && look(q.sheet).kind === 'kart')) return;   // karts : pas de dégâts visibles
   const kk = PR[q.kind] ? q.kind : (q.sheet && PR[look(q.sheet).kind] ? look(q.sheet).kind : 'gt'), K = PR[kk], own = q.n !== undefined, top = q.body || OR;
   const rw = w.rw || 0, fw = w.fw || 0, hd = w.hood || 0, ns = w.nose || 0, L = w.l || 0, Rr = w.r || 0;
   if (own) { q.wr = rw; q.wf = fw; q.xl = L > .3; q.xr = Rr > .3; }

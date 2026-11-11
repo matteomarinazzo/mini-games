@@ -1,7 +1,8 @@
 import { createGL, createCamera } from './core/gl.js';
 import { createF1Cockpit } from './core/cockpit-f1.js';
+import { createKartCockpit } from './core/cockpit-kart.js';
 import { groundAt, locate, TRACK, inPitBox, PIT, pitExt } from './core/track.js';
-import { buildTrackMesh } from './core/track-mesh.js';
+import { buildTrackMesh, applySky } from './core/track-mesh.js';
 import { createInput } from './core/input.js';
 import { CARS, createCar, stepCar } from './core/physics.js';
 import { look } from './core/sheets.js';
@@ -40,7 +41,10 @@ const sc = sessionConfig(), qc = queryConfig();
 const hasUrlWeather = new URLSearchParams(location.search).has('weather');
 const cfg = multiplayer ? (sc || qc) : (hasUrlWeather ? qc : (sc || live?.cfg || qc)), sheet = CARS[cfg.car] || CARS.serra_gt;
 // Résoudre la météo aléatoire une seule fois (tous les clients multi reçoivent la même valeur via cfg.weather)
+const indoor = TRACK.theme === 'indoor';   // karting en salle : jamais de pluie, ciel du hall (météo bloquée uniquement en intérieur)
+const kartTrack = String((circuitList().find((c) => c.id === TRACK.id) || {}).cat || '').startsWith('karting');   // circuit karting (intérieur ou extérieur) : karts, sans dégâts
 const resolvedWeather = (() => {
+  if (indoor) return 'dry';
   if (cfg.weather === 'random') {
     const opts = ['dry', 'light_rain', 'heavy_rain'];
     return opts[Math.floor(Math.random() * opts.length)];
@@ -72,6 +76,7 @@ const menuLink = $('results').querySelector('a.btn');   // lien Menu de la fenê
 
 // IA et voitures humaines distantes : seul l'hôte simule la grille entière.
 const place = (c, slot) => { c.slot = slot; c.ph = createCar(c.sheet, slot.s, slot.lat, wetFactor); if (c.ai) { c.ai.ph = c.ph; c.ph.sheet = c.ai.sheet; c.ai.tl = c.ph.lat; } };   // sheet : fiche de l'IA (bonus de specs expert / difficile)
+const aiPool = CAR_LIST.filter((c) => (CARS[c.id].kind === 'kart') === kartTrack);   // IA « mixte » : karts en salle, voitures ailleurs
 const humanCars = field.cars.slice(0, remotePlayers.length), aiCars = field.cars.slice(remotePlayers.length);
 for (let i = 0; i < humanCars.length; i++) {
   const c = humanCars[i], [uid, player] = remotePlayers[i], choice = CARS[player.car] || sheet;
@@ -90,7 +95,7 @@ for (let i = 0; i < humanCars.length; i++) {
 const sharedAiSheet = multiplayer ? (CARS[online.players?.[online.hostId]?.car] || sheet) : sheet;
 for (let i = 0; i < aiCars.length; i++) {
   const c = aiCars[i];
-  const choice = cfg.carMode === 'same' ? sharedAiSheet : CARS[CAR_LIST[(i * 5 + 3) % CAR_LIST.length].id] || sheet;
+  const choice = cfg.carMode === 'same' ? sharedAiSheet : CARS[aiPool[(i * 5 + 3) % aiPool.length].id] || sheet;
   c.sheet = choice;
   const lk = look(choice);
   c.body = lk.color;
@@ -114,7 +119,7 @@ if (multiplayer && !cfg.qualifying && !cfg.gridOrder) {
 localLoaded = true;
 const ais = aiCars.map((c) => c.ai), all = [drv, ...field.cars.map((c) => c.ph)];
 const clm = cfg.mode === 'clm';   // contre la montre : tours illimités, sans IA ni pénalité de faux départ
-const race = createRace({ laps: cfg.qualifying ? 1 : clm ? 1e6 : cfg.laps, training: clm, waitAll: cfg.qualifying, qualifying: cfg.qualifying, penaltiesEnabled: set.penalties, multi: multiplayer, entries: [{ n: multiplayer ? localUid : 1, name: multiplayer ? (online.players[localUid]?.name || 'Vous') : 'Vous', ph: drv, start: field.playerSlot.k + 1, player: true }, ...humanCars.map((c) => ({ n: multiplayer ? c.humanUid : c.n, name: c.humanName, ph: c.ph, start: c.slot.k + 1, human: true })), ...aiCars.map((c) => ({ n: multiplayer ? c.netKey : c.n, name: 'IA ' + c.n, ph: c.ph, start: c.slot.k + 1 }))] });
+const race = createRace({ laps: cfg.qualifying ? 1 : clm ? 1e6 : cfg.laps, training: clm, noPit: sheet.kind === 'kart' || kartTrack, waitAll: cfg.qualifying, qualifying: cfg.qualifying, penaltiesEnabled: set.penalties, multi: multiplayer, entries: [{ n: multiplayer ? localUid : 1, name: multiplayer ? (online.players[localUid]?.name || 'Vous') : 'Vous', ph: drv, start: field.playerSlot.k + 1, player: true }, ...humanCars.map((c) => ({ n: multiplayer ? c.humanUid : c.n, name: c.humanName, ph: c.ph, start: c.slot.k + 1, human: true })), ...aiCars.map((c) => ({ n: multiplayer ? c.netKey : c.n, name: 'IA ' + c.n, ph: c.ph, start: c.slot.k + 1 }))] });
 for (const c of field.cars) {
   const e = race.E.find((x) => x.ph === c.ph);
   if (e) { c.entry = e; c.ph.entry = e; }
@@ -125,6 +130,7 @@ const dmg = createDamage($('dmg')), mp = createMap($('map')), skids = createSkid
 // Pluie : initialisation après buildTrackMesh (setWeather écrase les couleurs de ciel du circuit)
 const rain = createRain(R, resolvedWeather, $('cockpitDrops'));
 R.setWeather(resolvedWeather);
+if (indoor) applySky();
 smoke.wet = R.weather.wet;
 drv.wet = R.weather.wet;
 field.cars.forEach((c) => { if (c.ph) c.ph.wet = R.weather.wet; });
@@ -151,7 +157,9 @@ $('map').hidden = !set.map;
 $('radar').hidden = !set.radar;
 // Dégâts : effectif = config room en multi, réglage perso sinon ; en multi la case est grisée (l'hôte décide)
 // dégâts : cfg.damage (vient du menu, solo ou CLM) prime sur set.damage ; en multi c'est l'hôte qui décide
-const damageEnabled = cfg.damage !== false;
+const damageEnabled = cfg.damage !== false && sheet.kind !== 'kart' && !kartTrack;   // karts : pas de dégâts ni de moteur
+const kartPen = sheet.kind === 'kart' || kartTrack;   // faux départ : +10 s (pas de drive-through en kart)
+if (sheet.kind === 'kart' || kartTrack) $('dmg').style.display = 'none';   // pas d'aperçu des dégâts
 $('setBtn').addEventListener('click', () => { $('setPanel').hidden = !$('setPanel').hidden; });
 const views = [['rear', '3e personne'], ['close', '3e personne rapprochée'], ['cockpit', 'Cockpit'], ['front', 'Avant']];
 const setView = (step = 0) => {
@@ -519,7 +527,7 @@ function updateHud() {
   for (const t of WG) t.textContent = gr;
 }
 const WG = [...document.querySelectorAll('.wg')], WS = [...document.querySelectorAll('.ws')], WB = document.querySelector('.wb'), LEDS = [...document.querySelectorAll(['open', 'wedge', 'proto'].includes(look(sheet).kind) ? '.lds circle' : '#shiftBar i')], CK = $('cockpit');
-const EYE = { gt: 1.12, wedge: 1.0, proto: 1.02, open: .95, rally: 1.32 }[look(sheet).kind] || 1.12;
+const EYE = { gt: 1.12, wedge: 1.0, proto: 1.02, open: .95, rally: 1.32, kart: .6 }[look(sheet).kind] || 1.12;
 const OPENV = look(sheet).kind === 'open', LOCK = { open: 55, wedge: 70, proto: 70 }[look(sheet).kind] || 110;   // débattement visuel du volant (°) : réduit si volant à écran, pour rester lisible
 {   // livrée (nez, jantes) + graduations du compte-tours (une seule fois)
   const lk = look(sheet), rgb = (c) => 'rgb(' + c.map((v) => Math.round(v * 255)).join() + ')', ds = $('dialSvg'); let h = '';
@@ -532,6 +540,8 @@ const OPENV = look(sheet).kind === 'open', LOCK = { open: 55, wedge: 70, proto: 
   ds.innerHTML = h;
 }
 const F1 = OPENV ? createF1Cockpit(CK, CK.querySelector('.cp-front')) : null;
+const KARTV = look(sheet).kind === 'kart', KV = KARTV ? createKartCockpit(CK, look(sheet)) : null;   // kart : vue pilote dédiée (volant simple + avant du kart), sans tableau de bord ni pare-brise
+const KX = { rpm: 1100, gear: -1, roll: 0, pitch: 0, ax: 0, ay: 0, lap: -1, wet: 0 }, KGEARS = !!(KARTV && sheet.gears && sheet.gears.length > 1);   // objet réutilisé chaque image (kart : écran LCD, suspension, pluie visière)
 const WH = $('wheel'), ND = $('needle'), PT = $('pThr'), PB = $('pBrk'), cc = { a: NaN, n: NaN, t: -1, b: -1, w: -1, s: -1 };
 /** Cockpit (chaque image) : volant qui tourne, aiguille, LED de changement de rapport, pédales, barre de régime du volant. Écritures DOM seulement si la valeur affichée change. */
 function cockpitTick() {
@@ -544,6 +554,7 @@ function cockpitTick() {
   if (WB && w !== cc.w) { cc.w = w; WB.setAttribute('width', w); }
   for (let i = 0; i < LEDS.length; i++) LEDS[i].classList.toggle('on', rf > .5 + i * .04 && (!flash || i % 2 === 0));
   if (F1) F1.draw(st.steer, drv.kmh);
+  if (KV) { const p0 = race.E[0]; KX.rpm = drv.rpm; KX.gear = KGEARS ? drv.gear : -1; KX.roll = drv.roll; KX.pitch = drv.pitch; KX.ax = drv.ax; KX.ay = drv.ay; KX.wet = drv.wet || 0; KX.lap = p0.lapStart === null ? -1 : Math.max(0, race.t - p0.lapStart + race.lapPenalty); KV.draw(drv.sa !== undefined ? drv.sa / (sheet.steerMax || .5) : st.steer, drv.kmh, drv.surf, KX); }   // braquage réel (drv.sa) normalisé, sinon entrée clavier
   if (sk !== cc.s) { cc.s = sk; CK.style.setProperty('--shake', (sk / 10).toFixed(2)); }
 }
 const formatPlayerNum = (n) => {
@@ -722,11 +733,11 @@ function frame(ts) {
         sensorClock = race.t;
       }
     } else if (!loadGate) {
-      if (race.phase === 'lights' && input.state.throttle > .3) { race.falseStart = true; if (!race._falseStartHandled) { race._falseStartHandled = true; if (!race.qualifying && !clm) { race.dt = true; race.penaltyMsg = 'Faux départ : drive-through à effectuer'; race.penaltyMsgT = 4; } } }
+      if (race.phase === 'lights' && input.state.throttle > .3) { race.falseStart = true; if (!race._falseStartHandled) { race._falseStartHandled = true; if (!race.qualifying && !clm) { if (kartPen) { race.addPenalty(10, 'Faux départ'); } else { race.dt = true; race.penaltyMsg = 'Faux départ : drive-through à effectuer'; } race.penaltyMsgT = 4; } } }
       if (race.phase === 'go') {
         if (race.falseStart && race.penalty === 0 && !race._falseStartHandled) {
           race._falseStartHandled = true;
-          if (!race.qualifying && !clm) { race.dt = true; race.penaltyMsg = 'Faux départ : drive-through à effectuer'; race.penaltyMsgT = 4; }
+          if (!race.qualifying && !clm) { if (kartPen) { race.addPenalty(10, 'Faux départ'); } else { race.dt = true; race.penaltyMsg = 'Faux départ : drive-through à effectuer'; } race.penaltyMsgT = 4; }
         }
         race.checkCut(drv, DT);
       }
@@ -804,8 +815,14 @@ function frame(ts) {
   const fx = Math.cos(camPsi), fz = Math.sin(camPsi), rx = -fz, rz = fx;
   let cx, cz, cy, tx, tz, ty;
   if (set.view === 'cockpit') {
-    cx = me.x + fx * .05; cz = me.z + fz * .05; cy = me.y + EYE;
-    tx = me.x + fx * 28; tz = me.z + fz * 28; ty = me.y + (OPENV ? EYE - 5 : 1.25);   // monoplace : caméra légèrement penchée vers la piste comme en onboard F1
+    if (KARTV) {
+      // Kart : camera très basse (tête du pilote), légèrement en arrière du volant, regard vers l'avant-bas de la piste
+      cx = me.x + fx * (-0.08); cz = me.z + fz * (-0.08); cy = me.y + EYE;
+      tx = me.x + fx * 20; tz = me.z + fz * 20; ty = me.y + EYE - 0.28;
+    } else {
+      cx = me.x + fx * .05; cz = me.z + fz * .05; cy = me.y + EYE;
+      tx = me.x + fx * 28; tz = me.z + fz * 28; ty = me.y + (OPENV ? EYE - 5 : 1.25);   // monoplace : caméra légèrement penchée vers la piste comme en onboard F1
+    }
   } else if (set.view === 'front') {
     cx = me.x + fx * 2.42; cz = me.z + fz * 2.42; cy = me.y + .48;
     tx = me.x + fx * 30; tz = me.z + fz * 30; ty = me.y + .58;
@@ -825,6 +842,7 @@ function frame(ts) {
     cx = me.x - fx * 8.5; cy = me.y + 3.1; cz = me.z - fz * 8.5;
     tx = me.x; ty = me.y + 1; tz = me.z;
   }
+  if (KARTV) { const ft = set.view === 'cockpit' ? 65 + Math.min(9, drv.kmh * .085) : 65; cam.fov += (ft - cam.fov) * (1 - Math.exp(-4 * dt)); }   // kart : champ de vision qui s'élargit avec la vitesse (sensation de vitesse)
   if (set.view === 'cockpit') cockpitTick();
   cam.look(cx, cy, cz, tx, ty, tz);
   if (!shown) {
@@ -861,7 +879,7 @@ function frame(ts) {
   }
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
-  const isCockpit = set.view === 'cockpit';
+  const isCockpit = set.view === 'cockpit' && !KARTV;   // kart : pas de pare-brise, donc pas de gouttes
   rain.draw(cam);
   smoke.draw(cam);
   rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);   // en dernier : les gouttes du pare-brise lisent la scène 3D déjà complète

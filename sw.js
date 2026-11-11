@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.54.2026-11-09.14";
+﻿const CACHE_NAME = "mini-games-cache-v1.55.2026-11-09.2";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -644,6 +644,7 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/cars.js',
     'games/little-turismo/js/core/circuits.js',
     'games/little-turismo/js/core/cockpit-f1.js',
+    'games/little-turismo/js/core/cockpit-kart.js',
     'games/little-turismo/js/core/config.js',
     'games/little-turismo/js/core/damage.js',
     'games/little-turismo/js/core/engine.js',
@@ -662,6 +663,7 @@ const ASSETS_TO_CACHE = [
     'games/little-turismo/js/core/track-editor.js',
     'games/little-turismo/js/core/track-mesh.js',
     'games/little-turismo/js/core/track.js',
+    'games/little-turismo/js/core/wheel-gl.js',
     'games/little-turismo/js/ui/notify.js',
 
     // Game: Anagram

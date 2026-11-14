@@ -315,6 +315,18 @@
             "escape-game": {
                 "name": "Escape Game",
                 "description": "Enfermé dans une salle sombre, fouille chaque recoin, déchiffre les indices et trouve le code de la porte avant d'épuiser tes essais. Les salles s'enchaînent : jusqu'où iras-tu ?"
+            },
+            "aires": {
+                "name": "Aires",
+                "description": "Découpe la grille en rectangles : chaque chiffre est l'aire du sien. Une seule solution par grille, trois tailles, de 7×7 à 10×10."
+            },
+            "path": {
+                "name": "Chemin",
+                "description": "Trace un trait qui passe par les chiffres de 1 à 10, dans l'ordre, et remplit toute la grille. Une seule solution par grille, trois tailles, de 5×5 à 8×8."
+            },
+            "netwalk": {
+                "name": "Netwalk",
+                "description": "Tourne les câbles pour allumer tout le réseau depuis le serveur, sans boucle ni fil dans le vide. Une seule solution par grille, trois tailles de 5×5 à 9×9, ou ta propre grille jusqu'à 50×50."
             }
         },
         "badges": {

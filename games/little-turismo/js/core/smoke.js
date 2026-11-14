@@ -67,7 +67,7 @@ export function createSmoke(R, maxParticles = 1000) {
     const accumEngine = new Float32Array(64);
     let count = 0;
     let ok = true, prog = null, U = null, vao = null, quadVbo = null, instVbo = null;
-    let camX = 0, camZ = 0, low = false, wet = 0;
+    let camX = 0, camZ = 0, low = false, gfxLevel = 3, wet = 0;
     const N = TRACK.N, T = TRACK.T, ds = TRACK.ds;
 
     function init() {
@@ -140,6 +140,8 @@ export function createSmoke(R, maxParticles = 1000) {
       clear() { count = 0; accum.fill(0); accumEngine.fill(0); },
       get low() { return low; },
       set low(v) { low = !!v; },
+      get gfxLevel() { return gfxLevel; },
+      set gfxLevel(v) { gfxLevel = Math.max(0, Math.min(4, +v || 0)); low = gfxLevel < 2; },
       get wet() { return wet; },
       set wet(v) { wet = Math.max(0, Math.min(1, Number(v) || 0)); },
       begin(dt, cam) {
@@ -196,7 +198,7 @@ export function createSmoke(R, maxParticles = 1000) {
         if (!ok || slot * 4 + 4 > accum.length) return;
         const p = pose || ph, ai = slot > 0;
         const dx = p.x - camX, dz = p.z - camZ;
-        const far = low ? 70 : 150;
+        const far = [45, 70, 100, 150, 200][gfxLevel] ?? 150;
         if (ai && dx * dx + dz * dz > far * far) return;
 
         const S = ph.sheet || DEF;
@@ -348,7 +350,7 @@ export function createSmoke(R, maxParticles = 1000) {
         if (!ok || slot >= accumEngine.length || engLevel <= 0.05) return;
         const p = pose || ph, ai = slot > 0;
         const dx = p.x - camX, dz = p.z - camZ;
-        const far = low ? 60 : 130;
+        const far = [40, 60, 85, 130, 180][gfxLevel] ?? 130;
         if (ai && dx * dx + dz * dz > far * far) return;
 
         const S = ph.sheet || DEF;
@@ -364,7 +366,7 @@ export function createSmoke(R, maxParticles = 1000) {
         const mz = p.z + sn * fwdM + (Math.random() - 0.5) * 0.35;
         const my = p.y + upM;
 
-        const rate = (low ? 8 : 14) * Math.min(2.0, engLevel * 1.6);
+        const rate = ([5,8,11,14,18][gfxLevel]??14) * Math.min(2.0, engLevel * 1.6);
         accumEngine[slot] += dt * rate;
         if (accumEngine[slot] > 2.0) accumEngine[slot] = 2.0;
 

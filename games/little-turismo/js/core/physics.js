@@ -27,6 +27,7 @@ const wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI
 // dropCurve: adhérence résiduelle post-décrochage en virage
 export const WET_PROFILES = {
   rally: { dropMid: .12, dropMax: .24, aquaKmh: 240, spinLoss: .35, dropCurve: .68 },
+  kart: { dropMid: .22, dropMax: .44, aquaKmh: 95, spinLoss: .50, dropCurve: .58 },
   gt: { dropMid: .38, dropMax: .55, aquaKmh: 175, spinLoss: .60, dropCurve: .48 },
   wedge: { dropMid: .40, dropMax: .58, aquaKmh: 170, spinLoss: .62, dropCurve: .46 },
   proto: { dropMid: .42, dropMax: .60, aquaKmh: 165, spinLoss: .65, dropCurve: .44 },

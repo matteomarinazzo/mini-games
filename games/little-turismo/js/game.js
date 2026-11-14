@@ -1,7 +1,7 @@
 import { createGL, createCamera } from './core/gl.js';
 import { createF1Cockpit } from './core/cockpit-f1.js';
 import { createKartCockpit } from './core/cockpit-kart.js';
-import { groundAt, locate, TRACK, inPitBox, PIT, pitExt } from './core/track.js';
+import { groundAt, locate, TRACK, inPitBox, PIT, pitExt, shelter } from './core/track.js';
 import { buildTrackMesh, applySky } from './core/track-mesh.js';
 import { createInput } from './core/input.js';
 import { CARS, createCar, stepCar } from './core/physics.js';
@@ -18,6 +18,7 @@ import { createSkids } from './core/skidmarks.js';
 import { createSmoke } from './core/smoke.js';
 import { createRain } from './core/rain.js';
 import { circuitList, CAR_LIST, sessionConfig, queryConfig, saveRec, saveClm, loadSet, saveSet, startSession } from './core/config.js';
+import { GFX, GFX_PARAMS, adaptGfx } from './core/gfx.js';
 import * as Net from './net.js';
 
 const $ = (id) => document.getElementById(id);
@@ -43,6 +44,7 @@ const cfg = multiplayer ? (sc || qc) : (hasUrlWeather ? qc : (sc || live?.cfg ||
 // Résoudre la météo aléatoire une seule fois (tous les clients multi reçoivent la même valeur via cfg.weather)
 const indoor = TRACK.theme === 'indoor';   // karting en salle : jamais de pluie, ciel du hall (météo bloquée uniquement en intérieur)
 const kartTrack = String((circuitList().find((c) => c.id === TRACK.id) || {}).cat || '').startsWith('karting');   // circuit karting (intérieur ou extérieur) : karts, sans dégâts
+const mixed = !!TRACK.hall;   // circuit mixte int./ext. : météo dehors, jamais sous le toit (pluie, adhérence)
 const resolvedWeather = (() => {
   if (indoor) return 'dry';
   if (cfg.weather === 'random') {
@@ -176,7 +178,7 @@ $('viewPrev').addEventListener('click', () => setView(-1)); $('viewNext').addEve
 
 const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 let gameTime = 0;   // temps continu pour animer les nuages / pluie
-let tick = 0, acc = 0, last = 0, sensorClock = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
+let tick = 0, acc = 0, last = 0, sensorClock = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
 function startPlayerDnf() { if (dnfActive) return; dnfActive = true; dnfElapsed = 0; dnfStopElapsed = 0; dnfHold = 0; playerEngine.failed = true; playerEngine.fade = 0; playerEngine.retiredAt = race.t; race.retire(race.E[0]); drv.ghost = true; pitMsg = ''; pitMsgT = 0; }
 const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
 // Réseau fluide : chaque machine est autoritaire sur SA voiture (physique locale 60 Hz) et la publie à 20 Hz en tableau compact.
@@ -730,8 +732,14 @@ function frame(ts) {
   if (multiplayer && !hostMode) {
     race.lapMsgT = Math.max(0, race.lapMsgT - dt);
   }
-  ema += (dt - ema) * .05;
-  if (ema > .03 && R.scale > .5) { if (++slow > 40) { slow = 0; ema = DT; cam.aspect = R.resize(R.scale * .8); } } else slow = 0;
+  if (mixed && wetFactor) { drv.wet = wetFactor * (1 - shelter(drv.s || 0)); smoke.wet = drv.wet; for (const c of field.cars) if (c.ph) c.ph.wet = wetFactor * (1 - shelter(c.ph.s || 0)); }   // adhérence : mouillé dehors seulement
+  // qualité graphique adaptative
+  if (dt > 0 && adaptGfx(1 / dt)) {
+    const [sf, , , , rd] = GFX_PARAMS[GFX.level];
+    const dpr = devicePixelRatio || 1;
+    cam.aspect = R.resize(GFX.level >= 4 ? Math.min(dpr, 1.5) : sf);
+    rain.setMaxDrops(rd);
+  }
   // Guest mode: apply network snapshot once per frame (outside the physics loop)
   if (multiplayer) syncNet();
   for (const c of aiCars) {
@@ -876,7 +884,7 @@ function frame(ts) {
   cam.look(cx, cy, cz, tx, ty, tz);
   updateTags(cx, cy, cz, tx, ty, tz);
   if (!shown) {
-    smoke.low = skids.low; skids.begin(dt, cam); smoke.begin(dt, cam);
+    smoke.gfxLevel = skids.gfxLevel = GFX.level; skids.begin(dt, cam); smoke.begin(dt, cam);
     skids.car(0, drv, me); smoke.car(0, drv, me, dt);
     const pEng = playerEngine.failed ? 1.0 : Math.min(1, (dmg.w.hood || 0) * .6 + (dmg.w.nose || 0) * .5);
     if (pEng > 0.35 || playerEngine.failed) smoke.engine(0, drv, me, pEng, dt);
@@ -910,6 +918,7 @@ function frame(ts) {
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
   const isCockpit = set.view === 'cockpit' && !KARTV;   // kart : pas de pare-brise, donc pas de gouttes
+  if (mixed) rain.setShelter(shelter(drv.s || 0));
   rain.draw(cam);
   smoke.draw(cam);
   rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);   // en dernier : les gouttes du pare-brise lisent la scène 3D déjà complète

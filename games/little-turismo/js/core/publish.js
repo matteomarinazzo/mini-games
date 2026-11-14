@@ -45,7 +45,7 @@ export async function publishItem(kind, d, enabled = true) {
   if (!old && next.length > MAX) throw Error('Maximum de 24 publications atteint');
   const updates = {};
   updates[`${data}/${id}`] = { d: json, u: uid, n: author, t: now };
-  updates[`${idx}/${id}`] = { n: name, a: uid, an: author, t: now };
+  updates[`${idx}/${id}`] = { n: name, a: uid, an: author, t: now, k: d.kind || '' };
   updates[`${BASE}/users/${uid}`] = { l: now, ids: next.join(',') };
   await Net.publicationUpdate(updates);
   d.pubId = id;
@@ -73,7 +73,7 @@ export async function listPublished(kind, { before = null, reset = false } = {})
   if (!reset && c && before == null) return c.items;
   if (!await Net.publicationReady()) return c?.items || [];
   const [idx] = paths(kind), all = await read(idx) || {};
-  let vals = Object.entries(all).filter(([, x]) => x && typeof x.a === 'string' && typeof x.n === 'string').map(([id, x]) => ({ id, name: x.n, author: x.an || 'Pilote', uid: x.a, t: x.t || 0 })).sort((a, b) => b.t - a.t || a.id.localeCompare(b.id));
+  let vals = Object.entries(all).filter(([, x]) => x && typeof x.a === 'string' && typeof x.n === 'string').map(([id, x]) => ({ id, name: x.n, author: x.an || 'Pilote', uid: x.a, t: x.t || 0, kind: x.k || '' })).sort((a, b) => b.t - a.t || a.id.localeCompare(b.id));
   if (before) {
     const n = vals.findIndex(x => x.id === before);
     if (n >= 0) vals = vals.slice(n + 1);

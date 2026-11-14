@@ -71,11 +71,12 @@ export function createRain(R, initialWeather = 'dry', cockpitCanvas = null) {
   let activeCount = 0;
   let fallSpeed = 42;
   let streakScale = 0.032;
-  let intensity = 1.0;
+  let intensity = 1.0, shelter = 0;   // shelter : 0 dehors, 1 sous toit (circuits mixtes) : pas de pluie dans le hall
   let time = 0;
 
   // PERF : Réduit de 4500 → 2800 max (suffisant visuellement, économise ~40% de draw calls GPU)
   const MAX_DROPS = 2800;
+let maxDropsCap = MAX_DROPS;  // ajusté dynamiquement par GFX
   const BOX = [75, 36, 75];
   const WIND = [-3.5, 0, 2.5];
 
@@ -167,18 +168,21 @@ export function createRain(R, initialWeather = 'dry', cockpitCanvas = null) {
   return {
     get weather() { return weather; },
     setWeather,
+    setShelter(f) { shelter = Math.max(0, Math.min(1, f)); },
+    setMaxDrops(n) { maxDropsCap = Math.max(100, Math.min(MAX_DROPS, n)); },
     update(dt, cam, carForwardSpeed = 0, carLateralSpeed = 0, isCockpitView = false) {
       if (activeCount <= 0 || dt <= 0) return;
       time += dt;
 
       if (glass) {
-        if (isCockpitView && cockpitCanvas.isConnected) glass.update(Math.min(dt, .05), carForwardSpeed, carLateralSpeed);
+        if (isCockpitView && shelter < .5 && cockpitCanvas.isConnected) glass.update(Math.min(dt, .05), carForwardSpeed, carLateralSpeed);
         else glass.clear();
       }
     },
     draw(cam) {
       if (!ok || R.lost || activeCount <= 0) return;
 
+      const vis = 1 - shelter; if (vis < .03) return;
       const gl = R.gl;
       gl.useProgram(prog);
 
@@ -209,7 +213,7 @@ export function createRain(R, initialWeather = 'dry', cockpitCanvas = null) {
       gl.uniform3f(U.uWind, WIND[0], WIND[1], WIND[2]);
       gl.uniform3fv(U.uFog, R.weather.fogC || [0.55, 0.60, 0.66]);
       gl.uniform1f(U.uFogD, R.weather.fogD || 0.001);
-      gl.uniform1f(U.uIntensity, intensity);
+      gl.uniform1f(U.uIntensity, intensity * vis);
 
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -217,7 +221,7 @@ export function createRain(R, initialWeather = 'dry', cockpitCanvas = null) {
 
       gl.bindVertexArray(vao);
       // PERF : activeCount est déjà limité, Math.min sécurise en plus
-      gl.drawArrays(gl.LINES, 0, Math.min(activeCount, MAX_DROPS) * 2);
+      gl.drawArrays(gl.LINES, 0, Math.min(activeCount, maxDropsCap) * 2);
 
       gl.depthMask(true);
       gl.disable(gl.BLEND);

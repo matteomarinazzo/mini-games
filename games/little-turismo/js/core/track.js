@@ -145,7 +145,7 @@ function build(D, id) {
     return qualifyingLine;
   };
   let ql = null, qlDone = false;
-  return { id, name: D.name, theme: D.theme || 'temperate', kart: !!D.kart, N, ds, length, half: D.half || H, wall: D.gravel ? (D.half || H) + D.gravel : WALL0, gravel: D.gravel || GRAVEL, P, T, K: ks, kerbL, kerbR, ideal, get qualifyingLine() { if (!qlDone) { qlDone = true; ql = qualLine(); } return ql; }, startIdx: Math.round(D.start / ds) };
+  return { id, name: D.name, theme: D.theme || 'temperate', kart: !!D.kart, mixed: !!D.mixed, hall: D.hall || null, hallN: D.hall ? Uint8Array.from({ length: N }, (_, i) => { const x = P[i * 3], z = P[i * 3 + 2], h = D.hall; return x > h[0] && x < h[2] && z > h[1] && z < h[3] ? 1 : 0; }) : null, N, ds, length, half: D.half || H, wall: D.gravel ? (D.half || H) + D.gravel : WALL0, gravel: D.gravel || GRAVEL, P, T, K: ks, kerbL, kerbR, ideal, get qualifyingLine() { if (!qlDone) { qlDone = true; ql = qualLine(); } return ql; }, startIdx: Math.round(D.start / ds) };
 }
 /** Offset de bord partagé par le rendu. Les joints utilisent la bissectrice des
  * normales adjacentes (miter limité) ; l’offset intérieur est borné par le rayon
@@ -184,6 +184,10 @@ export { build as buildTrack };
 export const trackOf = (id) => { const D = DEFS[id] || custom(id); if (!D) id = 'serra-nova'; return CACHE[id] || (CACHE[id] = build(D || DEFS[id], id)); };
 export const TRACK = trackOf((sessionConfig() || queryConfig()).circuit);
 const { N, ds, P, T } = TRACK;
+/** Circuit mixte : true si l'abscisse s (m) est dans le hall (rectangle `hall`). */
+export const inZone = (s, t = TRACK) => { if (!t.hallN) return false; return t.hallN[((Math.round(s / t.ds) % t.N) + t.N) % t.N] === 1; };
+/** Couverture 0..1 (1 = bien à l'abri) avec fondu de ±w m autour des portails : pluie, adhérence. */
+export const shelter = (s, w = 10, t = TRACK) => { if (!t.hall) return t.theme === 'indoor' ? 1 : 0; let a = 0; for (let k = -2; k <= 2; k++) a += inZone(s + k * w / 2, t) ? 1 : 0; return a / 5; };
 export const WALL = TRACK.wall;   // mur de collision du circuit chargé (16,5 m sur les circuits classiques, bord du mur visible en karting)
 
 /** Repère interpolé à l'abscisse s (m) d'un circuit donné : x,y,z, tx,tz, rx,rz. */
@@ -228,7 +232,7 @@ export function surface(l) {
   const a = Math.abs(l.lat), k = (l.lat > 0 ? TRACK.kerbR : TRACK.kerbL)[l.i];
   const h = TRACK.half;
   if (l.lat * PIT.sg > 0 && a > h && a <= h + pitExt(l.s !== undefined ? l.s : l.i * ds)) return 0;   // voie des stands : asphalte 
-  return a <= h ? 0 : a <= h + k ? 1 : a <= h + TRACK.gravel ? (TRACK.theme === 'indoor' ? 0 : 2) : 3; // 0 asphalte, 1 kerb, 2 gravier, 3 herbe (salle : sol lisse jusqu'au mur)
+  return a <= h ? 0 : a <= h + k ? 1 : a <= h + TRACK.gravel ? (TRACK.theme === 'indoor' || (TRACK.hallN && inZone(l.s !== undefined ? l.s : l.i * ds)) ? 0 : 2) : 3; // 0 asphalte, 1 kerb, 2 gravier, 3 herbe (salle : sol lisse jusqu'au mur)
 }
 
 // --- Stands : voie des stands le long de la ligne de départ, du côté libre (extérieur du circuit). Partagé par le rendu, la physique et la réparation.

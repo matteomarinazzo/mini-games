@@ -1,4 +1,5 @@
 // Voitures GT low poly : carrosseries lissées (sections Catmull-Rom, flancs à 2 pans), roues dynamiques partagées (pneu à flancs, jante à branches, disque + étrier) qui braquent (angle réel de physics.js) puis roulent, feux stop, livrées procédurales (aplats, bandes, numéros). Un seul mesh par carrosserie (couleur par uniforme). La physique/IA est dans physics.js / ai.js (c.ph ajouté par game.js).
+import { GFX, GFX_PARAMS } from './gfx.js';
 import { builder } from './track-mesh.js';
 import { TRACK } from './track.js';
 import { playerIndex } from './race.js';
@@ -719,7 +720,7 @@ export function createCars(R, ai, S, startPosition = 0, gridOrder = null) {
 }
 /** ph = état physique (c.ph ; le joueur porte u, sa, bk posés par game.js). Braquage : ph.sa (angle réel de la physique) sinon dérivé du lacet (voitures distantes, aucun paquet réseau en plus) ; feux stop : ph.bk sinon décélération. */
 function one(R, c, q, cam, ph, dt) {
-  const dx = q.x - cam.pos[0], dz = q.z - cam.pos[2], d2 = dx * dx + dz * dz; if (d2 > 640000 || dx * cam.f[0] + dz * cam.f[2] < -10) { c.lp = 0; return; }
+  const dx = q.x - cam.pos[0], dz = q.z - cam.pos[2], d2 = dx * dx + dz * dz; if (d2 > GFX_PARAMS[GFX.level][1] || dx * cam.f[0] + dz * cam.f[2] < -10) { c.lp = 0; return; }
   const kd = c.kind || (c.sheet ? look(c.sheet).kind : 'gt'), sh = ph.sheet || c.sheet || DEFS, lv = Math.max(0, Math.min(4, c.lv ?? (c.sheet && Number.isInteger(c.sheet.liv) ? c.sheet.liv : c.n % 5))), key = kd + lv;
   if (c.mk !== key) { c.mk = key; c.mesh = R.mesh(buildDecals(c.n, c.stripe, kd, lv)); }
   const P = partsOf(R, kd), K = WH[kd] || WH.gt, H = wheelsOf(R), u = ph.u || 0;
@@ -734,7 +735,7 @@ function one(R, c, q, cam, ph, dt) {
   const tlCol = bk ? TLB : (isWet && rainFlash ? TLB : TLD);
   carMatrix(M, q.x, q.y, q.z, q.psi, q.pitch, q.roll, c.sc); R.draw(P.main, M, c.body); R.draw(c.mesh, M); R.draw(P.tl, M, tlCol);
   if (!c.wr) R.draw(P.wing, M, c.body); if (!c.wf) R.draw(P.front, M, c.body);   // flags posés par drawWear (joueur)
-  const near = d2 < 4900;   // LOD : au-delà de 70 m, plus de rétros, étriers, bras ni détails
+  const near = d2 < GFX_PARAMS[GFX.level][2];   // LOD : au-delà de ~70 m, plus de rétros, étriers, bras ni détails
   if (near) { if (!c.xl) R.draw(P.ml, M, c.body); if (!c.xr) R.draw(P.mr, M, c.body); R.draw(P.det, M); }
   const rf = K.f[2], rr = K.r[2], af = c.wd / rf, ar = c.wd / rr, cs = Math.cos(c.vs), sn = Math.sin(c.vs), cf = Math.cos(af), sf = Math.sin(af), cr = Math.cos(ar), sr = Math.sin(ar), wmesh = H.w[K.s];
   for (let sg = -1; sg <= 1; sg += 2) {

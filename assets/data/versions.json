@@ -1,7 +1,24 @@
 {
-    "currentVersion": "1.55.2026-11-09",
-    "lastUpdate": "2026-11-09",
+    "currentVersion": "1.57.2026-11-14",
+    "lastUpdate": "2026-11-14",
     "history": [
+        {
+            "version": "1.57.2026-11-14",
+            "date": "2024-11-14",
+            "changes": [
+                "Little Turismo : choix des niveaux de graphismes en fonction des FPS",
+                "Little Turismo : ajout des cirucits de kart mixte (intérieur et extérieur)"
+            ]
+        },
+        {
+            "version": "1.56.2026-11-11",
+            "date": "2026-11-11",
+            "changes": [
+                "Little Turismo : correction de bugs multijoueur après avoir joué avec un kart",
+                "Little Turismo : quand on désactive les dégats, l'aperçu est désormais masqué",
+                "Little Turismo : etiquettes avec le nom des joueurs IA et humain"
+            ]
+        },
         {
             "version": "1.55.2026-11-09",
             "date": "2026-11-09",

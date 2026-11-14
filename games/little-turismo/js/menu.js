@@ -28,12 +28,28 @@ const markCards = (el, id) => { for (const b of el.querySelectorAll('.gcard')) {
 // Karting : circuit karting → karts uniquement ; circuit intérieur → pas de météo ; kart ou circuit karting → pas de dégâts (coches masquées)
 const kcat = (id) => String((CIRCUITS.find((c) => c.id === id) || {}).cat || '');
 const isKartCar = (id) => !!CARS[id] && CARS[id].kind === 'kart';
+// Masque / réaffiche un réglage AVEC son libellé : label englobant, label[for], bloc ne contenant que ce contrôle, ou libellé « Météo » orphelin juste avant.
+function toggleField(e, off) {
+  if (!e) return;
+  e.disabled = off;
+  let host = e.closest('label, .field');
+  if (!host) { const p = e.parentElement; if (p && p !== document.body && p.querySelectorAll('select, input, textarea, button').length === 1) host = p; }
+  (host || e).style.display = off ? 'none' : '';
+  const lab = e.id && document.querySelector('label[for="' + e.id + '"]'); if (lab && lab !== host) lab.style.display = off ? 'none' : '';
+  let s = (host || e).previousSibling; while (s && s.nodeType === 3 && !s.textContent.trim() && !s._lt) s = s.previousSibling;
+  if (!s) return;
+  if (s.nodeType === 3) { if (off && /m[ée]t[ée]o/i.test(s.textContent)) { s._lt = s.textContent; s.textContent = ''; } else if (!off && s._lt) { s.textContent = s._lt; s._lt = null; } }
+  else if (s.nodeType === 1 && !s.querySelector('select, input, textarea, button') && /^[^\p{L}]*m[ée]t[ée]o[^\p{L}]*$/iu.test(s.textContent)) s.style.display = off ? 'none' : '';
+}
 function applyKarting() {
-  const kt = kcat(cfg.circuit).startsWith('karting'), ind = kcat(cfg.circuit) === 'karting', dm = kt || isKartCar(cfg.car);
-  for (const [id, off] of [['weather', ind], ['clmWeather', ind]]) { const e = $(id); if (!e) continue; e.disabled = off; (e.closest('label, .field') || e).style.display = off ? 'none' : ''; }
-  for (const e of document.querySelectorAll('input[id*="amage"]')) { e.disabled = dm; (e.closest('label') || e.parentElement).style.setProperty('display', dm ? 'none' : '', 'important'); } for (const g of [$('vgrid'), $('mgrid')]) for (const b of g.querySelectorAll('.gcard')) b.style.display = kt && !isKartCar(b.dataset.id) ? 'none' : '';
+  // En multijoueur le circuit vient du salon (renderRoom gère météo/dégâts du salon) : jamais du dernier circuit solo / CLM, sinon le flag karting reste actif.
+  const multi = gameMode === 'multi', circ = multi ? '' : kcat(cfg.circuit);
+  const kt = circ.startsWith('karting'), ind = circ === 'karting', dm = kt || (!multi && isKartCar(cfg.car));
+  for (const id of ['weather', 'clmWeather']) toggleField($(id), ind);
+  for (const e of document.querySelectorAll('input[id*="amage"]')) { if (e.id.startsWith('room')) continue; e.disabled = dm; (e.closest('label') || e.parentElement).style.setProperty('display', dm ? 'none' : '', 'important'); }
+  for (const g of [$('vgrid'), $('mgrid')]) for (const b of g.querySelectorAll('.gcard')) b.style.display = kt && !isKartCar(b.dataset.id) ? 'none' : '';
   for (const h of $('vgrid').querySelectorAll('h2')) h.style.display = kt && !/^Kart/.test(h.textContent) ? 'none' : '';
-  $('tabPub').style.display = kt ? 'none' : '';
+  // tabPub always visible
 }
 function show() {
   const id = cur();
@@ -127,7 +143,7 @@ function cardEl(it, preview, stats, pick) {
 // Circuits : aperçu dessiné depuis la spline de chaque circuit (intégrés et perso)
 const cPrev = (x, c) => { const t = trackOf(c.id); startMark(x, (drawTrack(x, 300, 220, 18, 11, '#0b0f1a', t), drawTrack(x, 300, 220, 18, 5, '#e9eef7', t)), 8, t); };
 const cStats = (c) => { const s = stats(trackOf(c.id)); return [['Longueur', (s.length / 1000).toFixed(2).replace('.', ',') + ' km'], ['Virages', s.turns], ['Dénivelé', Math.round(s.climb) + ' m']]; };
-const cPick = (c) => { cfg.circuit = c.id; cfg = sanitize(cfg); saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
+const cPick = (c) => { const prevCar = cfg.car; cfg.circuit = c.id; cfg = sanitize(cfg); if (gameMode === 'multi') cfg.car = prevCar; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); return create ? makeRoom() : undefined; } location.hash = 'cars'; };
 for (const [k, n] of CIRCUIT_CATS) { const l = CIRCUITS.filter((c) => c.cat === k); if (!l.length) continue; const h = document.createElement('h2'); h.textContent = n + ' (' + l.length + ')'; h.style.cssText = 'grid-column:1/-1;flex:0 0 100%;width:100%;margin:14px 0 2px;font-size:15px;opacity:.85'; $('cgrid').appendChild(h); grid($('cgrid'), l, cPrev, cStats, cPick); }
 
 // Voitures : aperçu vectoriel (vue de dessus, sans image, livrée et proportions de la fiche) et stats lues dans les fiches physiques
@@ -470,7 +486,9 @@ function options(el, entries) {
   for (const [v, label] of entries) { const o = document.createElement('option'); o.value = v; o.textContent = label; el.appendChild(o); }
 }
 const CAR_MODES = [['same', 'Toutes identiques à ma voiture'], ['mixed', 'Voitures variées']];
-options($('diff'), DIFFS);
+// Difficulté IA : curseur 1-4 (facile → expert, <input type=range> dans index.html) ; .value = position, la clé ('facile'…) passe par diffKey / diffShow.
+const diffKey = (el) => (DIFFS[(+el.value || 2) - 1] || DIFFS[1])[0];
+const diffShow = (el, key) => { if (!el) return; const i = Math.max(0, DIFFS.findIndex((d) => d[0] === key)); el.value = String(i + 1); el.setAttribute('aria-valuetext', DIFFS[i][1]); const o = $(el.id + 'Value'); if (o) o.textContent = DIFFS[i][1]; };
 options($('weather'), WEATHERS);
 if ($('clmWeather')) options($('clmWeather'), WEATHERS);
 // clm config sync
@@ -486,17 +504,17 @@ if ($('soloDamage')) $('soloDamage').addEventListener('change', (e) => { cfg = s
 const fillCarMode = (el) => options(el, CAR_MODES);
 fillCarMode($('carMode'));
 fillCarMode($('roomCarMode'));
-options($('roomDiff'), DIFFS);
 options($('roomWeather'), WEATHERS);
 const upd = (k, v) => { cfg = sanitize({ ...cfg, [k]: k === 'qualifying' ? v === 'true' : v }); sync(true); };
 $('laps').addEventListener('input', (e) => upd('laps', e.target.value));
-for (const key of ['qualifying', 'carMode', 'diff', 'weather']) $(key).addEventListener('change', (e) => upd(key, e.target.value));
+for (const key of ['qualifying', 'carMode', 'weather']) $(key).addEventListener('change', (e) => upd(key, e.target.value));
+$('diff').addEventListener('input', (e) => upd('diff', diffKey(e.target)));
 $('ai').addEventListener('input', (e) => upd('ai', e.target.value));
 $('startPosition').addEventListener('input', (e) => upd('startPosition', e.target.value));
 function sync(save) {
   cfg.startPosition = Math.min(cfg.startPosition, cfg.ai + 1);
   $('qualifying').value = String(cfg.qualifying); $('carMode').value = cfg.carMode;
-  $('laps').value = String(cfg.laps); $('lapsValue').value = String(cfg.laps); $('lapsValue').textContent = String(cfg.laps); $('diff').value = cfg.diff; $('weather').value = cfg.weather;
+  $('laps').value = String(cfg.laps); $('lapsValue').value = String(cfg.laps); $('lapsValue').textContent = String(cfg.laps); diffShow($('diff'), cfg.diff); $('weather').value = cfg.weather;
   $('ai').value = String(cfg.ai); $('aiValue').value = String(cfg.ai); $('aiValue').textContent = String(cfg.ai);
   $('startPosition').max = String(cfg.ai + 1); $('startPosition').value = String(cfg.startPosition);
   $('startPositionValue').value = cfg.startPosition === 0 ? (cfg.ai === 0 ? 'Seul en piste' : 'Milieu de grille') : 'Position ' + cfg.startPosition;
@@ -596,8 +614,10 @@ $('tabMine').addEventListener('click', () => { carTab = 'mine'; mine = true; sho
 $('tabPub').addEventListener('click', () => { carTab = 'published'; show(); loadPublishedCards('car', true) }); $('moreCars').addEventListener('click', () => loadPublishedCards('car', false));
 function renderMine() {
   const el = $('mgrid'), l = loadCustom(); el.textContent = '';
-  if (!l.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.style.gridColumn = '1/-1'; p.textContent = 'Aucune voiture créée pour le moment.'; el.appendChild(p); return; }
-  for (const d of l) {
+  const kt = kcat(cfg.circuit).startsWith('karting');
+  const filtered = kt ? l.filter(d => d.kind === 'kart') : l;
+  if (!filtered.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.style.gridColumn = '1/-1'; p.textContent = kt ? 'Aucun kart créé.' : 'Aucune voiture créée pour le moment.'; el.appendChild(p); return; }
+  for (const d of filtered) {
     const w = document.createElement('div'); w.className = 'mcell';
     w.appendChild(cardEl(d, (x, c) => carPreview(x, { sheet: CARS[c.id] }), (c) => statsOf(CARS[c.id]), pickCar));
     const e = document.createElement('button'); e.type = 'button'; e.className = 'bk'; e.textContent = '✎ Modifier'; e.addEventListener('click', () => openDz(d, 'cars'));
@@ -680,7 +700,8 @@ function saveLocal(k, d) { if (k === 'car') { const a = loadCustom(), i = a.find
 function publicationError(e) { const m = String(e?.message || e || 'Erreur réseau'); if (/permission_denied|permission denied|PERMISSION_DENIED/i.test(m)) return 'Permission refusée par Firebase. Vérifiez les règles de publication et votre connexion.'; if (/60|minute|rate/i.test(m)) return '1 publication maximum par minute.'; if (/network|offline|connexion|unavailable/i.test(m)) return 'Connexion réseau indisponible. Réessayez lorsque vous serez en ligne.'; return m }
 function localHas(k, id) { return (k === 'car' ? loadCustom() : loadTracks()).some(x => x.id === id) }
 async function refreshPublishedCount(k) { const el = $(k === 'car' ? 'cntPub' : 'cntCPub'); if (!el) return; const token = ++pubCountToken[k], seen = new Set(); let before = null; try { while (true) { const items = await listPublished(k, { before, reset: before === null }); if (!items.length) break; for (const item of items) if (item?.id) seen.add(item.id); const next = items[items.length - 1]?.id; if (!next || next === before || items.length < 20) break; before = next; } if (pubCountToken[k] === token) el.textContent = String(seen.size) } catch (e) { if (pubCountToken[k] === token) el.textContent = '–' } }
-async function loadPublishedCards(k, reset) { if (pubLoading.has(k)) return; pubLoading.add(k); const el = $(k === 'car' ? 'vpgrid' : 'tpgrid'), more = $(k === 'car' ? 'moreCars' : 'moreTracks'); if (reset) { pubSeen[k].clear(); el.textContent = ''; if (k === 'car') { pubCars = []; pubCarCursor = null } else { pubTracks = []; pubTrackCursor = null } } const existing = pubSeen[k]; try { const items = await listPublished(k, { before: reset ? null : (k === 'car' ? pubCarCursor : pubTrackCursor), reset }); const clean = []; for (const it of items) { if (!it?.id || existing.has(it.id)) continue; existing.add(it.id); clean.push(it) } for (const it of clean) appendPubCardOnce(k, it, el); const all = k === 'car' ? pubCars : pubTracks; all.push(...clean); if (clean.length) { if (k === 'car') pubCarCursor = clean.at(-1).id; else pubTrackCursor = clean.at(-1).id } more.hidden = items.length < 20; if (!all.length && !items.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.textContent = 'Aucune création publiée pour le moment.'; el.append(p) } } catch (e) { notify.show({ type: 'error', title: 'Erreur réseau', message: publicationError(e) }) } finally { pubLoading.delete(k); refreshPublishedCount(k) } }
+async function loadPublishedCards(k, reset) { if (pubLoading.has(k)) return; pubLoading.add(k); const el = $(k === 'car' ? 'vpgrid' : 'tpgrid'), more = $(k === 'car' ? 'moreCars' : 'moreTracks'); if (reset) { pubSeen[k].clear(); el.textContent = ''; if (k === 'car') { pubCars = []; pubCarCursor = null } else { pubTracks = []; pubTrackCursor = null } } const existing = pubSeen[k]; try { const items = await listPublished(k, { before: reset ? null : (k === 'car' ? pubCarCursor : pubTrackCursor), reset }); const kt = kcat(cfg.circuit).startsWith('karting');
+    const clean = []; for (const it of items) { if (!it?.id || existing.has(it.id)) continue; if (k === 'car' && kt && it.kind !== 'kart') continue; existing.add(it.id); clean.push(it) } for (const it of clean) appendPubCardOnce(k, it, el); const all = k === 'car' ? pubCars : pubTracks; all.push(...clean); if (clean.length) { if (k === 'car') pubCarCursor = clean.at(-1).id; else pubTrackCursor = clean.at(-1).id } more.hidden = items.length < 20; if (!all.length && !items.length) { const p = document.createElement('p'); p.className = 'multi-intro'; p.textContent = 'Aucune création publiée pour le moment.'; el.append(p) } } catch (e) { notify.show({ type: 'error', title: 'Erreur réseau', message: publicationError(e) }) } finally { pubLoading.delete(k); refreshPublishedCount(k) } }
 function appendPubCardOnce(k, it, el) { // le document d/{id} n'est chargé que lorsque l'aperçu entre dans le viewport.
   const wrap = document.createElement('div'); wrap.className = 'mcell'; const b = document.createElement('button'); b.type = 'button'; b.className = 'gcard'; b.dataset.id = it.id; b.dataset.pubKind = k; b.dataset.previewState = 'loading'; b.innerHTML = '<canvas width="300" height="220" aria-label="Aperçu en chargement"></canvas><h3></h3><p></p><small>Créé par un joueur</small><div class="pub-preview-stats"></div>'; b.querySelector('h3').textContent = it.name; b.querySelector('p').textContent = 'par ' + it.author; drawPubPlaceholder(b.querySelector('canvas').getContext('2d'), 'Chargement de l’aperçu…'); b.addEventListener('click', async () => { b.disabled = true; try { const o = await loadPubData(k, it.id); if (!o) throw Error('Création publiée introuvable.'); if (k === 'car') { o.id = 'pubcar_' + it.id; sessionStorage.setItem('little-turismo-pub-car', JSON.stringify(o)); registerCustom(o); cfg.car = o.id; saveSaved(cfg); if (gameMode === 'clm') return launchClm(); location.hash = 'race'; } else { o.id = 'pubtrack_' + it.id; sessionStorage.setItem('little-turismo-pub-track', JSON.stringify(o)); cfg.circuit = o.id; saveSaved(cfg); if (gameMode === 'multi') { const create = multiCreatePending; multiCreatePending = false; location.replace('#race'); if (create) makeRoom(); } else location.hash = 'cars' } } catch (e) { notify.show({ type: 'error', title: 'Chargement impossible', message: publicationError(e) }) } finally { b.disabled = false } }); wrap.append(b); el.append(wrap); if (pubPreviewObserver) pubPreviewObserver.observe(b.querySelector('canvas')); else queuePubPreview(b.querySelector('canvas'))
 }
@@ -878,7 +899,7 @@ function renderRoom(d) {
   const dc = d.config || cfg;
   $('roomQualifying').value = String(!!dc.qualifying);
   $('roomAi').value = String(dc.ai || 0); $('roomCarMode').value = dc.carMode === 'same' ? 'same' : 'mixed';
-  $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; $('roomDiff').value = dc.diff || 'normal';
+  $('roomLaps').value = String(dc.laps || 3); $('roomLapsValue').textContent = $('roomLaps').value; diffShow($('roomDiff'), dc.diff || 'normal');
   if ($('roomWeather')) $('roomWeather').value = dc.weather || 'dry';
   if ($('roomDamage')) $('roomDamage').checked = dc.damage !== false;
   for (const [id, off] of [['roomWeather', kcat(dc.circuit) === 'karting'], ['roomDamage', kcat(dc.circuit).startsWith('karting')]]) { const e = $(id); if (e) { e.disabled = off; (e.closest('label, .field') || e).style.display = off ? 'none' : ''; } }
@@ -981,6 +1002,7 @@ $('roomQualifying')?.addEventListener('change', async () => {
 });
 
 $('roomLaps')?.addEventListener('input', () => { $('roomLapsValue').textContent = $('roomLaps').value; });
+$('roomDiff')?.addEventListener('input', () => diffShow($('roomDiff'), diffKey($('roomDiff'))));
 
 $('roomCarMode')?.addEventListener('change', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
@@ -998,7 +1020,7 @@ $('roomAi')?.addEventListener('input', async () => {
 
 for (const [id, key] of [['roomLaps', 'laps'], ['roomDiff', 'diff'], ['roomWeather', 'weather']]) $(id)?.addEventListener('change', async () => {
   if (!activeRoom || roomData?.leaderId !== Net.N.uid) return;
-  await Net.update(activeRoom, { ['config/' + key]: key === 'laps' ? +$(id).value : $(id).value });
+  await Net.update(activeRoom, { ['config/' + key]: key === 'laps' ? +$(id).value : key === 'diff' ? diffKey($(id)) : $(id).value });
 });
 
 $('createRoom').addEventListener('click', () => { if (!roomBusy && playerName()) { multiCreatePending = true; location.hash = 'circuits'; } });
@@ -1007,13 +1029,14 @@ async function makeRoom() {
   let made = null, sessionSaved = false;
   try {
     if (!(await Net.init())) throw new Error('offline');
-    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: cfg.car, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff, damage: true, weather: cfg.weather || 'dry' });
+    const rc = kcat(cfg.circuit).startsWith('karting') && !isKartCar(cfg.car) ? 'kart_frelon' : cfg.car;   // salon karting : kart obligatoire
+    const initial = sanitize({ ...cfg, circuit: cfg.circuit, car: rc, carMode: cfg.carMode, ai: 0, qualifying: false, laps: cfg.laps || 3, diff: cfg.diff, damage: true, weather: cfg.weather || 'dry' });
     for (let i = 0; i < 4 && !made; i++) {
       const c = Net.code();
       const ok = await Net.createRoom(c, {
         code: c, state: 'waiting', leaderId: Net.N.uid, createdAt: Net.now(), maxHumans: 20, numPlayers: 20, config: initial,
         assets: { track: assetRef('track', cfg.circuit) },
-        players: { [Net.N.uid]: { uid: Net.N.uid, name, score: 0, car: cfg.car, carAsset: assetRef('car', cfg.car), joined: Net.now(), lastSeen: Net.now(), away: false } }
+        players: { [Net.N.uid]: { uid: Net.N.uid, name, score: 0, car: rc, carAsset: assetRef('car', rc), joined: Net.now(), lastSeen: Net.now(), away: false } }
       });
       if (ok) made = c;
     }
@@ -1089,7 +1112,7 @@ $('startRoom').addEventListener('click', async () => {
   if (players < 1 || players + aiCount > 20) return;
   clearInterval(pubTimer); pubOn = false; await Net.setPublic(activeRoom, null);   // plus visible dans la liste une fois lancée
   const qual = $('roomQualifying').value === 'true';
-  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: $('roomDiff').value, carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false, weather: $('roomWeather')?.value || 'dry' });
+  const nextConfig = sanitize({ ...roomData.config, ai: aiCount, qualifying: qual, laps: +$('roomLaps').value || 3, diff: diffKey($('roomDiff')), carMode: $('roomCarMode').value, damage: $('roomDamage')?.checked !== false, weather: $('roomWeather')?.value || 'dry' });
   // Reset ready flags each round; the assets/config remain intact for replay.
   roomLoadNotice = ''; const updates = { config: nextConfig, state: 'loading', startedAt: Net.now(), runtime: null };
   for (const uid of Object.keys(roomData.players || {})) {

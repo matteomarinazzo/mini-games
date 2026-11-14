@@ -1,7 +1,7 @@
 import { createGL, createCamera } from './core/gl.js';
 import { createF1Cockpit } from './core/cockpit-f1.js';
 import { createKartCockpit } from './core/cockpit-kart.js';
-import { groundAt, locate, TRACK, inPitBox, PIT, pitExt } from './core/track.js';
+import { groundAt, locate, TRACK, inPitBox, PIT, pitExt, shelter } from './core/track.js';
 import { buildTrackMesh, applySky } from './core/track-mesh.js';
 import { createInput } from './core/input.js';
 import { CARS, createCar, stepCar } from './core/physics.js';
@@ -9,7 +9,7 @@ import { look } from './core/sheets.js';
 import { createCars, drawCars, gridSlot } from './core/cars.js';
 import { createAiAsync, stepField, collide } from './core/ai.js';
 import { engineState, engineIncrement, repairEngine } from './core/engine.js';
-import { createRace, fmt } from './core/race.js';
+import { createRace, fmt, fmtDash } from './core/race.js';
 import { buildLine, buildZone, buildLamp, drawBrake, drawLights } from './core/aids.js';
 import { createMap } from './core/map.js';
 import { createRadar } from './core/radar.js';
@@ -18,6 +18,7 @@ import { createSkids } from './core/skidmarks.js';
 import { createSmoke } from './core/smoke.js';
 import { createRain } from './core/rain.js';
 import { circuitList, CAR_LIST, sessionConfig, queryConfig, saveRec, saveClm, loadSet, saveSet, startSession } from './core/config.js';
+import { GFX, GFX_PARAMS, adaptGfx } from './core/gfx.js';
 import * as Net from './net.js';
 
 const $ = (id) => document.getElementById(id);
@@ -43,6 +44,7 @@ const cfg = multiplayer ? (sc || qc) : (hasUrlWeather ? qc : (sc || live?.cfg ||
 // Résoudre la météo aléatoire une seule fois (tous les clients multi reçoivent la même valeur via cfg.weather)
 const indoor = TRACK.theme === 'indoor';   // karting en salle : jamais de pluie, ciel du hall (météo bloquée uniquement en intérieur)
 const kartTrack = String((circuitList().find((c) => c.id === TRACK.id) || {}).cat || '').startsWith('karting');   // circuit karting (intérieur ou extérieur) : karts, sans dégâts
+const mixed = !!TRACK.hall;   // circuit mixte int./ext. : météo dehors, jamais sous le toit (pluie, adhérence)
 const resolvedWeather = (() => {
   if (indoor) return 'dry';
   if (cfg.weather === 'random') {
@@ -53,6 +55,7 @@ const resolvedWeather = (() => {
 })();
 const wetFactor = resolvedWeather === 'heavy_rain' ? 1.0 : (resolvedWeather === 'light_rain' ? 0.65 : 0);
 const set = loadSet();
+const TAGS_KEY = 'little-turismo-tags'; let tagsOn = true; try { tagsOn = localStorage.getItem(TAGS_KEY) !== '0'; } catch (e) { }
 const humanPlayers = multiplayer ? Object.entries(online.players).filter(([, p]) => !p.away) : [];
 const sortedHumans = humanPlayers.sort(([, a], [, b]) => (a.joined || 0) - (b.joined || 0));
 const remotePlayers = multiplayer ? sortedHumans.filter(([uid]) => uid !== localUid) : [];
@@ -151,6 +154,8 @@ for (const [id, k] of [['sLine', 'line'], ['sBrake', 'brake'], ['sMap', 'map'], 
     if (k === 'radar') $('radar').hidden = !set.radar;
   });
 }
+$('sTags').checked = tagsOn;
+$('sTags').addEventListener('change', () => { tagsOn = $('sTags').checked; try { localStorage.setItem(TAGS_KEY, tagsOn ? '1' : '0'); } catch (e) { } });
 $('sPenalties').checked = set.penalties;
 $('sPenalties').addEventListener('change', () => { set.penalties = $('sPenalties').checked; race.penaltiesEnabled = set.penalties; saveSet(set); });
 $('map').hidden = !set.map;
@@ -159,7 +164,7 @@ $('radar').hidden = !set.radar;
 // dégâts : cfg.damage (vient du menu, solo ou CLM) prime sur set.damage ; en multi c'est l'hôte qui décide
 const damageEnabled = cfg.damage !== false && sheet.kind !== 'kart' && !kartTrack;   // karts : pas de dégâts ni de moteur
 const kartPen = sheet.kind === 'kart' || kartTrack;   // faux départ : +10 s (pas de drive-through en kart)
-if (sheet.kind === 'kart' || kartTrack) $('dmg').style.display = 'none';   // pas d'aperçu des dégâts
+if (!damageEnabled) $('dmg').style.display = 'none';   // dégâts désactivés (réglage, kart, circuit karting) : pas d'aperçu des dégâts, en solo, multi et contre la montre
 $('setBtn').addEventListener('click', () => { $('setPanel').hidden = !$('setPanel').hidden; });
 const views = [['rear', '3e personne'], ['close', '3e personne rapprochée'], ['cockpit', 'Cockpit'], ['front', 'Avant']];
 const setView = (step = 0) => {
@@ -173,7 +178,7 @@ $('viewPrev').addEventListener('click', () => setView(-1)); $('viewNext').addEve
 
 const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 let gameTime = 0;   // temps continu pour animer les nuages / pluie
-let tick = 0, acc = 0, last = 0, sensorClock = 0, ema = DT, slow = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
+let tick = 0, acc = 0, last = 0, sensorClock = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
 function startPlayerDnf() { if (dnfActive) return; dnfActive = true; dnfElapsed = 0; dnfStopElapsed = 0; dnfHold = 0; playerEngine.failed = true; playerEngine.fade = 0; playerEngine.retiredAt = race.t; race.retire(race.E[0]); drv.ghost = true; pitMsg = ''; pitMsgT = 0; }
 const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
 // Réseau fluide : chaque machine est autoritaire sur SA voiture (physique locale 60 Hz) et la publie à 20 Hz en tableau compact.
@@ -248,24 +253,17 @@ function onRuntime(s) {   // invité : paquet hôte
       for (const se of rs.E) {
         const e = race.E.find((x) => x.n === se?.n);
         if (e) {
-          if (race.phase === 'go' && e === race.E[0] && se.last !== null && (se.k || 0) >= 2 && (e.lastLapK || 0) < (se.k || 0)) {
-            e.lastLapK = se.k || 0;
-            const lapPen = race.lapPenalty || 0;
-            const guestLapTime = se.last + lapPen;
-            e.last = guestLapTime;
-            const isNewBest = (e.best === null || guestLapTime < e.best);
-            if (isNewBest) e.best = guestLapTime;
-            race.lapMsg = 'Tour ' + Math.max(1, (se.k || 1) - 1) + ' · ' + fmt(guestLapTime) + (isNewBest ? ' · Meilleur tour personnel !' : '');
-            race.lapMsgT = 3.2;
-            race.lapPenalty = 0;
+          if (race.phase === 'go' && e === race.E[0] && se.last != null && (se.k || 0) >= 2 && (e.lastLapK || 0) < (se.k || 0)) {
+            e.lastLapK = se.k || 0;   // tour terminé, mesuré par l'hôte (pénalités du tour incluses) : message pour moi
+            race.lapMsg = 'Tour ' + Math.max(1, (se.k || 1) - 1) + ' · ' + fmt(se.last) + (se.best != null && se.best === se.last ? ' · Meilleur tour personnel !' : '');
+            race.lapMsgT = 3.2; race.lapPenalty = 0;
           }
           for (const k of ['p0', 'p', 'maxP', 'prevS', 'k', 'lapStart', 'fin', 'fl', 'fp']) {
             if (se[k] !== undefined) e[k] = se[k];
           }
-          if (e !== race.E[0] && race.timePenalty === 0 && (race.lapPenalty || 0) === 0) {
-            if (se.last !== undefined) e.last = se.last;
-            if (se.best !== undefined) e.best = se.best;
-          }
+          // temps de tour : source unique = hôte (pénalités du tour déjà incluses), donc identiques pour tous les joueurs et dans le classement final
+          if (se.last !== undefined) e.last = se.last;
+          if (se.best !== undefined) e.best = se.best;
           if (typeof se.dnf === 'boolean') {
             e.dnf = se.dnf;
             if (se.dnf) {
@@ -293,12 +291,10 @@ function onPlayers(pl) {   // hôte : paquets des invités
     const p = pl[c.humanUid]?.carState || pl[c.humanUid]?.car;
     if (p?.a && p.t) { one.k = p.a; Net.chanPush(humanBufs[c.humanUid] ||= Net.newChan(), p.t, one); }
     if (pl[c.humanUid]?.gameReady || (p?.t && p.t > 0)) { c.gameReady = true; }
-    const pen = pl[c.humanUid]?.pen, dtf = pl[c.humanUid]?.dt, dnfDone = pl[c.humanUid]?.dnfDone, lapPen = pl[c.humanUid]?.lapPen, rBest = pl[c.humanUid]?.best;
+    const pen = pl[c.humanUid]?.pen, dtf = pl[c.humanUid]?.dt, dnfDone = pl[c.humanUid]?.dnfDone;
     if (dtf !== undefined && (dtf === 0 || dtf === 1 || dtf === false || dtf === true)) { const e = race.E.find((x) => x.n === c.humanUid); if (e) e.dt = !!dtf; }
     if (race.phase === 'go' && pl[c.humanUid]?.dnf === true && !c.ph.ghost) { const e = race.E.find(x => x.n === c.humanUid); if (e) race.retire(e); c.ph.ghost = true; c.remoteDnfFade = 0; }
     if (typeof dnfDone === 'boolean') { const e = race.E.find(x => x.n === c.humanUid); if (e) e.dnfReady = dnfDone; }
-    if (typeof lapPen === 'number') { const e = race.E.find((x) => x.n === c.humanUid); if (e) e.lapPenalty = lapPen; }
-    if (typeof rBest === 'number' && Number.isFinite(rBest)) { const e = race.E.find((x) => x.n === c.humanUid); if (e) { if (e.best === null || rBest < e.best) e.best = rBest; } }
     if (typeof pen === 'number') {
       const e = race.E.find((x) => x.n === c.humanUid);
       if (e) e.timePenalty = pen;
@@ -332,8 +328,6 @@ async function publishNetwork() {
         d[`players/${localUid}/carState`] = { t, a: packCar(drv, dmg.w) };
         if (localLoaded) d[`players/${localUid}/gameReady`] = true;
         if (race.timePenalty > 0) d[`players/${localUid}/pen`] = race.timePenalty;
-        d[`players/${localUid}/lapPen`] = race.lapPenalty || 0;
-        if (race.E[0]?.best !== null && Number.isFinite(race.E[0]?.best)) d[`players/${localUid}/best`] = race.E[0].best;
         d[`players/${localUid}/dt`] = race.dt ? 1 : 0;
         if (playerEngine.failed) {
           d[`players/${localUid}/dnf`] = true;
@@ -460,6 +454,7 @@ function updateBoard() {
     while (b >= 0 && boardCmp(boardCars[b], item) > 0) { boardCars[b + 1] = boardCars[b]; b--; }
     boardCars[b + 1] = item;
   }
+  for (let k = 0; k < boardCars.length; k++) boardCars[k].e.place = k + 1;   // rang courant (plaques de nom)
   let i = 0; while (boardCars[i] !== playerBoardCar) i++;
   const n = boardCars.length, st = Math.max(0, Math.min(i - 2, n - 5));
   for (let r = 0; r < rows.length; r++) {
@@ -579,10 +574,47 @@ function showLive() {   // multi : mon arrivée + 1 s ; classement en cours, mis
   rk.forEach((e, i) => {
     const gap = e.dnf ? '' : e.fin === null ? 'En piste' : i === 0 ? fmt(e.fin) : e.fl < rk[0].fl ? '+' + (rk[0].fl - e.fl) + ' tour(s)' : '+' + (e.fin - wf).toFixed(2) + ' s';
     const tr = document.createElement('tr'); if (e === race.E[0]) tr.className = 'me'; if (e.dnf) tr.classList.add('dnf');
-    for (const v of [e.dnf ? 'DNF' : i + 1, formatPlayerNum(e.n), e.dnf ? 'DNF · ' + e.name + ' · ' + Math.max(0, e.fl || 0) + ' tour(s)' : (e.fin !== null ? '🏁 ' : '') + e.name, e.start, fmt(e.best), gap]) { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }
+    for (const v of [e.dnf ? 'DNF' : i + 1, formatPlayerNum(e.n), e.dnf ? 'DNF · ' + e.name + ' · ' + Math.max(0, e.fl || 0) + ' tour(s)' : (e.fin !== null ? '🏁 ' : '') + e.name, e.start, fmtDash(e.best), gap]) { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }
     tb.appendChild(tr);
   });
   $('results').hidden = false;
+}
+// Plaques de nom (style F1) : DOM superposé, projeté à la main depuis la caméra (œil → cible, fov vertical en degrés, aspect). Pool de div, une par voiture adverse (humains distants + IA, solo et multi). Affichage local uniquement (réglage perso).
+const tagsEl = $('tags'), tagPool = new Map(), TAG_MAX = 140; let tagFrame = 0;
+function updateTags(ex, ey, ez, tx, ty, tz) {
+  if (!tagsEl) return;
+  tagFrame++;
+  if (tagsOn && !shown && !liveShown && race.phase !== 'intro') {
+    let fx = tx - ex, fy = ty - ey, fz = tz - ez; const fl = Math.hypot(fx, fy, fz) || 1; fx /= fl; fy /= fl; fz /= fl;
+    let rx = -fz, rz = fx; const rl = Math.hypot(rx, rz) || 1; rx /= rl; rz /= rl;   // droite = avant × haut
+    const ux = -rz * fy, uy = rz * fx - rx * fz, uz = rx * fy;                       // haut = droite × avant
+    const W = document.documentElement.clientWidth || innerWidth, H = document.documentElement.clientHeight || innerHeight, th = Math.tan((cam.fov || 65) * Math.PI / 360), asp = cam.aspect || W / H;
+    const myPlace = race.E[0].place || 0;
+    for (const c of field.cars) {
+      const o = c.ph; if (!o || o.gone) continue;
+      const kart = c.kartH ?? (c.kartH = look(c.sheet).kind === 'kart');
+      const dx = o.x - ex, dy = o.y + (kart ? 1.05 : 1.65) - ey, dz = o.z - ez, zc = dx * fx + dy * fy + dz * fz;
+      if (zc < 1.5 || zc > TAG_MAX) continue;
+      const nx = (dx * rx + dz * rz) / (zc * th * asp), ny = (dx * ux + dy * uy + dz * uz) / (zc * th);
+      if (Math.abs(nx) > 1.1 || Math.abs(ny) > 1.1) continue;
+      let t = tagPool.get(c);
+      if (!t) {
+        const el = document.createElement('div'); el.className = 'tag'; el.innerHTML = '<div class="pill"><b></b><span></span></div>';
+        tagsEl.appendChild(el); t = { el, b: el.querySelector('b'), s: el.querySelector('span'), nm: '', pl: -1, cl: '' }; tagPool.set(c, t);
+      }
+      const e = c.entry || c.tagE || (c.tagE = race.E.find((x) => x.ph === c.ph)), place = e?.place || 0, name = String(c.humanName || e?.name || '').slice(0, 18), cl = !place || !myPlace ? '' : place < myPlace ? 'f' : 'r';
+      if (t.nm !== name) { t.nm = name; t.s.textContent = name; }
+      if (t.pl !== place) { t.pl = place; t.b.textContent = place || ''; }
+      if (t.cl !== cl) { t.cl = cl; t.el.className = 'tag' + (cl ? ' ' + cl : ''); }
+      t.el.style.setProperty('--k', Math.max(.38, Math.min(1.05, 1.15 - zc / 95)).toFixed(3));   // plus loin = plus petit
+      t.el.style.opacity = zc < 55 ? 1 : Math.max(0, (TAG_MAX - zc) / (TAG_MAX - 55)).toFixed(2);   // fondu puis invisible au loin
+      const dp = place && myPlace ? Math.abs(place - myPlace) : 99, z = 500 - Math.min(99, dp) * 4 + (place < myPlace ? 2 : 0) | 0;   // au premier plan : rangs les plus proches du joueur (devant d'abord)
+      if (t.z !== z) { t.z = z; t.el.style.zIndex = z; }
+      t.el.style.transform = 'translate3d(' + ((nx + 1) * .5 * W).toFixed(1) + 'px,' + ((1 - ny) * .5 * H).toFixed(1) + 'px,0)';
+      t.el.style.display = 'block'; t.f = tagFrame;
+    }
+  }
+  for (const t of tagPool.values()) if (t.f !== tagFrame && t.el.style.display !== 'none') t.el.style.display = 'none';
 }
 function toLobby() { const s = Net.readSession(); if (s) { s.going = false; delete s.players; Net.saveSession(s); } location.href = 'index.html'; }
 async function replayMulti() {   // hôte : remet la room en attente ; invités : suivent dès que l'hôte l'a fait
@@ -637,8 +669,7 @@ function showResults() {
   const tb = $('resBody'); tb.textContent = '';
   for (const x of r.rows) {
     const tr = document.createElement('tr'); if (isMine(x)) tr.className = 'me';
-    const bestVal = (isMine(x) && race.E[0]?.best !== null) ? race.E[0].best : x.best;
-    if (x.dnf) tr.classList.add('dnf'); for (const v of [x.dnf ? 'DNF' : x.dsq ? 'DSQ' : x.place, formatPlayerNum(x.n), x.dnf ? 'DNF · ' + x.name + ' · ' + x.laps + ' tour(s)' : x.name, x.start, fmt(bestVal), x.dnf ? '' : x.gap]) { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }
+    if (x.dnf) tr.classList.add('dnf'); for (const v of [x.dnf ? 'DNF' : x.dsq ? 'DSQ' : x.place, formatPlayerNum(x.n), x.dnf ? 'DNF · ' + x.name + ' · ' + x.laps + ' tour(s)' : x.name, x.start, fmtDash(x.best), x.dnf ? '' : x.gap]) { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }
     tb.appendChild(tr);
   }
   $('results').hidden = false;
@@ -701,8 +732,14 @@ function frame(ts) {
   if (multiplayer && !hostMode) {
     race.lapMsgT = Math.max(0, race.lapMsgT - dt);
   }
-  ema += (dt - ema) * .05;
-  if (ema > .03 && R.scale > .5) { if (++slow > 40) { slow = 0; ema = DT; cam.aspect = R.resize(R.scale * .8); } } else slow = 0;
+  if (mixed && wetFactor) { drv.wet = wetFactor * (1 - shelter(drv.s || 0)); smoke.wet = drv.wet; for (const c of field.cars) if (c.ph) c.ph.wet = wetFactor * (1 - shelter(c.ph.s || 0)); }   // adhérence : mouillé dehors seulement
+  // qualité graphique adaptative
+  if (dt > 0 && adaptGfx(1 / dt)) {
+    const [sf, , , , rd] = GFX_PARAMS[GFX.level];
+    const dpr = devicePixelRatio || 1;
+    cam.aspect = R.resize(GFX.level >= 4 ? Math.min(dpr, 1.5) : sf);
+    rain.setMaxDrops(rd);
+  }
   // Guest mode: apply network snapshot once per frame (outside the physics loop)
   if (multiplayer) syncNet();
   for (const c of aiCars) {
@@ -793,7 +830,7 @@ function frame(ts) {
   if (race.phase === 'finished' && !shown && (race.results || !multiplayer || hostMode)) showResults();
   if (R.lost) return;
   boardAcc += dt; if (boardAcc >= .1) { boardAcc = 0; updateBoard(); }
-  if (++hudN % 4 === 0) { updateHud(); dmg.draw(); }
+  if (++hudN % 4 === 0) { updateHud(); if (damageEnabled) dmg.draw(); }
   if (set.map && hudN % 2 === 0 && !race.qualifying) {
     mapCars.length = 0;
     for (const c of field.cars) {
@@ -845,8 +882,9 @@ function frame(ts) {
   if (KARTV) { const ft = set.view === 'cockpit' ? 65 + Math.min(9, drv.kmh * .085) : 65; cam.fov += (ft - cam.fov) * (1 - Math.exp(-4 * dt)); }   // kart : champ de vision qui s'élargit avec la vitesse (sensation de vitesse)
   if (set.view === 'cockpit') cockpitTick();
   cam.look(cx, cy, cz, tx, ty, tz);
+  updateTags(cx, cy, cz, tx, ty, tz);
   if (!shown) {
-    smoke.low = skids.low; skids.begin(dt, cam); smoke.begin(dt, cam);
+    smoke.gfxLevel = skids.gfxLevel = GFX.level; skids.begin(dt, cam); smoke.begin(dt, cam);
     skids.car(0, drv, me); smoke.car(0, drv, me, dt);
     const pEng = playerEngine.failed ? 1.0 : Math.min(1, (dmg.w.hood || 0) * .6 + (dmg.w.nose || 0) * .5);
     if (pEng > 0.35 || playerEngine.failed) smoke.engine(0, drv, me, pEng, dt);
@@ -880,6 +918,7 @@ function frame(ts) {
   if (showPlayer) drawWear(R, dmg.w, me);
   skids.draw(cam);   // en dernier : change de programme GL
   const isCockpit = set.view === 'cockpit' && !KARTV;   // kart : pas de pare-brise, donc pas de gouttes
+  if (mixed) rain.setShelter(shelter(drv.s || 0));
   rain.draw(cam);
   smoke.draw(cam);
   rain.update(dt, cam, drv.u || 0, drv.w || 0, isCockpit);   // en dernier : les gouttes du pare-brise lisent la scène 3D déjà complète

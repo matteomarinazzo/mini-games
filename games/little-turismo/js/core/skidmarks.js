@@ -20,7 +20,7 @@ export function createSkids(R, nCars) {
   const gl = R.gl, CAP = SK.CAP, V = new Float32Array(CAP * VPS), st = new Float64Array(Math.max(1, nCars) * 40);
   const ix = new Uint16Array(CAP * 6); for (let s = 0; s < CAP; s++) { const b = s * 4, o = s * 6; ix[o] = b; ix[o + 1] = b + 1; ix[o + 2] = b + 2; ix[o + 3] = b; ix[o + 4] = b + 2; ix[o + 5] = b + 3; }
   const mobile = matchMedia('(pointer:coarse)').matches || innerWidth < 700, N = TRACK.N, T = TRACK.T, ds = TRACK.ds;
-  let ok = true, prog = null, U = null, vao = null, vb = null, head = 0, dStart = 0, dN = 0, clock = 0, maxDeath = 0, camX = 0, camZ = 0, aiLeft = 0, low = false, fe = 1 / 60, slow = 0, good = 0;
+  let ok = true, prog = null, U = null, vao = null, vb = null, head = 0, dStart = 0, dN = 0, clock = 0, maxDeath = 0, camX = 0, camZ = 0, aiLeft = 0, low = false, gfxLevel = 3, fe = 1 / 60, slow = 0, good = 0;
   function init() {
     const mk = (t, s) => { const h = gl.createShader(t); gl.shaderSource(h, s); gl.compileShader(h); if (!gl.getShaderParameter(h, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(h)); return h; };
     prog = gl.createProgram(); gl.attachShader(prog, mk(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
@@ -68,9 +68,9 @@ export function createSkids(R, nCars) {
       if (!on) return; st[o] = 0;
       return tail(o, ai);
     }
-    const sf = G.sf, a = AMAX[sf] * (.25 + .75 * I), life = (ai ? SK.LIFE_AI : SK.LIFE_P) * (low ? .6 : 1);
+    const sf = G.sf, a = AMAX[sf] * (.25 + .75 * I), life = (ai ? SK.LIFE_AI : SK.LIFE_P) * (gfxLevel < 2 ? .6 : 1);
     if (!on) { put(o, 0); return; }
-    const dx = G.cx - st[o + 1], dz = G.cz - st[o + 2], dd = dx * dx + dz * dz, m = (ai ? SK.MIN_AI : SK.MIN_P) * (low ? 1.8 : 1);
+    const dx = G.cx - st[o + 1], dz = G.cz - st[o + 2], dd = dx * dx + dz * dz, m = (ai ? SK.MIN_AI : SK.MIN_P) * (gfxLevel < 2 ? 1.8 : 1);
     if (dd < m * m) return;
     if (dd > 64) { put(o, 0); return; }
     if (ai && aiLeft <= 0) return; if (ai) aiLeft--;
@@ -80,7 +80,7 @@ export function createSkids(R, nCars) {
   function tail(o, ai) {
     const dx = G.cx - st[o + 1], dz = G.cz - st[o + 2], dd = dx * dx + dz * dz;
     if (dd < .0004 || dd > 64 || (ai && aiLeft <= 0)) return; if (ai) aiLeft--;
-    seg(st[o + 3], st[o + 4], st[o + 5], st[o + 6], st[o + 8], G.lx, G.lz, G.rx, G.rz, G.y, st[o + 7], 0, G.sf, (ai ? SK.LIFE_AI : SK.LIFE_P) * (low ? .6 : 1));
+    seg(st[o + 3], st[o + 4], st[o + 5], st[o + 6], st[o + 8], G.lx, G.lz, G.rx, G.rz, G.y, st[o + 7], 0, G.sf, (ai ? SK.LIFE_AI : SK.LIFE_P) * (gfxLevel < 2 ? .6 : 1));
   }
   const G = { cx: 0, cz: 0, lx: 0, lz: 0, rx: 0, rz: 0, y: 0, sf: 0 };
   function geo(o, k, ph, p, S, cs, sn, csF, snF) {
@@ -96,13 +96,14 @@ export function createSkids(R, nCars) {
   return {
     clear() { head = dN = dStart = 0; maxDeath = 0; V.fill(0); st.fill(0); if (ok) { gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, V, gl.DYNAMIC_DRAW); } },
     get low() { return low; }, set low(v) { low = !!v; },
+    get gfxLevel() { return gfxLevel; }, set gfxLevel(v) { gfxLevel = Math.max(0, Math.min(4, +v || 0)); low = gfxLevel < 2; },
     begin(dt, cam) {
-      if (dt > 0) { clock += dt; fe += (dt - fe) * .05; if (mobile) { if (!low) { if (fe > SK.LOW_DT && ++slow > 90) { low = true; good = 0; } else if (fe <= SK.LOW_DT) slow = 0; } else if (fe < .0185 && ++good > 600) { low = false; slow = 0; } else if (fe >= .0185) good = 0; } }
-      camX = cam.pos[0]; camZ = cam.pos[2]; dStart = head % CAP; dN = 0; aiLeft = low ? SK.AI_FRAME_LOW : SK.AI_FRAME;
+      if (dt > 0) { clock += dt; fe += (dt - fe) * .05; /* qualité gérée par GFX (gfx.js) — mobile auto-low désactivé */ }
+      camX = cam.pos[0]; camZ = cam.pos[2]; dStart = head % CAP; dN = 0; aiLeft = gfxLevel < 2 ? SK.AI_FRAME_LOW : SK.AI_FRAME;
     },
     car(slot, ph, pose) {
       if (!ok || slot * 40 + 40 > st.length) return;
-      const p = pose || ph, ai = slot > 0, b = slot * 40, dx = p.x - camX, dz = p.z - camZ, far = low ? SK.FAR_LOW : SK.FAR_AI;
+      const p = pose || ph, ai = slot > 0, b = slot * 40, dx = p.x - camX, dz = p.z - camZ, far = gfxLevel < 2 ? SK.FAR_LOW : SK.FAR_AI;
       if (ai && dx * dx + dz * dz > far * far) { st[b] = st[b + 10] = st[b + 20] = st[b + 30] = 0; return; }
       const S = ph.sheet || DEF, u = ph.u || 0, w = ph.w || 0, r = ph.r || 0, sp = Math.hypot(u, w);
       let iF = ph.skF || 0, iR = ph.skR || 0, sa = ph.sa;

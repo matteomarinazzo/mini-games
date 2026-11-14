@@ -1,5 +1,5 @@
 // Géométrie procédurale : circuit (asphalte, vibreurs, gravier, herbe/terre, murs, portique, ligne de départ) et repère temporaire du mobile.
-import { TRACK, frameAt, edgePoint, PIT, pitExt } from './track.js';
+import { TRACK, frameAt, edgePoint, PIT, pitExt, inZone } from './track.js';
 import { SKY } from './gl.js';
 
 const hex = (h) => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
@@ -78,7 +78,7 @@ function palmTree(B, cx, cz, yBase, sc, woodCol, leafCol) {
 }
 
 export function buildTrackMesh() {
-  const { N, P, T, ds, kerbL, kerbR } = TRACK, B = builder(), H = TRACK.half, G = H + TRACK.gravel, IN = TRACK.theme === 'indoor', KO = !!TRACK.kart;   // IN : hall de karting ; KO : karting en extérieur (vrai décor, gravier + vibreurs, sans stands)
+  const { N, P, T, ds, kerbL, kerbR } = TRACK, B = builder(), H = TRACK.half, G = H + TRACK.gravel, IN = TRACK.theme === 'indoor', KO = !!TRACK.kart, MX = !!TRACK.hall, hall = (i) => MX && TRACK.hallN[((i % N) + N) % N] === 1;   // IN : hall de karting ; KO : karting en extérieur (vrai décor, gravier + vibreurs, sans stands)
   // Largeur max des bandes herbe/terre : on ne recouvre jamais une autre portion du circuit (dn = distance à la portion la plus proche, hors voisinage)
   // et, côté intérieur d'un virage, on reste sous le rayon de courbure (sinon la bande se replie sur elle-même).
   const dn = new Float32Array(N).fill(1e9), yn = new Float32Array(N), Kc = TRACK.K;
@@ -106,7 +106,8 @@ export function buildTrackMesh() {
   };
   const TH = THEMES[TRACK.theme] || THEMES.temperate; SKY.hor = TH.hor; SKY.zen = TH.zen;
   const C = { asp: hex(0x3a3c41), line: hex(0xe6e6e6), kr: hex(0xd0291f), kw: hex(0xf2f2f2), gr: hex(0xbba87b), wl: hex(0xdedede), wd: hex(0x9a9fa6), wt: hex(0x5d6269), pit: hex(0x4a4d53), g1: hex(TH.g1), g2: hex(TH.g2), out: hex(TH.out) };
-  if (IN) { C.wl = C.wd = hex(0x7d828a); C.gr = hex(0x5a5d63); C.asp = hex(0x4c4f55); }   // barrières grises unies, dégagement = sol béton (ni gravier ni vibreurs), asphalte lissé
+  if (IN) { C.wl = C.wd = hex(0x7d828a); C.gr = hex(0x5a5d63); C.asp = hex(0x4c4f55); }
+   // barrières grises unies, dégagement = sol béton (ni gravier ni vibreurs), asphalte lissé
   for (let i = 0; i < N; i++) {
     const j = (i + 1) % N;
     for (const sg of [-1, 1]) {
@@ -114,17 +115,17 @@ export function buildTrackMesh() {
       band(i, sg, () => H - .45, () => H - .15, .02, .02, C.line);
       for (let h = 0; h < 2; h++) {
         const u0 = h / 2, u1 = (h + 1) / 2, w0 = kw[i], w1 = kw[j];
-        if (w0 > 0 || w1 > 0) B.quad(lerp(pt(i, sg * H, .03), pt(j, sg * H, .03), u0), lerp(pt(i, sg * (H + w0), .03), pt(j, sg * (H + w1), .03), u0), lerp(pt(i, sg * (H + w0), .03), pt(j, sg * (H + w1), .03), u1), lerp(pt(i, sg * H, .03), pt(j, sg * H, .03), u1), (i * 2 + h) & 1 ? C.kr : C.kw, nm);
+        if ((w0 > 0 || w1 > 0) && !hall(i)) B.quad(lerp(pt(i, sg * H, .03), pt(j, sg * H, .03), u0), lerp(pt(i, sg * (H + w0), .03), pt(j, sg * (H + w1), .03), u0), lerp(pt(i, sg * (H + w0), .03), pt(j, sg * (H + w1), .03), u1), lerp(pt(i, sg * H, .03), pt(j, sg * H, .03), u1), (i * 2 + h) & 1 ? C.kr : C.kw, nm);
       }
-      band(i, sg, (k) => H + kw[k], () => G, -.04, -.04, sh(C.gr, .9 + .1 * hash(i + sg * 7)));
-      const inn = [sg * T[i * 2 + 1], 0, -sg * T[i * 2]], col = i & 1 ? C.wl : C.wd;
+      band(i, sg, (k) => H + (hall(k) ? 0 : kw[k]), () => G, -.04, -.04, hall(i) ? sh(hex(0x5a5d63), .92 + .08 * hash(i + sg * 7)) : sh(C.gr, .9 + .1 * hash(i + sg * 7)));
+      const inn = [sg * T[i * 2 + 1], 0, -sg * T[i * 2]], col = hall(i) ? hex(i & 2 ? 0x6b7078 : 0x62676e) : i & 1 ? C.wl : C.wd;
       if (!(sg === PIT.sg && Math.max(pitExt(i * ds), pitExt(j * ds)) >= G - H)) {   // pas de mur extérieur là où la voie des stands le traverse
         B.quad(pt(i, sg * G, -.1), pt(i, sg * G, 1.25), pt(j, sg * G, 1.25), pt(j, sg * G, -.1), col, inn);
         B.quad(pt(i, sg * G, 1.25), pt(i, sg * (G + .5), 1.25), pt(j, sg * (G + .5), 1.25), pt(j, sg * G, 1.25), C.wt, [0, 1, 0]);
       }
       const gd = (k) => -.1 - S[k] * (Math.min(70, lim(k, sg)) - G - .5);
-      if (!IN) band(i, sg, () => G + .5, (k) => Math.min(70, lim(k, sg)), -.1, gd, (i / 5 | 0) & 1 ? C.g1 : C.g2);
-      if (!IN) band(i, sg, (k) => Math.min(70, lim(k, sg)), (k) => Math.min(160, lim(k, sg)), gd, (k) => Math.min(-35, gd(k) - 10), C.out);
+      if (!IN && !hall(i)) band(i, sg, () => G + .5, (k) => Math.min(70, lim(k, sg)), -.1, gd, (i / 5 | 0) & 1 ? C.g1 : C.g2);
+      if (!IN && !hall(i)) band(i, sg, (k) => Math.min(70, lim(k, sg)), (k) => Math.min(160, lim(k, sg)), gd, (k) => Math.min(-35, gd(k) - 10), C.out);
     }
     band(i, 1, () => -H, () => H, 0, 0, sh(C.asp, .93 + .1 * hash(i)));
     {   // voie des stands : asphalte (rampes comprises), muret et ligne de séparation voie rapide / voie des box
@@ -218,10 +219,10 @@ export function buildTrackMesh() {
   const BC = [0xc9272d, 0x2c5aa8, 0xf2b705, 0x2a9d57, 0xeeeeee];
   for (let i = 0; i < N; i++) {
     const g = frameAt(i * ds), d = Math.abs(((i * ds - S0 + TRACK.length * 1.5) % TRACK.length) - TRACK.length / 2);
-    if (!IN && i % 5 === 0 && (d > TRACK.length / 2 - 300 || d < 220)) for (const sg of [-1, 1]) if (!(sg === PIT.sg && pitExt(i * ds) > 0)) obox(B, g.x + g.rx * sg * (G + .25), g.y + 1.7, g.z + g.rz * sg * (G + .25), g.tx, g.tz, .04, .45, 8, hex(BC[(i / 5 + (sg > 0 ? 2 : 0)) % 5 | 0]));
+    if (!IN && !hall(i) && i % 5 === 0 && (d > TRACK.length / 2 - 300 || d < 220)) for (const sg of [-1, 1]) if (!(sg === PIT.sg && pitExt(i * ds) > 0)) obox(B, g.x + g.rx * sg * (G + .25), g.y + 1.7, g.z + g.rz * sg * (G + .25), g.tx, g.tz, .04, .45, 8, hex(BC[(i / 5 + (sg > 0 ? 2 : 0)) % 5 | 0]));
   }
   for (let i = 0; i < (IN ? 0 : N); i += 5) for (const sg of [-1, 1]) {
-    const hs = hash(i * 3 + sg * 11); if (hs < .3 || (sg === PIT.sg && pitExt(i * ds) > 0)) continue;
+    const hs = hash(i * 3 + sg * 11); if (hs < .3 || hall(i) || (sg === PIT.sg && pitExt(i * ds) > 0)) continue;
     const o = G + 3 + hs * 7; if (o + 5 > Math.min(70, lim(i, sg))) continue;
     const g = frameAt(i * ds), cx = g.x + g.rx * sg * o, cz = g.z + g.rz * sg * o, y = P[i * 3 + 1] - .1 - S[i] * (o - G - .5), sc = .8 + hash(i + 5) * .8, tc = hex(TH.tc), tr = hex(0x5a3d22);
     if (TH.tree === 'rock') {
@@ -247,11 +248,11 @@ export function buildTrackMesh() {
   if (KO) {   // karting extérieur : murs de pneus en bord de gravier (côté extérieur des virages), petite tribune + paddock (tentes, conteneurs) au départ, panneaux de freinage
     const blk = hex(0x16181c), red = hex(0xc9272d), wht = hex(0xeeeeee), conc = hex(0x8a929e), darkP = hex(0x282c34), TENT = [0xc9272d, 0x2c5aa8, 0xf2b705, 0xeeeeee], CONT = [0x2c5aa8, 0x2a9d57, 0xc26a1c];
     for (let i = 0; i < N; i += 2) {   // piles de pneus : 3 hauteurs, bandes rouges / blanches / noires tous les 5 piles
-      const k = Kc[i]; if (Math.abs(k) < .011) continue;
+      const k = Kc[i]; if (Math.abs(k) < .011 || hall(i)) continue;
       const sg = k > 0 ? -1 : 1, g = frameAt(i * ds), cx = g.x + g.rx * sg * (G - .75), cz = g.z + g.rz * sg * (G - .75), grp = (i / 2 | 0) % 6, col = grp < 2 ? blk : grp < 4 ? red : wht;
       for (let h = 0; h < 3; h++) obox(B, cx, g.y + .17 + h * .34, cz, g.tx, g.tz, .45, .17, 1.9, h === 1 ? blk : col);
     }
-    const si = TRACK.startIdx, spot = (sg, o, d) => o + 10 < Math.min(70, lim(((Math.round((S0 + d) / ds) % N) + N) % N, sg));
+    const si = TRACK.startIdx, spot = (sg, o, d) => !hall(Math.round((S0 + d) / ds)) && o + 10 < Math.min(70, lim(((Math.round((S0 + d) / ds) % N) + N) % N, sg));
     const sgS = lim(si, 1) >= lim(si, -1) ? 1 : -1, oS = G + 6;
     if (spot(sgS, oS, -14)) {   // petite tribune couverte face à la ligne de départ
       const b = frameAt(S0 - 14), ux = b.tx, uz = b.tz, rx = b.rx * sgS, rz = b.rz * sgS, hl = 15;
@@ -272,7 +273,7 @@ export function buildTrackMesh() {
       else obox(B, cx, b.y + 1.3, cz, b.tx, b.tz, 1.2, 1.3, 3.0, hex(CONT[n - 3]));
     }
     for (let i = 0; i < N; i++) {   // panneaux de freinage 75 / 50 / 25 m avant chaque gros virage, côté extérieur, près du mur
-      const k = Math.abs(Kc[i]); if (k < .02) continue;
+      const k = Math.abs(Kc[i]); if (k < .02 || hall(i)) continue;
       let isStart = true; for (let d = 1; d <= 6; d++) if (Math.abs(Kc[(i - d + N) % N]) >= .02) { isStart = false; break; }
       if (!isStart) continue;
       const sg = Kc[i] > 0 ? -1 : 1;
@@ -282,26 +283,50 @@ export function buildTrackMesh() {
       }
     }
   }
-  if (IN) {   // hall de karting : sol béton, murs sombres + bandeau néon, colonnes, plafond avec rampes lumineuses
+  if (IN || MX) {   // hall de karting (MX : circuit mixte, hall = rectangle TRACK.hall, murs percés de portes) : sol béton, murs sombres + bandeau néon, colonnes, plafond avec rampes lumineuses
     let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
     for (let i = 0; i < N; i++) { x0 = Math.min(x0, P[i * 3]); x1 = Math.max(x1, P[i * 3]); z0 = Math.min(z0, P[i * 3 + 2]); z1 = Math.max(z1, P[i * 3 + 2]); }
-    x0 -= 45; x1 += 45; z0 -= 45; z1 += 45;
+    x0 -= 45; x1 += 45; z0 -= 45; z1 += 45; if (MX) [x0, z0, x1, z1] = TRACK.hall;
     const CH = 12, hy = -.12, wc = hex(0x303540), neon = [.4, 1.9, 2.2], lamp = [2.2, 2.1, 1.9], col = hex(0x252932);
     B.quad([x0, hy, z0], [x1, hy, z0], [x1, hy, z1], [x0, hy, z1], hex(0x5a5d63), [0, 1, 0]);
     B.quad([x0, CH, z0], [x1, CH, z0], [x1, CH, z1], [x0, CH, z1], hex(0x1b1e25), [0, -1, 0]);
     const wall = (ax, az, bx, bz, nx, nz) => { for (const [y0, y1, c] of [[hy, CH, wc], [3, 3.35, neon]]) { const o = y0 === 3 ? .06 : 0; B.quad([ax + nx * o, y0, az + nz * o], [bx + nx * o, y0, bz + nz * o], [bx + nx * o, y1, bz + nz * o], [ax + nx * o, y1, az + nz * o], c, [nx, 0, nz]); } };
-    wall(x0, z0, x1, z0, 0, 1); wall(x1, z0, x1, z1, -1, 0); wall(x1, z1, x0, z1, 0, -1); wall(x0, z1, x0, z0, 1, 0);
-    for (let x = x0 + 20; x < x1; x += 40) { obox(B, x, CH / 2, z0 + .5, 1, 0, .5, CH / 2, .5, col); obox(B, x, CH / 2, z1 - .5, 1, 0, .5, CH / 2, .5, col); }
-    for (let z = z0 + 20; z < z1; z += 40) { obox(B, x0 + .5, CH / 2, z, 1, 0, .5, CH / 2, .5, col); obox(B, x1 - .5, CH / 2, z, 1, 0, .5, CH / 2, .5, col); }
+    if (!MX) { wall(x0, z0, x1, z0, 0, 1); wall(x1, z0, x1, z1, -1, 0); wall(x1, z1, x0, z1, 0, -1); wall(x0, z1, x0, z0, 1, 0); }
+    if (!MX) for (let x = x0 + 20; x < x1; x += 40) { obox(B, x, CH / 2, z0 + .5, 1, 0, .5, CH / 2, .5, col); obox(B, x, CH / 2, z1 - .5, 1, 0, .5, CH / 2, .5, col); }
+    if (!MX) for (let z = z0 + 20; z < z1; z += 40) { obox(B, x0 + .5, CH / 2, z, 1, 0, .5, CH / 2, .5, col); obox(B, x1 - .5, CH / 2, z, 1, 0, .5, CH / 2, .5, col); }
     for (let x = x0 + 16; x < x1; x += 26) for (let z = z0 + 16; z < z1; z += 26) obox(B, x, CH - .3, z, 1, 0, .5, .12, 4, lamp);
     // décor du hall (primitives seulement) : poutres et gaines au plafond, plinthe, portes roulantes + issues de secours, joints de dalle, colonnes, piles de pneus à l'extérieur des virages, caisses, palettes, fûts, étagères
     const stl = hex(0x20242c), duct = hex(0x8b9099), door = hex(0x39414d), skirt = hex(0x4a505a), joint = hex(0x4e5157), blk = hex(0x16181c), wood = hex(0x7a6244), wood2 = hex(0x6a553b), card = hex(0xa88a5e), drums = [hex(0x2b4a7a), hex(0x55595f), hex(0x6b2a24)], rack = hex(0x3d5a80), rbeam = hex(0xc26a1c), base = hex(0xc9a227), exit = [.15, 1.4, .35];
     const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, nd = (x, z) => { let m = 1e9; for (let i = 0; i < N; i += 2) { const d = (P[i * 3] - x) ** 2 + (P[i * 3 + 2] - z) ** 2; if (d < m) m = d; } return Math.sqrt(m); };
+    if (MX) {   // murs du hall mixte : percés d'une porte (linteau + cadre rayé) à chaque passage de la piste ; toit visible de dessus
+      const W4 = [[x0, z0, x1, z0, 0, 1], [x1, z0, x1, z1, -1, 0], [x1, z1, x0, z1, 0, -1], [x0, z1, x0, z0, 1, 0]], GH = G + 3, gp = [[], [], [], []], yel = hex(0xf2b705);
+      for (let i = 0; i < N; i++) if (hall(i) !== hall(i + 1)) {
+        const x = P[i * 3], z = P[i * 3 + 2], d = [Math.abs(z - z0), Math.abs(x - x1), Math.abs(z - z1), Math.abs(x - x0)], sd = d.indexOf(Math.min(...d));
+        gp[sd].push([x - x0, z - z0, x1 - x, z1 - z][sd]);
+      }
+      B.quad([x0, CH + .08, z0], [x0, CH + .08, z1], [x1, CH + .08, z1], [x1, CH + .08, z0], hex(0x6a7078), [0, 1, 0]);
+      W4.forEach(([ax, az, bx, bz, nx, nz], sd) => {
+        const len = Math.hypot(bx - ax, bz - az), dx = (bx - ax) / len, dz = (bz - az) / len, at = (t, y, o) => [ax + dx * t + nx * o, y, az + dz * t + nz * o], nn = [nx, 0, nz], rv = [-nx, 0, -nz], G2 = gp[sd].sort((p, q) => p - q), iv = []; let a0 = 0;
+        for (const t of G2) { if (t - GH > a0) iv.push([a0, t - GH]); a0 = t + GH; } if (a0 < len) iv.push([a0, len]);
+        const face = (t0, t1, y0, y1, o, c) => { B.quad(at(t0, y0, o), at(t1, y0, o), at(t1, y1, o), at(t0, y1, o), c, nn); B.quad(at(t1, y0, o - .08), at(t0, y0, o - .08), at(t0, y1, o - .08), at(t1, y1, o - .08), c, rv); };
+        for (const [t0, t1] of iv) {
+          face(t0, t1, hy, CH, 0, wc); face(t0, t1, hy, 1.2, .03, skirt);
+          B.quad(at(t0, 3, .06), at(t1, 3, .06), at(t1, 3.35, .06), at(t0, 3.35, .06), neon, nn);
+          for (let t = t0 + 14; t < t1 - 14; t += 40) { B.quad(at(t - 4, hy, .05), at(t + 4, hy, .05), at(t + 4, 5.2, .05), at(t - 4, 5.2, .05), door, nn); B.quad(at(t - .7, 5.8, .07), at(t + .7, 5.8, .07), at(t + .7, 6.25, .07), at(t - .7, 6.25, .07), exit, nn); }
+          for (let t = t0 + 10; t < t1 - 6; t += 30) { const p = at(t, 0, 0); obox(B, p[0], CH / 2, p[2], nx, nz, .5, CH / 2, .5, col); }
+        }
+        for (const t of G2) {
+          face(t - GH, t + GH, 6.2, CH, 0, wc);
+          for (let c = 0; c < 8; c++) { const p = at(t - GH + (c + .5) * GH / 4, 0, 0); obox(B, p[0], 6.0, p[2], nx, nz, GH / 8, .3, .5, c & 1 ? blk : yel); }
+          for (const e of [-GH, GH]) { const p = at(t + e, 0, 0); obox(B, p[0], 3.1, p[2], nx, nz, .4, 3.1, .5, stl); }
+        }
+      });
+    }
     for (let x = x0 + 3; x < x1; x += 26) obox(B, x, CH - .9, cz, 0, 1, .25, .35, (z1 - z0) / 2, stl);
     for (let z = z0 + 3; z < z1; z += 26) obox(B, cx, CH - 1.3, z, 1, 0, .25, .35, (x1 - x0) / 2, stl);
     obox(B, cx, CH - 2.2, z0 + 9, 1, 0, .6, .6, (x1 - x0) / 2, duct); obox(B, cx, CH - 2.2, z1 - 9, 1, 0, .6, .6, (x1 - x0) / 2, duct);
     obox(B, x0 + 9, CH - 2.2, cz, 0, 1, .6, .6, (z1 - z0) / 2, duct); obox(B, x1 - 9, CH - 2.2, cz, 0, 1, .6, .6, (z1 - z0) / 2, duct);
-    for (const [ax, az, bx, bz, nx, nz] of [[x0, z0, x1, z0, 0, 1], [x1, z0, x1, z1, -1, 0], [x1, z1, x0, z1, 0, -1], [x0, z1, x0, z0, 1, 0]]) {
+    for (const [ax, az, bx, bz, nx, nz] of MX ? [] : [[x0, z0, x1, z0, 0, 1], [x1, z0, x1, z1, -1, 0], [x1, z1, x0, z1, 0, -1], [x0, z1, x0, z0, 1, 0]]) {
       const len = Math.hypot(bx - ax, bz - az), dx = (bx - ax) / len, dz = (bz - az) / len, at = (t, y, o) => [ax + dx * t + nx * o, y, az + dz * t + nz * o];
       B.quad(at(0, hy, .03), at(len, hy, .03), at(len, 1.2, .03), at(0, 1.2, .03), skirt, [nx, 0, nz]);   // plinthe
       for (let t = 40; t < len - 20; t += 40) {
@@ -313,7 +338,7 @@ export function buildTrackMesh() {
     for (let z = z0 + 12; z < z1; z += 12) B.quad([x0, hy + .02, z - .03], [x1, hy + .02, z - .03], [x1, hy + .02, z + .03], [x0, hy + .02, z + .03], joint, [0, 1, 0]);
     for (let x = x0 + 60; x < x1 - 20; x += 60) for (let z = z0 + 60; z < z1 - 20; z += 60) if (nd(x, z) > G + 6) { obox(B, x, CH / 2, z, 1, 0, .6, CH / 2, .6, col); obox(B, x, .6, z, 1, 0, .66, .6, .66, base); }
     for (let i = 0; i < N; i += 3) {   // piles de pneus derrière le mur, côté extérieur des virages
-      const k = Kc[i]; if (Math.abs(k) < .012) continue;
+      const k = Kc[i]; if (Math.abs(k) < .012 || (MX && !hall(i))) continue;
       const o = -Math.sign(k) * (TRACK.wall + 1.3), px = P[i * 3] - T[i * 2 + 1] * o, pz = P[i * 3 + 2] + T[i * 2] * o, tx = T[i * 2], tz = T[i * 2 + 1];
       for (const e of [-.5, .5]) for (let h = 0; h < 3; h++) obox(B, px + tx * e, .17 + h * .34, pz + tz * e, tx, tz, .45, .17, .24, blk);
     }

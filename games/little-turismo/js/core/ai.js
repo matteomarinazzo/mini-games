@@ -6,7 +6,7 @@ import { TRACK, frameAt, PIT, pitExt } from './track.js';
 import { stepCar, createCar, getCarWetGripFactor, WET_PROFILES } from './physics.js';
 import { engineState, engineIncrement } from './engine.js';
 
-const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, KT = ROAD_HALF < 5, WS = KT ? .58 : 1, LS = KT ? .48 : 1, LIM = ROAD_HALF - (KT ? 1.15 : 2.1);   // KT : piste étroite (karting) → distances latérales (WS) et longitudinales (LS) réduites ;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
+const { N, ds, length: LEN, K, ideal, half: ROAD_HALF } = TRACK, KT = ROAD_HALF < 5, WS = KT ? .58 : 1, LS = KT ? .68 : 1, LIM = ROAD_HALF - (KT ? 1.15 : 2.1);   // KT : piste étroite (karting) → distances latérales (WS) et longitudinales (LS) réduites ;   // centre voiture : ≥ 2,1 m du bord (demi-largeur .93 + marge)
 const LNF = 1, KC = Float32Array.from(K, (k) => Math.abs(k) * .85);   // LNF : part de la ligne idéale suivie ; KC : courbure utile de l'axe
 /** Ligne de course suivie par les IA (décalage latéral, + = droite) : c'est aussi celle affichée au joueur. */
 export const aiLine = TRACK.qualifyingLine || Float32Array.from(ideal, (v) => Math.max(-(LIM - .2), Math.min(LIM - .2, v * LNF)));
@@ -40,7 +40,7 @@ const withSpec = (S, k) => { if (!k || S._spec) return S; const key = S.id + '|'
 const PR = new Map();
 const YG = .8, CK = .8, BMU = .75, RM = .85;   // CK : crédit d'appui, BMU : adhérence de freinage (× grip), RM : capacité latérale réelle (cercle de friction au freinage)
 // CM : adhérence utilisée en courbe, calibrée par voiture en simulation (≈ 0 sortie de piste sur 10 circuits, le reste est corrigé par l'apprentissage ci-dessous)
-const CMS = { serra_gt: .65, titan: .65, nebula: .65, vipere: .61, comete: .59, spectre: .59, aigle: .57, prototype: .57, f1: .57, lame: .57, zephyr: .57, foudre: .55, mistral: .53, rallye: .49, safari: .49, baroudeur: .49, top_fuel: .68, thrust_ssc: .72 };
+const CMS = { kart_frelon: .66, kart_pepite: .68, kart_cobalt: .64, kart_vipere: .70, serra_gt: .65, titan: .65, nebula: .65, vipere: .61, comete: .59, spectre: .59, aigle: .57, prototype: .57, f1: .57, lame: .57, zephyr: .57, foudre: .55, mistral: .53, rallye: .49, safari: .49, baroudeur: .49, top_fuel: .68, thrust_ssc: .72 };
 const cmOf = (S) => CMS[S.id] ?? .53;
 /** Décélération maximale (m/s²) à la vitesse v : pneus (charge + appui) ou freins, + traînée. */
 export const decelAt = (S, v, wet = 0) => { const wg = getCarWetGripFactor(S.kind || 'gt', wet), g = S.grip * wg, kd = (S.drag + .12 * S.aero) * v * v / S.mass; return Math.min(g * BMU * (9.81 + S.aero * v * v / S.mass), S.brakeForce / S.mass * .95) + kd; };
@@ -164,7 +164,7 @@ function mk(ph, level, seed, pm, q = false) {
   const wet = ph.wet || 0, L = LEVELS[level] || LEVELS.normal, r = rng(seed * 7919 + 13), sheet = ph.sheet = withSpec(ph.sheet, L.spec), lane = q ? 0 : laneOf(ph.lat, seed), p = prof(sheet, lane, wet);
   return {
     ph, L, q, sheet, r, t1: table(sheet, p, L.margin, lane, wet), t2: table(sheet, p, L.margin * .94, lane, wet), skill: 1 + (r() - .5) * (SKILL_SPREAD[level] ?? .025), lane, blk: 0, vf: 0, p1: r() * 6.28, p2: r() * 6.28,
-    pm, ev: 0, off: false, wait: Math.min(.1, L.react * .08 * r()), tl: ph.lat, vt: 0, tx: ph.x, tz: ph.z, fault: null, atk: 0, tgt: null, atkT: 0, defDone: false, defT: 0, defSide: 0, calm: 0, gl: null, dist: 0, joined: false, stk: 0, rec: 0, recover: 0,
+    pm, ev: 0, off: false, wait: Math.min(.1, L.react * .08 * r()), tl: ph.lat, vt: 0, tx: ph.x, tz: ph.z, wetLearn: wet, fault: null, atk: 0, tgt: null, atkT: 0, defDone: false, defT: 0, defSide: 0, calm: 0, gl: null, dist: 0, joined: false, stk: 0, rec: 0, recover: 0,
     inp: { throttle: 0, brake: 0, steer: 0 }, level, laps: 0, p0: 0, pit: 0, pitD: 0, pitT: 0, pitN: 0, pitChk: false, pitW: 0, pitTO: 0, avgV: 0, engine: engineState(), damage: { aero: 0, grip: 0, drag: 0, w: { nose: 0, fw: 0, hood: 0, l: 0, r: 0, rw: 0, floor: 0 } },
   };
 }
@@ -337,7 +337,7 @@ function decide(a, all, t) {
   if (c.surf >= 2) { if (!a.off && v > 8) { if (near === 0) for (let d = -140; d <= 20; d += 20) { const b = bin(s + d); a.pm[b] = Math.max(.65, a.pm[b] - (c.wet > 0 ? .12 : .08)); } a.ev++; } a.off = true; } else a.off = false;
   let vt = (late ? a.t2 : a.t1)[ti]; vt *= (L.speed * a.skill) * (1 - (1 - a.pm[bin(ti * ds)]) * cl((.98 * a.sheet.vmax - vt) / (.15 * a.sheet.vmax), 0, 1));
   vt *= 1 - Math.min(.48, failure.grip * .42 + failure.aero * .08 + cl(slip - .12, 0, .8) * .22 + cl(headingError - .25, 0, 1.2) * .2);
-  const sharp = cl((kmx - .0035) / .0025, 0, 1); vt *= 1 - (L.speed >= 1 ? .035 : .07) * sharp;   // virage serré : vitesse un peu plus basse pour garder l'adhérence
+  const sharp = cl((kmx - .0035) / .0025, 0, 1); vt *= 1 - (L.speed >= 1 ? .035 : .07) * sharp;   // virage serré : vitesse cible réduitesse un peu plus basse pour garder l'adhérence
   if (c.wet > 0) {
     vt *= 1 - (c.wet || 0) * (sharp > 0 ? .08 : .03);
     if (slip > .06 || headingError > .15) {
@@ -353,6 +353,12 @@ function decide(a, all, t) {
   if (a.recover > 0) vt = Math.min(vt, 12 + Math.max(0, 5 - Math.abs(headingError) * 5));
   if (pit) vt = pitSpeed(a, vt, v, am, wrapS(s - S0));
   if (inLane(c)) vt = Math.min(vt, PL);   // pit limiter : toute IA dans la voie rapide
+  // circuit mixte : ajuster vt si wet courant ≠ wet d'apprentissage (sous/hors abri)
+  // mixte : réduire vt si on sort sous la pluie avec tables apprises en sec (jamais de boost).
+  if (a.wetLearn !== undefined && (c.wet||0) > a.wetLearn + 0.05) {
+    const wl = getCarWetGripFactor(a.sheet.kind||'gt', a.wetLearn), wn = getCarWetGripFactor(a.sheet.kind||'gt', c.wet||0);
+    if (wl > 0.01) vt = Math.min(vt * Math.sqrt(wn / wl), vt);
+  }
   a.vf = vt; a.vt = Math.max(0, Math.min(vt, cap));
 }
 /** Pilotage à chaque pas physique : pure pursuit + pédales vers vt. */
@@ -380,20 +386,23 @@ function drive(a, dt) {
 
   // ABS & modulation de freinage sous la pluie
   if (wet > 0 && br > 0) {
-    const maxBrake = Math.max(.66, 1 - wet * .24);
+    const isKart = (S.kind === 'kart');
+    const maxBrake = Math.max(isKart ? .58 : .66, 1 - wet * (isKart ? .32 : .24));  // karts : freinage max réduit sous pluie
     br = Math.min(br, maxBrake);
     const steerMag = Math.abs(i.steer);
-    if (steerMag > .12) br *= Math.max(.48, 1 - steerMag * .5 * wet);
-    if (slip > .07) br *= Math.max(.42, 1 - (slip - .07) * 4 * wet);
+    if (steerMag > .12) br *= Math.max(isKart ? .40 : .48, 1 - steerMag * (isKart ? .7 : .5) * wet);
+    if (slip > .07) br *= Math.max(isKart ? .35 : .42, 1 - (slip - .07) * 4 * wet);
   }
 
   // Antipatinage (TCS) sous la pluie
   if (wet > 0) {
     const steerMag = Math.abs(i.steer);
-    if (steerMag > .1) th *= Math.max(.35, 1 - steerMag * 1.3 * wet);
-    const slipThresh = .045;
+    const isKart = (S.kind === 'kart');
+    const wetMult = isKart ? 1.5 : 1;  // karts plus sensibles au patinage sous la pluie
+    if (steerMag > .1) th *= Math.max(.3, 1 - steerMag * 1.3 * wet * wetMult);
+    const slipThresh = isKart ? .035 : .045;  // karts : seuil de patinage plus bas
     if (slip > slipThresh) {
-      th *= Math.max(.2, 1 - (slip - slipThresh) * 7 * wet);
+      th *= Math.max(.15, 1 - (slip - slipThresh) * 7 * wet * wetMult);
     }
   } else {
     th *= (1 - (1 - L.aggr) * cl(Math.abs(i.steer) * 3, 0, 1)) * cl(1 - (slip - .1) * 4, .12, 1);

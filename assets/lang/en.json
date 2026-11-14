@@ -316,6 +316,18 @@
             "escape-game": {
                 "name": "Escape Game",
                 "description": "Trapped in a dark room, search every corner, decipher the clues and find the door code before running out of tries. Rooms keep coming: how far will you go?"
+            },
+            "aires": {
+                "name": "Aires",
+                "description": "Cut the grid into rectangles: each number is the area of its rectangle. Only one solution per grid, three sizes, from 7×7 to 10×10"
+            },
+            "path": {
+                "name": "Path",
+                "description": "Draw a line passing through the numbers 1 to 10 in order, and fill the entire grid. Only one solution per grid, three sizes, from 5×5 to 8×8."
+            },
+            "netwalk": {
+                "name": "Netwalk",
+                "description": "Turn cables to light up the whole network from the server, with no loops or wires going nowhere. One solution per grid, three sizes from 5×5 to 9×9, or your own grid up to 50×50."
             }
         },
         "badges": {

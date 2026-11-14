@@ -316,6 +316,18 @@
             "escape-game": {
                 "name": "Fluchtspiel",
                 "description": "Eingesperrt in einem dunklen Raum, durchsuche jede Ecke, entschlüssele die Hinweise und finde den Türcode, bevor dir die Versuche ausgehen. Die Räume reihen sich aneinander: wie weit wirst du kommen?"
+            },
+            "aires": {
+                "name": "Aires",
+                "description": "Teile das Raster in Rechtecke: jede Zahl ist die Fläche ihres Rechtecks. Nur eine Lösung pro Raster, drei Größen, von 7×cri à 10×10."
+            },
+            "path": {
+                "name": "Pfad",
+                "description": "Zeichne eine einzige Linie, die die Zahlen von 1 bis 10 der Reihe nach durchläuft und das ganze Gitter füllt. Pro Gitter gibt es nur eine Lösung, drei Größen von 5×5 bis 8×8."
+            },
+            "netwalk": {
+                "name": "Netwalk",
+                "description": "Durch Drehen der Kabel wird das gesamte Netzwerk vom Server aus mit Strom versorgt, wodurch Schleifen und lose Kabel vermieden werden. Eine Lösung pro Raster, drei Größen von 5x5 bis 9x9 oder Ihr eigenes benutzerdefiniertes Raster bis zu 50x50."
             }
         },
         "badges": {

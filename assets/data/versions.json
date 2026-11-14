@@ -1,7 +1,16 @@
 {
-    "currentVersion": "1.57.2026-11-14",
+    "currentVersion": "1.58.2026-11-14",
     "lastUpdate": "2026-11-14",
     "history": [
+        {
+            "version": "1.58.2026-11-14",
+            "date": "2024-11-14",
+            "changes": [
+                "Ajout du jeu Netwalk",
+                "Ajout du jeu Path",
+                "Ajout du jeu Aires"
+            ]
+        },
         {
             "version": "1.57.2026-11-14",
             "date": "2024-11-14",

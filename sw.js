@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "mini-games-cache-v1.58.2026-11-14";
+﻿const CACHE_NAME = "mini-games-cache-v1.58.2026-11-14.8";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -117,6 +117,10 @@ const ASSETS_TO_CACHE = [
     'assets/logos/anagram.webp',
     'assets/logos/four-in-a-row.webp',
     'assets/logos/escape-game.webp',
+    'assets/logos/target-count.webp',
+    'assets/logos/aires.webp',
+    'assets/logos/path.webp',
+    'assets/logos/netwalk.webp',
 
     // About
     'about/about.html',
@@ -706,6 +710,29 @@ const ASSETS_TO_CACHE = [
     'games/escape-game/js/core/render.js',
     'games/escape-game/js/core/room.js',
     'games/escape-game/js/core/save.js',
+
+    // Game: Aires
+    'games/aires/index.html',
+    'games/aires/css/game.css',
+    'games/aires/js/game.js',
+    'games/aires/js/core/generate.js',
+
+    // Game: Chemin
+    'games/path/index.html',
+    'games/path/css/game.css',
+    'games/path/js/game.js',
+    'games/path/js/core/fallback.js',
+    'games/path/js/core/generate.js',
+    'games/path/js/core/records.js',
+    'games/path/js/core/rules.js',
+
+    // Game: Netwalk
+    'games/netwalk/index.html',
+    'games/netwalk/css/game.css',
+    'games/netwalk/js/game.js',
+    'games/netwalk/js/core/generate.js',
+    'games/netwalk/js/core/records.js',
+    'games/netwalk/js/core/rules.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

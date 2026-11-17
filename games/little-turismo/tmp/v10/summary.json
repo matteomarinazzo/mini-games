@@ -1,0 +1,63 @@
+{
+  "version": "v10",
+  "date": "2026-11-17T13:27:38.306Z",
+  "durationSec": 0.5,
+  "taskCount": 1,
+  "runs": [
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_sentinelle_qualif.json",
+      "wallTimeMs": 360,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 71.95,
+          "lapTimes": [
+            71.95
+          ],
+          "maxV": 295,
+          "avgV": 169,
+          "offTrackTicks": 0,
+          "lockupTicks": 14
+        },
+        {
+          "level": "difficile",
+          "bestLap": 74.17,
+          "lapTimes": [
+            74.17
+          ],
+          "maxV": 290.7,
+          "avgV": 163,
+          "offTrackTicks": 0,
+          "lockupTicks": 3
+        },
+        {
+          "level": "normal",
+          "bestLap": 78.4,
+          "lapTimes": [
+            78.4
+          ],
+          "maxV": 284.9,
+          "avgV": 155,
+          "offTrackTicks": 0,
+          "lockupTicks": 4
+        },
+        {
+          "level": "facile",
+          "bestLap": 81.23,
+          "lapTimes": [
+            81.23
+          ],
+          "maxV": 280.4,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 6
+        }
+      ]
+    }
+  ]
+}

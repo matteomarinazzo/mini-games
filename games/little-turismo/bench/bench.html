@@ -1,0 +1,2536 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Little Turismo · Banc d'Essai & Comparateur Télémétrique IA</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131b2e;
+      --card-alt: #1a243d;
+      --border: #233152;
+      --accent: #ff4d3d;
+      --accent-hover: #ff3320;
+      --text: #e9eef7;
+      --muted: #8a9bb8;
+      --good: #33cc66;
+      --warn: #ffaa33;
+      --bad: #ff4d3d;
+      --cmp-gold: #ffd700;
+      --expert: #b366ff;
+      --difficile: #ff9933;
+      --normal: #33ccff;
+      --facile: #33cc66;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #0d1322;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 5px 12px;
+      font-size: 0.84rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all .15s;
+    }
+
+    .nav-tab.active {
+      background: var(--card-alt);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-tab:hover:not(.active) {
+      color: #fff;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    button,
+    input[type="text"] {
+      background: #1c2742;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      outline: none;
+      transition: all .15s;
+    }
+
+    select:hover,
+    button:hover {
+      border-color: #3b5080;
+      background: #243254;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    button.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Tab Pages */
+    .tab-page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .tab-page.active {
+      display: flex;
+    }
+
+    /* Page 1: 2D Telemetry Viewport & Sidebar */
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: #080c14;
+      display: flex;
+      flex-direction: column;
+    }
+
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    canvas:active {
+      cursor: grabbing;
+    }
+
+    /* Overlays on Canvas */
+    .canvas-overlay-top {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      display: flex;
+      gap: 12px;
+      background: rgba(19, 27, 46, 0.90);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      z-index: 5;
+      font-size: 0.82rem;
+      align-items: center;
+    }
+
+    .canvas-overlay-top label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Player Bar */
+    .player-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      background: rgba(19, 27, 46, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 5;
+    }
+
+    .timeline {
+      flex: 1;
+      height: 8px;
+      background: #243254;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-progress {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      width: 0%;
+    }
+
+    .timeline-handle {
+      position: absolute;
+      top: -4px;
+      left: 0%;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .time-label {
+      font-family: monospace;
+      font-size: 0.92rem;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* Right Telemetry Sidebar */
+    .sidebar {
+      width: 400px;
+      background: var(--card);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cmp-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--cmp-gold);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    /* HUD Gauges */
+    .hud-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .hud-card {
+      background: #19233c;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hud-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: monospace;
+    }
+
+    .hud-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .hud-diff {
+      font-size: 0.78rem;
+      font-family: monospace;
+      margin-top: 4px;
+    }
+
+    .pedal-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .pedal-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+    }
+
+    .pedal-track {
+      flex: 1;
+      height: 6px;
+      background: #1c2742;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .pedal-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.05s linear;
+    }
+
+    .fill-th {
+      background: #33cc66;
+    }
+
+    .fill-br {
+      background: #ff4d3d;
+    }
+
+    .fill-st {
+      background: #33ccff;
+    }
+
+    /* Results Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th,
+    td {
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    td.mono {
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    .delta-good {
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .delta-bad {
+      color: var(--bad);
+      font-weight: 700;
+    }
+
+    .delta-neutral {
+      color: var(--muted);
+    }
+
+    /* Incidents List */
+    .incident-item {
+      padding: 8px 10px;
+      background: #19233c;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      border-left: 3px solid #ff4d3d;
+      transition: background .15s;
+    }
+
+    .incident-item:hover {
+      background: #223052;
+    }
+
+    .incident-time {
+      font-family: monospace;
+      color: var(--muted);
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 5;
+    }
+
+    .zoom-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      padding: 0;
+    }
+
+    /* Page 2: Matrice Comparative Globale */
+    .matrix-page {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--card);
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-pill {
+      background: #19233c;
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      min-width: 120px;
+    }
+
+    .stat-pill .num {
+      font-size: 1.3rem;
+      font-weight: 800;
+      font-family: monospace;
+    }
+
+    .stat-pill .lbl {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .matrix-table {
+      width: 100%;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .matrix-table th {
+      background: #172036;
+      padding: 10px 12px;
+    }
+
+    .matrix-table td {
+      padding: 10px 12px;
+    }
+
+    .matrix-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge-circuit {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #243254;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .badge-cat {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-right: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-indoor {
+      background: #3d224e;
+      color: #d896ff;
+      border: 1px solid #72379c;
+    }
+
+    .badge-outdoor {
+      background: #163823;
+      color: #66e088;
+      border: 1px solid #23683a;
+    }
+
+    .badge-mixte {
+      background: #3b3014;
+      color: #ffd24d;
+      border: 1px solid #7a6018;
+    }
+
+    .badge-gp {
+      background: #182844;
+      color: #66b3ff;
+      border: 1px solid #244978;
+    }
+
+    .badge-kart {
+      background: #442414;
+      color: #ff944d;
+      border: 1px solid #803914;
+    }
+
+    .badge-car {
+      background: #1e2a44;
+      color: #b8c7e0;
+      border: 1px solid #334468;
+    }
+
+    optgroup {
+      background: #111728;
+      color: #ffaa33;
+      font-weight: 700;
+      font-style: normal;
+      padding: 4px 0;
+    }
+
+    optgroup option {
+      background: #1c2742;
+      color: var(--text);
+      font-weight: normal;
+      padding: 3px 6px;
+    }
+
+    /* Page 3: V(s) Velocity Charts */
+    .chart-page {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .chart-canvas-wrap {
+      flex: 1;
+      min-height: 480px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+    }
+
+    #chartCv {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Page 4: Comparateur Même Voiture & Même Circuit */
+    .compare-page {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .specs-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .specs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 10px;
+    }
+
+    .specs-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .specs-kind-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .spec-item {
+      background: #0d1322;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spec-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-family: monospace;
+      color: #fff;
+    }
+
+    .spec-lbl {
+      font-size: 0.70rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .two-cols-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1100px) {
+      .two-cols-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .compare-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .compare-card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .compare-cv-wrap {
+      width: 100%;
+      height: 280px;
+      position: relative;
+      background: #0d1322;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .compare-cv-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hist-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .hist-table th,
+    .hist-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hist-table th {
+      background: #172036;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .hist-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge-ver {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #243254;
+      font-weight: 700;
+      font-family: monospace;
+      font-size: 0.80rem;
+    }
+
+    .badge-ver.latest {
+      background: var(--accent);
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="brand">
+      <span>🏎️ Little Turismo</span> · Télémétrie & Banc d'Essai IA
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-telemetry">Circuit 2D & Replay</button>
+      <button class="nav-tab" data-tab="tab-chart">Courbes V(s) & Delta T</button>
+      <button class="nav-tab" data-tab="tab-car-compare">Même Voiture / Multi-Versions</button>
+      <button class="nav-tab" data-tab="tab-matrix">Matrice Comparative Globale</button>
+    </div>
+
+    <div class="controls-row">
+      <label>Version: <select id="verSelect"></select></label>
+      <label>Catégorie:
+        <select id="catFilter">
+          <option value="all">Toutes pistes</option>
+          <option value="indoor">🏟️ Karting Intérieur</option>
+          <option value="outdoor">🌿 Karting Extérieur</option>
+          <option value="mixte">🔀 Karting Mixte</option>
+          <option value="standard">🏁 Grands Prix</option>
+        </select>
+      </label>
+      <label>Circuit: <select id="trkSelect"></select></label>
+      <label>Véhicule:
+        <select id="carCatFilter">
+          <option value="all">Tous véhicules</option>
+          <option value="kart">🏎️ Karts uniquement</option>
+          <option value="car">🚗 Voitures uniquement</option>
+        </select>
+      </label>
+      <label>Épreuve: <select id="runSelect"></select></label>
+      <label>Réf: <select id="cmpSelect">
+          <option value="">-- Aucune --</option>
+        </select></label>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: 2D Viewport & Replay -->
+    <div class="tab-page active" id="tab-telemetry">
+      <div class="viewport">
+        <div class="canvas-overlay-top">
+          <label><input type="checkbox" id="chkExp" checked> <span class="badge-dot"
+              style="background:var(--expert)"></span> Expert</label>
+          <label><input type="checkbox" id="chkDiff" checked> <span class="badge-dot"
+              style="background:var(--difficile)"></span> Difficile</label>
+          <label><input type="checkbox" id="chkNorm" checked> <span class="badge-dot"
+              style="background:var(--normal)"></span> Normal</label>
+          <label><input type="checkbox" id="chkFac" checked> <span class="badge-dot"
+              style="background:var(--facile)"></span> Facile</label>
+          <label id="lblCmpGhost" style="display:none; color:var(--cmp-gold);">
+            <input type="checkbox" id="chkCmp" checked>
+            <span class="badge-dot" style="background:var(--cmp-gold)"></span> Fantôme Réf
+          </label>
+          <label style="margin-left:8px;">Style:
+            <select id="colorMode" style="padding:2px 6px;font-size:0.75rem;">
+              <option value="level">Par Niveau</option>
+              <option value="speed">Heatmap Vitesse</option>
+              <option value="pedal">Gaz / Frein</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="btnZoomIn">+</button>
+          <button class="zoom-btn" id="btnZoomOut">-</button>
+          <button class="zoom-btn" id="btnFit" title="Centrer le circuit">⛶</button>
+        </div>
+
+        <canvas id="cv"></canvas>
+
+        <div class="player-bar">
+          <button id="btnPlay">▶ Play</button>
+          <select id="speedSelect" style="width:75px">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1.0x</option>
+            <option value="2">2.0x</option>
+            <option value="5">5.0x</option>
+            <option value="10">10x</option>
+          </select>
+          <div class="timeline" id="timeline">
+            <div class="timeline-progress" id="timeProgress"></div>
+            <div class="timeline-handle" id="timeHandle"></div>
+          </div>
+          <div class="time-label" id="timeLabel">00:00.00</div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="section">
+          <div class="section-title">
+            Informations Course
+            <span class="cmp-badge" id="cmpHeaderBadge" style="display:none;"></span>
+          </div>
+          <div style="font-weight:700;font-size:1.1rem;margin-bottom:4px;" id="infoTrkName">Serra Nova</div>
+          <div style="font-size:0.85rem;color:var(--muted);" id="infoDetails">Longueur: 3445 m · Voiture: Tempête</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">
+            Chronomètres & Performance
+            <span style="font-size:0.75rem; color:var(--muted);" id="cmpTableSub">Actuel vs Ref</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Niveau</th>
+                <th>Chrono</th>
+                <th>Vmax</th>
+                <th>Fautes</th>
+              </tr>
+            </thead>
+            <tbody id="timesTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Télémétrie Instantanée (Expert)</div>
+          <div class="hud-grid">
+            <div class="hud-card">
+              <div class="hud-val" id="hudSpeed">0</div>
+              <div class="hud-sub">KM/H</div>
+              <div class="hud-diff" id="hudSpeedDiff"></div>
+            </div>
+            <div class="hud-card">
+              <div class="hud-val" id="hudSurf">Route</div>
+              <div class="hud-sub">SURFACE</div>
+              <div class="hud-diff" id="hudSurfDiff"></div>
+            </div>
+          </div>
+          <div class="pedal-bar-wrap">
+            <div class="pedal-row">
+              <span style="width:40px;">Gaz</span>
+              <div class="pedal-track">
+                <div class="pedal-fill fill-th" id="barTh"></div>
+              </div>
+              <span style="width:35px;font-family:monospace;" id="valTh">0%</span>
+            </div>
+            <div class="pedal-row">
+              <span style="width:40px;">Frein</span>
+              <div class="pedal-track">
+                <div class="pedal-fill fill-br" id="barBr"></div>
+              </div>
+              <span style="width:35px;font-family:monospace;" id="valBr">0%</span>
+            </div>
+            <div class="pedal-row">
+              <span style="width:40px;">Volant</span>
+              <div class="pedal-track">
+                <div class="pedal-fill fill-st" id="barSt"></div>
+              </div>
+              <span style="width:35px;font-family:monospace;" id="valSt">0°</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" style="flex:1;">
+          <div class="section-title">Incidents Détectés (<span id="incCount">0</span>)</div>
+          <div id="incList" style="max-height:220px;overflow-y:auto;">
+            <div style="color:var(--muted);font-size:0.8rem;">Aucun incident.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: V(s) Curves Graph -->
+    <div class="tab-page" id="tab-chart">
+      <div class="chart-page">
+        <div class="filter-bar">
+          <span style="font-weight:700;">Profil de Vitesse V(s) & Delta Chrono Cumulé Δt(s)</span>
+          <span style="color:var(--muted); font-size:0.85rem;" id="chartMeta"></span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chartCv"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Same Car / Multi-Versions In-Depth Comparator -->
+    <div class="tab-page" id="tab-car-compare">
+      <div class="compare-page">
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <label>Catégorie Piste:
+            <select id="cmpCatFilter">
+              <option value="all">Toutes pistes</option>
+              <option value="indoor">🏟️ Karting Intérieur</option>
+              <option value="outdoor">🌿 Karting Extérieur</option>
+              <option value="mixte">🔀 Karting Mixte</option>
+              <option value="standard">🏁 Grands Prix</option>
+            </select>
+          </label>
+          <label>Circuit: <select id="cmpTrkSelect"></select></label>
+          <label>Type Véhicule:
+            <select id="cmpCarCatFilter">
+              <option value="all">Tous types</option>
+              <option value="kart">🏎️ Karts</option>
+              <option value="car">🚗 Voitures</option>
+            </select>
+          </label>
+          <label>Voiture: <select id="cmpCarSelect"></select></label>
+          <label>Mode:
+            <select id="cmpModeSelect">
+              <option value="race">Course (Grille & Dépassements)</option>
+              <option value="qualif">Qualification (Tour Rapide Solo)</option>
+            </select>
+          </label>
+          <div style="flex:1;"></div>
+          <span style="font-size:0.80rem;color:var(--muted);">Analyse historique & télémétrique iso-véhicule</span>
+        </div>
+
+        <!-- Vehicle Specs Card -->
+        <div class="specs-card" id="carSpecsCard">
+          <div class="specs-header">
+            <div class="specs-title">
+              <span id="carSpecsName">Tempête</span>
+              <span class="specs-kind-badge" id="carSpecsKind">GT</span>
+            </div>
+            <div style="font-size:0.82rem; color:var(--muted);" id="carSpecsId">ID: tempete</div>
+          </div>
+          <div class="specs-grid">
+            <div class="spec-item">
+              <span class="spec-val" id="specMass">1480 kg</span>
+              <span class="spec-lbl">Masse (m)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specPower">707 ch</span>
+              <span class="spec-lbl">Puissance Moteur</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specPwrWeight">2.09 kg/ch</span>
+              <span class="spec-lbl">Rapport Poids/Pce</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specVmax">324 km/h</span>
+              <span class="spec-lbl">Vitesse Max Théo</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specGrip">1.35</span>
+              <span class="spec-lbl">Grip Pneu (μ)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specAero">0.60</span>
+              <span class="spec-lbl">Appui Aéro (Cz)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specOversteer" style="color:var(--warn)">0.80</span>
+              <span class="spec-lbl">Survirage (Train AR)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specUndersteer">0.20</span>
+              <span class="spec-lbl">Sous-virage (Train AV)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specHOverTw">0.34</span>
+              <span class="spec-lbl">Ratio Basculement h/tw</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val" id="specBrake">24 kN</span>
+              <span class="spec-lbl">Force Freinage</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historical Version Evolution Table -->
+        <div class="compare-card">
+          <div class="compare-card-title">
+            <span>Évolution Chronomètrique à Travers les Versions (Même Circuit & Même Voiture)</span>
+            <span style="font-size:0.75rem;color:var(--muted);">Deltas calculés par rapport à v1 et à la version
+              précédente</span>
+          </div>
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Version</th>
+                <th>Expert Best</th>
+                <th>Δ vs v1</th>
+                <th>Δ vs v(n-1)</th>
+                <th>Difficile Best</th>
+                <th>Normal Best</th>
+                <th>Facile Best</th>
+                <th>Fautes Hors-Piste</th>
+                <th>Vmax Atteinte</th>
+                <th>Hiérarchie (Exp vs Diff)</th>
+              </tr>
+            </thead>
+            <tbody id="carHistTbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 2 Column Charts: Timeline & Superposed V(s) -->
+        <div class="two-cols-wrap">
+          <!-- Timeline Evolution Graph -->
+          <div class="compare-card">
+            <div class="compare-card-title">
+              <span>Courbes de Progression Chrono (Timeline v1 ➔ v5)</span>
+              <div style="font-size:0.76rem; display:flex; gap:10px;">
+                <span style="color:var(--expert)">● Expert</span>
+                <span style="color:var(--difficile)">● Difficile</span>
+                <span style="color:var(--normal)">● Normal</span>
+                <span style="color:var(--facile)">● Facile</span>
+              </div>
+            </div>
+            <div class="compare-cv-wrap">
+              <canvas id="timelineCv"></canvas>
+            </div>
+          </div>
+
+          <!-- Multi-version V(s) overlay -->
+          <div class="compare-card">
+            <div class="compare-card-title">
+              <span>Superposition V(s) Toutes Versions sur le Circuit</span>
+              <div style="font-size:0.76rem; display:flex; gap:8px;" id="multiVersLegend"></div>
+            </div>
+            <div class="compare-cv-wrap">
+              <canvas id="multiVersCv"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Global Comparative Matrix -->
+    <div class="tab-page" id="tab-matrix">
+      <div class="matrix-page">
+        <div class="filter-bar">
+          <div class="stat-pill">
+            <span class="num" id="matSimTotal">0</span>
+            <span class="lbl">Simulations</span>
+          </div>
+          <div class="stat-pill">
+            <span class="num" id="matTimeGains" style="color:var(--good)">0</span>
+            <span class="lbl">Gains de Temps</span>
+          </div>
+          <div class="stat-pill">
+            <span class="num" id="matFaultsTotal" style="color:var(--warn)">0</span>
+            <span class="lbl">Fautes Hors-Piste</span>
+          </div>
+          <div style="flex:1;"></div>
+          <input type="text" id="matSearch" placeholder="Rechercher circuit ou voiture..." style="width:200px;">
+          <select id="matCatFilter">
+            <option value="all">Toutes les pistes</option>
+            <option value="indoor">🏟️ Karting Intérieur</option>
+            <option value="outdoor">🌿 Karting Extérieur</option>
+            <option value="mixte">🔀 Karting Mixte</option>
+            <option value="standard">🏁 Grands Prix</option>
+          </select>
+          <select id="matCarCatFilter">
+            <option value="all">Tous véhicules</option>
+            <option value="kart">🏎️ Karts uniquement</option>
+            <option value="car">🚗 Voitures uniquement</option>
+          </select>
+          <select id="matModeFilter">
+            <option value="all">Tous les modes</option>
+            <option value="qualif">Qualif uniquement</option>
+            <option value="race">Race uniquement</option>
+          </select>
+        </div>
+
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Circuit</th>
+              <th>Voiture</th>
+              <th>Mode</th>
+              <th>Expert Actuel</th>
+              <th>Expert Réf</th>
+              <th>Delta Expert</th>
+              <th>Difficile</th>
+              <th>Delta Diff</th>
+              <th>Fautes Actuel vs Réf</th>
+            </tr>
+          </thead>
+          <tbody id="matrixTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+    const chartCv = document.getElementById('chartCv');
+    const chartCtx = chartCv.getContext('2d');
+    const timelineCv = document.getElementById('timelineCv');
+    const timelineCtx = timelineCv.getContext('2d');
+    const multiVersCv = document.getElementById('multiVersCv');
+    const multiVersCtx = multiVersCv.getContext('2d');
+
+    let manifest = null;
+    let summary = null;
+    let cmpSummary = null;
+    let runData = null;
+    let cmpData = null;
+
+    // Cache global de tous les summaries par version pour le comparateur même voiture
+    const allSummaries = new Map();
+
+    const CAR_SPECS = {
+      serra_gt: { id: "serra_gt", name: "GT Serra", kind: "GT", mass: 1250, powerCh: 598, pwrWeight: "2.09", vmaxKmh: 306, grip: 1.50, aero: 1.10, oversteer: 0.35, understeer: 0.35, hOverTw: "0.31", brake: 21 },
+      tempete: { id: "tempete", name: "Tempête", kind: "GT", mass: 1480, powerCh: 707, pwrWeight: "2.09", vmaxKmh: 324, grip: 1.35, aero: 0.60, oversteer: 0.80, understeer: 0.20, hOverTw: "0.34", brake: 24 },
+      aurore: { id: "aurore", name: "Aurore", kind: "GT", mass: 1120, powerCh: 544, pwrWeight: "2.06", vmaxKmh: 310, grip: 1.65, aero: 1.30, oversteer: 0.15, understeer: 0.45, hOverTw: "0.29", brake: 21 },
+      gerfaut: { id: "gerfaut", name: "Gerfaut", kind: "GT", mass: 1550, powerCh: 761, pwrWeight: "2.04", vmaxKmh: 353, grip: 1.45, aero: 1.00, oversteer: 0.15, understeer: 0.50, hOverTw: "0.31", brake: 26 },
+      spectre: { id: "spectre", name: "Spectre", kind: "Wedge GT", mass: 1050, powerCh: 816, pwrWeight: "1.29", vmaxKmh: 367, grip: 1.60, aero: 1.40, oversteer: 0.35, understeer: 0.25, hOverTw: "0.26", brake: 23 },
+      nebula: { id: "nebula", name: "Nébuleuse", kind: "Wedge GT", mass: 1200, powerCh: 653, pwrWeight: "1.84", vmaxKmh: 324, grip: 1.50, aero: 1.00, oversteer: 0.30, understeer: 0.35, hOverTw: "0.29", brake: 21 },
+      pulsar: { id: "pulsar", name: "Pulsar", kind: "Wedge GT", mass: 1020, powerCh: 789, pwrWeight: "1.29", vmaxKmh: 360, grip: 1.58, aero: 1.50, oversteer: 0.50, understeer: 0.20, hOverTw: "0.26", brake: 22.5 },
+      mirage: { id: "mirage", name: "Mirage", kind: "Wedge GT", mass: 1150, powerCh: 707, pwrWeight: "1.63", vmaxKmh: 338, grip: 1.70, aero: 1.80, oversteer: 0.20, understeer: 0.30, hOverTw: "0.27", brake: 23.5 },
+      sentinelle: { id: "sentinelle", name: "Sentinelle", kind: "Prototype", mass: 1000, powerCh: 816, pwrWeight: "1.23", vmaxKmh: 349, grip: 1.80, aero: 1.70, oversteer: 0.15, understeer: 0.35, hOverTw: "0.24", brake: 22.8 },
+      orion: { id: "orion", name: "Orion", kind: "Prototype", mass: 950, powerCh: 761, pwrWeight: "1.25", vmaxKmh: 324, grip: 2.00, aero: 2.30, oversteer: 0.20, understeer: 0.25, hOverTw: "0.24", brake: 23.5 },
+      tornade: { id: "tornade", name: "Tornade", kind: "Prototype", mass: 980, powerCh: 884, pwrWeight: "1.11", vmaxKmh: 389, grip: 1.65, aero: 1.20, oversteer: 0.45, understeer: 0.20, hOverTw: "0.24", brake: 22 },
+      lynx: { id: "lynx", name: "Lynx", kind: "Prototype", mass: 880, powerCh: 707, pwrWeight: "1.24", vmaxKmh: 331, grip: 1.90, aero: 1.60, oversteer: 0.50, understeer: 0.10, hOverTw: "0.24", brake: 22 },
+      f1: { id: "f1", name: "F1 Éclair", kind: "Monoplace F1", mass: 800, powerCh: 938, pwrWeight: "0.85", vmaxKmh: 378, grip: 2.05, aero: 2.20, oversteer: 0.25, understeer: 0.12, hOverTw: "0.21", brake: 25 },
+      mistral: { id: "mistral", name: "Mistral Jr", kind: "Formule Junior", mass: 650, powerCh: 408, pwrWeight: "1.59", vmaxKmh: 295, grip: 1.70, aero: 1.40, oversteer: 0.25, understeer: 0.15, hOverTw: "0.21", brake: 17 },
+      x2014: { id: "x2014", name: "X2014 Concepte", kind: "RedBull X", mass: 545, powerCh: 1520, pwrWeight: "0.36", vmaxKmh: 486, grip: 3.50, aero: 4.50, oversteer: 0.20, understeer: 0.10, hOverTw: "0.18", brake: 30 },
+      libellule: { id: "libellule", name: "Libellule", kind: "Barquette", mass: 600, powerCh: 517, pwrWeight: "1.16", vmaxKmh: 324, grip: 1.90, aero: 1.60, oversteer: 0.35, understeer: 0.10, hOverTw: "0.21", brake: 18.5 },
+      rallye: { id: "rallye", name: "Rallye 4×4", kind: "WRC 4×4", mass: 1380, powerCh: 571, pwrWeight: "2.42", vmaxKmh: 281, grip: 1.62, aero: 0.65, oversteer: 0.18, understeer: 0.30, hOverTw: "0.36", brake: 24.5 },
+      maquis: { id: "maquis", name: "Maquis", kind: "Rallye Raid", mass: 1300, powerCh: 544, pwrWeight: "2.39", vmaxKmh: 266, grip: 1.45, aero: 0.60, oversteer: 0.60, understeer: 0.20, hOverTw: "0.36", brake: 23.5 },
+      scarabee: { id: "scarabee", name: "Scarabée", kind: "Dakar 4×4", mass: 1500, powerCh: 625, pwrWeight: "2.40", vmaxKmh: 288, grip: 1.55, aero: 0.60, oversteer: 0.15, understeer: 0.50, hOverTw: "0.38", brake: 26 },
+      sierra: { id: "sierra", name: "Sierra", kind: "Groupe B", mass: 1280, powerCh: 598, pwrWeight: "2.14", vmaxKmh: 295, grip: 1.85, aero: 0.80, oversteer: 0.25, understeer: 0.20, hOverTw: "0.33", brake: 24.5 },
+      top_fuel: { id: "top_fuel", name: "Top Fuel Drag", kind: "Dragster", mass: 980, powerCh: 7478, pwrWeight: "0.13", vmaxKmh: 594, grip: 3.20, aero: 4.80, oversteer: 0.10, understeer: 0.45, hOverTw: "0.17", brake: 42 },
+      thrust_ssc: { id: "thrust_ssc", name: "ThrustSSC", kind: "Supersonique", mass: 10500, powerCh: 106000, pwrWeight: "0.10", vmaxKmh: 1228, grip: 2.50, aero: 3.50, oversteer: 0.10, understeer: 0.20, hOverTw: "0.13", brake: 180 },
+      kart_frelon: { id: "kart_frelon", name: "Frelon", kind: "Karting 125cc", mass: 170, powerCh: 33, pwrWeight: "5.21", vmaxKmh: 108, grip: 1.70, aero: 0.10, oversteer: 0.70, understeer: 0.08, hOverTw: "0.19", brake: 3.5 },
+      kart_pepite: { id: "kart_pepite", name: "Pépite", kind: "Karting 100cc", mass: 160, powerCh: 29, pwrWeight: "5.60", vmaxKmh: 101, grip: 1.80, aero: 0.10, oversteer: 0.60, understeer: 0.08, hOverTw: "0.19", brake: 3.35 },
+      kart_cobalt: { id: "kart_cobalt", name: "Cobalt", kind: "Karting Rotax", mass: 185, powerCh: 37, pwrWeight: "5.04", vmaxKmh: 115, grip: 1.65, aero: 0.10, oversteer: 0.45, understeer: 0.15, hOverTw: "0.19", brake: 3.9 },
+      kart_vipere: { id: "kart_vipere", name: "Vipère", kind: "Superkart 250cc", mass: 165, powerCh: 41, pwrWeight: "4.05", vmaxKmh: 126, grip: 1.75, aero: 0.10, oversteer: 0.80, understeer: 0.08, hOverTw: "0.19", brake: 3.6 }
+    };
+
+    const VER_COLORS = {
+      v1: '#ffd700', // Gold
+      v2: '#33ccff', // Cyan
+      v3: '#33cc66', // Green
+      v4: '#ff9933', // Orange
+      v5: '#ff4d3d', // Red
+      v6: '#b366ff'  // Purple
+    };
+
+    let panX = 0, panY = 0, scale = 1;
+    let isDragging = false, startMouseX = 0, startMouseY = 0;
+
+    let curTime = 0;
+    let maxTime = 1;
+    let isPlaying = false;
+    let playSpeed = 1.0;
+    let lastAnimFrame = 0;
+
+    const COLORS = {
+      expert: '#b366ff',
+      difficile: '#ff9933',
+      normal: '#33ccff',
+      facile: '#33cc66'
+    };
+
+    // Navigation Tabs
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+
+        if (targetId === 'tab-chart') drawChart();
+        else if (targetId === 'tab-car-compare') renderCarCompare();
+        else if (targetId === 'tab-matrix') renderMatrix();
+        else { fitTrack(); draw(); }
+      };
+    });
+
+    // Load Manifest
+    async function init() {
+      try {
+        const res = await fetch('../tmp/manifest.json?t=' + Date.now(), { cache: 'no-store' });
+        manifest = await res.json();
+        const verSel = document.getElementById('verSelect');
+        const cmpSel = document.getElementById('cmpSelect');
+        verSel.innerHTML = '';
+        cmpSel.innerHTML = '<option value="">-- Aucune (Solo) --</option>';
+
+        for (const v of manifest.versions) {
+          verSel.add(new Option(v, v));
+          cmpSel.add(new Option(v, v));
+        }
+        verSel.value = manifest.latest;
+        // Default comparison to v1 if latest != v1
+        if (manifest.versions.includes('v1') && manifest.latest !== 'v1') {
+          cmpSel.value = 'v1';
+        }
+
+        // Pré-charger tous les summaries en mémoire pour le comparateur multi-versions
+        await Promise.all(manifest.versions.map(async (v) => {
+          try {
+            const sRes = await fetch(`../tmp/${v}/summary.json`);
+            allSummaries.set(v, await sRes.json());
+          } catch (e) { }
+        }));
+
+        await loadVersion(manifest.latest);
+        if (cmpSel.value) await loadCmpSummary(cmpSel.value);
+        initCarCompareSelectors();
+      } catch (err) {
+        console.warn('Impossible de charger le manifest. Lancez d\'abord `node bench.mjs` !', err);
+      }
+    }
+
+    function getCircuitCategory(trkId) {
+      if (!trkId) return 'standard';
+      if (trkId.startsWith('karting-arene') || trkId.startsWith('karting-hangar') || trkId.startsWith('karting-usine') || trkId.startsWith('karting-entrepot')) {
+        return 'indoor';
+      }
+      if (trkId.startsWith('karting-')) return 'outdoor';
+      if (trkId.startsWith('mixte-')) return 'mixte';
+      return 'standard';
+    }
+
+    function populateTrackSelect() {
+      if (!summary) return;
+      const catFilter = document.getElementById('catFilter')?.value || 'all';
+      const trkSel = document.getElementById('trkSelect');
+      const prevTrk = trkSel.value;
+      trkSel.innerHTML = '';
+
+      const trkMap = new Map();
+      for (const r of summary.runs) {
+        trkMap.set(r.circuit, { name: r.circuitName, cat: getCircuitCategory(r.circuit) });
+      }
+
+      const groups = {
+        indoor: { label: '🏟️ Karting Intérieur', list: [] },
+        outdoor: { label: '🌿 Karting Extérieur', list: [] },
+        mixte: { label: '🔀 Karting Mixte', list: [] },
+        standard: { label: '🏁 Grands Prix / Standard', list: [] }
+      };
+
+      for (const [id, data] of trkMap.entries()) {
+        const cat = data.cat || 'standard';
+        if (catFilter !== 'all' && cat !== catFilter) continue;
+        if (groups[cat]) groups[cat].list.push({ id, name: data.name });
+      }
+
+      for (const key of ['indoor', 'outdoor', 'mixte', 'standard']) {
+        const g = groups[key];
+        if (g.list.length === 0) continue;
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = g.label;
+        for (const item of g.list) optgroup.appendChild(new Option(item.name, item.id));
+        trkSel.appendChild(optgroup);
+      }
+
+      if (prevTrk && trkMap.has(prevTrk) && (catFilter === 'all' || trkMap.get(prevTrk).cat === catFilter)) {
+        trkSel.value = prevTrk;
+      }
+    }
+
+    async function loadVersion(ver) {
+      const res = await fetch(`../tmp/${ver}/summary.json`);
+      summary = await res.json();
+      populateTrackSelect();
+      await onTrackChanged();
+    }
+
+    async function loadCmpSummary(ver) {
+      if (!ver) {
+        cmpSummary = null;
+        cmpData = null;
+        document.getElementById('lblCmpGhost').style.display = 'none';
+        document.getElementById('cmpHeaderBadge').style.display = 'none';
+        updateSidebar();
+        draw();
+        return;
+      }
+      try {
+        const res = await fetch(`../tmp/${ver}/summary.json`);
+        cmpSummary = await res.json();
+        document.getElementById('lblCmpGhost').style.display = 'inline-flex';
+        document.getElementById('cmpHeaderBadge').style.display = 'inline-block';
+        document.getElementById('cmpHeaderBadge').textContent = `Vs ${ver}`;
+        await loadCmpRunFile();
+      } catch (err) {
+        cmpSummary = null;
+        cmpData = null;
+      }
+    }
+
+    async function onTrackChanged() {
+      const trkId = document.getElementById('trkSelect').value;
+      const carCatFilter = document.getElementById('carCatFilter')?.value || 'all';
+      let runs = (summary?.runs || []).filter(r => r.circuit === trkId);
+      if (carCatFilter === 'kart') {
+        runs = runs.filter(r => r.carId.startsWith('kart_'));
+      } else if (carCatFilter === 'car') {
+        runs = runs.filter(r => !r.carId.startsWith('kart_'));
+      }
+
+      const runSel = document.getElementById('runSelect');
+      const prevVal = runSel.value;
+      runSel.innerHTML = '';
+
+      const kartGroup = document.createElement('optgroup'); kartGroup.label = '🏎️ Karts';
+      const carGroup = document.createElement('optgroup'); carGroup.label = '🚗 Voitures';
+
+      for (const r of runs) {
+        const opt = new Option(`${r.carName} · ${r.mode.toUpperCase()}`, r.fileName);
+        if (r.carId.startsWith('kart_')) kartGroup.appendChild(opt);
+        else carGroup.appendChild(opt);
+      }
+
+      if (kartGroup.children.length > 0) runSel.appendChild(kartGroup);
+      if (carGroup.children.length > 0) runSel.appendChild(carGroup);
+
+      if (prevVal && runs.some(r => r.fileName === prevVal)) runSel.value = prevVal;
+
+      await loadRunFile();
+      await loadCmpRunFile();
+    }
+
+    async function loadRunFile() {
+      const ver = document.getElementById('verSelect').value;
+      const fileName = document.getElementById('runSelect').value;
+      if (!fileName) return;
+
+      const res = await fetch(`../tmp/${ver}/${fileName}`);
+      runData = await res.json();
+
+      maxTime = 0;
+      for (const r of runData.results) {
+        if (r.trajectory && r.trajectory.length) {
+          const lastPoint = r.trajectory[r.trajectory.length - 1];
+          maxTime = Math.max(maxTime, lastPoint[0]);
+        }
+      }
+      curTime = 0;
+      updateSidebar();
+      fitTrack();
+      draw();
+      drawChart();
+    }
+
+    async function loadCmpRunFile() {
+      const cmpVer = document.getElementById('cmpSelect').value;
+      const fileName = document.getElementById('runSelect').value;
+      if (!cmpVer || !fileName) {
+        cmpData = null;
+        updateSidebar();
+        draw();
+        drawChart();
+        return;
+      }
+      try {
+        const res = await fetch(`../tmp/${cmpVer}/${fileName}`);
+        cmpData = await res.json();
+      } catch (e) {
+        cmpData = null;
+      }
+      updateSidebar();
+      draw();
+      drawChart();
+    }
+
+    function fitTrack() {
+      if (!runData) return;
+      const b = runData.circuit.bounds;
+      const w = cv.clientWidth, h = cv.clientHeight;
+      const tw = b.x1 - b.x0, th = b.z1 - b.z0;
+      const margin = 60;
+      scale = Math.min((w - margin * 2) / tw, (h - margin * 2) / th);
+      panX = (w - (b.x1 + b.x0) * scale) / 2;
+      panY = (h - (b.z1 + b.z0) * scale) / 2;
+    }
+
+    function toScreenX(x) { return x * scale + panX; }
+    function toScreenY(z) { return z * scale + panY; }
+
+    function draw() {
+      const w = cv.clientWidth, h = cv.clientHeight;
+      if (cv.width !== w || cv.height !== h) {
+        cv.width = w;
+        cv.height = h;
+      }
+      ctx.clearRect(0, 0, w, h);
+      if (!runData) return;
+
+      // 1. Asphalt surface
+      const { leftEdge, rightEdge, centerline, startLine } = runData.circuit;
+      if (leftEdge && rightEdge && leftEdge.length > 2) {
+        ctx.fillStyle = '#182033';
+        ctx.beginPath();
+        for (let i = 0; i < leftEdge.length; i++) {
+          const sx = toScreenX(leftEdge[i][0]), sy = toScreenY(leftEdge[i][1]);
+          i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+        }
+        for (let i = rightEdge.length - 1; i >= 0; i--) {
+          ctx.lineTo(toScreenX(rightEdge[i][0]), toScreenY(rightEdge[i][1]));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#293959';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // 2. Centerline
+      if (centerline) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.setLineDash([6, 6]);
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        for (let i = 0; i < centerline.length; i++) {
+          const sx = toScreenX(centerline[i][0]), sy = toScreenY(centerline[i][1]);
+          i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 3. Start Line
+      if (startLine) {
+        const sx = toScreenX(startLine.x), sy = toScreenY(startLine.z);
+        const len = 15 * scale;
+        ctx.strokeStyle = '#ff4d3d';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(sx - startLine.rx * len, sy - startLine.rz * len);
+        ctx.lineTo(sx + startLine.rx * len, sy + startLine.rz * len);
+        ctx.stroke();
+      }
+
+      // 4. Draw Comparison Reference Trajectory (if active)
+      const showCmp = document.getElementById('chkCmp').checked && cmpData;
+      if (showCmp) {
+        const cmpExp = cmpData.results?.find(r => r.level === 'expert');
+        if (cmpExp && cmpExp.trajectory && cmpExp.trajectory.length > 1) {
+          ctx.strokeStyle = 'rgba(255, 215, 0, 0.45)';
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          for (let i = 0; i < cmpExp.trajectory.length; i++) {
+            const pt = cmpExp.trajectory[i];
+            const sx = toScreenX(pt[2]), sy = toScreenY(pt[3]);
+            i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+
+      // 5. Draw Active Trajectories
+      const style = document.getElementById('colorMode').value;
+      const toggles = {
+        expert: document.getElementById('chkExp').checked,
+        difficile: document.getElementById('chkDiff').checked,
+        normal: document.getElementById('chkNorm').checked,
+        facile: document.getElementById('chkFac').checked
+      };
+
+      for (const res of runData.results) {
+        if (!toggles[res.level]) continue;
+        const traj = res.trajectory;
+        if (!traj || traj.length < 2) continue;
+
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        for (let i = 0; i < traj.length - 1; i++) {
+          const p1 = traj[i], p2 = traj[i + 1];
+          const x1 = toScreenX(p1[2]), y1 = toScreenY(p1[3]);
+          const x2 = toScreenX(p2[2]), y2 = toScreenY(p2[3]);
+
+          if (style === 'level') {
+            ctx.strokeStyle = COLORS[res.level] || '#fff';
+          } else if (style === 'speed') {
+            const kmh = p1[4];
+            const ratio = Math.min(1, Math.max(0, (kmh - 80) / 180));
+            ctx.strokeStyle = `hsl(${(1 - ratio) * 240}, 100%, 50%)`;
+          } else if (style === 'pedal') {
+            const br = p1[6];
+            const th = p1[5];
+            if (br > 20) ctx.strokeStyle = '#ff4d3d';
+            else if (th > 70) ctx.strokeStyle = '#33cc66';
+            else ctx.strokeStyle = '#ffaa33';
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
+      }
+
+      // 6. Draw Animated Ghost Car (Comparison Reference)
+      if (showCmp) {
+        const cmpExp = cmpData.results?.find(r => r.level === 'expert');
+        if (cmpExp) {
+          const ptCmp = sampleAtTime(cmpExp.trajectory, curTime);
+          if (ptCmp) {
+            const cx = toScreenX(ptCmp.x), cy = toScreenY(ptCmp.z);
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(ptCmp.heading);
+            ctx.strokeStyle = 'var(--cmp-gold)';
+            ctx.lineWidth = 1.5;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.4)';
+            ctx.fillRect(-6, -3, 12, 6);
+            ctx.strokeRect(-6, -3, 12, 6);
+            ctx.restore();
+            ctx.fillStyle = 'var(--cmp-gold)';
+            ctx.font = '10px monospace';
+            ctx.fillText(`Réf (${ptCmp.u}k)`, cx + 8, cy + 12);
+          }
+        }
+      }
+
+      // 7. Draw Active Animated Cars
+      for (const res of runData.results) {
+        if (!toggles[res.level]) continue;
+        const pt = sampleAtTime(res.trajectory, curTime);
+        if (!pt) continue;
+
+        const cx = toScreenX(pt.x), cy = toScreenY(pt.z);
+        const col = COLORS[res.level] || '#fff';
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(pt.heading);
+
+        // Body
+        ctx.fillStyle = col;
+        ctx.fillRect(-6, -3, 12, 6);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-6, -3, 12, 6);
+
+        // Brake lights
+        if (pt.brake > 20) {
+          ctx.fillStyle = '#ff0000';
+          ctx.fillRect(-6.5, -2.5, 1.5, 5);
+        }
+        ctx.restore();
+
+        // Level label + speed
+        ctx.fillStyle = col;
+        ctx.font = '10px monospace';
+        ctx.fillText(`${res.level[0].toUpperCase()} ${pt.u}k`, cx + 8, cy - 8);
+      }
+    }
+
+    function sampleAtTime(traj, t) {
+      if (!traj || traj.length === 0) return null;
+      if (t <= traj[0][0]) {
+        const p = traj[0];
+        return { x: p[2], z: p[3], u: p[4], throttle: p[5], brake: p[6], steer: p[7], surf: p[8], heading: 0 };
+      }
+      for (let i = 0; i < traj.length - 1; i++) {
+        const p1 = traj[i], p2 = traj[i + 1];
+        if (t >= p1[0] && t <= p2[0]) {
+          const ratio = (t - p1[0]) / Math.max(0.0001, p2[0] - p1[0]);
+          const x = p1[2] + (p2[2] - p1[2]) * ratio;
+          const z = p1[3] + (p2[3] - p1[3]) * ratio;
+          const heading = Math.atan2(p2[3] - p1[3], p2[2] - p1[2]);
+          return {
+            x, z,
+            u: Math.round(p1[4] + (p2[4] - p1[4]) * ratio),
+            throttle: Math.round(p1[5] + (p2[5] - p1[5]) * ratio),
+            brake: Math.round(p1[6] + (p2[6] - p1[6]) * ratio),
+            steer: Math.round(p1[7] + (p2[7] - p1[7]) * ratio),
+            surf: p1[8],
+            heading
+          };
+        }
+      }
+      const last = traj[traj.length - 1];
+      return { x: last[2], z: last[3], u: last[4], throttle: last[5], brake: last[6], steer: last[7], surf: last[8], heading: 0 };
+    }
+
+    function updateSidebar() {
+      if (!runData) return;
+      document.getElementById('infoTrkName').textContent = runData.circuit.name;
+      document.getElementById('infoDetails').textContent = `Longueur: ${runData.circuit.length} m · Voiture: ${runData.run.carName} · Mode: ${runData.run.mode.toUpperCase()}`;
+
+      const tbody = document.getElementById('timesTbody');
+      tbody.innerHTML = '';
+      let totalInc = 0;
+      const allIncidents = [];
+
+      for (const res of runData.results) {
+        const cmpRes = cmpData?.results?.find(r => r.level === res.level);
+        const tr = document.createElement('tr');
+
+        let chronoHtml = res.bestLap ? `${res.bestLap}s` : '-';
+        let vmaxHtml = `${res.maxV}`;
+        let faultsHtml = `${res.offTrackTicks}`;
+
+        if (cmpRes && res.bestLap && cmpRes.bestLap) {
+          const delta = (res.bestLap - cmpRes.bestLap).toFixed(2);
+          const sign = delta > 0 ? `+${delta}s` : `${delta}s`;
+          const cls = delta < -0.1 ? 'delta-good' : (delta > 0.1 ? 'delta-bad' : 'delta-neutral');
+          chronoHtml += ` <span class="${cls}" style="font-size:0.75rem;">(${sign})</span>`;
+
+          const dV = Math.round(res.maxV - cmpRes.maxV);
+          if (dV !== 0) {
+            vmaxHtml += ` <span style="font-size:0.75rem; color:${dV > 0 ? 'var(--good)' : 'var(--bad)'};">(${dV > 0 ? '+' : ''}${dV})</span>`;
+          }
+
+          const dF = res.offTrackTicks - cmpRes.offTrackTicks;
+          if (dF !== 0) {
+            faultsHtml += ` <span style="font-size:0.75rem; color:${dF < 0 ? 'var(--good)' : 'var(--bad)'};">(${dF > 0 ? '+' : ''}${dF})</span>`;
+          }
+        }
+
+        tr.innerHTML = `
+          <td><span class="badge-dot" style="background:${COLORS[res.level]}"></span> ${res.level}</td>
+          <td class="mono">${chronoHtml}</td>
+          <td class="mono">${vmaxHtml}</td>
+          <td class="mono">${faultsHtml}</td>
+        `;
+        tbody.appendChild(tr);
+
+        for (const inc of res.incidents || []) {
+          totalInc++;
+          allIncidents.push({ ...inc, level: res.level });
+        }
+      }
+
+      // Incidents list
+      document.getElementById('incCount').textContent = totalInc;
+      const incList = document.getElementById('incList');
+      incList.innerHTML = '';
+      if (allIncidents.length === 0) {
+        incList.innerHTML = '<div style="color:var(--good);font-size:0.8rem;padding:4px 0;">✓ Aucun incident hors-piste détecté !</div>';
+      } else {
+        for (const inc of allIncidents.slice(0, 20)) {
+          const div = document.createElement('div');
+          div.className = 'incident-item';
+          div.innerHTML = `
+            <span>Sortie ${inc.level} (virage ~${inc.s}m)</span>
+            <span class="incident-time">${inc.t}s</span>
+          `;
+          div.onclick = () => {
+            curTime = inc.t;
+            updateHud();
+            draw();
+          };
+          incList.appendChild(div);
+        }
+      }
+    }
+
+    function updateHud() {
+      const expRes = runData?.results?.find(r => r.level === 'expert');
+      const cmpExp = cmpData?.results?.find(r => r.level === 'expert');
+
+      if (expRes) {
+        const pt = sampleAtTime(expRes.trajectory, curTime);
+        const ptCmp = cmpExp ? sampleAtTime(cmpExp.trajectory, curTime) : null;
+
+        if (pt) {
+          document.getElementById('hudSpeed').textContent = pt.u;
+          if (ptCmp) {
+            const dV = pt.u - ptCmp.u;
+            document.getElementById('hudSpeedDiff').innerHTML = `Réf: ${ptCmp.u} <span style="color:${dV >= 0 ? 'var(--good)' : 'var(--bad)'};">(${dV >= 0 ? '+' : ''}${dV})</span>`;
+          } else {
+            document.getElementById('hudSpeedDiff').textContent = '';
+          }
+
+          document.getElementById('hudSurf').textContent = pt.surf >= 2 ? 'HERBE' : (pt.surf === 1 ? 'VIBREUR' : 'ROUTE');
+          document.getElementById('hudSurf').style.color = pt.surf >= 2 ? '#ff4d3d' : '#fff';
+
+          document.getElementById('barTh').style.width = pt.throttle + '%';
+          document.getElementById('valTh').textContent = pt.throttle + '%';
+          document.getElementById('barBr').style.width = pt.brake + '%';
+          document.getElementById('valBr').textContent = pt.brake + '%';
+          document.getElementById('barSt').style.width = Math.abs(pt.steer) + '%';
+          document.getElementById('valSt').textContent = (pt.steer > 0 ? '+' : '') + pt.steer + '°';
+        }
+      }
+
+      // Timeline UI
+      const pct = Math.min(100, (curTime / maxTime) * 100);
+      document.getElementById('timeProgress').style.width = pct + '%';
+      document.getElementById('timeHandle').style.left = pct + '%';
+      const m = Math.floor(curTime / 60);
+      const s = (curTime % 60).toFixed(2).padStart(5, '0');
+      document.getElementById('timeLabel').textContent = `${m.toString().padStart(2, '0')}:${s}`;
+    }
+
+    // Velocity Profile Chart V(s) & Delta Time Graph Δt(s)
+    function drawChart() {
+      const w = chartCv.parentElement.clientWidth - 32;
+      const h = chartCv.parentElement.clientHeight - 32;
+      if (chartCv.width !== w || chartCv.height !== h) {
+        chartCv.width = w;
+        chartCv.height = h;
+      }
+      chartCtx.clearRect(0, 0, w, h);
+      if (!runData) return;
+
+      const expRes = runData.results?.find(r => r.level === 'expert');
+      const cmpExp = cmpData?.results?.find(r => r.level === 'expert');
+      if (!expRes || !expRes.trajectory || expRes.trajectory.length === 0) return;
+
+      const trackLen = runData.circuit.length;
+      document.getElementById('chartMeta').textContent = `${runData.circuit.name} · ${runData.run.carName} · Vitesse V(s) & Delta Chrono Cumulé`;
+
+      const hasCmp = cmpExp && cmpExp.trajectory && cmpExp.trajectory.length > 2;
+
+      // Coordinate transforms
+      const padL = 55, padR = 25, padT = 25, padB = 30;
+      const totalPlotW = w - padL - padR;
+
+      // Split height: 68% for V(s), 32% for Delta Time (if comparison active)
+      const vPlotH = hasCmp ? Math.round((h - padT - padB) * 0.65) : (h - padT - padB);
+      const dtPlotTop = padT + vPlotH + 30;
+      const dtPlotH = (h - padB) - dtPlotTop;
+
+      const maxV = Math.max(runData.run.vmax || 320, 320);
+      const toPlotX = (s) => padL + ((s % trackLen) / trackLen) * totalPlotW;
+      const toPlotY = (v) => padT + vPlotH - (v / maxV) * vPlotH;
+
+      // 1. Grid & Scales for V(s)
+      chartCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+      chartCtx.lineWidth = 1;
+      for (let v = 50; v <= maxV; v += 50) {
+        const y = toPlotY(v);
+        chartCtx.beginPath();
+        chartCtx.moveTo(padL, y);
+        chartCtx.lineTo(w - padR, y);
+        chartCtx.stroke();
+        chartCtx.fillStyle = 'var(--muted)';
+        chartCtx.font = '10px monospace';
+        chartCtx.fillText(`${v}k`, 12, y + 3);
+      }
+
+      for (let s = 500; s < trackLen; s += 500) {
+        const x = toPlotX(s);
+        chartCtx.beginPath();
+        chartCtx.moveTo(x, padT);
+        chartCtx.lineTo(x, padT + vPlotH);
+        chartCtx.stroke();
+        chartCtx.fillStyle = 'var(--muted)';
+        chartCtx.font = '10px monospace';
+        chartCtx.fillText(`${s}m`, x - 12, padT + vPlotH + 16);
+      }
+
+      // Title V(s)
+      chartCtx.fillStyle = 'var(--muted)';
+      chartCtx.font = '11px sans-serif';
+      chartCtx.fillText('VITESSE (km/h)', padL, padT - 8);
+
+      // 2. Draw Comparison Reference V(s) (Gold)
+      if (hasCmp) {
+        chartCtx.strokeStyle = 'rgba(255, 215, 0, 0.75)';
+        chartCtx.lineWidth = 2;
+        chartCtx.setLineDash([4, 4]);
+        chartCtx.beginPath();
+        for (let i = 0; i < cmpExp.trajectory.length; i++) {
+          const pt = cmpExp.trajectory[i];
+          const px = toPlotX(pt[1]);
+          const py = toPlotY(pt[4]);
+          i === 0 ? chartCtx.moveTo(px, py) : chartCtx.lineTo(px, py);
+        }
+        chartCtx.stroke();
+        chartCtx.setLineDash([]);
+      }
+
+      // 3. Draw Active Version V(s) (Expert Violet)
+      chartCtx.strokeStyle = 'var(--expert)';
+      chartCtx.lineWidth = 2.5;
+      chartCtx.beginPath();
+      for (let i = 0; i < expRes.trajectory.length; i++) {
+        const pt = expRes.trajectory[i];
+        const px = toPlotX(pt[1]);
+        const py = toPlotY(pt[4]);
+        i === 0 ? chartCtx.moveTo(px, py) : chartCtx.lineTo(px, py);
+      }
+      chartCtx.stroke();
+
+      // Legend V(s)
+      chartCtx.font = '12px sans-serif';
+      chartCtx.fillStyle = 'var(--expert)';
+      chartCtx.fillText(`■ Expert ${document.getElementById('verSelect').value}`, padL + 120, padT - 8);
+      if (hasCmp) {
+        chartCtx.fillStyle = 'var(--cmp-gold)';
+        chartCtx.fillText(`■ Réf ${document.getElementById('cmpSelect').value}`, padL + 250, padT - 8);
+      }
+
+      // 4. Draw Delta Time Sub-Graph Δt(s)
+      if (hasCmp && dtPlotH > 40) {
+        // Delta time title
+        chartCtx.fillStyle = 'var(--muted)';
+        chartCtx.font = '11px sans-serif';
+        chartCtx.fillText('ÉCART CHRONO CUMULÉ Δt(s) : Vert = Gain Actuel / Rouge = Perte vs Réf', padL, dtPlotTop - 8);
+
+        // Find max delta for dynamic scale
+        const sampleStep = 20;
+        const deltas = [];
+        let maxDeltaAbs = 0.5;
+
+        // Echantillonner s le long du tour
+        for (let s = 0; s < trackLen; s += sampleStep) {
+          const pAct = expRes.trajectory.find(p => Math.abs((p[1] % trackLen) - s) < sampleStep);
+          const pRef = cmpExp.trajectory.find(p => Math.abs((p[1] % trackLen) - s) < sampleStep);
+          if (pAct && pRef) {
+            // Delta time: t_act - t_ref (si t_act < t_ref, l'actuel est plus rapide, gain de temps !)
+            const dt = pAct[0] - pRef[0];
+            deltas.push({ s, dt });
+            maxDeltaAbs = Math.max(maxDeltaAbs, Math.abs(dt));
+          }
+        }
+        maxDeltaAbs = Math.ceil(maxDeltaAbs * 2) / 2; // arrondi au demi dixième supérieur
+
+        const toDtY = (dt) => dtPlotTop + (dtPlotH / 2) + (dt / maxDeltaAbs) * (dtPlotH / 2);
+
+        // Baseline 0s
+        const yZero = dtPlotTop + dtPlotH / 2;
+        chartCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+        chartCtx.lineWidth = 1.5;
+        chartCtx.beginPath();
+        chartCtx.moveTo(padL, yZero);
+        chartCtx.lineTo(w - padR, yZero);
+        chartCtx.stroke();
+        chartCtx.fillStyle = '#fff';
+        chartCtx.font = '10px monospace';
+        chartCtx.fillText('0.0s', 15, yZero + 3);
+
+        // Upper & Lower grid
+        chartCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+        chartCtx.beginPath();
+        chartCtx.moveTo(padL, toDtY(-maxDeltaAbs)); chartCtx.lineTo(w - padR, toDtY(-maxDeltaAbs));
+        chartCtx.moveTo(padL, toDtY(maxDeltaAbs)); chartCtx.lineTo(w - padR, toDtY(maxDeltaAbs));
+        chartCtx.stroke();
+        chartCtx.fillStyle = 'var(--good)';
+        chartCtx.fillText(`-${maxDeltaAbs.toFixed(1)}s (Avance)`, 2, toDtY(-maxDeltaAbs) + 3);
+        chartCtx.fillStyle = 'var(--bad)';
+        chartCtx.fillText(`+${maxDeltaAbs.toFixed(1)}s (Retard)`, 2, toDtY(maxDeltaAbs) + 3);
+
+        // Vertical track markers on Delta graph
+        for (let s = 500; s < trackLen; s += 500) {
+          const x = toPlotX(s);
+          chartCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+          chartCtx.beginPath();
+          chartCtx.moveTo(x, dtPlotTop);
+          chartCtx.lineTo(x, dtPlotTop + dtPlotH);
+          chartCtx.stroke();
+          chartCtx.fillStyle = 'var(--muted)';
+          chartCtx.font = '10px monospace';
+          chartCtx.fillText(`${s}m`, x - 12, dtPlotTop + dtPlotH + 16);
+        }
+
+        // Draw Delta curve with gradient fill
+        if (deltas.length > 2) {
+          chartCtx.beginPath();
+          chartCtx.moveTo(toPlotX(deltas[0].s), yZero);
+          for (const d of deltas) {
+            chartCtx.lineTo(toPlotX(d.s), toDtY(d.dt));
+          }
+          chartCtx.lineTo(toPlotX(deltas[deltas.length - 1].s), yZero);
+          chartCtx.fillStyle = 'rgba(51, 204, 102, 0.12)';
+          chartCtx.fill();
+
+          // Stroke line
+          chartCtx.beginPath();
+          for (let i = 0; i < deltas.length; i++) {
+            const d = deltas[i];
+            const px = toPlotX(d.s);
+            const py = toDtY(d.dt);
+            i === 0 ? chartCtx.moveTo(px, py) : chartCtx.lineTo(px, py);
+          }
+          chartCtx.strokeStyle = '#33ccff';
+          chartCtx.lineWidth = 2;
+          chartCtx.stroke();
+        }
+      }
+    }
+
+    // =========================================================================
+    // COMPARATEUR ISO-VÉHICULE & MULTI-VERSIONS (Même Circuit & Même Voiture)
+    // =========================================================================
+
+    function initCarCompareSelectors() {
+      if (!summary) return;
+      const trkSel = document.getElementById('cmpTrkSelect');
+      const carSel = document.getElementById('cmpCarSelect');
+      const catFilter = document.getElementById('cmpCatFilter')?.value || 'all';
+      const carCatFilter = document.getElementById('cmpCarCatFilter')?.value || 'all';
+
+      const circuits = new Map();
+      const cars = new Map();
+
+      // Récupérer tous les circuits et voitures parmi tous les summaries chargés
+      for (const [v, sum] of allSummaries.entries()) {
+        for (const r of sum.runs) {
+          circuits.set(r.circuit, { name: r.circuitName, cat: getCircuitCategory(r.circuit) });
+          cars.set(r.carId, { name: r.carName, isKart: r.carId.startsWith('kart_') });
+        }
+      }
+
+      const prevTrk = trkSel.value;
+      trkSel.innerHTML = '';
+      const trkGroups = {
+        indoor: { label: '🏟️ Karting Intérieur', list: [] },
+        outdoor: { label: '🌿 Karting Extérieur', list: [] },
+        mixte: { label: '🔀 Karting Mixte', list: [] },
+        standard: { label: '🏁 Grands Prix / Standard', list: [] }
+      };
+      for (const [id, data] of circuits.entries()) {
+        if (catFilter !== 'all' && data.cat !== catFilter) continue;
+        if (trkGroups[data.cat]) trkGroups[data.cat].list.push({ id, name: data.name });
+      }
+      for (const k of ['indoor', 'outdoor', 'mixte', 'standard']) {
+        const g = trkGroups[k];
+        if (g.list.length === 0) continue;
+        const optg = document.createElement('optgroup');
+        optg.label = g.label;
+        for (const it of g.list) optg.appendChild(new Option(it.name, it.id));
+        trkSel.appendChild(optg);
+      }
+      if (prevTrk && circuits.has(prevTrk) && (catFilter === 'all' || circuits.get(prevTrk).cat === catFilter)) {
+        trkSel.value = prevTrk;
+      }
+
+      const prevCar = carSel.value;
+      carSel.innerHTML = '';
+      const kartG = document.createElement('optgroup'); kartG.label = '🏎️ Karts';
+      const carG = document.createElement('optgroup'); carG.label = '🚗 Voitures';
+      for (const [id, data] of cars.entries()) {
+        if (carCatFilter === 'kart' && !data.isKart) continue;
+        if (carCatFilter === 'car' && data.isKart) continue;
+        const opt = new Option(data.name, id);
+        if (data.isKart) kartG.appendChild(opt);
+        else carG.appendChild(opt);
+      }
+      if (kartG.children.length > 0) carSel.appendChild(kartG);
+      if (carG.children.length > 0) carSel.appendChild(carG);
+      if (prevCar && cars.has(prevCar)) {
+        carSel.value = prevCar;
+      } else if (cars.has('sentinelle')) {
+        carSel.value = 'sentinelle';
+      }
+
+      // Valeurs par défaut si rien n'est sélectionné
+      if (!trkSel.value && trkSel.options.length > 0) trkSel.selectedIndex = 0;
+      if (!carSel.value && carSel.options.length > 0) carSel.selectedIndex = 0;
+
+      trkSel.onchange = renderCarCompare;
+      carSel.onchange = renderCarCompare;
+      document.getElementById('cmpModeSelect').onchange = renderCarCompare;
+
+      renderCarCompare();
+    }
+
+
+    async function renderCarCompare() {
+      const trkId = document.getElementById('cmpTrkSelect').value;
+      const carId = document.getElementById('cmpCarSelect').value;
+      const mode = document.getElementById('cmpModeSelect').value;
+      if (!trkId || !carId) return;
+
+      // 1. Mise à jour de la Fiche Technique Véhicule
+      const spec = CAR_SPECS[carId] || {
+        id: carId, name: carId, kind: 'Inconnu', mass: 1200, powerCh: 500, pwrWeight: '2.4',
+        vmaxKmh: 300, grip: 1.5, aero: 1.0, oversteer: 0.3, understeer: 0.3, hOverTw: '0.30', brake: 22
+      };
+
+      document.getElementById('carSpecsName').textContent = spec.name;
+      document.getElementById('carSpecsKind').textContent = spec.kind;
+      document.getElementById('carSpecsId').textContent = `ID Système: ${spec.id}`;
+      document.getElementById('specMass').textContent = `${spec.mass} kg`;
+      document.getElementById('specPower').textContent = `${spec.powerCh} ch`;
+      document.getElementById('specPwrWeight').textContent = `${spec.pwrWeight} kg/ch`;
+      document.getElementById('specVmax').textContent = `${spec.vmaxKmh} km/h`;
+      document.getElementById('specGrip').textContent = spec.grip.toFixed(2);
+      document.getElementById('specAero').textContent = spec.aero.toFixed(2);
+      document.getElementById('specOversteer').textContent = spec.oversteer.toFixed(2);
+      document.getElementById('specOversteer').style.color = spec.oversteer > 0.4 ? 'var(--warn)' : 'var(--text)';
+      document.getElementById('specUndersteer').textContent = spec.understeer.toFixed(2);
+      document.getElementById('specHOverTw').textContent = spec.hOverTw;
+      document.getElementById('specBrake').textContent = `${spec.brake} kN`;
+
+      // 2. Extraction des données historiques à travers les versions
+      const historyRows = [];
+      for (const [ver, sum] of allSummaries.entries()) {
+        const run = sum.runs.find(r => r.circuit === trkId && r.carId === carId && r.mode === mode);
+        if (run) {
+          const sMap = Object.fromEntries(run.summary.map(s => [s.level, s]));
+          historyRows.push({
+            ver,
+            isLatest: ver === manifest?.latest,
+            expert: sMap.expert?.bestLap || null,
+            difficile: sMap.difficile?.bestLap || null,
+            normal: sMap.normal?.bestLap || null,
+            facile: sMap.facile?.bestLap || null,
+            offExp: sMap.expert?.offTrackTicks || 0,
+            offDiff: sMap.difficile?.offTrackTicks || 0,
+            maxV: Math.max(...run.summary.map(s => s.maxV || 0)),
+            fileName: run.fileName
+          });
+        }
+      }
+
+      // Trier par numéro de version croissant (v1, v2, v3...)
+      historyRows.sort((a, b) => {
+        const na = parseInt(a.ver.replace('v', ''), 10) || 0;
+        const nb = parseInt(b.ver.replace('v', ''), 10) || 0;
+        return na - nb;
+      });
+
+      // 3. Remplissage du Tableau Historique
+      const tbody = document.getElementById('carHistTbody');
+      tbody.innerHTML = '';
+
+      const v1Row = historyRows.find(r => r.ver === 'v1');
+
+      for (let i = 0; i < historyRows.length; i++) {
+        const r = historyRows[i];
+        const prevR = i > 0 ? historyRows[i - 1] : null;
+
+        const expTime = r.expert ? `${r.expert}s` : '-';
+        const diffTime = r.difficile ? `${r.difficile}s` : '-';
+        const normTime = r.normal ? `${r.normal}s` : '-';
+        const facTime = r.facile ? `${r.facile}s` : '-';
+
+        // Delta vs v1
+        let deltaV1Html = '-';
+        if (r.expert && v1Row?.expert) {
+          const d = (r.expert - v1Row.expert).toFixed(2);
+          const sign = d > 0 ? `+${d}s` : `${d}s`;
+          const cls = d < -0.1 ? 'delta-good' : (d > 0.1 ? 'delta-bad' : 'delta-neutral');
+          deltaV1Html = r.ver === 'v1' ? '<span class="delta-neutral">Réf</span>' : `<span class="${cls}">${sign}</span>`;
+        }
+
+        // Delta vs prev version
+        let deltaPrevHtml = '-';
+        if (r.expert && prevR?.expert) {
+          const d = (r.expert - prevR.expert).toFixed(2);
+          const sign = d > 0 ? `+${d}s` : `${d}s`;
+          const cls = d < -0.1 ? 'delta-good' : (d > 0.1 ? 'delta-bad' : 'delta-neutral');
+          deltaPrevHtml = `<span class="${cls}">${sign}</span>`;
+        }
+
+        // Hiérarchie Expert vs Difficile
+        let hierHtml = '-';
+        if (r.expert && r.difficile) {
+          const gap = (r.difficile - r.expert).toFixed(2);
+          if (gap > 0.5) hierHtml = `<span class="delta-good">✔ Conforme (+${gap}s)</span>`;
+          else if (gap >= 0) hierHtml = `<span class="delta-neutral">⚠️ Serré (+${gap}s)</span>`;
+          else hierHtml = `<span class="delta-bad">❌ Inversion (${gap}s)</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="badge-ver ${r.isLatest ? 'latest' : ''}">${r.ver}${r.isLatest ? ' ★' : ''}</span></td>
+          <td class="mono" style="font-weight:700; color:var(--expert);">${expTime}</td>
+          <td class="mono">${deltaV1Html}</td>
+          <td class="mono">${deltaPrevHtml}</td>
+          <td class="mono" style="color:var(--difficile);">${diffTime}</td>
+          <td class="mono" style="color:var(--normal);">${normTime}</td>
+          <td class="mono" style="color:var(--facile);">${facTime}</td>
+          <td class="mono">${r.offExp} / ${r.offDiff}</td>
+          <td class="mono">${r.maxV ? Math.round(r.maxV) + ' km/h' : '-'}</td>
+          <td>${hierHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // 4. Tracé des Graphiques
+      drawTimelineChart(historyRows);
+      drawMultiVersionChart(historyRows, trkId, carId, mode);
+    }
+
+    // Graphique Timeline d'Évolution Chrono (Axe X: Versions, Axe Y: Chronos)
+    function drawTimelineChart(rows) {
+      const w = timelineCv.parentElement.clientWidth;
+      const h = timelineCv.parentElement.clientHeight;
+      if (timelineCv.width !== w || timelineCv.height !== h) {
+        timelineCv.width = w;
+        timelineCv.height = h;
+      }
+      timelineCtx.clearRect(0, 0, w, h);
+      if (!rows || rows.length === 0) return;
+
+      const padL = 45, padR = 25, padT = 25, padB = 30;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      // Chercher min et max time parmi les rows
+      let minT = 1e9, maxT = 0;
+      for (const r of rows) {
+        for (const k of ['expert', 'difficile', 'normal', 'facile']) {
+          if (r[k]) { minT = Math.min(minT, r[k]); maxT = Math.max(maxT, r[k]); }
+        }
+      }
+      if (minT === 1e9) return;
+      minT = Math.floor(minT - 1);
+      maxT = Math.ceil(maxT + 1);
+
+      const toPlotX = (idx) => padL + (idx / Math.max(1, rows.length - 1)) * plotW;
+      const toPlotY = (t) => padT + plotH - ((t - minT) / (maxT - minT)) * plotH;
+
+      // Grille horizontale des chronos
+      timelineCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+      timelineCtx.lineWidth = 1;
+      const stepT = (maxT - minT) > 15 ? 5 : ((maxT - minT) > 6 ? 2 : 1);
+      for (let t = Math.ceil(minT); t <= maxT; t += stepT) {
+        const y = toPlotY(t);
+        timelineCtx.beginPath();
+        timelineCtx.moveTo(padL, y);
+        timelineCtx.lineTo(w - padR, y);
+        timelineCtx.stroke();
+        timelineCtx.fillStyle = 'var(--muted)';
+        timelineCtx.font = '10px monospace';
+        timelineCtx.fillText(`${t}s`, 10, y + 3);
+      }
+
+      // Grille verticale des versions
+      for (let i = 0; i < rows.length; i++) {
+        const x = toPlotX(i);
+        timelineCtx.beginPath();
+        timelineCtx.moveTo(x, padT);
+        timelineCtx.lineTo(x, padT + plotH);
+        timelineCtx.stroke();
+        timelineCtx.fillStyle = rows[i].isLatest ? 'var(--accent)' : 'var(--text)';
+        timelineCtx.font = '11px monospace';
+        timelineCtx.fillText(rows[i].ver, x - 8, padT + plotH + 18);
+      }
+
+      // Tracer les courbes pour chaque niveau
+      const levels = [
+        { key: 'expert', color: COLORS.expert },
+        { key: 'difficile', color: COLORS.difficile },
+        { key: 'normal', color: COLORS.normal },
+        { key: 'facile', color: COLORS.facile }
+      ];
+
+      for (const lvl of levels) {
+        const pts = [];
+        for (let i = 0; i < rows.length; i++) {
+          if (rows[i][lvl.key]) pts.push({ x: toPlotX(i), y: toPlotY(rows[i][lvl.key]), val: rows[i][lvl.key] });
+        }
+        if (pts.length > 0) {
+          timelineCtx.strokeStyle = lvl.color;
+          timelineCtx.lineWidth = 2.2;
+          timelineCtx.beginPath();
+          pts.forEach((p, idx) => { idx === 0 ? timelineCtx.moveTo(p.x, p.y) : timelineCtx.lineTo(p.x, p.y); });
+          timelineCtx.stroke();
+
+          // Points
+          for (const p of pts) {
+            timelineCtx.fillStyle = lvl.color;
+            timelineCtx.beginPath();
+            timelineCtx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            timelineCtx.fill();
+            timelineCtx.fillStyle = '#fff';
+            timelineCtx.font = '9px monospace';
+            timelineCtx.fillText(`${p.val}`, p.x - 10, p.y - 7);
+          }
+        }
+      }
+    }
+
+    // Superposition télémétrique V(s) de toutes les versions disponibles pour ce run
+    async function drawMultiVersionChart(rows, trkId, carId, mode) {
+      const w = multiVersCv.parentElement.clientWidth;
+      const h = multiVersCv.parentElement.clientHeight;
+      if (multiVersCv.width !== w || multiVersCv.height !== h) {
+        multiVersCv.width = w;
+        multiVersCv.height = h;
+      }
+      multiVersCtx.clearRect(0, 0, w, h);
+
+      const legendEl = document.getElementById('multiVersLegend');
+      legendEl.innerHTML = '';
+
+      if (!rows || rows.length === 0) return;
+
+      // Charger les trajectoires Expert pour chaque version
+      const versData = [];
+      await Promise.all(rows.map(async (r) => {
+        try {
+          const res = await fetch(`../tmp/${r.ver}/${r.fileName}`);
+          const data = await res.json();
+          const exp = data.results?.find(x => x.level === 'expert');
+          if (exp && exp.trajectory) {
+            versData.push({
+              ver: r.ver,
+              color: VER_COLORS[r.ver] || '#fff',
+              traj: exp.trajectory,
+              trackLen: data.circuit.length,
+              vmax: data.run.vmax || 320
+            });
+          }
+        } catch (e) { }
+      }));
+
+      versData.sort((a, b) => (parseInt(a.ver.replace('v', ''), 10) || 0) - (parseInt(b.ver.replace('v', ''), 10) || 0));
+
+      if (versData.length === 0) return;
+
+      const trackLen = versData[0].trackLen;
+      const padL = 45, padR = 20, padT = 20, padB = 30;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+      const maxV = Math.max(...versData.map(v => v.vmax), 320);
+
+      const toPlotX = (s) => padL + ((s % trackLen) / trackLen) * plotW;
+      const toPlotY = (v) => padT + plotH - (v / maxV) * plotH;
+
+      // Grille V(s)
+      multiVersCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+      multiVersCtx.lineWidth = 1;
+      for (let v = 50; v <= maxV; v += 50) {
+        const y = toPlotY(v);
+        multiVersCtx.beginPath();
+        multiVersCtx.moveTo(padL, y);
+        multiVersCtx.lineTo(w - padR, y);
+        multiVersCtx.stroke();
+        multiVersCtx.fillStyle = 'var(--muted)';
+        multiVersCtx.font = '10px monospace';
+        multiVersCtx.fillText(`${v}k`, 10, y + 3);
+      }
+
+      for (let s = 500; s < trackLen; s += 500) {
+        const x = toPlotX(s);
+        multiVersCtx.beginPath();
+        multiVersCtx.moveTo(x, padT);
+        multiVersCtx.lineTo(x, padT + plotH);
+        multiVersCtx.stroke();
+        multiVersCtx.fillStyle = 'var(--muted)';
+        multiVersCtx.font = '10px monospace';
+        multiVersCtx.fillText(`${s}m`, x - 12, padT + plotH + 16);
+      }
+
+      // Tracer chaque version superposée
+      for (const vd of versData) {
+        multiVersCtx.strokeStyle = vd.color;
+        multiVersCtx.lineWidth = vd.ver === manifest?.latest ? 2.5 : 1.6;
+        multiVersCtx.beginPath();
+        for (let i = 0; i < vd.traj.length; i++) {
+          const pt = vd.traj[i];
+          const px = toPlotX(pt[1]);
+          const py = toPlotY(pt[4]);
+          i === 0 ? multiVersCtx.moveTo(px, py) : multiVersCtx.lineTo(px, py);
+        }
+        multiVersCtx.stroke();
+
+        // Légende
+        const pill = document.createElement('span');
+        pill.style.color = vd.color;
+        pill.style.fontWeight = '700';
+        pill.textContent = `■ ${vd.ver}`;
+        legendEl.appendChild(pill);
+      }
+    }
+
+    // Global Matrix Render
+    function renderMatrix() {
+      if (!summary) return;
+      const tbody = document.getElementById('matrixTbody');
+      tbody.innerHTML = '';
+
+      const search = document.getElementById('matSearch').value.toLowerCase().trim();
+      const modeFilter = document.getElementById('matModeFilter').value;
+      const catFilter = document.getElementById('matCatFilter')?.value || 'all';
+      const carCatFilter = document.getElementById('matCarCatFilter')?.value || 'all';
+
+      let totalRuns = 0;
+      let timeGains = 0;
+      let totalFaults = 0;
+
+      for (const run of summary.runs) {
+        if (modeFilter !== 'all' && run.mode !== modeFilter) continue;
+        const trkCat = getCircuitCategory(run.circuit);
+        if (catFilter !== 'all' && trkCat !== catFilter) continue;
+        const isKart = run.carId.startsWith('kart_');
+        if (carCatFilter === 'kart' && !isKart) continue;
+        if (carCatFilter === 'car' && isKart) continue;
+
+        const searchTarget = `${run.circuitName} ${run.circuit} ${run.carName} ${run.carId} ${trkCat}`.toLowerCase();
+        if (search && !searchTarget.includes(search)) continue;
+
+        totalRuns++;
+        const cmpRun = cmpSummary?.runs?.find(r => r.circuit === run.circuit && r.carId === run.carId && r.mode === run.mode);
+
+        const exp = run.summary.find(s => s.level === 'expert');
+        const dif = run.summary.find(s => s.level === 'difficile');
+        const cmpExp = cmpRun?.summary?.find(s => s.level === 'expert');
+        const cmpDif = cmpRun?.summary?.find(s => s.level === 'difficile');
+
+        const expTime = exp?.bestLap ? `${exp.bestLap}s` : '-';
+        const cmpExpTime = cmpExp?.bestLap ? `${cmpExp.bestLap}s` : '-';
+        let deltaExpHtml = '-';
+
+        if (exp?.bestLap && cmpExp?.bestLap) {
+          const d = (exp.bestLap - cmpExp.bestLap).toFixed(2);
+          const sign = d > 0 ? `+${d}s` : `${d}s`;
+          const cls = d < -0.1 ? 'delta-good' : (d > 0.1 ? 'delta-bad' : 'delta-neutral');
+          deltaExpHtml = `<span class="${cls}">${sign}</span>`;
+          if (d < 0) timeGains++;
+        }
+
+        const difTime = dif?.bestLap ? `${dif.bestLap}s` : '-';
+        let deltaDifHtml = '-';
+        if (dif?.bestLap && cmpDif?.bestLap) {
+          const d = (dif.bestLap - cmpDif.bestLap).toFixed(2);
+          const sign = d > 0 ? `+${d}s` : `${d}s`;
+          const cls = d < -0.1 ? 'delta-good' : (d > 0.1 ? 'delta-bad' : 'delta-neutral');
+          deltaDifHtml = `<span class="${cls}">${sign}</span>`;
+        }
+
+        const curOffTrack = run.summary.reduce((acc, s) => acc + (s.offTrackTicks || 0), 0);
+        const curWall = run.summary.reduce((acc, s) => acc + (s.wallTicks || 0), 0);
+        const curTotalFaults = curOffTrack + curWall;
+        const cmpOff = cmpRun ? cmpRun.summary.reduce((acc, s) => acc + (s.offTrackTicks || 0) + (s.wallTicks || 0), 0) : null;
+        totalFaults += curTotalFaults;
+
+        let faultsHtml = `${curOffTrack}`;
+        if (curWall > 0) faultsHtml += ` <span style="color:var(--bad);font-weight:700;">(+${curWall} mur)</span>`;
+        if (cmpOff !== null) {
+          const dF = curTotalFaults - cmpOff;
+          const cls = dF < 0 ? 'delta-good' : (dF > 0 ? 'delta-bad' : 'delta-neutral');
+          faultsHtml = `<b>${curTotalFaults}</b> <span class="${cls}" style="font-size:0.75rem;">(Réf: ${cmpOff})</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.onclick = () => {
+          document.getElementById('trkSelect').value = run.circuit;
+          onTrackChanged().then(() => {
+            document.getElementById('runSelect').value = run.fileName;
+            loadRunFile();
+            loadCmpRunFile();
+            document.querySelector('[data-tab="tab-telemetry"]').click();
+          });
+        };
+
+        const catBadgeClass = trkCat === 'indoor' ? 'badge-indoor' : (trkCat === 'outdoor' ? 'badge-outdoor' : (trkCat === 'mixte' ? 'badge-mixte' : 'badge-gp'));
+        const catBadgeLabel = trkCat === 'indoor' ? 'Indoor' : (trkCat === 'outdoor' ? 'Outdoor' : (trkCat === 'mixte' ? 'Mixte' : 'GP'));
+        const carBadgeClass = isKart ? 'badge-kart' : 'badge-car';
+
+        tr.innerHTML = `
+          <td><span class="badge-cat ${catBadgeClass}">${catBadgeLabel}</span><span class="badge-circuit">${run.circuitName}</span></td>
+          <td style="font-weight:600;"><span class="badge-cat ${carBadgeClass}">${isKart ? 'Kart' : 'Auto'}</span>${run.carName}</td>
+          <td><span style="font-size:0.75rem;text-transform:uppercase;color:var(--muted);">${run.mode}</span></td>
+          <td class="mono">${expTime}</td>
+          <td class="mono" style="color:var(--muted);">${cmpExpTime}</td>
+          <td class="mono">${deltaExpHtml}</td>
+          <td class="mono">${difTime}</td>
+          <td class="mono">${deltaDifHtml}</td>
+          <td class="mono">${faultsHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('matSimTotal').textContent = totalRuns;
+      document.getElementById('matTimeGains').textContent = timeGains;
+      document.getElementById('matFaultsTotal').textContent = totalFaults;
+    }
+
+    document.getElementById('matSearch').oninput = renderMatrix;
+    document.getElementById('matModeFilter').onchange = renderMatrix;
+    document.getElementById('matCatFilter').onchange = renderMatrix;
+    document.getElementById('matCarCatFilter').onchange = renderMatrix;
+    document.getElementById('catFilter').onchange = () => { populateTrackSelect(); onTrackChanged(); };
+    document.getElementById('carCatFilter').onchange = onTrackChanged;
+    document.getElementById('cmpCatFilter').onchange = () => { initCarCompareSelectors(); renderCarCompare(); };
+    document.getElementById('cmpCarCatFilter').onchange = () => { initCarCompareSelectors(); renderCarCompare(); };
+
+    // Animation Loop
+    function animate(t) {
+      if (isPlaying) {
+        const dt = (t - lastAnimFrame) / 1000;
+        curTime += dt * playSpeed;
+        if (curTime >= maxTime) {
+          curTime = maxTime;
+          isPlaying = false;
+          document.getElementById('btnPlay').textContent = '▶ Play';
+        }
+        updateHud();
+        draw();
+      }
+      lastAnimFrame = t;
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // Event Listeners
+    document.getElementById('trkSelect').onchange = onTrackChanged;
+    document.getElementById('runSelect').onchange = () => { loadRunFile(); loadCmpRunFile(); };
+    document.getElementById('verSelect').onchange = (e) => loadVersion(e.target.value);
+    document.getElementById('cmpSelect').onchange = (e) => loadCmpSummary(e.target.value);
+    document.getElementById('colorMode').onchange = draw;
+    ['chkExp', 'chkDiff', 'chkNorm', 'chkFac', 'chkCmp'].forEach(id => {
+      document.getElementById(id).onchange = draw;
+    });
+
+    document.getElementById('btnPlay').onclick = () => {
+      isPlaying = !isPlaying;
+      document.getElementById('btnPlay').textContent = isPlaying ? '⏸ Pause' : '▶ Play';
+      if (curTime >= maxTime) curTime = 0;
+    };
+    document.getElementById('speedSelect').onchange = (e) => { playSpeed = parseFloat(e.target.value); };
+
+    // Timeline scrubber
+    const timeline = document.getElementById('timeline');
+    timeline.onmousedown = (e) => {
+      const rect = timeline.getBoundingClientRect();
+      const clickRatio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      curTime = clickRatio * maxTime;
+      updateHud();
+      draw();
+    };
+
+    // Zoom & Pan
+    cv.onmousedown = (e) => {
+      isDragging = true;
+      startMouseX = e.clientX - panX;
+      startMouseY = e.clientY - panY;
+    };
+    window.onmousemove = (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startMouseX;
+      panY = e.clientY - startMouseY;
+      draw();
+    };
+    window.onmouseup = () => { isDragging = false; };
+    cv.onwheel = (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      const mouseX = e.clientX, mouseY = e.clientY;
+      panX = mouseX - (mouseX - panX) * zoomFactor;
+      panY = mouseY - (mouseY - panY) * zoomFactor;
+      scale *= zoomFactor;
+      draw();
+    };
+    document.getElementById('btnZoomIn').onclick = () => { scale *= 1.25; draw(); };
+    document.getElementById('btnZoomOut').onclick = () => { scale *= 0.8; draw(); };
+    document.getElementById('btnFit').onclick = () => { fitTrack(); draw(); };
+
+    window.onresize = () => {
+      fitTrack();
+      draw();
+      drawChart();
+      renderCarCompare();
+    };
+
+    init();
+  </script>
+</body>
+
+</html>

@@ -180,7 +180,7 @@ const DT = 1 / 60, wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) %
 let gameTime = 0;   // temps continu pour animer les nuages / pluie
 let tick = 0, acc = 0, last = 0, sensorClock = 0, camPsi = drv.psi, camY = drv.y + 3, camT = drv.y + 1, hudN = 0, boardAcc = 0, shown = false, qualNotice = false, qualUiTick = 0, lastBest = null, pitMsg = '', pitMsgT = 0, repT = 0, saveAcc = 0, discardingLive = false, finAt = 0, liveShown = false, liveTick = 0, dnfActive = false, dnfElapsed = 0, dnfStopElapsed = 0, dnfHold = 0;
 function startPlayerDnf() { if (dnfActive) return; dnfActive = true; dnfElapsed = 0; dnfStopElapsed = 0; dnfHold = 0; playerEngine.failed = true; playerEngine.fade = 0; playerEngine.retiredAt = race.t; race.retire(race.E[0]); drv.ghost = true; pitMsg = ''; pitMsgT = 0; }
-const AI_SAVE = ['skill', 'lane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
+const AI_SAVE = ['skill', 'lane', 'targetLane', 'p1', 'p2', 'wait', 'tl', 'vt', 'tx', 'tz', 'fault', 'atk', 'atkT', 'passLat', 'defDone', 'defT', 'defSide', 'calm', 'gl', 'dist', 'joined', 'stk', 'rec', 'damage', 'inp', 'blk', 'vf', 'p0', 'pit', 'pitD', 'pitT', 'pitN', 'pitChk', 'pitW', 'pitTO'];
 // Réseau fluide : chaque machine est autoritaire sur SA voiture (physique locale 60 Hz) et la publie à 20 Hz en tableau compact.
 // L'hôte publie IA + humains ; les clients rejouent les paquets avec un retard fixe (interpolation, extrapolation courte).
 const NF = ['x', 'y', 'z', 'psi', 'pitch', 'roll', 'u', 'w', 'r', 's', 'lat', 'kmh'], NLEN = 20, NET_STEP = field.cars.length > 11 ? .055 : .045, DK = ['nose', 'fw', 'hood', 'l', 'r', 'floor', 'rw'];
@@ -374,7 +374,22 @@ function restoreLive(data) {
     const carsByN = new Map(field.cars.map((c) => [c.n, c]));
     for (const saved of data.cars) restoreCar(carsByN.get(saved.n)?.ph, saved.state);
     const aiByN = new Map(ais.map((a, i) => [field.cars[i].n, a]));
-    for (const saved of data.ai || []) { const a = aiByN.get(saved.n); if (!a) continue; for (const k of AI_SAVE) if (saved.state[k] !== undefined) a[k] = saved.state[k]; a.r.setState(saved.state.rng); a._savedTarget = saved.state.target; }
+    for (const saved of data.ai || []) {
+      const a = aiByN.get(saved.n);
+      if (!a) continue;
+      for (const k of AI_SAVE) if (saved.state[k] !== undefined) a[k] = saved.state[k];
+      if (Math.abs(a.lane) > 1.2) a.lane = 0;
+      else if (a.lane > 0.4) a.lane = 1;
+      else if (a.lane < -0.4) a.lane = -1;
+      else a.lane = 0;
+      if (a.targetLane === undefined || typeof a.targetLane !== 'number') a.targetLane = a.lane;
+      else if (Math.abs(a.targetLane) > 1.2) a.targetLane = 0;
+      else if (a.targetLane > 0.4) a.targetLane = 1;
+      else if (a.targetLane < -0.4) a.targetLane = -1;
+      else a.targetLane = 0;
+      a.r.setState(saved.state.rng);
+      a._savedTarget = saved.state.target;
+    }
     for (const a of ais) { a.tgt = a._savedTarget == null ? null : carsByN.get(a._savedTarget)?.ph || null; delete a._savedTarget; }
     Object.assign(dmg.w, data.damage || {}); tick = data.tick || 0;
     const rs = data.race; for (const k of ['phase', 'clock', 't', 'laps', 'waitAll', 'qualifying', 'afterPlayer', 'lights', 'hold', 'falseStart', 'penalty', 'goMsg', 'msg', 'results', 'penaltiesEnabled', 'penalties', 'timePenalty', 'lapPenalty', 'cutTimer', 'cutCooldown', 'penaltyMsg', 'penaltyMsgT', 'dt']) if (rs[k] !== undefined) race[k] = rs[k];

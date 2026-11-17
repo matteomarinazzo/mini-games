@@ -1,0 +1,4728 @@
+{
+  "version": "v5",
+  "date": "2026-11-17T08:31:11.944Z",
+  "durationSec": 31.4,
+  "taskCount": 80,
+  "runs": [
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_serra_gt_qualif.json",
+      "wallTimeMs": 1095,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 125.85,
+          "lapTimes": [
+            128.92,
+            125.85
+          ],
+          "maxV": 272.2,
+          "avgV": 152,
+          "offTrackTicks": 0,
+          "lockupTicks": 126
+        },
+        {
+          "level": "difficile",
+          "bestLap": 129.72,
+          "lapTimes": [
+            132.78,
+            129.72
+          ],
+          "maxV": 268.6,
+          "avgV": 148,
+          "offTrackTicks": 0,
+          "lockupTicks": 74
+        },
+        {
+          "level": "normal",
+          "bestLap": 137.8,
+          "lapTimes": [
+            140.82,
+            137.8
+          ],
+          "maxV": 263.3,
+          "avgV": 139,
+          "offTrackTicks": 0,
+          "lockupTicks": 132
+        },
+        {
+          "level": "facile",
+          "bestLap": 145.02,
+          "lapTimes": [
+            148,
+            145.02
+          ],
+          "maxV": 259,
+          "avgV": 132,
+          "offTrackTicks": 0,
+          "lockupTicks": 72
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_tempete_qualif.json",
+      "wallTimeMs": 1124,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 137.9,
+          "lapTimes": [
+            141.4,
+            137.9
+          ],
+          "maxV": 274.3,
+          "avgV": 139,
+          "offTrackTicks": 0,
+          "lockupTicks": 147
+        },
+        {
+          "level": "difficile",
+          "bestLap": 142.25,
+          "lapTimes": [
+            145.78,
+            142.25
+          ],
+          "maxV": 269.5,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 87
+        },
+        {
+          "level": "normal",
+          "bestLap": 151.55,
+          "lapTimes": [
+            155.03,
+            151.55
+          ],
+          "maxV": 262,
+          "avgV": 126,
+          "offTrackTicks": 0,
+          "lockupTicks": 113
+        },
+        {
+          "level": "facile",
+          "bestLap": 160.07,
+          "lapTimes": [
+            163.45,
+            160.07
+          ],
+          "maxV": 256.1,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 84
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_valmont-gp_serra_gt_race.json",
+      "wallTimeMs": 1349,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 125.85,
+          "lapTimes": [
+            130.23,
+            125.85
+          ],
+          "maxV": 272.3,
+          "avgV": 155,
+          "offTrackTicks": 0,
+          "lockupTicks": 134
+        },
+        {
+          "level": "difficile",
+          "bestLap": 129.72,
+          "lapTimes": [
+            134.2,
+            129.72
+          ],
+          "maxV": 268.6,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 91
+        },
+        {
+          "level": "normal",
+          "bestLap": 137.77,
+          "lapTimes": [
+            143.17,
+            137.77
+          ],
+          "maxV": 263.5,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 129
+        },
+        {
+          "level": "facile",
+          "bestLap": 145,
+          "lapTimes": [
+            150.5,
+            145
+          ],
+          "maxV": 259.2,
+          "avgV": 132,
+          "offTrackTicks": 0,
+          "lockupTicks": 81
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_valmont-gp_tempete_race.json",
+      "wallTimeMs": 1322,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 137.9,
+          "lapTimes": [
+            142.93,
+            137.9
+          ],
+          "maxV": 274.3,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 177
+        },
+        {
+          "level": "difficile",
+          "bestLap": 142.25,
+          "lapTimes": [
+            147.38,
+            142.25
+          ],
+          "maxV": 269.5,
+          "avgV": 136,
+          "offTrackTicks": 0,
+          "lockupTicks": 98
+        },
+        {
+          "level": "normal",
+          "bestLap": 151.55,
+          "lapTimes": [
+            157.53,
+            151.55
+          ],
+          "maxV": 262.4,
+          "avgV": 128,
+          "offTrackTicks": 0,
+          "lockupTicks": 125
+        },
+        {
+          "level": "facile",
+          "bestLap": 160.07,
+          "lapTimes": [
+            166.12,
+            160.07
+          ],
+          "maxV": 256,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 90
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_sentinelle_qualif.json",
+      "wallTimeMs": 1347,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 107.05,
+          "lapTimes": [
+            109.25,
+            107.05
+          ],
+          "maxV": 311.4,
+          "avgV": 179,
+          "offTrackTicks": 0,
+          "lockupTicks": 60
+        },
+        {
+          "level": "difficile",
+          "bestLap": 109.78,
+          "lapTimes": [
+            112.57,
+            109.78
+          ],
+          "maxV": 307,
+          "avgV": 175,
+          "offTrackTicks": 0,
+          "lockupTicks": 66
+        },
+        {
+          "level": "normal",
+          "bestLap": 116.95,
+          "lapTimes": [
+            119.82,
+            116.95
+          ],
+          "maxV": 304.1,
+          "avgV": 164,
+          "offTrackTicks": 0,
+          "lockupTicks": 128
+        },
+        {
+          "level": "facile",
+          "bestLap": 120.98,
+          "lapTimes": [
+            123.73,
+            120.98
+          ],
+          "maxV": 301.3,
+          "avgV": 158,
+          "offTrackTicks": 0,
+          "lockupTicks": 60
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_spectre_qualif.json",
+      "wallTimeMs": 1266,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 114.15,
+          "lapTimes": [
+            116.38,
+            114.15
+          ],
+          "maxV": 310.5,
+          "avgV": 168,
+          "offTrackTicks": 0,
+          "lockupTicks": 172
+        },
+        {
+          "level": "difficile",
+          "bestLap": 116.75,
+          "lapTimes": [
+            119.68,
+            116.75
+          ],
+          "maxV": 306.5,
+          "avgV": 164,
+          "offTrackTicks": 0,
+          "lockupTicks": 102
+        },
+        {
+          "level": "normal",
+          "bestLap": 124.3,
+          "lapTimes": [
+            127.27,
+            124.3
+          ],
+          "maxV": 300.9,
+          "avgV": 154,
+          "offTrackTicks": 0,
+          "lockupTicks": 127
+        },
+        {
+          "level": "facile",
+          "bestLap": 131.08,
+          "lapTimes": [
+            133.97,
+            131.08
+          ],
+          "maxV": 295.9,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 84
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_valmont-gp_spectre_race.json",
+      "wallTimeMs": 1474,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 114.13,
+          "lapTimes": [
+            118.38,
+            114.13
+          ],
+          "maxV": 310.5,
+          "avgV": 172,
+          "offTrackTicks": 0,
+          "lockupTicks": 208
+        },
+        {
+          "level": "difficile",
+          "bestLap": 116.75,
+          "lapTimes": [
+            121.1,
+            116.75
+          ],
+          "maxV": 306.6,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 116
+        },
+        {
+          "level": "normal",
+          "bestLap": 124.3,
+          "lapTimes": [
+            129.25,
+            124.3
+          ],
+          "maxV": 301,
+          "avgV": 156,
+          "offTrackTicks": 0,
+          "lockupTicks": 127
+        },
+        {
+          "level": "facile",
+          "bestLap": 131.07,
+          "lapTimes": [
+            136.1,
+            131.07
+          ],
+          "maxV": 296.2,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 86
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_valmont-gp_sentinelle_race.json",
+      "wallTimeMs": 1826,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 109.75,
+          "lapTimes": [
+            114.17,
+            109.75
+          ],
+          "maxV": 309.6,
+          "avgV": 176,
+          "offTrackTicks": 21,
+          "lockupTicks": 229
+        },
+        {
+          "level": "difficile",
+          "bestLap": 109.82,
+          "lapTimes": [
+            113.98,
+            109.82
+          ],
+          "maxV": 307,
+          "avgV": 176,
+          "offTrackTicks": 0,
+          "lockupTicks": 79
+        },
+        {
+          "level": "normal",
+          "bestLap": 116.95,
+          "lapTimes": [
+            121.78,
+            116.95
+          ],
+          "maxV": 304.2,
+          "avgV": 167,
+          "offTrackTicks": 0,
+          "lockupTicks": 140
+        },
+        {
+          "level": "facile",
+          "bestLap": 120.97,
+          "lapTimes": [
+            126.18,
+            120.97
+          ],
+          "maxV": 301.3,
+          "avgV": 158,
+          "offTrackTicks": 0,
+          "lockupTicks": 56
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_f1_qualif.json",
+      "wallTimeMs": 1143,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 94.2,
+          "lapTimes": [
+            95.28,
+            94.2
+          ],
+          "maxV": 331.6,
+          "avgV": 205,
+          "offTrackTicks": 0,
+          "lockupTicks": 97
+        },
+        {
+          "level": "difficile",
+          "bestLap": 94.13,
+          "lapTimes": [
+            99.35,
+            94.13
+          ],
+          "maxV": 331.4,
+          "avgV": 201,
+          "offTrackTicks": 80,
+          "lockupTicks": 163
+        },
+        {
+          "level": "normal",
+          "bestLap": 98.28,
+          "lapTimes": [
+            100.17,
+            98.28
+          ],
+          "maxV": 327.4,
+          "avgV": 195,
+          "offTrackTicks": 0,
+          "lockupTicks": 26
+        },
+        {
+          "level": "facile",
+          "bestLap": 102.4,
+          "lapTimes": [
+            104.82,
+            102.4
+          ],
+          "maxV": 324.4,
+          "avgV": 187,
+          "offTrackTicks": 0,
+          "lockupTicks": 12
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_valmont-gp_rallye_qualif.json",
+      "wallTimeMs": 1072,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 133.15,
+          "lapTimes": [
+            136.18,
+            133.15
+          ],
+          "maxV": 261.7,
+          "avgV": 144,
+          "offTrackTicks": 0,
+          "lockupTicks": 149
+        },
+        {
+          "level": "difficile",
+          "bestLap": 137.15,
+          "lapTimes": [
+            140.17,
+            137.15
+          ],
+          "maxV": 258.2,
+          "avgV": 140,
+          "offTrackTicks": 0,
+          "lockupTicks": 101
+        },
+        {
+          "level": "normal",
+          "bestLap": 145.47,
+          "lapTimes": [
+            148.45,
+            145.47
+          ],
+          "maxV": 252.9,
+          "avgV": 132,
+          "offTrackTicks": 0,
+          "lockupTicks": 125
+        },
+        {
+          "level": "facile",
+          "bestLap": 152.95,
+          "lapTimes": [
+            155.83,
+            152.95
+          ],
+          "maxV": 248.5,
+          "avgV": 126,
+          "offTrackTicks": 0,
+          "lockupTicks": 66
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_valmont-gp_f1_race.json",
+      "wallTimeMs": 1301,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 97.45,
+          "lapTimes": [
+            97.85,
+            97.45
+          ],
+          "maxV": 331.8,
+          "avgV": 202,
+          "offTrackTicks": 38,
+          "lockupTicks": 267
+        },
+        {
+          "level": "difficile",
+          "bestLap": 94.43,
+          "lapTimes": [
+            100.73,
+            94.43
+          ],
+          "maxV": 331.4,
+          "avgV": 202,
+          "offTrackTicks": 80,
+          "lockupTicks": 161
+        },
+        {
+          "level": "normal",
+          "bestLap": 97.65,
+          "lapTimes": [
+            103.03,
+            97.65
+          ],
+          "maxV": 327.5,
+          "avgV": 198,
+          "offTrackTicks": 0,
+          "lockupTicks": 43
+        },
+        {
+          "level": "facile",
+          "bestLap": 102.37,
+          "lapTimes": [
+            106.88,
+            102.37
+          ],
+          "maxV": 324.3,
+          "avgV": 187,
+          "offTrackTicks": 0,
+          "lockupTicks": 12
+        }
+      ]
+    },
+    {
+      "circuit": "valmont-gp",
+      "circuitName": "Valmont",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_valmont-gp_rallye_race.json",
+      "wallTimeMs": 1293,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 133.15,
+          "lapTimes": [
+            137.35,
+            133.15
+          ],
+          "maxV": 261.7,
+          "avgV": 147,
+          "offTrackTicks": 0,
+          "lockupTicks": 173
+        },
+        {
+          "level": "difficile",
+          "bestLap": 137.13,
+          "lapTimes": [
+            141.53,
+            137.13
+          ],
+          "maxV": 258.2,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 100
+        },
+        {
+          "level": "normal",
+          "bestLap": 145.53,
+          "lapTimes": [
+            150.65,
+            145.53
+          ],
+          "maxV": 252.7,
+          "avgV": 134,
+          "offTrackTicks": 0,
+          "lockupTicks": 126
+        },
+        {
+          "level": "facile",
+          "bestLap": 152.93,
+          "lapTimes": [
+            158.27,
+            152.93
+          ],
+          "maxV": 248,
+          "avgV": 125,
+          "offTrackTicks": 0,
+          "lockupTicks": 68
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_serra_gt_qualif.json",
+      "wallTimeMs": 1054,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 79.98,
+          "lapTimes": [
+            82.87,
+            79.98
+          ],
+          "maxV": 271.8,
+          "avgV": 150,
+          "offTrackTicks": 0,
+          "lockupTicks": 73
+        },
+        {
+          "level": "difficile",
+          "bestLap": 82.15,
+          "lapTimes": [
+            85.03,
+            82.15
+          ],
+          "maxV": 268.4,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 45
+        },
+        {
+          "level": "normal",
+          "bestLap": 87.55,
+          "lapTimes": [
+            92.33,
+            87.55
+          ],
+          "maxV": 263.7,
+          "avgV": 136,
+          "offTrackTicks": 0,
+          "lockupTicks": 98
+        },
+        {
+          "level": "facile",
+          "bestLap": 91.83,
+          "lapTimes": [
+            94.6,
+            91.83
+          ],
+          "maxV": 259.3,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 22
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_tempete_qualif.json",
+      "wallTimeMs": 1109,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 88.98,
+          "lapTimes": [
+            92.3,
+            88.98
+          ],
+          "maxV": 273.5,
+          "avgV": 134,
+          "offTrackTicks": 0,
+          "lockupTicks": 119
+        },
+        {
+          "level": "difficile",
+          "bestLap": 90.5,
+          "lapTimes": [
+            93.82,
+            90.5
+          ],
+          "maxV": 269.3,
+          "avgV": 132,
+          "offTrackTicks": 0,
+          "lockupTicks": 49
+        },
+        {
+          "level": "normal",
+          "bestLap": 96.2,
+          "lapTimes": [
+            101.5,
+            96.2
+          ],
+          "maxV": 262.5,
+          "avgV": 123,
+          "offTrackTicks": 39,
+          "lockupTicks": 126
+        },
+        {
+          "level": "facile",
+          "bestLap": 101.05,
+          "lapTimes": [
+            104.27,
+            101.05
+          ],
+          "maxV": 256.3,
+          "avgV": 119,
+          "offTrackTicks": 0,
+          "lockupTicks": 23
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_serra-nova_serra_gt_race.json",
+      "wallTimeMs": 1358,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 79.97,
+          "lapTimes": [
+            84.18,
+            79.97
+          ],
+          "maxV": 271.8,
+          "avgV": 152,
+          "offTrackTicks": 0,
+          "lockupTicks": 99
+        },
+        {
+          "level": "difficile",
+          "bestLap": 82.15,
+          "lapTimes": [
+            86.45,
+            82.15
+          ],
+          "maxV": 268.5,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 52
+        },
+        {
+          "level": "normal",
+          "bestLap": 92.42,
+          "lapTimes": [
+            98.83,
+            92.42
+          ],
+          "maxV": 261.2,
+          "avgV": 129,
+          "offTrackTicks": 70,
+          "lockupTicks": 371
+        },
+        {
+          "level": "facile",
+          "bestLap": 91.85,
+          "lapTimes": [
+            98.6,
+            91.85
+          ],
+          "maxV": 260,
+          "avgV": 130,
+          "offTrackTicks": 0,
+          "lockupTicks": 29
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_serra-nova_tempete_race.json",
+      "wallTimeMs": 1378,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 88.95,
+          "lapTimes": [
+            93.83,
+            88.95
+          ],
+          "maxV": 273.5,
+          "avgV": 138,
+          "offTrackTicks": 0,
+          "lockupTicks": 141
+        },
+        {
+          "level": "difficile",
+          "bestLap": 90.5,
+          "lapTimes": [
+            95.45,
+            90.5
+          ],
+          "maxV": 269.4,
+          "avgV": 136,
+          "offTrackTicks": 0,
+          "lockupTicks": 56
+        },
+        {
+          "level": "normal",
+          "bestLap": 95.78,
+          "lapTimes": [
+            101.77,
+            95.78
+          ],
+          "maxV": 263,
+          "avgV": 130,
+          "offTrackTicks": 0,
+          "lockupTicks": 35
+        },
+        {
+          "level": "facile",
+          "bestLap": 101.05,
+          "lapTimes": [
+            107.1,
+            101.05
+          ],
+          "maxV": 256.6,
+          "avgV": 118,
+          "offTrackTicks": 0,
+          "lockupTicks": 24
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_sentinelle_qualif.json",
+      "wallTimeMs": 1458,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 76.82,
+          "lapTimes": [
+            79.38,
+            76.82
+          ],
+          "maxV": 309.9,
+          "avgV": 157,
+          "offTrackTicks": 0,
+          "lockupTicks": 472
+        },
+        {
+          "level": "difficile",
+          "bestLap": 76.35,
+          "lapTimes": [
+            81.08,
+            76.35
+          ],
+          "maxV": 306.8,
+          "avgV": 156,
+          "offTrackTicks": 78,
+          "lockupTicks": 382
+        },
+        {
+          "level": "normal",
+          "bestLap": 78.52,
+          "lapTimes": [
+            81.33,
+            78.52
+          ],
+          "maxV": 304.1,
+          "avgV": 153,
+          "offTrackTicks": 54,
+          "lockupTicks": 253
+        },
+        {
+          "level": "facile",
+          "bestLap": 77.05,
+          "lapTimes": [
+            79.68,
+            77.05
+          ],
+          "maxV": 301.9,
+          "avgV": 156,
+          "offTrackTicks": 0,
+          "lockupTicks": 18
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_spectre_qualif.json",
+      "wallTimeMs": 1342,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 79.9,
+          "lapTimes": [
+            82.67,
+            79.9
+          ],
+          "maxV": 309.7,
+          "avgV": 151,
+          "offTrackTicks": 0,
+          "lockupTicks": 430
+        },
+        {
+          "level": "difficile",
+          "bestLap": 79.35,
+          "lapTimes": [
+            82.18,
+            79.35
+          ],
+          "maxV": 306.4,
+          "avgV": 151,
+          "offTrackTicks": 0,
+          "lockupTicks": 195
+        },
+        {
+          "level": "normal",
+          "bestLap": 80.33,
+          "lapTimes": [
+            83.13,
+            80.33
+          ],
+          "maxV": 301,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 74
+        },
+        {
+          "level": "facile",
+          "bestLap": 83.1,
+          "lapTimes": [
+            85.87,
+            83.1
+          ],
+          "maxV": 296.8,
+          "avgV": 144,
+          "offTrackTicks": 0,
+          "lockupTicks": 24
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_serra-nova_sentinelle_race.json",
+      "wallTimeMs": 1721,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 74.83,
+          "lapTimes": [
+            79.95,
+            74.83
+          ],
+          "maxV": 309.9,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 291
+        },
+        {
+          "level": "difficile",
+          "bestLap": 74.92,
+          "lapTimes": [
+            82.08,
+            74.92
+          ],
+          "maxV": 306.9,
+          "avgV": 164,
+          "offTrackTicks": 0,
+          "lockupTicks": 284
+        },
+        {
+          "level": "normal",
+          "bestLap": 78.98,
+          "lapTimes": [
+            83.87,
+            78.98
+          ],
+          "maxV": 304.1,
+          "avgV": 153,
+          "offTrackTicks": 55,
+          "lockupTicks": 294
+        },
+        {
+          "level": "facile",
+          "bestLap": 78.33,
+          "lapTimes": [
+            86.83,
+            78.33
+          ],
+          "maxV": 301.9,
+          "avgV": 149,
+          "offTrackTicks": 24,
+          "lockupTicks": 168
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_f1_qualif.json",
+      "wallTimeMs": 976,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 60.6,
+          "lapTimes": [
+            63.45,
+            60.6
+          ],
+          "maxV": 331.8,
+          "avgV": 197,
+          "offTrackTicks": 0,
+          "lockupTicks": 99
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.6,
+          "lapTimes": [
+            63.78,
+            61.6
+          ],
+          "maxV": 331,
+          "avgV": 195,
+          "offTrackTicks": 0,
+          "lockupTicks": 99
+        },
+        {
+          "level": "normal",
+          "bestLap": 64.47,
+          "lapTimes": [
+            66.78,
+            64.47
+          ],
+          "maxV": 327,
+          "avgV": 186,
+          "offTrackTicks": 0,
+          "lockupTicks": 83
+        },
+        {
+          "level": "facile",
+          "bestLap": 66,
+          "lapTimes": [
+            68.37,
+            66
+          ],
+          "maxV": 325.4,
+          "avgV": 181,
+          "offTrackTicks": 0,
+          "lockupTicks": 0
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_serra-nova_spectre_race.json",
+      "wallTimeMs": 1996,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 82.68,
+          "lapTimes": [
+            86.65,
+            82.68
+          ],
+          "maxV": 309.9,
+          "avgV": 149,
+          "offTrackTicks": 35,
+          "lockupTicks": 524
+        },
+        {
+          "level": "difficile",
+          "bestLap": 78.97,
+          "lapTimes": [
+            83.2,
+            78.97
+          ],
+          "maxV": 306.5,
+          "avgV": 158,
+          "offTrackTicks": 0,
+          "lockupTicks": 238
+        },
+        {
+          "level": "normal",
+          "bestLap": 84.52,
+          "lapTimes": [
+            89.02,
+            84.52
+          ],
+          "maxV": 296.3,
+          "avgV": 142,
+          "offTrackTicks": 19,
+          "lockupTicks": 347
+        },
+        {
+          "level": "facile",
+          "bestLap": 84.22,
+          "lapTimes": [
+            88.82,
+            84.22
+          ],
+          "maxV": 297.3,
+          "avgV": 142,
+          "offTrackTicks": 0,
+          "lockupTicks": 45
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_serra-nova_rallye_qualif.json",
+      "wallTimeMs": 991,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 86.12,
+          "lapTimes": [
+            88.77,
+            86.12
+          ],
+          "maxV": 261.5,
+          "avgV": 139,
+          "offTrackTicks": 0,
+          "lockupTicks": 154
+        },
+        {
+          "level": "difficile",
+          "bestLap": 86.75,
+          "lapTimes": [
+            89.55,
+            86.75
+          ],
+          "maxV": 257.7,
+          "avgV": 138,
+          "offTrackTicks": 0,
+          "lockupTicks": 48
+        },
+        {
+          "level": "normal",
+          "bestLap": 92.12,
+          "lapTimes": [
+            94.88,
+            92.12
+          ],
+          "maxV": 252.8,
+          "avgV": 130,
+          "offTrackTicks": 0,
+          "lockupTicks": 28
+        },
+        {
+          "level": "facile",
+          "bestLap": 96.85,
+          "lapTimes": [
+            99.53,
+            96.85
+          ],
+          "maxV": 248.5,
+          "avgV": 124,
+          "offTrackTicks": 0,
+          "lockupTicks": 17
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_serra-nova_f1_race.json",
+      "wallTimeMs": 1196,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 63.85,
+          "lapTimes": [
+            69.08,
+            63.85
+          ],
+          "maxV": 331.8,
+          "avgV": 190,
+          "offTrackTicks": 76,
+          "lockupTicks": 261
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.6,
+          "lapTimes": [
+            65.77,
+            61.6
+          ],
+          "maxV": 331,
+          "avgV": 200,
+          "offTrackTicks": 0,
+          "lockupTicks": 98
+        },
+        {
+          "level": "normal",
+          "bestLap": 63.77,
+          "lapTimes": [
+            68.68,
+            63.77
+          ],
+          "maxV": 327,
+          "avgV": 191,
+          "offTrackTicks": 0,
+          "lockupTicks": 75
+        },
+        {
+          "level": "facile",
+          "bestLap": 66.57,
+          "lapTimes": [
+            71.25,
+            66.57
+          ],
+          "maxV": 325.2,
+          "avgV": 179,
+          "offTrackTicks": 0,
+          "lockupTicks": 25
+        }
+      ]
+    },
+    {
+      "circuit": "serra-nova",
+      "circuitName": "Serra Nova",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_serra-nova_rallye_race.json",
+      "wallTimeMs": 1289,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 86.1,
+          "lapTimes": [
+            90.18,
+            86.1
+          ],
+          "maxV": 261.5,
+          "avgV": 143,
+          "offTrackTicks": 0,
+          "lockupTicks": 170
+        },
+        {
+          "level": "difficile",
+          "bestLap": 86.75,
+          "lapTimes": [
+            91.17,
+            86.75
+          ],
+          "maxV": 257.7,
+          "avgV": 142,
+          "offTrackTicks": 0,
+          "lockupTicks": 53
+        },
+        {
+          "level": "normal",
+          "bestLap": 92.13,
+          "lapTimes": [
+            97.13,
+            92.13
+          ],
+          "maxV": 252.9,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 32
+        },
+        {
+          "level": "facile",
+          "bestLap": 96.85,
+          "lapTimes": [
+            102,
+            96.85
+          ],
+          "maxV": 248.3,
+          "avgV": 124,
+          "offTrackTicks": 0,
+          "lockupTicks": 16
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_serra_gt_qualif.json",
+      "wallTimeMs": 1163,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 83.4,
+          "lapTimes": [
+            86.3,
+            83.4
+          ],
+          "maxV": 259,
+          "avgV": 116,
+          "offTrackTicks": 0,
+          "lockupTicks": 152
+        },
+        {
+          "level": "difficile",
+          "bestLap": 84.87,
+          "lapTimes": [
+            87.48,
+            84.87
+          ],
+          "maxV": 255.3,
+          "avgV": 114,
+          "offTrackTicks": 0,
+          "lockupTicks": 107
+        },
+        {
+          "level": "normal",
+          "bestLap": 89.83,
+          "lapTimes": [
+            92.48,
+            89.83
+          ],
+          "maxV": 249.7,
+          "avgV": 108,
+          "offTrackTicks": 0,
+          "lockupTicks": 58
+        },
+        {
+          "level": "facile",
+          "bestLap": 94.88,
+          "lapTimes": [
+            97.43,
+            94.88
+          ],
+          "maxV": 245.3,
+          "avgV": 102,
+          "offTrackTicks": 0,
+          "lockupTicks": 41
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_sous-bois_serra_gt_race.json",
+      "wallTimeMs": 1296,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 83.38,
+          "lapTimes": [
+            87.62,
+            83.38
+          ],
+          "maxV": 259,
+          "avgV": 118,
+          "offTrackTicks": 0,
+          "lockupTicks": 187
+        },
+        {
+          "level": "difficile",
+          "bestLap": 84.87,
+          "lapTimes": [
+            91.97,
+            84.87
+          ],
+          "maxV": 255.3,
+          "avgV": 115,
+          "offTrackTicks": 0,
+          "lockupTicks": 171
+        },
+        {
+          "level": "normal",
+          "bestLap": 89.82,
+          "lapTimes": [
+            95.23,
+            89.82
+          ],
+          "maxV": 250,
+          "avgV": 111,
+          "offTrackTicks": 0,
+          "lockupTicks": 59
+        },
+        {
+          "level": "facile",
+          "bestLap": 94.87,
+          "lapTimes": [
+            99.75,
+            94.87
+          ],
+          "maxV": 244.8,
+          "avgV": 102,
+          "offTrackTicks": 0,
+          "lockupTicks": 38
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_tempete_qualif.json",
+      "wallTimeMs": 1151,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 90.48,
+          "lapTimes": [
+            93.53,
+            90.48
+          ],
+          "maxV": 257.5,
+          "avgV": 107,
+          "offTrackTicks": 0,
+          "lockupTicks": 141
+        },
+        {
+          "level": "difficile",
+          "bestLap": 93.25,
+          "lapTimes": [
+            96.28,
+            93.25
+          ],
+          "maxV": 252.7,
+          "avgV": 104,
+          "offTrackTicks": 0,
+          "lockupTicks": 105
+        },
+        {
+          "level": "normal",
+          "bestLap": 99.23,
+          "lapTimes": [
+            102.2,
+            99.23
+          ],
+          "maxV": 245.7,
+          "avgV": 98,
+          "offTrackTicks": 0,
+          "lockupTicks": 84
+        },
+        {
+          "level": "facile",
+          "bestLap": 105.23,
+          "lapTimes": [
+            108.05,
+            105.23
+          ],
+          "maxV": 240.3,
+          "avgV": 92,
+          "offTrackTicks": 0,
+          "lockupTicks": 39
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_sentinelle_qualif.json",
+      "wallTimeMs": 997,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 76.88,
+          "lapTimes": [
+            76.88,
+            77
+          ],
+          "maxV": 300.7,
+          "avgV": 129,
+          "offTrackTicks": 61,
+          "lockupTicks": 269
+        },
+        {
+          "level": "difficile",
+          "bestLap": 74.15,
+          "lapTimes": [
+            76.82,
+            74.15
+          ],
+          "maxV": 297.3,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 133
+        },
+        {
+          "level": "normal",
+          "bestLap": 77.05,
+          "lapTimes": [
+            79.48,
+            77.05
+          ],
+          "maxV": 292.1,
+          "avgV": 126,
+          "offTrackTicks": 0,
+          "lockupTicks": 48
+        },
+        {
+          "level": "facile",
+          "bestLap": 80.78,
+          "lapTimes": [
+            83.18,
+            80.78
+          ],
+          "maxV": 287.6,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 29
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_sous-bois_tempete_race.json",
+      "wallTimeMs": 1235,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 90.48,
+          "lapTimes": [
+            95.02,
+            90.48
+          ],
+          "maxV": 257.6,
+          "avgV": 108,
+          "offTrackTicks": 0,
+          "lockupTicks": 152
+        },
+        {
+          "level": "difficile",
+          "bestLap": 93.25,
+          "lapTimes": [
+            97.92,
+            93.25
+          ],
+          "maxV": 252.7,
+          "avgV": 106,
+          "offTrackTicks": 0,
+          "lockupTicks": 119
+        },
+        {
+          "level": "normal",
+          "bestLap": 99.23,
+          "lapTimes": [
+            104.5,
+            99.23
+          ],
+          "maxV": 245.8,
+          "avgV": 101,
+          "offTrackTicks": 0,
+          "lockupTicks": 95
+        },
+        {
+          "level": "facile",
+          "bestLap": 105.25,
+          "lapTimes": [
+            110.52,
+            105.25
+          ],
+          "maxV": 240.3,
+          "avgV": 92,
+          "offTrackTicks": 0,
+          "lockupTicks": 44
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_spectre_qualif.json",
+      "wallTimeMs": 1121,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 78.37,
+          "lapTimes": [
+            81,
+            78.37
+          ],
+          "maxV": 295.7,
+          "avgV": 124,
+          "offTrackTicks": 0,
+          "lockupTicks": 279
+        },
+        {
+          "level": "difficile",
+          "bestLap": 81,
+          "lapTimes": [
+            83.73,
+            81
+          ],
+          "maxV": 291.7,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 269
+        },
+        {
+          "level": "normal",
+          "bestLap": 83.85,
+          "lapTimes": [
+            86.43,
+            83.85
+          ],
+          "maxV": 285.3,
+          "avgV": 116,
+          "offTrackTicks": 0,
+          "lockupTicks": 138
+        },
+        {
+          "level": "facile",
+          "bestLap": 87.33,
+          "lapTimes": [
+            89.83,
+            87.33
+          ],
+          "maxV": 280,
+          "avgV": 111,
+          "offTrackTicks": 0,
+          "lockupTicks": 40
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_sous-bois_sentinelle_race.json",
+      "wallTimeMs": 1250,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 76.15,
+          "lapTimes": [
+            76.83,
+            76.15
+          ],
+          "maxV": 301,
+          "avgV": 135,
+          "offTrackTicks": 62,
+          "lockupTicks": 253
+        },
+        {
+          "level": "difficile",
+          "bestLap": 74.1,
+          "lapTimes": [
+            78.12,
+            74.1
+          ],
+          "maxV": 297.3,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 136
+        },
+        {
+          "level": "normal",
+          "bestLap": 77.03,
+          "lapTimes": [
+            81.37,
+            77.03
+          ],
+          "maxV": 292.3,
+          "avgV": 130,
+          "offTrackTicks": 0,
+          "lockupTicks": 61
+        },
+        {
+          "level": "facile",
+          "bestLap": 80.8,
+          "lapTimes": [
+            85.23,
+            80.8
+          ],
+          "maxV": 287.5,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 31
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_f1_qualif.json",
+      "wallTimeMs": 865,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 66.5,
+          "lapTimes": [
+            66.82,
+            66.5
+          ],
+          "maxV": 324,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 267
+        },
+        {
+          "level": "difficile",
+          "bestLap": 65.5,
+          "lapTimes": [
+            68.05,
+            65.5
+          ],
+          "maxV": 321.2,
+          "avgV": 148,
+          "offTrackTicks": 0,
+          "lockupTicks": 221
+        },
+        {
+          "level": "normal",
+          "bestLap": 70.2,
+          "lapTimes": [
+            71.35,
+            70.2
+          ],
+          "maxV": 316.8,
+          "avgV": 140,
+          "offTrackTicks": 24,
+          "lockupTicks": 204
+        },
+        {
+          "level": "facile",
+          "bestLap": 71,
+          "lapTimes": [
+            72.02,
+            71
+          ],
+          "maxV": 314.3,
+          "avgV": 138,
+          "offTrackTicks": 0,
+          "lockupTicks": 68
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_sous-bois_spectre_race.json",
+      "wallTimeMs": 1349,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 78.35,
+          "lapTimes": [
+            82.23,
+            78.35
+          ],
+          "maxV": 295.7,
+          "avgV": 127,
+          "offTrackTicks": 0,
+          "lockupTicks": 325
+        },
+        {
+          "level": "difficile",
+          "bestLap": 81.13,
+          "lapTimes": [
+            84.15,
+            81.13
+          ],
+          "maxV": 291.7,
+          "avgV": 125,
+          "offTrackTicks": 0,
+          "lockupTicks": 305
+        },
+        {
+          "level": "normal",
+          "bestLap": 83.9,
+          "lapTimes": [
+            88.32,
+            83.9
+          ],
+          "maxV": 285.7,
+          "avgV": 120,
+          "offTrackTicks": 0,
+          "lockupTicks": 144
+        },
+        {
+          "level": "facile",
+          "bestLap": 87.35,
+          "lapTimes": [
+            91.83,
+            87.35
+          ],
+          "maxV": 280.6,
+          "avgV": 111,
+          "offTrackTicks": 0,
+          "lockupTicks": 45
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_sous-bois_rallye_qualif.json",
+      "wallTimeMs": 935,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 85.75,
+          "lapTimes": [
+            88.4,
+            85.75
+          ],
+          "maxV": 248,
+          "avgV": 113,
+          "offTrackTicks": 0,
+          "lockupTicks": 176
+        },
+        {
+          "level": "difficile",
+          "bestLap": 88.37,
+          "lapTimes": [
+            90.95,
+            88.37
+          ],
+          "maxV": 245.4,
+          "avgV": 110,
+          "offTrackTicks": 0,
+          "lockupTicks": 81
+        },
+        {
+          "level": "normal",
+          "bestLap": 94.23,
+          "lapTimes": [
+            96.8,
+            94.23
+          ],
+          "maxV": 241.2,
+          "avgV": 103,
+          "offTrackTicks": 0,
+          "lockupTicks": 42
+        },
+        {
+          "level": "facile",
+          "bestLap": 99.52,
+          "lapTimes": [
+            101.97,
+            99.52
+          ],
+          "maxV": 237.3,
+          "avgV": 98,
+          "offTrackTicks": 0,
+          "lockupTicks": 32
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_sous-bois_f1_race.json",
+      "wallTimeMs": 1227,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 65.9,
+          "lapTimes": [
+            74.58,
+            65.9
+          ],
+          "maxV": 324.2,
+          "avgV": 147,
+          "offTrackTicks": 50,
+          "lockupTicks": 288
+        },
+        {
+          "level": "difficile",
+          "bestLap": 66.15,
+          "lapTimes": [
+            69.62,
+            66.15
+          ],
+          "maxV": 321.3,
+          "avgV": 152,
+          "offTrackTicks": 0,
+          "lockupTicks": 248
+        },
+        {
+          "level": "normal",
+          "bestLap": 71.2,
+          "lapTimes": [
+            74.73,
+            71.2
+          ],
+          "maxV": 309.5,
+          "avgV": 137,
+          "offTrackTicks": 0,
+          "lockupTicks": 238
+        },
+        {
+          "level": "facile",
+          "bestLap": 71.25,
+          "lapTimes": [
+            74.5,
+            71.25
+          ],
+          "maxV": 310.1,
+          "avgV": 137,
+          "offTrackTicks": 0,
+          "lockupTicks": 73
+        }
+      ]
+    },
+    {
+      "circuit": "sous-bois",
+      "circuitName": "Sous-Bois",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_sous-bois_rallye_race.json",
+      "wallTimeMs": 1100,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 85.75,
+          "lapTimes": [
+            89.57,
+            85.75
+          ],
+          "maxV": 248,
+          "avgV": 115,
+          "offTrackTicks": 0,
+          "lockupTicks": 200
+        },
+        {
+          "level": "difficile",
+          "bestLap": 88.32,
+          "lapTimes": [
+            92.27,
+            88.32
+          ],
+          "maxV": 245.5,
+          "avgV": 112,
+          "offTrackTicks": 0,
+          "lockupTicks": 97
+        },
+        {
+          "level": "normal",
+          "bestLap": 94.22,
+          "lapTimes": [
+            98.75,
+            94.22
+          ],
+          "maxV": 241.5,
+          "avgV": 106,
+          "offTrackTicks": 0,
+          "lockupTicks": 57
+        },
+        {
+          "level": "facile",
+          "bestLap": 99.52,
+          "lapTimes": [
+            104.17,
+            99.52
+          ],
+          "maxV": 236.9,
+          "avgV": 97,
+          "offTrackTicks": 0,
+          "lockupTicks": 33
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_serra_gt_qualif.json",
+      "wallTimeMs": 853,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 62.83,
+          "lapTimes": [
+            63.95,
+            62.83
+          ],
+          "maxV": 271.5,
+          "avgV": 135,
+          "offTrackTicks": 10,
+          "lockupTicks": 237
+        },
+        {
+          "level": "difficile",
+          "bestLap": 62.47,
+          "lapTimes": [
+            64.38,
+            62.47
+          ],
+          "maxV": 268.4,
+          "avgV": 134,
+          "offTrackTicks": 0,
+          "lockupTicks": 140
+        },
+        {
+          "level": "normal",
+          "bestLap": 63.07,
+          "lapTimes": [
+            66.87,
+            63.07
+          ],
+          "maxV": 263.3,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 96
+        },
+        {
+          "level": "facile",
+          "bestLap": 64.83,
+          "lapTimes": [
+            67.8,
+            64.83
+          ],
+          "maxV": 258.8,
+          "avgV": 128,
+          "offTrackTicks": 0,
+          "lockupTicks": 41
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_tempete_qualif.json",
+      "wallTimeMs": 732,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 63.25,
+          "lapTimes": [
+            66.78,
+            63.25
+          ],
+          "maxV": 273.5,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 139
+        },
+        {
+          "level": "difficile",
+          "bestLap": 64.78,
+          "lapTimes": [
+            68.3,
+            64.78
+          ],
+          "maxV": 268.9,
+          "avgV": 128,
+          "offTrackTicks": 0,
+          "lockupTicks": 125
+        },
+        {
+          "level": "normal",
+          "bestLap": 67.3,
+          "lapTimes": [
+            70.77,
+            67.3
+          ],
+          "maxV": 262.3,
+          "avgV": 123,
+          "offTrackTicks": 0,
+          "lockupTicks": 90
+        },
+        {
+          "level": "facile",
+          "bestLap": 70.67,
+          "lapTimes": [
+            74,
+            70.67
+          ],
+          "maxV": 256.6,
+          "avgV": 117,
+          "offTrackTicks": 0,
+          "lockupTicks": 54
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_aerodrome_serra_gt_race.json",
+      "wallTimeMs": 1087,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 60.05,
+          "lapTimes": [
+            66.58,
+            60.05
+          ],
+          "maxV": 271.5,
+          "avgV": 144,
+          "offTrackTicks": 0,
+          "lockupTicks": 211
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.92,
+          "lapTimes": [
+            67.9,
+            61.92
+          ],
+          "maxV": 268.2,
+          "avgV": 138,
+          "offTrackTicks": 10,
+          "lockupTicks": 215
+        },
+        {
+          "level": "normal",
+          "bestLap": 63.48,
+          "lapTimes": [
+            69.88,
+            63.48
+          ],
+          "maxV": 263.4,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 129
+        },
+        {
+          "level": "facile",
+          "bestLap": 64.92,
+          "lapTimes": [
+            71.08,
+            64.92
+          ],
+          "maxV": 259.2,
+          "avgV": 126,
+          "offTrackTicks": 0,
+          "lockupTicks": 71
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_sentinelle_qualif.json",
+      "wallTimeMs": 666,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 54,
+          "lapTimes": [
+            55.05,
+            54
+          ],
+          "maxV": 309.3,
+          "avgV": 156,
+          "offTrackTicks": 64,
+          "lockupTicks": 213
+        },
+        {
+          "level": "difficile",
+          "bestLap": 52.25,
+          "lapTimes": [
+            56.53,
+            52.25
+          ],
+          "maxV": 305.8,
+          "avgV": 156,
+          "offTrackTicks": 14,
+          "lockupTicks": 140
+        },
+        {
+          "level": "normal",
+          "bestLap": 54.48,
+          "lapTimes": [
+            57.2,
+            54.48
+          ],
+          "maxV": 304.2,
+          "avgV": 152,
+          "offTrackTicks": 0,
+          "lockupTicks": 161
+        },
+        {
+          "level": "facile",
+          "bestLap": 55.48,
+          "lapTimes": [
+            58.65,
+            55.48
+          ],
+          "maxV": 301.2,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 67
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_aerodrome_tempete_race.json",
+      "wallTimeMs": 896,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 63.48,
+          "lapTimes": [
+            68.25,
+            63.48
+          ],
+          "maxV": 273.6,
+          "avgV": 136,
+          "offTrackTicks": 0,
+          "lockupTicks": 155
+        },
+        {
+          "level": "difficile",
+          "bestLap": 64.78,
+          "lapTimes": [
+            69.83,
+            64.78
+          ],
+          "maxV": 268.9,
+          "avgV": 134,
+          "offTrackTicks": 0,
+          "lockupTicks": 132
+        },
+        {
+          "level": "normal",
+          "bestLap": 67.27,
+          "lapTimes": [
+            73.22,
+            67.27
+          ],
+          "maxV": 262.7,
+          "avgV": 128,
+          "offTrackTicks": 0,
+          "lockupTicks": 91
+        },
+        {
+          "level": "facile",
+          "bestLap": 70.63,
+          "lapTimes": [
+            76.72,
+            70.63
+          ],
+          "maxV": 255.9,
+          "avgV": 117,
+          "offTrackTicks": 0,
+          "lockupTicks": 48
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_aerodrome_sentinelle_race.json",
+      "wallTimeMs": 819,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 54.3,
+          "lapTimes": [
+            56.65,
+            54.3
+          ],
+          "maxV": 309.3,
+          "avgV": 162,
+          "offTrackTicks": 59,
+          "lockupTicks": 239
+        },
+        {
+          "level": "difficile",
+          "bestLap": 51.88,
+          "lapTimes": [
+            55.73,
+            51.88
+          ],
+          "maxV": 306,
+          "avgV": 168,
+          "offTrackTicks": 0,
+          "lockupTicks": 127
+        },
+        {
+          "level": "normal",
+          "bestLap": 54.38,
+          "lapTimes": [
+            59.17,
+            54.38
+          ],
+          "maxV": 304.2,
+          "avgV": 155,
+          "offTrackTicks": 0,
+          "lockupTicks": 147
+        },
+        {
+          "level": "facile",
+          "bestLap": 55.82,
+          "lapTimes": [
+            60.65,
+            55.82
+          ],
+          "maxV": 301.4,
+          "avgV": 148,
+          "offTrackTicks": 0,
+          "lockupTicks": 83
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_spectre_qualif.json",
+      "wallTimeMs": 815,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 54.88,
+          "lapTimes": [
+            57.72,
+            54.88
+          ],
+          "maxV": 309.4,
+          "avgV": 151,
+          "offTrackTicks": 0,
+          "lockupTicks": 164
+        },
+        {
+          "level": "difficile",
+          "bestLap": 54.8,
+          "lapTimes": [
+            57.57,
+            54.8
+          ],
+          "maxV": 305.7,
+          "avgV": 151,
+          "offTrackTicks": 0,
+          "lockupTicks": 151
+        },
+        {
+          "level": "normal",
+          "bestLap": 58.45,
+          "lapTimes": [
+            60.27,
+            58.45
+          ],
+          "maxV": 300.2,
+          "avgV": 143,
+          "offTrackTicks": 0,
+          "lockupTicks": 141
+        },
+        {
+          "level": "facile",
+          "bestLap": 59.05,
+          "lapTimes": [
+            61.88,
+            59.05
+          ],
+          "maxV": 295.1,
+          "avgV": 140,
+          "offTrackTicks": 0,
+          "lockupTicks": 63
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_f1_qualif.json",
+      "wallTimeMs": 669,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 44.95,
+          "lapTimes": [
+            47.42,
+            44.95
+          ],
+          "maxV": 331.8,
+          "avgV": 184,
+          "offTrackTicks": 0,
+          "lockupTicks": 151
+        },
+        {
+          "level": "difficile",
+          "bestLap": 46.37,
+          "lapTimes": [
+            48.72,
+            46.37
+          ],
+          "maxV": 329.7,
+          "avgV": 179,
+          "offTrackTicks": 0,
+          "lockupTicks": 146
+        },
+        {
+          "level": "normal",
+          "bestLap": 48.37,
+          "lapTimes": [
+            50.9,
+            48.37
+          ],
+          "maxV": 326.1,
+          "avgV": 171,
+          "offTrackTicks": 0,
+          "lockupTicks": 154
+        },
+        {
+          "level": "facile",
+          "bestLap": 49.72,
+          "lapTimes": [
+            52.27,
+            49.72
+          ],
+          "maxV": 323.7,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 104
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_aerodrome_spectre_race.json",
+      "wallTimeMs": 952,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 58.42,
+          "lapTimes": [
+            61.65,
+            58.42
+          ],
+          "maxV": 308.6,
+          "avgV": 147,
+          "offTrackTicks": 0,
+          "lockupTicks": 282
+        },
+        {
+          "level": "difficile",
+          "bestLap": 55.38,
+          "lapTimes": [
+            61.42,
+            55.38
+          ],
+          "maxV": 305.7,
+          "avgV": 155,
+          "offTrackTicks": 0,
+          "lockupTicks": 164
+        },
+        {
+          "level": "normal",
+          "bestLap": 57.37,
+          "lapTimes": [
+            63.35,
+            57.37
+          ],
+          "maxV": 300.4,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 138
+        },
+        {
+          "level": "facile",
+          "bestLap": 59.08,
+          "lapTimes": [
+            64.55,
+            59.08
+          ],
+          "maxV": 295.3,
+          "avgV": 139,
+          "offTrackTicks": 0,
+          "lockupTicks": 74
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_aerodrome_f1_race.json",
+      "wallTimeMs": 701,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 44.93,
+          "lapTimes": [
+            49.05,
+            44.93
+          ],
+          "maxV": 331.8,
+          "avgV": 191,
+          "offTrackTicks": 0,
+          "lockupTicks": 140
+        },
+        {
+          "level": "difficile",
+          "bestLap": 46.33,
+          "lapTimes": [
+            50.55,
+            46.33
+          ],
+          "maxV": 329.6,
+          "avgV": 186,
+          "offTrackTicks": 0,
+          "lockupTicks": 159
+        },
+        {
+          "level": "normal",
+          "bestLap": 48.23,
+          "lapTimes": [
+            52.7,
+            48.23
+          ],
+          "maxV": 326.1,
+          "avgV": 174,
+          "offTrackTicks": 0,
+          "lockupTicks": 128
+        },
+        {
+          "level": "facile",
+          "bestLap": 49.75,
+          "lapTimes": [
+            53.95,
+            49.75
+          ],
+          "maxV": 323.7,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 101
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_aerodrome_rallye_qualif.json",
+      "wallTimeMs": 907,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 61.58,
+          "lapTimes": [
+            64.65,
+            61.58
+          ],
+          "maxV": 261.3,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 129
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.3,
+          "lapTimes": [
+            64.3,
+            61.3
+          ],
+          "maxV": 258.1,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 78
+        },
+        {
+          "level": "normal",
+          "bestLap": 64.57,
+          "lapTimes": [
+            67.48,
+            64.57
+          ],
+          "maxV": 253,
+          "avgV": 129,
+          "offTrackTicks": 0,
+          "lockupTicks": 53
+        },
+        {
+          "level": "facile",
+          "bestLap": 67.65,
+          "lapTimes": [
+            70.5,
+            67.65
+          ],
+          "maxV": 249,
+          "avgV": 123,
+          "offTrackTicks": 0,
+          "lockupTicks": 33
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_serra_gt_qualif.json",
+      "wallTimeMs": 860,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 74.35,
+          "lapTimes": [
+            77.45,
+            74.35
+          ],
+          "maxV": 272.5,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 116
+        },
+        {
+          "level": "difficile",
+          "bestLap": 75.52,
+          "lapTimes": [
+            78.63,
+            75.52
+          ],
+          "maxV": 269.2,
+          "avgV": 147,
+          "offTrackTicks": 0,
+          "lockupTicks": 54
+        },
+        {
+          "level": "normal",
+          "bestLap": 80.3,
+          "lapTimes": [
+            83.4,
+            80.3
+          ],
+          "maxV": 264.5,
+          "avgV": 138,
+          "offTrackTicks": 0,
+          "lockupTicks": 98
+        },
+        {
+          "level": "facile",
+          "bestLap": 84.38,
+          "lapTimes": [
+            87.37,
+            84.38
+          ],
+          "maxV": 259.9,
+          "avgV": 132,
+          "offTrackTicks": 0,
+          "lockupTicks": 67
+        }
+      ]
+    },
+    {
+      "circuit": "aerodrome",
+      "circuitName": "Aérodrome",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_aerodrome_rallye_race.json",
+      "wallTimeMs": 1059,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 62.07,
+          "lapTimes": [
+            66.52,
+            62.07
+          ],
+          "maxV": 261.4,
+          "avgV": 140,
+          "offTrackTicks": 0,
+          "lockupTicks": 152
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.25,
+          "lapTimes": [
+            65.97,
+            61.25
+          ],
+          "maxV": 258.1,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 85
+        },
+        {
+          "level": "normal",
+          "bestLap": 64.55,
+          "lapTimes": [
+            69.68,
+            64.55
+          ],
+          "maxV": 253.1,
+          "avgV": 133,
+          "offTrackTicks": 0,
+          "lockupTicks": 53
+        },
+        {
+          "level": "facile",
+          "bestLap": 67.72,
+          "lapTimes": [
+            72.92,
+            67.72
+          ],
+          "maxV": 248.5,
+          "avgV": 122,
+          "offTrackTicks": 0,
+          "lockupTicks": 36
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_tempete_qualif.json",
+      "wallTimeMs": 889,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 80.4,
+          "lapTimes": [
+            83.95,
+            80.4
+          ],
+          "maxV": 274.6,
+          "avgV": 137,
+          "offTrackTicks": 0,
+          "lockupTicks": 105
+        },
+        {
+          "level": "difficile",
+          "bestLap": 82.85,
+          "lapTimes": [
+            86.38,
+            82.85
+          ],
+          "maxV": 270.4,
+          "avgV": 134,
+          "offTrackTicks": 0,
+          "lockupTicks": 58
+        },
+        {
+          "level": "normal",
+          "bestLap": 88.35,
+          "lapTimes": [
+            91.88,
+            88.35
+          ],
+          "maxV": 263.5,
+          "avgV": 125,
+          "offTrackTicks": 0,
+          "lockupTicks": 111
+        },
+        {
+          "level": "facile",
+          "bestLap": 93.17,
+          "lapTimes": [
+            96.52,
+            93.17
+          ],
+          "maxV": 256.9,
+          "avgV": 119,
+          "offTrackTicks": 0,
+          "lockupTicks": 86
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_parc-royal_serra_gt_race.json",
+      "wallTimeMs": 1101,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 75.98,
+          "lapTimes": [
+            82.58,
+            75.98
+          ],
+          "maxV": 272.5,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 238
+        },
+        {
+          "level": "difficile",
+          "bestLap": 75.53,
+          "lapTimes": [
+            82.25,
+            75.53
+          ],
+          "maxV": 269.3,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 53
+        },
+        {
+          "level": "normal",
+          "bestLap": 80.3,
+          "lapTimes": [
+            85.92,
+            80.3
+          ],
+          "maxV": 264.4,
+          "avgV": 142,
+          "offTrackTicks": 0,
+          "lockupTicks": 99
+        },
+        {
+          "level": "facile",
+          "bestLap": 84.38,
+          "lapTimes": [
+            89.9,
+            84.38
+          ],
+          "maxV": 260.3,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 68
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_sentinelle_qualif.json",
+      "wallTimeMs": 723,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 63,
+          "lapTimes": [
+            65.83,
+            63
+          ],
+          "maxV": 311.1,
+          "avgV": 176,
+          "offTrackTicks": 0,
+          "lockupTicks": 146
+        },
+        {
+          "level": "difficile",
+          "bestLap": 64.1,
+          "lapTimes": [
+            66.98,
+            64.1
+          ],
+          "maxV": 308,
+          "avgV": 173,
+          "offTrackTicks": 0,
+          "lockupTicks": 89
+        },
+        {
+          "level": "normal",
+          "bestLap": 68.27,
+          "lapTimes": [
+            70.82,
+            68.27
+          ],
+          "maxV": 304.1,
+          "avgV": 163,
+          "offTrackTicks": 0,
+          "lockupTicks": 149
+        },
+        {
+          "level": "facile",
+          "bestLap": 70.12,
+          "lapTimes": [
+            72.95,
+            70.12
+          ],
+          "maxV": 302.7,
+          "avgV": 158,
+          "offTrackTicks": 0,
+          "lockupTicks": 35
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_parc-royal_tempete_race.json",
+      "wallTimeMs": 1090,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 80.4,
+          "lapTimes": [
+            85.43,
+            80.4
+          ],
+          "maxV": 274.7,
+          "avgV": 140,
+          "offTrackTicks": 0,
+          "lockupTicks": 111
+        },
+        {
+          "level": "difficile",
+          "bestLap": 82.83,
+          "lapTimes": [
+            87.98,
+            82.83
+          ],
+          "maxV": 270.4,
+          "avgV": 137,
+          "offTrackTicks": 0,
+          "lockupTicks": 57
+        },
+        {
+          "level": "normal",
+          "bestLap": 88.35,
+          "lapTimes": [
+            94.33,
+            88.35
+          ],
+          "maxV": 263.4,
+          "avgV": 129,
+          "offTrackTicks": 0,
+          "lockupTicks": 116
+        },
+        {
+          "level": "facile",
+          "bestLap": 93.15,
+          "lapTimes": [
+            99.18,
+            93.15
+          ],
+          "maxV": 256.8,
+          "avgV": 119,
+          "offTrackTicks": 0,
+          "lockupTicks": 81
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_spectre_qualif.json",
+      "wallTimeMs": 1114,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 67,
+          "lapTimes": [
+            70.02,
+            67
+          ],
+          "maxV": 311.1,
+          "avgV": 165,
+          "offTrackTicks": 0,
+          "lockupTicks": 145
+        },
+        {
+          "level": "difficile",
+          "bestLap": 68.87,
+          "lapTimes": [
+            71.18,
+            68.87
+          ],
+          "maxV": 307.4,
+          "avgV": 161,
+          "offTrackTicks": 0,
+          "lockupTicks": 119
+        },
+        {
+          "level": "normal",
+          "bestLap": 72.33,
+          "lapTimes": [
+            75.37,
+            72.33
+          ],
+          "maxV": 302,
+          "avgV": 153,
+          "offTrackTicks": 0,
+          "lockupTicks": 144
+        },
+        {
+          "level": "facile",
+          "bestLap": 76.12,
+          "lapTimes": [
+            79.05,
+            76.12
+          ],
+          "maxV": 297.8,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 77
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_parc-royal_sentinelle_race.json",
+      "wallTimeMs": 1387,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 64.1,
+          "lapTimes": [
+            68.45,
+            64.1
+          ],
+          "maxV": 310.4,
+          "avgV": 177,
+          "offTrackTicks": 0,
+          "lockupTicks": 206
+        },
+        {
+          "level": "difficile",
+          "bestLap": 64.05,
+          "lapTimes": [
+            68.33,
+            64.05
+          ],
+          "maxV": 308,
+          "avgV": 178,
+          "offTrackTicks": 0,
+          "lockupTicks": 93
+        },
+        {
+          "level": "normal",
+          "bestLap": 68.15,
+          "lapTimes": [
+            72.98,
+            68.15
+          ],
+          "maxV": 304.2,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 150
+        },
+        {
+          "level": "facile",
+          "bestLap": 70.55,
+          "lapTimes": [
+            75.15,
+            70.55
+          ],
+          "maxV": 302.8,
+          "avgV": 157,
+          "offTrackTicks": 0,
+          "lockupTicks": 73
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_parc-royal_spectre_race.json",
+      "wallTimeMs": 1361,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 66.98,
+          "lapTimes": [
+            71.28,
+            66.98
+          ],
+          "maxV": 311.1,
+          "avgV": 169,
+          "offTrackTicks": 0,
+          "lockupTicks": 155
+        },
+        {
+          "level": "difficile",
+          "bestLap": 68.9,
+          "lapTimes": [
+            72.7,
+            68.9
+          ],
+          "maxV": 307.4,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 136
+        },
+        {
+          "level": "normal",
+          "bestLap": 72.37,
+          "lapTimes": [
+            77.33,
+            72.37
+          ],
+          "maxV": 302.1,
+          "avgV": 158,
+          "offTrackTicks": 0,
+          "lockupTicks": 145
+        },
+        {
+          "level": "facile",
+          "bestLap": 76.12,
+          "lapTimes": [
+            81.18,
+            76.12
+          ],
+          "maxV": 297.7,
+          "avgV": 145,
+          "offTrackTicks": 0,
+          "lockupTicks": 93
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_f1_qualif.json",
+      "wallTimeMs": 1215,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 56.4,
+          "lapTimes": [
+            59,
+            56.4
+          ],
+          "maxV": 331.8,
+          "avgV": 197,
+          "offTrackTicks": 0,
+          "lockupTicks": 181
+        },
+        {
+          "level": "difficile",
+          "bestLap": 56.07,
+          "lapTimes": [
+            58.52,
+            56.07
+          ],
+          "maxV": 331.8,
+          "avgV": 198,
+          "offTrackTicks": 0,
+          "lockupTicks": 110
+        },
+        {
+          "level": "normal",
+          "bestLap": 58.33,
+          "lapTimes": [
+            60.8,
+            58.33
+          ],
+          "maxV": 327.9,
+          "avgV": 190,
+          "offTrackTicks": 0,
+          "lockupTicks": 116
+        },
+        {
+          "level": "facile",
+          "bestLap": 60.57,
+          "lapTimes": [
+            62.02,
+            60.57
+          ],
+          "maxV": 325.8,
+          "avgV": 184,
+          "offTrackTicks": 0,
+          "lockupTicks": 106
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_parc-royal_rallye_qualif.json",
+      "wallTimeMs": 1026,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 77.73,
+          "lapTimes": [
+            80.82,
+            77.73
+          ],
+          "maxV": 261.7,
+          "avgV": 143,
+          "offTrackTicks": 0,
+          "lockupTicks": 88
+        },
+        {
+          "level": "difficile",
+          "bestLap": 79.98,
+          "lapTimes": [
+            83.03,
+            79.98
+          ],
+          "maxV": 258.3,
+          "avgV": 139,
+          "offTrackTicks": 0,
+          "lockupTicks": 67
+        },
+        {
+          "level": "normal",
+          "bestLap": 85,
+          "lapTimes": [
+            88.03,
+            85
+          ],
+          "maxV": 253.3,
+          "avgV": 131,
+          "offTrackTicks": 0,
+          "lockupTicks": 77
+        },
+        {
+          "level": "facile",
+          "bestLap": 89.28,
+          "lapTimes": [
+            92.25,
+            89.28
+          ],
+          "maxV": 249,
+          "avgV": 125,
+          "offTrackTicks": 0,
+          "lockupTicks": 41
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_parc-royal_f1_race.json",
+      "wallTimeMs": 1148,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 55.9,
+          "lapTimes": [
+            60.78,
+            55.9
+          ],
+          "maxV": 331.8,
+          "avgV": 203,
+          "offTrackTicks": 0,
+          "lockupTicks": 161
+        },
+        {
+          "level": "difficile",
+          "bestLap": 57.58,
+          "lapTimes": [
+            61.17,
+            57.58
+          ],
+          "maxV": 330.6,
+          "avgV": 199,
+          "offTrackTicks": 0,
+          "lockupTicks": 173
+        },
+        {
+          "level": "normal",
+          "bestLap": 58.35,
+          "lapTimes": [
+            62.73,
+            58.35
+          ],
+          "maxV": 328,
+          "avgV": 193,
+          "offTrackTicks": 0,
+          "lockupTicks": 115
+        },
+        {
+          "level": "facile",
+          "bestLap": 60.58,
+          "lapTimes": [
+            65.07,
+            60.58
+          ],
+          "maxV": 325.8,
+          "avgV": 182,
+          "offTrackTicks": 0,
+          "lockupTicks": 112
+        }
+      ]
+    },
+    {
+      "circuit": "parc-royal",
+      "circuitName": "Parc Royal",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_parc-royal_rallye_race.json",
+      "wallTimeMs": 1123,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 77.75,
+          "lapTimes": [
+            82.02,
+            77.75
+          ],
+          "maxV": 261.7,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 108
+        },
+        {
+          "level": "difficile",
+          "bestLap": 79.98,
+          "lapTimes": [
+            84.4,
+            79.98
+          ],
+          "maxV": 258.3,
+          "avgV": 143,
+          "offTrackTicks": 0,
+          "lockupTicks": 75
+        },
+        {
+          "level": "normal",
+          "bestLap": 85,
+          "lapTimes": [
+            90.22,
+            85
+          ],
+          "maxV": 253.2,
+          "avgV": 135,
+          "offTrackTicks": 0,
+          "lockupTicks": 81
+        },
+        {
+          "level": "facile",
+          "bestLap": 89.27,
+          "lapTimes": [
+            94.62,
+            89.27
+          ],
+          "maxV": 248.9,
+          "avgV": 124,
+          "offTrackTicks": 0,
+          "lockupTicks": 43
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "qualif",
+      "fileName": "run_grand-col_serra_gt_qualif.json",
+      "wallTimeMs": 1706,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 135.52,
+          "lapTimes": [
+            138.33,
+            135.52
+          ],
+          "maxV": 276.5,
+          "avgV": 168,
+          "offTrackTicks": 81,
+          "lockupTicks": 520
+        },
+        {
+          "level": "difficile",
+          "bestLap": 134.8,
+          "lapTimes": [
+            138.13,
+            134.8
+          ],
+          "maxV": 275,
+          "avgV": 168,
+          "offTrackTicks": 23,
+          "lockupTicks": 245
+        },
+        {
+          "level": "normal",
+          "bestLap": 138.03,
+          "lapTimes": [
+            141.3,
+            138.03
+          ],
+          "maxV": 270.6,
+          "avgV": 164,
+          "offTrackTicks": 0,
+          "lockupTicks": 76
+        },
+        {
+          "level": "facile",
+          "bestLap": 145.38,
+          "lapTimes": [
+            148.67,
+            145.38
+          ],
+          "maxV": 267.3,
+          "avgV": 156,
+          "offTrackTicks": 0,
+          "lockupTicks": 33
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "qualif",
+      "fileName": "run_grand-col_tempete_qualif.json",
+      "wallTimeMs": 1350,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 139.97,
+          "lapTimes": [
+            143.75,
+            139.97
+          ],
+          "maxV": 281.8,
+          "avgV": 162,
+          "offTrackTicks": 0,
+          "lockupTicks": 104
+        },
+        {
+          "level": "difficile",
+          "bestLap": 144.02,
+          "lapTimes": [
+            147.5,
+            144.02
+          ],
+          "maxV": 277.9,
+          "avgV": 157,
+          "offTrackTicks": 0,
+          "lockupTicks": 40
+        },
+        {
+          "level": "normal",
+          "bestLap": 152.05,
+          "lapTimes": [
+            155.87,
+            152.05
+          ],
+          "maxV": 272.2,
+          "avgV": 149,
+          "offTrackTicks": 0,
+          "lockupTicks": 67
+        },
+        {
+          "level": "facile",
+          "bestLap": 160.57,
+          "lapTimes": [
+            164.23,
+            160.57
+          ],
+          "maxV": 268.2,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 32
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "tempete",
+      "carName": "Tempête",
+      "mode": "race",
+      "fileName": "run_grand-col_tempete_race.json",
+      "wallTimeMs": 1527,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 139.95,
+          "lapTimes": [
+            145.23,
+            139.95
+          ],
+          "maxV": 281.8,
+          "avgV": 164,
+          "offTrackTicks": 0,
+          "lockupTicks": 110
+        },
+        {
+          "level": "difficile",
+          "bestLap": 143.75,
+          "lapTimes": [
+            150.47,
+            143.75
+          ],
+          "maxV": 278.1,
+          "avgV": 160,
+          "offTrackTicks": 0,
+          "lockupTicks": 73
+        },
+        {
+          "level": "normal",
+          "bestLap": 152.05,
+          "lapTimes": [
+            158.37,
+            152.05
+          ],
+          "maxV": 272.5,
+          "avgV": 150,
+          "offTrackTicks": 0,
+          "lockupTicks": 70
+        },
+        {
+          "level": "facile",
+          "bestLap": 160.57,
+          "lapTimes": [
+            166.95,
+            160.57
+          ],
+          "maxV": 268,
+          "avgV": 141,
+          "offTrackTicks": 0,
+          "lockupTicks": 30
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "serra_gt",
+      "carName": "GT Serra",
+      "mode": "race",
+      "fileName": "run_grand-col_serra_gt_race.json",
+      "wallTimeMs": 2180,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 133.32,
+          "lapTimes": [
+            135.72,
+            133.32
+          ],
+          "maxV": 276.5,
+          "avgV": 175,
+          "offTrackTicks": 32,
+          "lockupTicks": 354
+        },
+        {
+          "level": "difficile",
+          "bestLap": 138.6,
+          "lapTimes": [
+            145.4,
+            138.6
+          ],
+          "maxV": 274.8,
+          "avgV": 165,
+          "offTrackTicks": 71,
+          "lockupTicks": 543
+        },
+        {
+          "level": "normal",
+          "bestLap": 137.93,
+          "lapTimes": [
+            144.17,
+            137.93
+          ],
+          "maxV": 270.8,
+          "avgV": 166,
+          "offTrackTicks": 0,
+          "lockupTicks": 88
+        },
+        {
+          "level": "facile",
+          "bestLap": 145.43,
+          "lapTimes": [
+            154.88,
+            145.43
+          ],
+          "maxV": 267.5,
+          "avgV": 153,
+          "offTrackTicks": 0,
+          "lockupTicks": 40
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "qualif",
+      "fileName": "run_grand-col_sentinelle_qualif.json",
+      "wallTimeMs": 1451,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 115.3,
+          "lapTimes": [
+            120,
+            115.3
+          ],
+          "maxV": 317.2,
+          "avgV": 196,
+          "offTrackTicks": 0,
+          "lockupTicks": 316
+        },
+        {
+          "level": "difficile",
+          "bestLap": 118.42,
+          "lapTimes": [
+            121.33,
+            118.42
+          ],
+          "maxV": 313.3,
+          "avgV": 192,
+          "offTrackTicks": 0,
+          "lockupTicks": 365
+        },
+        {
+          "level": "normal",
+          "bestLap": 118.18,
+          "lapTimes": [
+            118.73,
+            118.18
+          ],
+          "maxV": 308.9,
+          "avgV": 194,
+          "offTrackTicks": 0,
+          "lockupTicks": 125
+        },
+        {
+          "level": "facile",
+          "bestLap": 119,
+          "lapTimes": [
+            122.12,
+            119
+          ],
+          "maxV": 307.6,
+          "avgV": 190,
+          "offTrackTicks": 0,
+          "lockupTicks": 24
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "sentinelle",
+      "carName": "Sentinelle",
+      "mode": "race",
+      "fileName": "run_grand-col_sentinelle_race.json",
+      "wallTimeMs": 1686,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 117.13,
+          "lapTimes": [
+            120.82,
+            117.13
+          ],
+          "maxV": 317.2,
+          "avgV": 197,
+          "offTrackTicks": 0,
+          "lockupTicks": 351
+        },
+        {
+          "level": "difficile",
+          "bestLap": 117.1,
+          "lapTimes": [
+            127.63,
+            117.1
+          ],
+          "maxV": 313.3,
+          "avgV": 191,
+          "offTrackTicks": 0,
+          "lockupTicks": 312
+        },
+        {
+          "level": "normal",
+          "bestLap": 118.2,
+          "lapTimes": [
+            125.8,
+            118.2
+          ],
+          "maxV": 309,
+          "avgV": 192,
+          "offTrackTicks": 0,
+          "lockupTicks": 217
+        },
+        {
+          "level": "facile",
+          "bestLap": 119.18,
+          "lapTimes": [
+            130.45,
+            119.18
+          ],
+          "maxV": 307,
+          "avgV": 185,
+          "offTrackTicks": 0,
+          "lockupTicks": 50
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "qualif",
+      "fileName": "run_grand-col_spectre_qualif.json",
+      "wallTimeMs": 1620,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 139.45,
+          "lapTimes": [
+            147.33,
+            139.45
+          ],
+          "maxV": 316.1,
+          "avgV": 161,
+          "offTrackTicks": 158,
+          "lockupTicks": 1390
+        },
+        {
+          "level": "difficile",
+          "bestLap": 126.57,
+          "lapTimes": [
+            132.85,
+            126.57
+          ],
+          "maxV": 313,
+          "avgV": 177,
+          "offTrackTicks": 54,
+          "lockupTicks": 598
+        },
+        {
+          "level": "normal",
+          "bestLap": 126.65,
+          "lapTimes": [
+            129.95,
+            126.65
+          ],
+          "maxV": 309.3,
+          "avgV": 179,
+          "offTrackTicks": 0,
+          "lockupTicks": 293
+        },
+        {
+          "level": "facile",
+          "bestLap": 129.72,
+          "lapTimes": [
+            132.85,
+            129.72
+          ],
+          "maxV": 305.9,
+          "avgV": 175,
+          "offTrackTicks": 0,
+          "lockupTicks": 43
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "qualif",
+      "fileName": "run_grand-col_f1_qualif.json",
+      "wallTimeMs": 1069,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 90.82,
+          "lapTimes": [
+            93.38,
+            90.82
+          ],
+          "maxV": 332.7,
+          "avgV": 249,
+          "offTrackTicks": 0,
+          "lockupTicks": 98
+        },
+        {
+          "level": "difficile",
+          "bestLap": 93.22,
+          "lapTimes": [
+            96.22,
+            93.22
+          ],
+          "maxV": 331.8,
+          "avgV": 242,
+          "offTrackTicks": 0,
+          "lockupTicks": 82
+        },
+        {
+          "level": "normal",
+          "bestLap": 100.05,
+          "lapTimes": [
+            101.22,
+            100.05
+          ],
+          "maxV": 329.2,
+          "avgV": 228,
+          "offTrackTicks": 0,
+          "lockupTicks": 109
+        },
+        {
+          "level": "facile",
+          "bestLap": 100.43,
+          "lapTimes": [
+            103.4,
+            100.43
+          ],
+          "maxV": 328.4,
+          "avgV": 225,
+          "offTrackTicks": 0,
+          "lockupTicks": 20
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "spectre",
+      "carName": "Spectre",
+      "mode": "race",
+      "fileName": "run_grand-col_spectre_race.json",
+      "wallTimeMs": 2240,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 133.82,
+          "lapTimes": [
+            138.37,
+            133.82
+          ],
+          "maxV": 316.4,
+          "avgV": 173,
+          "offTrackTicks": 33,
+          "lockupTicks": 1016
+        },
+        {
+          "level": "difficile",
+          "bestLap": 136.75,
+          "lapTimes": [
+            138.4,
+            136.75
+          ],
+          "maxV": 313.1,
+          "avgV": 169,
+          "offTrackTicks": 102,
+          "lockupTicks": 1030
+        },
+        {
+          "level": "normal",
+          "bestLap": 137.68,
+          "lapTimes": [
+            137.68,
+            139.45
+          ],
+          "maxV": 309,
+          "avgV": 167,
+          "offTrackTicks": 92,
+          "lockupTicks": 890
+        },
+        {
+          "level": "facile",
+          "bestLap": 129.72,
+          "lapTimes": [
+            135.1,
+            129.72
+          ],
+          "maxV": 305.8,
+          "avgV": 177,
+          "offTrackTicks": 0,
+          "lockupTicks": 46
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "f1",
+      "carName": "F1 Éclair",
+      "mode": "race",
+      "fileName": "run_grand-col_f1_race.json",
+      "wallTimeMs": 1589,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 90.67,
+          "lapTimes": [
+            94.5,
+            90.67
+          ],
+          "maxV": 332.7,
+          "avgV": 255,
+          "offTrackTicks": 0,
+          "lockupTicks": 97
+        },
+        {
+          "level": "difficile",
+          "bestLap": 93.95,
+          "lapTimes": [
+            98.4,
+            93.95
+          ],
+          "maxV": 331.8,
+          "avgV": 244,
+          "offTrackTicks": 0,
+          "lockupTicks": 92
+        },
+        {
+          "level": "normal",
+          "bestLap": 101.15,
+          "lapTimes": [
+            106.92,
+            101.15
+          ],
+          "maxV": 329,
+          "avgV": 222,
+          "offTrackTicks": 0,
+          "lockupTicks": 101
+        },
+        {
+          "level": "facile",
+          "bestLap": 101.33,
+          "lapTimes": [
+            106.37,
+            101.33
+          ],
+          "maxV": 328.2,
+          "avgV": 222,
+          "offTrackTicks": 0,
+          "lockupTicks": 47
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "qualif",
+      "fileName": "run_grand-col_rallye_qualif.json",
+      "wallTimeMs": 1477,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 134.48,
+          "lapTimes": [
+            137.73,
+            134.48
+          ],
+          "maxV": 267.1,
+          "avgV": 168,
+          "offTrackTicks": 0,
+          "lockupTicks": 74
+        },
+        {
+          "level": "difficile",
+          "bestLap": 138.75,
+          "lapTimes": [
+            142.05,
+            138.75
+          ],
+          "maxV": 264,
+          "avgV": 163,
+          "offTrackTicks": 0,
+          "lockupTicks": 45
+        },
+        {
+          "level": "normal",
+          "bestLap": 146.95,
+          "lapTimes": [
+            150.27,
+            146.95
+          ],
+          "maxV": 259.5,
+          "avgV": 154,
+          "offTrackTicks": 0,
+          "lockupTicks": 69
+        },
+        {
+          "level": "facile",
+          "bestLap": 154.82,
+          "lapTimes": [
+            158,
+            154.82
+          ],
+          "maxV": 251.9,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 25
+        }
+      ]
+    },
+    {
+      "circuit": "karting-arene",
+      "circuitName": "Arène",
+      "carId": "kart_frelon",
+      "carName": "Frelon",
+      "mode": "qualif",
+      "fileName": "run_karting-arene_kart_frelon_qualif.json",
+      "wallTimeMs": 766,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 55.3,
+          "lapTimes": [
+            55.5,
+            55.3
+          ],
+          "maxV": 101.8,
+          "avgV": 65,
+          "offTrackTicks": 0,
+          "lockupTicks": 72
+        },
+        {
+          "level": "difficile",
+          "bestLap": 56,
+          "lapTimes": [
+            56.65,
+            56
+          ],
+          "maxV": 101.6,
+          "avgV": 64,
+          "offTrackTicks": 0,
+          "lockupTicks": 14
+        },
+        {
+          "level": "normal",
+          "bestLap": 56.2,
+          "lapTimes": [
+            57.03,
+            56.2
+          ],
+          "maxV": 101.4,
+          "avgV": 63,
+          "offTrackTicks": 0,
+          "lockupTicks": 10
+        },
+        {
+          "level": "facile",
+          "bestLap": 56.9,
+          "lapTimes": [
+            57.85,
+            56.9
+          ],
+          "maxV": 96,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 12
+        }
+      ]
+    },
+    {
+      "circuit": "grand-col",
+      "circuitName": "Grand Col Alpin",
+      "carId": "rallye",
+      "carName": "Rallye 4×4",
+      "mode": "race",
+      "fileName": "run_grand-col_rallye_race.json",
+      "wallTimeMs": 1650,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 134.43,
+          "lapTimes": [
+            138.92,
+            134.43
+          ],
+          "maxV": 267.2,
+          "avgV": 171,
+          "offTrackTicks": 0,
+          "lockupTicks": 85
+        },
+        {
+          "level": "difficile",
+          "bestLap": 138.77,
+          "lapTimes": [
+            144.95,
+            138.77
+          ],
+          "maxV": 264.1,
+          "avgV": 165,
+          "offTrackTicks": 0,
+          "lockupTicks": 74
+        },
+        {
+          "level": "normal",
+          "bestLap": 146.95,
+          "lapTimes": [
+            154.4,
+            146.95
+          ],
+          "maxV": 259.5,
+          "avgV": 155,
+          "offTrackTicks": 0,
+          "lockupTicks": 126
+        },
+        {
+          "level": "facile",
+          "bestLap": 154.85,
+          "lapTimes": [
+            160.92,
+            154.85
+          ],
+          "maxV": 252,
+          "avgV": 146,
+          "offTrackTicks": 0,
+          "lockupTicks": 30
+        }
+      ]
+    },
+    {
+      "circuit": "karting-arene",
+      "circuitName": "Arène",
+      "carId": "kart_frelon",
+      "carName": "Frelon",
+      "mode": "race",
+      "fileName": "run_karting-arene_kart_frelon_race.json",
+      "wallTimeMs": 1162,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 56.75,
+          "lapTimes": [
+            59.87,
+            56.75
+          ],
+          "maxV": 101.2,
+          "avgV": 63,
+          "offTrackTicks": 0,
+          "lockupTicks": 20
+        },
+        {
+          "level": "difficile",
+          "bestLap": 55.8,
+          "lapTimes": [
+            62.28,
+            55.8
+          ],
+          "maxV": 101.6,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 59
+        },
+        {
+          "level": "normal",
+          "bestLap": 56,
+          "lapTimes": [
+            57.05,
+            56
+          ],
+          "maxV": 101.4,
+          "avgV": 64,
+          "offTrackTicks": 0,
+          "lockupTicks": 17
+        },
+        {
+          "level": "facile",
+          "bestLap": 56.75,
+          "lapTimes": [
+            59.65,
+            56.75
+          ],
+          "maxV": 95.9,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 16
+        }
+      ]
+    },
+    {
+      "circuit": "karting-arene",
+      "circuitName": "Arène",
+      "carId": "kart_vipere",
+      "carName": "Vipère",
+      "mode": "qualif",
+      "fileName": "run_karting-arene_kart_vipere_qualif.json",
+      "wallTimeMs": 890,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 57.5,
+          "lapTimes": [
+            58.07,
+            57.5
+          ],
+          "maxV": 118.1,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 131
+        },
+        {
+          "level": "difficile",
+          "bestLap": 57.03,
+          "lapTimes": [
+            58.15,
+            57.03
+          ],
+          "maxV": 117.7,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 141
+        },
+        {
+          "level": "normal",
+          "bestLap": 55.65,
+          "lapTimes": [
+            56.35,
+            55.65
+          ],
+          "maxV": 117.6,
+          "avgV": 64,
+          "offTrackTicks": 0,
+          "lockupTicks": 28
+        },
+        {
+          "level": "facile",
+          "bestLap": 56.55,
+          "lapTimes": [
+            57.72,
+            56.55
+          ],
+          "maxV": 112,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 19
+        }
+      ]
+    },
+    {
+      "circuit": "karting-hangar",
+      "circuitName": "Hangar",
+      "carId": "kart_frelon",
+      "carName": "Frelon",
+      "mode": "qualif",
+      "fileName": "run_karting-hangar_kart_frelon_qualif.json",
+      "wallTimeMs": 1015,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 66.8,
+          "lapTimes": [
+            67.67,
+            66.8
+          ],
+          "maxV": 101.8,
+          "avgV": 57,
+          "offTrackTicks": 0,
+          "lockupTicks": 177
+        },
+        {
+          "level": "difficile",
+          "bestLap": 65.52,
+          "lapTimes": [
+            66.78,
+            65.52
+          ],
+          "maxV": 101.7,
+          "avgV": 58,
+          "offTrackTicks": 0,
+          "lockupTicks": 68
+        },
+        {
+          "level": "normal",
+          "bestLap": 62.05,
+          "lapTimes": [
+            62.13,
+            62.05
+          ],
+          "maxV": 101.6,
+          "avgV": 61,
+          "offTrackTicks": 0,
+          "lockupTicks": 33
+        },
+        {
+          "level": "facile",
+          "bestLap": 61.48,
+          "lapTimes": [
+            62.05,
+            61.48
+          ],
+          "maxV": 96,
+          "avgV": 61,
+          "offTrackTicks": 0,
+          "lockupTicks": 12
+        }
+      ]
+    },
+    {
+      "circuit": "karting-arene",
+      "circuitName": "Arène",
+      "carId": "kart_vipere",
+      "carName": "Vipère",
+      "mode": "race",
+      "fileName": "run_karting-arene_kart_vipere_race.json",
+      "wallTimeMs": 1238,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 57.47,
+          "lapTimes": [
+            66.62,
+            57.47
+          ],
+          "maxV": 118.1,
+          "avgV": 59,
+          "offTrackTicks": 0,
+          "lockupTicks": 155
+        },
+        {
+          "level": "difficile",
+          "bestLap": 55.15,
+          "lapTimes": [
+            60.92,
+            55.15
+          ],
+          "maxV": 117.7,
+          "avgV": 63,
+          "offTrackTicks": 0,
+          "lockupTicks": 48
+        },
+        {
+          "level": "normal",
+          "bestLap": 55.55,
+          "lapTimes": [
+            56.77,
+            55.55
+          ],
+          "maxV": 117.6,
+          "avgV": 64,
+          "offTrackTicks": 0,
+          "lockupTicks": 21
+        },
+        {
+          "level": "facile",
+          "bestLap": 56.85,
+          "lapTimes": [
+            59.03,
+            56.85
+          ],
+          "maxV": 112,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 19
+        }
+      ]
+    },
+    {
+      "circuit": "karting-hangar",
+      "circuitName": "Hangar",
+      "carId": "kart_vipere",
+      "carName": "Vipère",
+      "mode": "qualif",
+      "fileName": "run_karting-hangar_kart_vipere_qualif.json",
+      "wallTimeMs": 883,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 62.18,
+          "lapTimes": [
+            62.83,
+            62.18
+          ],
+          "maxV": 118.4,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 160
+        },
+        {
+          "level": "difficile",
+          "bestLap": 61.58,
+          "lapTimes": [
+            62.52,
+            61.58
+          ],
+          "maxV": 118.3,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 71
+        },
+        {
+          "level": "normal",
+          "bestLap": 59.12,
+          "lapTimes": [
+            60.45,
+            59.12
+          ],
+          "maxV": 118.1,
+          "avgV": 64,
+          "offTrackTicks": 0,
+          "lockupTicks": 57
+        },
+        {
+          "level": "facile",
+          "bestLap": 59.78,
+          "lapTimes": [
+            60.47,
+            59.78
+          ],
+          "maxV": 112.1,
+          "avgV": 63,
+          "offTrackTicks": 0,
+          "lockupTicks": 13
+        }
+      ]
+    },
+    {
+      "circuit": "karting-hangar",
+      "circuitName": "Hangar",
+      "carId": "kart_frelon",
+      "carName": "Frelon",
+      "mode": "race",
+      "fileName": "run_karting-hangar_kart_frelon_race.json",
+      "wallTimeMs": 1074,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 64.72,
+          "lapTimes": [
+            70,
+            64.72
+          ],
+          "maxV": 101.8,
+          "avgV": 58,
+          "offTrackTicks": 0,
+          "lockupTicks": 175
+        },
+        {
+          "level": "difficile",
+          "bestLap": 62.85,
+          "lapTimes": [
+            66.42,
+            62.85
+          ],
+          "maxV": 101.7,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 68
+        },
+        {
+          "level": "normal",
+          "bestLap": 61.67,
+          "lapTimes": [
+            64.63,
+            61.67
+          ],
+          "maxV": 101.6,
+          "avgV": 63,
+          "offTrackTicks": 0,
+          "lockupTicks": 12
+        },
+        {
+          "level": "facile",
+          "bestLap": 60.95,
+          "lapTimes": [
+            66.28,
+            60.95
+          ],
+          "maxV": 96,
+          "avgV": 62,
+          "offTrackTicks": 0,
+          "lockupTicks": 14
+        }
+      ]
+    },
+    {
+      "circuit": "karting-hangar",
+      "circuitName": "Hangar",
+      "carId": "kart_vipere",
+      "carName": "Vipère",
+      "mode": "race",
+      "fileName": "run_karting-hangar_kart_vipere_race.json",
+      "wallTimeMs": 907,
+      "summary": [
+        {
+          "level": "expert",
+          "bestLap": 61.8,
+          "lapTimes": [
+            64.95,
+            61.8
+          ],
+          "maxV": 118.4,
+          "avgV": 61,
+          "offTrackTicks": 0,
+          "lockupTicks": 146
+        },
+        {
+          "level": "difficile",
+          "bestLap": 62.87,
+          "lapTimes": [
+            63.63,
+            62.87
+          ],
+          "maxV": 118.2,
+          "avgV": 61,
+          "offTrackTicks": 0,
+          "lockupTicks": 73
+        },
+        {
+          "level": "normal",
+          "bestLap": 59.1,
+          "lapTimes": [
+            60.75,
+            59.1
+          ],
+          "maxV": 118.1,
+          "avgV": 66,
+          "offTrackTicks": 0,
+          "lockupTicks": 49
+        },
+        {
+          "level": "facile",
+          "bestLap": 62.9,
+          "lapTimes": [
+            63.38,
+            62.9
+          ],
+          "maxV": 112.1,
+          "avgV": 61,
+          "offTrackTicks": 0,
+          "lockupTicks": 34
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,64 @@
 {
-    "currentVersion": "1.58.2026-11-14",
-    "lastUpdate": "2026-11-14",
+    "currentVersion": "1.62.2026-11-17",
+    "lastUpdate": "2026-11-17",
     "history": [
+        {
+            "version": "1.62.2026-11-17",
+            "date": "2026-11-17",
+            "changes": [
+                "Little Turismo : éradication complète des contacts avec les murs en karting intérieur (répulsion active à 0.95 m du mur, assistance de réalignement immédiate et freinage réflexe d'urgence)",
+                "Little Turismo : calibration physique de la décélération kart (prise en compte du cap de freinage et pénalité de sous-virage spécifique pour kart lourd/adhérence basse comme le Cobalt)",
+                "Little Turismo : désactivation du facteur de coupe de chicane sur pistes intérieures béton sans vibreurs pour supprimer les survitesses d'approche",
+                "Little Turismo : banc télémétrique v10 complet validé sur les 12 circuits de karting × 4 karts (100% de hiérarchie stricte Expert < Difficile < Normal < Facile et 0 mur/0 faute)",
+                "Little Turismo : refonte de l'interface de bench.html avec filtrage par catégorie de circuit (Intérieur, Extérieur, Mixte, Grand Prix) et type de véhicule (Karts vs Voitures)"
+            ]
+        },
+        {
+            "version": "1.61.2026-11-17",
+            "date": "2026-11-17",
+            "changes": [
+                "Little Turismo : IA karting intérieur béton — les IA exploitent désormais toute la largeur béton jusqu'à 5 m (au lieu de 3 m) sans taper les murs",
+                "Little Turismo : détection automatique des circuits karting intérieur (KT_INDOOR) et adaptation des limites latérales, trajectoires et apprentissage",
+                "Little Turismo : l'apprentissage de la prudence s'applique aux murs béton en kart intérieur (même sans surf >= 2)",
+                "Little Turismo : 0 faute hors-piste validée sur Arène et Hangar (3 tours, 4 niveaux) avec hiérarchie Expert < Difficile < Normal < Facile respectée"
+            ]
+        },
+        {
+            "version": "1.60.2026-11-17",
+            "date": "2026-11-17",
+            "changes": [
+                "Little Turismo : optimisation haute performance des IA Expert (Late Apex, freinage aéro haute vitesse et filet de gaz de maintien)",
+                "Little Turismo : passage sous les 70 secondes sur Serra Nova (69.25s avec Sentinelle) et gains sur Valmont et Sous-Bois",
+                "Little Turismo : grand nettoyage du code de l'IA (suppression de variables et propriétés mortes, suppression des allocations résiduelles)",
+                "Little Turismo : suppression des bridages parasites sur vibreurs et réaccélération franche en sortie de courbe pour l'IA Expert",
+                "Little Turismo : calibration physique du sous-virage (understeer) dans les tables de vitesse pour prototypes LMP et hypercars",
+                "Little Turismo : freinage dégressif (trail braking) étendu au sec et ABS réactif sans blocage prolongé des roues",
+                "Little Turismo : hiérarchie stricte des 4 niveaux (Expert < Difficile < Normal < Facile) validée sur 100% des tests avec 0 faute hors-piste",
+                "Little Turismo : banc télémétrique v7 et comparateur multi-versions enrichi dans bench.html (fiches techniques, superpositions et courbes delta-t)"
+            ]
+        },
+        {
+            "version": "1.59.2026-11-16",
+            "date": "2026-11-16",
+            "changes": [
+                "Little Turismo : 3 voies dynamiques (-1, 0, +1) et coordination inter-IA en course",
+                "Little Turismo : table d'occupation partagée et anticipation de freinage par voie visée",
+                "Little Turismo : amélioration des dépassements et défense sans zigzag",
+                "Little Turismo : étalonnage des 4 niveaux d'IA (Expert intouchable, Difficile pour pilotes aguerris, Normal équilibré, Facile débutants)",
+                "Little Turismo : fluidification du peloton, régulation des gaz en virage et dépassements dynamiques en course et qualifications",
+                "Little Turismo : franchissement rapide des chicanes en coupant la trajectoire avec maintien du régime moteur",
+                "Little Turismo : exploitation active des vibreurs en entrée et sortie de virage sans panique ni freinage intempestif",
+                "Little Turismo : départ arrêté fluide sans blocus ni ralentissement en chaîne de la meute",
+                "Little Turismo : stabilisation des contacts latéraux (portière contre portière) sans tête-à-queue",
+                "Little Turismo : freinage dégressif (trail-braking), lâcher d'accélérateur et réaccélération par à-coups pour des virages plus propres",
+                "Little Turismo : anticipation de freinage dynamique adaptée à la vitesse et à la courbure imminente",
+                "Little Turismo : anti-blocage (ABS) et contrôle de traction (TC) par cadence de pédale sans saturation des pneus",
+                "Little Turismo : géométrie d'Apex dynamique (plongeon à la corde et réaccélération anticipée en sortie)",
+                "Little Turismo : optimiseur de repères de freinage progressif (Braking Point Optimizer) par circuit et voiture",
+                "Little Turismo : adaptation automatique aux casses mécaniques (compensation de tirage, freins voilés, perte d'ailerons)",
+                "Little Turismo : gestion du trou d'air en qualification et aspiration en ligne droite en course"
+            ]
+        },
         {
             "version": "1.58.2026-11-14",
             "date": "2024-11-14",

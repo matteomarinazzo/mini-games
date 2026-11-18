@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+    <title>Minigolf 3D</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#0a1c13">
+
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="icon" type="image/png" href="https://mini-games.ch/assets/logos/favicon.png?v=2">
+
+    <!-- Script Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4376256291112381"
+        crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYX3ZK4KB2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYX3ZK4KB2');
+    </script>
+</head>
+
+<body>
+    <header id="hud">
+        <div class="hud-l"><button class="icon-btn" id="bRules" title="Règles" aria-label="Règles"><svg width="20"
+                    height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg></button></div>
+        <div class="hud-c">
+            <div class="cell"><span class="lbl">Trou</span><b id="hHole">1/9</b></div>
+            <div class="cell"><span class="lbl">Coups</span><b id="hStr">0</b></div>
+            <div class="cell score"><span class="lbl">Score <i>· obj. <span id="hGoal">36</span></i></span><b
+                    id="hTot">0</b></div>
+        </div>
+        <div class="hud-r"><button class="icon-btn" id="bPause" title="Pause" aria-label="Pause"><svg width="20"
+                    height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg></button></div>
+        <div class="prog" id="hProg"></div>
+    </header>
+    <div id="stage">
+        <canvas id="gl"></canvas>
+        <div id="gauge">
+            <div id="gfill"></div>
+            <div id="gtick"></div><span id="gtitle">Tire ↓</span><span id="gval">0</span>
+        </div>
+        <div id="toast"></div>
+        <div id="board"></div>
+    </div>
+    <div class="modal" id="mPause" hidden>
+        <div class="card">
+            <h2>Pause</h2><button id="bResume">Reprendre</button><button class="secondary"
+                id="bRestart">Recommencer</button><button class="secondary" id="bMenu">Menu</button>
+        </div>
+    </div>
+    <div class="modal" id="mRules" hidden>
+        <div class="card">
+            <h2>📖 Règles</h2>
+            <section>
+                <h3>🎯 Objectif</h3>
+                <ul>
+                    <li>Un trou rapporte <strong>7 moins ton nombre de coups</strong> : 3 coups = 4 points, jamais moins
+                        de 0.</li>
+                    <li>Chaque map se débloque avec le <strong>total de tes meilleurs scores</strong> : 36 pts pour Le
+                        clos, 72 au total pour la map 3, puis de plus en plus haut. Refais une map pour battre ton
+                        record.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⛳ Jouer</h3>
+                <ul>
+                    <li><strong>Viser</strong> : glisse sur la scène (ou ← → / A D) pour tourner autour de la balle.
+                    </li>
+                    <li><strong>Tirer</strong> : tire la jauge vers le bas, plus bas = plus fort, puis lâche. Sous le
+                        repère, le tir est annulé.</li>
+                    <li>La balle roule, saute sur les rampes et doit tomber dans le trou.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>🧩 Obstacles</h3>
+                <ul>
+                    <li><strong>Sable</strong> freine, <strong>glace</strong> glisse, <strong>eau</strong> et
+                        <strong>vide</strong> : +1 coup.
+                    </li>
+                    <li><strong>Bumpers</strong> rebondissent, <strong>trampolines</strong> font sauter,
+                        <strong>portails</strong> téléportent.
+                    </li>
+                    <li><strong>Vent</strong> et <strong>boosts</strong> poussent la balle, les <strong>tunnels</strong>
+                        se traversent par dessous.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>⚠️ Pénalités</h3>
+                <ul>
+                    <li>Hors du terrain : <strong>+1 coup</strong>, la balle revient près de la sortie.</li>
+                    <li>Huit coups sur un trou : 0 point, on passe au suivant.</li>
+                    <li>Pas d’annulation. Recommencer relance les neuf trous.</li>
+                </ul>
+            </section>
+            <button id="bRulesClose">Fermer</button>
+        </div>
+    </div>
+    <div class="modal" id="mEnd" hidden>
+        <div class="card">
+            <div class="emoji">⛳</div>
+            <h2>Partie terminée</h2>
+            <p class="tot" id="eTot"></p>
+            <p id="eSub"></p>
+            <p class="goal" id="eGoal"></p>
+            <p id="eBest"></p><button id="bNext" hidden></button><button id="bAgain">Rejouer</button><button
+                class="secondary" id="bMenu2">Menu</button>
+        </div>
+    </div>
+    <div class="modal" id="mRank" hidden>
+        <div class="card rank">
+            <h2>Classement</h2>
+            <p class="rsub" id="rMap"></p>
+            <div class="rwrap">
+                <table>
+                    <thead id="rHead"></thead>
+                    <tbody id="rBody"></tbody>
+                </table>
+            </div>
+            <div class="rinfo" id="rInfo"></div>
+            <button id="bRank">Rejouer</button><button class="secondary" id="bMenu4">Menu</button>
+        </div>
+    </div>
+    <div class="modal" id="mWait" hidden>
+        <div class="card">
+            <h2 id="wTitle">Connexion…</h2>
+            <p id="wTxt"></p><button class="secondary" id="bMenu3">Menu</button>
+        </div>
+    </div>
+    <script src="js/net.js"></script>
+    <script src="js/core/maps.js"></script>
+    <script src="js/core/career.js"></script>
+    <script src="js/core/physics.js"></script>
+    <script src="js/core/render.js"></script>
+    <script src="js/core/ai.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/versus.js"></script>
+    <script type="module" src="../../js/countPlayedTime.js"></script>
+</body>
+
+</html>

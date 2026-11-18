@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.62.2026-11-17",
-    "lastUpdate": "2026-11-17",
+    "currentVersion": "1.63.2026-11-18",
+    "lastUpdate": "2026-11-18",
     "history": [
+        {
+            "version": "1.63.2026-11-18",
+            "date": "2026-11-18",
+            "changes": [
+                "Ajout du jeu Minigolf 3D"
+            ]
+        },
         {
             "version": "1.62.2026-11-17",
             "date": "2026-11-17",

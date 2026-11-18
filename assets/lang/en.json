@@ -328,6 +328,10 @@
             "netwalk": {
                 "name": "Netwalk",
                 "description": "Turn cables to light up the whole network from the server, with no loops or wires going nowhere. One solution per grid, three sizes from 5×5 to 9×9, or your own grid up to 50×50."
+            },
+            "minigolf": {
+                "name": "Minigolf 3D",
+                "description": "3D Minigolf: 12 varied maps. Play alone, against AI, or online with up to 4 players."
             }
         },
         "badges": {

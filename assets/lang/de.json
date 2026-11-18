@@ -328,6 +328,10 @@
             "netwalk": {
                 "name": "Netwalk",
                 "description": "Durch Drehen der Kabel wird das gesamte Netzwerk vom Server aus mit Strom versorgt, wodurch Schleifen und lose Kabel vermieden werden. Eine Lösung pro Raster, drei Größen von 5x5 bis 9x9 oder Ihr eigenes benutzerdefiniertes Raster bis zu 50x50."
+            },
+            "minigolf": {
+                "name": "Minigolf 3D",
+                "description": "3D-Minigolf: 12 abwechslungsreiche Karten. Spiele allein, gegen die KI oder online mit bis zu 4 Spielern."
             }
         },
         "badges": {

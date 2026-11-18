@@ -673,6 +673,23 @@
       "rating": "0",
       "stars": "☆☆☆☆☆"
     },
+    "minigolf": {
+      "path": "./games/minigolf/index.html",
+      "name": "Minigolf 3D",
+      "emoji": "⛳",
+      "description": "Minigolf en 3D : 12 maps variées. Seul, contre des IA ou en ligne jusqu'à 4 joueurs.",
+      "tags": [
+        "sports",
+        "physics",
+        "precision",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "fun",
+      "badgeText": "Fun !",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
     "skyjo": {
       "path": "./games/skyjo/index.html",
       "name": "Skyjo",

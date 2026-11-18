@@ -327,6 +327,10 @@
             "netwalk": {
                 "name": "Netwalk",
                 "description": "Tourne les câbles pour allumer tout le réseau depuis le serveur, sans boucle ni fil dans le vide. Une seule solution par grille, trois tailles de 5×5 à 9×9, ou ta propre grille jusqu'à 50×50."
+            },
+            "minigolf": {
+                "name": "Minigolf 3D",
+                "description": "Minigolf en 3D : 12 maps variées. Seul, contre des IA ou en ligne jusqu'à 4 joueurs."
             }
         },
         "badges": {

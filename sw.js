@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.62.2026-11-17";
+const CACHE_NAME = "mini-games-cache-v1.63.2026-11-18.1";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -121,6 +121,7 @@ const ASSETS_TO_CACHE = [
     'assets/logos/aires.webp',
     'assets/logos/path.webp',
     'assets/logos/netwalk.webp',
+    'assets/logos/minigolf.webp',
 
     // About
     'about/about.html',
@@ -733,6 +734,21 @@ const ASSETS_TO_CACHE = [
     'games/netwalk/js/core/generate.js',
     'games/netwalk/js/core/records.js',
     'games/netwalk/js/core/rules.js',
+
+    // Game: Minigolf
+    'games/minigolf/index.html',
+    'games/minigolf/game.html',
+    'games/minigolf/css/menu.css',
+    'games/minigolf/css/game.css',
+    'games/minigolf/js/menu.js',
+    'games/minigolf/js/game.js',
+    'games/minigolf/js/net.js',
+    'games/minigolf/js/versus.js',
+    'games/minigolf/js/core/ai.js',
+    'games/minigolf/js/core/career.js',
+    'games/minigolf/js/core/maps.js',
+    'games/minigolf/js/core/physics.js',
+    'games/minigolf/js/core/render.js',
 ];
 
 // ─── 1. Installation ──────────────────────────────────────────────────────────

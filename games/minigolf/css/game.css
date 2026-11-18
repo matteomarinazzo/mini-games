@@ -1,0 +1,768 @@
+/* Minigolf 3D – game.css : thème golf (feutre vert, bois, crème, or) sur la structure Mini-Games (variables, HUD, boutons, modales) + cadre 16:9 du canvas. */
+:root {
+    --ui-bg: rgba(10, 28, 18, .92);
+    --ui-border: rgba(200, 154, 91, .38);
+    --ui-text: #f4ecd8;
+    --ui-pale: #bccaa6;
+    --ui-accent: #e3b062;
+    --ui-danger: #ef476f;
+    --ui-ok: #5ef5a0;
+    --ui-warn: #ffd166;
+    --transition: all .25s cubic-bezier(.4, 0, .2, 1);
+    --font: 'Fredoka', 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+    --hud: calc(52px + env(safe-area-inset-top, 0px));
+    --void: #6aade0;
+    /* = couleur de vide du rendu (gl.clearColor) */
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+    font-family: var(--font);
+    color: var(--ui-text);
+    background: var(--void);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+/* ─── Le terrain occupe tout l'écran, quelle que soit la taille ou le zoom ─── */
+#stage {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--void);
+    overflow: hidden;
+    touch-action: none;
+    font-size: clamp(10px, calc((100vw + 100vh) / 110), 17px);
+}
+
+#gl {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ─── HUD : règles | trou · coups · score | pause ─── */
+#hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: var(--hud);
+    padding: env(safe-area-inset-top, 0px) 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--ui-bg);
+    border-bottom: 1px solid var(--ui-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.hud-l,
+.hud-r {
+    display: flex;
+    align-items: center;
+    min-width: 44px;
+}
+
+.hud-r {
+    justify-content: flex-end;
+}
+
+.hud-c {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 0;
+}
+
+.cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 62px;
+    padding: 3px 12px;
+    border-radius: 10px;
+    background: rgba(227, 176, 98, .07);
+    border: 1px solid rgba(227, 176, 98, .12);
+    line-height: 1;
+}
+
+.cell .lbl {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--ui-pale);
+    white-space: nowrap;
+}
+
+.cell .lbl i {
+    font-style: normal;
+    opacity: .75;
+}
+
+.cell b {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ui-accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.cell.score b {
+    color: var(--ui-text);
+}
+
+.cell.score.ok {
+    border-color: rgba(94, 245, 160, .4);
+    background: rgba(94, 245, 160, .1);
+}
+
+.cell.score.ok b {
+    color: var(--ui-ok);
+}
+
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--ui-border);
+    background: rgba(227, 176, 98, .12);
+    color: var(--ui-text);
+    transition: var(--transition);
+}
+
+.icon-btn:hover {
+    background: rgba(227, 176, 98, .25);
+}
+
+.icon-btn:active {
+    transform: scale(.94);
+}
+
+.icon-btn svg {
+    pointer-events: none;
+}
+
+.prog {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    display: flex;
+    gap: 2px;
+    padding: 0 12px;
+    pointer-events: none;
+}
+
+.prog i {
+    flex: 1;
+    background: rgba(227, 176, 98, .16);
+    border-radius: 2px;
+}
+
+.prog i.done {
+    background: var(--ui-accent);
+}
+
+.prog i.cur {
+    background: var(--ui-warn);
+}
+
+@media (max-width: 520px) {
+    .cell {
+        min-width: 52px;
+        padding: 3px 8px;
+    }
+
+    .cell b {
+        font-size: 17px;
+    }
+
+    .hud-c {
+        gap: 4px;
+    }
+}
+
+/* ─── Jauge de force : on tire vers le bas ─── */
+#gauge {
+    position: absolute;
+    right: max(2%, env(safe-area-inset-right, 0px));
+    top: calc(var(--hud) + 14px);
+    bottom: 8%;
+    width: max(46px, 4.6em);
+    overflow: hidden;
+    cursor: ns-resize;
+    touch-action: none;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+}
+
+#gfill {
+    position: absolute;
+    inset: 0;
+    opacity: .9;
+    clip-path: inset(0 0 100% 0);
+    background: linear-gradient(180deg, #5ef5a0 0%, #ffd166 55%, #ef476f 100%);
+}
+
+#gtick {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 8%;
+    border-top: 2px dashed rgba(255, 255, 255, .6);
+}
+
+#gtitle,
+#gval {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 0 4px #000, 0 1px 2px #000;
+}
+
+#gtitle {
+    top: .4em;
+    font-size: max(10px, .95em);
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+#gval {
+    bottom: .3em;
+    font-size: max(13px, 1.4em);
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+#toast {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--hud) + 14px);
+    transform: translateX(-50%);
+    padding: .45em 1.1em;
+    white-space: nowrap;
+    pointer-events: none;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 999px;
+    font-size: max(12px, 1.5em);
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity .25s;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+}
+
+#toast.on {
+    opacity: 1;
+}
+
+/* ─── Modales (fenêtre pleine, hors du cadre) ─── */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(4, 14, 9, .86);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 28px 24px;
+    text-align: center;
+    background: linear-gradient(160deg, #173222, #0c2217);
+    border: 1px solid var(--ui-border);
+    border-radius: 22px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .7);
+}
+
+.card h2 {
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--ui-accent);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    font-size: 15px;
+    color: var(--ui-accent);
+    margin: 14px 0 6px;
+    text-align: left;
+}
+
+.card ul {
+    padding-left: 18px;
+    text-align: left;
+}
+
+.card li {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 4px;
+    color: var(--ui-pale);
+}
+
+.card li strong {
+    color: var(--ui-text);
+}
+
+.card section {
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+}
+
+.card .emoji {
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.card p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ui-pale);
+    margin: 6px 0;
+}
+
+.card button {
+    display: block;
+    width: 100%;
+    margin: 12px 0 0;
+    min-height: 48px;
+    padding: 12px;
+    border-radius: 14px;
+    border: none;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #3aa862, #1d6b3c);
+    box-shadow: 0 6px 18px rgba(29, 107, 60, .5);
+    transition: var(--transition);
+}
+
+.card button:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+}
+
+.card button:active {
+    transform: translateY(0);
+}
+
+.card button.secondary {
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: none;
+}
+
+.card button.secondary:hover {
+    background: rgba(255, 255, 255, .14);
+}
+
+/* Fin de partie */
+.tot {
+    font-size: 40px !important;
+    font-weight: 700;
+    color: var(--ui-text) !important;
+    margin: 2px 0 4px !important;
+}
+
+.goal {
+    margin: 12px 0 !important;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px !important;
+    line-height: 1.4;
+}
+
+.goal.ok {
+    color: var(--ui-ok) !important;
+    background: rgba(94, 245, 160, .1);
+    border: 1px solid rgba(94, 245, 160, .4);
+}
+
+.goal.ko {
+    color: #ffb3c4 !important;
+    background: rgba(239, 71, 111, .12);
+    border: 1px solid rgba(239, 71, 111, .4);
+}
+
+#eBest {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .05);
+    color: var(--ui-accent) !important;
+    font-weight: 700;
+}
+
+/* ─── Parties à plusieurs ─── */
+.card button[hidden] {
+    display: none;
+}
+
+.cell.score b {
+    max-width: 7em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#eSub {
+    white-space: pre-line;
+    text-align: left;
+}
+
+#board {
+    position: absolute;
+    left: max(2%, env(safe-area-inset-left, 0px));
+    top: calc(var(--hud) + 14px);
+    min-width: 12em;
+    max-width: 52%;
+    padding: .5em .7em;
+    pointer-events: none;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    font-size: max(11px, 1.15em);
+}
+
+#board:empty {
+    display: none;
+}
+
+#board div {
+    display: grid;
+    grid-template-columns: .8em 1fr 2.2em 2.6em;
+    gap: .5em;
+    align-items: center;
+    padding: .15em 0;
+    color: var(--ui-pale);
+}
+
+#board .hd {
+    font-size: .8em;
+    opacity: .7;
+}
+
+#board .on {
+    color: var(--ui-text);
+    font-weight: 700;
+}
+
+#board .dn {
+    opacity: .55;
+}
+
+#board i {
+    width: .8em;
+    height: .8em;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, .45);
+}
+
+#board span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#board em,
+#board b {
+    font-style: normal;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── Classement (fin des parties à plusieurs) ─── */
+.card.rank {
+    max-width: 560px;
+    padding: 22px 14px;
+}
+
+.rank h2 {
+    margin-bottom: 4px;
+}
+
+.card .rsub {
+    font-weight: 700;
+    color: var(--ui-text);
+    margin: 0 0 12px;
+}
+
+.rwrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 12px;
+}
+
+.rwrap table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.rwrap th,
+.rwrap td {
+    min-width: 38px;
+    padding: 8px 6px;
+    text-align: center;
+    white-space: nowrap;
+    background: #10281b;
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.rwrap th {
+    font-size: 11px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--ui-pale);
+    background: #0b1f14;
+}
+
+.rwrap .k0,
+.rwrap .k1,
+.rwrap .k2 {
+    position: sticky;
+    z-index: 1;
+}
+
+.rwrap th.k0,
+.rwrap th.k1,
+.rwrap th.k2 {
+    z-index: 2;
+}
+
+.rwrap .k0 {
+    left: 0;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+}
+
+.rwrap .k1 {
+    left: 56px;
+    width: 108px;
+    min-width: 108px;
+    max-width: 108px;
+    text-align: left;
+}
+
+.rwrap .k2 {
+    left: 164px;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    font-weight: 700;
+    border-right: 1px solid rgba(255, 255, 255, .22);
+}
+
+.nm {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.nn {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tag {
+    flex: none;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--ui-text);
+    color: #10281b;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.rk {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+.rk.r1 {
+    background: linear-gradient(135deg, #f5d874, #c9a227);
+    color: #3a2c00;
+}
+
+.rk.r2 {
+    background: linear-gradient(135deg, #eceff1, #a9b0b7);
+    color: #23282d;
+}
+
+.rk.r3 {
+    background: linear-gradient(135deg, #e0a56c, #a8662f);
+    color: #2b1604;
+}
+
+.rk.r4 {
+    border-radius: 8px;
+    background: #6b4524;
+    border: 1px solid #8f6238;
+    color: var(--ui-text);
+}
+
+.rwrap tr.me td {
+    background: #3a321c;
+    color: #fff;
+    font-weight: 700;
+    border-top: 2px solid var(--ui-accent);
+    border-bottom: 2px solid var(--ui-accent);
+}
+
+.rwrap tr.me td.k0 {
+    border-left: 5px solid var(--ui-accent);
+}
+
+.rwrap tr.me td:last-child {
+    border-right: 2px solid var(--ui-accent);
+}
+
+.rinfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+.ri {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.ri small {
+    font-size: 11px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--ui-pale);
+}
+
+.ri b {
+    font-size: 15px;
+    line-height: 1.35;
+    white-space: pre-line;
+    color: var(--ui-text);
+}
+
+.rank button {
+    min-height: 56px;
+    font-size: 18px;
+}
+
+.card button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+}
+
+@media (max-width: 420px) {
+    .rinfo {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ─── Mobile en portrait : on pivote tout en paysage (les entrées sont remappées dans game.js / versus.js via la même règle) ─── */
+@media (orientation: portrait) and (max-width: 700px) and (pointer: coarse) {
+    body {
+        position: fixed;
+        top: 0;
+        left: 100%;
+        width: 100vh;
+        height: 100vw;
+        transform: rotate(90deg);
+        transform-origin: top left;
+    }
+
+    :root {
+        --hud: 52px;
+    }
+
+    #hud {
+        padding-top: 0;
+    }
+
+    .card {
+        max-height: 88vw;
+    }
+}

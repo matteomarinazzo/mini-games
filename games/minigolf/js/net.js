@@ -69,4 +69,142 @@
     validCode: (s) => /^[A-Z0-9]{6}$/.test(s),
     gameIdOf, serverNow, ts, isPresent, isDead, order, hostOf, readSavedRoom, saveRoom, clearSavedRoom, initFb, watch, beat, leaveRoom,
   };
+
+  // ── Défilement tactile fluide pour mobile (notamment en affichage pivoté à 90°) ──
+  (function initTouchScroll() {
+    if (typeof window === 'undefined') return;
+    const RQ = matchMedia('(orientation: portrait) and (max-width: 700px) and (pointer: coarse)');
+    let target = null;
+    let startX = 0, startY = 0;
+    let lastX = 0, lastY = 0;
+    let lastTime = 0;
+    let velX = 0, velY = 0;
+    let isScrolling = false;
+    let animId = null;
+
+    function getScroller(el) {
+      let cur = el;
+      while (cur && cur !== document.body && cur !== document.documentElement) {
+        const s = window.getComputedStyle(cur);
+        const canY = (s.overflowY === 'auto' || s.overflowY === 'scroll') && cur.scrollHeight > cur.clientHeight + 2;
+        const canX = (s.overflowX === 'auto' || s.overflowX === 'scroll') && cur.scrollWidth > cur.clientWidth + 2;
+        if (canY || canX) return cur;
+        cur = cur.parentElement;
+      }
+      if (RQ.matches) {
+        const modal = document.querySelector('.overlay.open .modal, .modal:not([hidden]) .card');
+        if (modal && modal.scrollHeight > modal.clientHeight + 2) return modal;
+        const wrap = document.querySelector('.wrap');
+        if (wrap && !document.querySelector('.overlay.open') && wrap.scrollHeight > wrap.clientHeight + 2) return wrap;
+      }
+      return null;
+    }
+
+    const isRotated = () => {
+      const t = window.getComputedStyle(document.body).transform;
+      return t && t !== 'none';
+    };
+
+    function onTouchStart(e) {
+      if (e.touches.length !== 1 || !isRotated()) return;
+      if (animId) cancelAnimationFrame(animId);
+      animId = null;
+      velX = 0;
+      velY = 0;
+      isScrolling = false;
+      const t = e.touches[0];
+      startX = lastX = t.clientX;
+      startY = lastY = t.clientY;
+      lastTime = performance.now();
+      target = getScroller(e.target);
+    }
+
+    function onTouchMove(e) {
+      if (!target || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const now = performance.now();
+      const dt = Math.max(1, now - lastTime);
+      const px = t.clientX;
+      const py = t.clientY;
+      const dist = Math.hypot(px - startX, py - startY);
+
+      if (!isScrolling && dist > 6) {
+        isScrolling = true;
+      }
+
+      if (isScrolling) {
+        if (e.cancelable) e.preventDefault();
+
+        const dPx = px - lastX;
+        const dPy = py - lastY;
+        const rotated = RQ.matches;
+
+        let deltaY = 0;
+        let deltaX = 0;
+
+        if (rotated) {
+          deltaY = Math.abs(dPx) >= Math.abs(dPy) ? dPx : -dPy;
+          deltaX = -dPy;
+        } else {
+          deltaY = -dPy;
+          deltaX = -dPx;
+        }
+
+        if (target.scrollHeight > target.clientHeight) {
+          target.scrollTop += deltaY;
+          velY = deltaY / dt;
+        }
+        if (target.scrollWidth > target.clientWidth) {
+          target.scrollLeft += deltaX;
+          velX = deltaX / dt;
+        }
+      }
+
+      lastX = px;
+      lastY = py;
+      lastTime = now;
+    }
+
+    function onTouchEnd() {
+      if (!target) return;
+      const scroller = target;
+      target = null;
+
+      if (isScrolling) {
+        const killClick = (ce) => {
+          ce.preventDefault();
+          ce.stopPropagation();
+        };
+        window.addEventListener('click', killClick, { capture: true, once: true });
+        setTimeout(() => window.removeEventListener('click', killClick, { capture: true }), 150);
+
+        let lastAnim = performance.now();
+        function momentum() {
+          const now = performance.now();
+          const dt = Math.min(32, now - lastAnim);
+          lastAnim = now;
+          velY *= Math.pow(0.92, dt / 16);
+          velX *= Math.pow(0.92, dt / 16);
+          let active = false;
+          if (Math.abs(velY) > 0.02 && scroller.scrollHeight > scroller.clientHeight) {
+            scroller.scrollTop += velY * dt;
+            active = true;
+          }
+          if (Math.abs(velX) > 0.02 && scroller.scrollWidth > scroller.clientWidth) {
+            scroller.scrollLeft += velX * dt;
+            active = true;
+          }
+          if (active) {
+            animId = requestAnimationFrame(momentum);
+          }
+        }
+        animId = requestAnimationFrame(momentum);
+      }
+    }
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+  })();
 })();

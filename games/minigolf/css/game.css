@@ -310,6 +310,7 @@ button {
     background: rgba(4, 14, 9, .86);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    touch-action: pan-y;
 }
 
 .modal[hidden] {
@@ -322,6 +323,8 @@ button {
     max-width: 380px;
     max-height: 88vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     padding: 28px 24px;
     text-align: center;
     background: linear-gradient(160deg, #173222, #0c2217);
@@ -742,16 +745,18 @@ button {
     }
 }
 
-/* ─── Mobile en portrait : on pivote tout en paysage (les entrées sont remappées dans game.js / versus.js via la même règle) ─── */
+/* ─── Mobile en portrait : on pivote tout en paysage (calé exactement sur l'espace visible réel) ─── */
 @media (orientation: portrait) and (max-width: 700px) and (pointer: coarse) {
     body {
         position: fixed;
         top: 0;
-        left: 100%;
-        width: 100vh;
-        height: 100vw;
-        transform: rotate(90deg);
-        transform-origin: top left;
+        left: 0;
+        width: 100dvh;
+        height: 100dvw;
+        width: var(--vh, 100dvh);
+        height: var(--vw, 100dvw);
+        transform-origin: 0 0;
+        transform: rotate(90deg) translateY(-100%);
     }
 
     :root {
@@ -760,6 +765,14 @@ button {
 
     #hud {
         padding-top: 0;
+    }
+
+    .hud-r {
+        padding-right: max(8px, env(safe-area-inset-bottom, 0px));
+    }
+
+    #gauge {
+        right: max(14px, env(safe-area-inset-bottom, 0px));
     }
 
     .card {

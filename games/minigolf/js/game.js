@@ -76,7 +76,7 @@
   // entrées : un seul pointeur actif (le deuxième doigt est ignoré)
   const G = $('gauge');
   const RQ = matchMedia('(orientation: portrait) and (max-width: 700px) and (pointer: coarse)');   // = règle de pivot de game.css
-const setP = (e) => { let v; if (RQ.matches) v = (innerWidth - e.clientX - G.offsetTop) / G.offsetHeight; else { const r = G.getBoundingClientRect(); v = (e.clientY - r.top) / r.height; } setPower(Math.round(Math.max(0, Math.min(100, v * 100)))); };
+  const setP = (e) => { const r = G.getBoundingClientRect(), v = RQ.matches ? (r.right - e.clientX) / (r.width || 1) : (e.clientY - r.top) / (r.height || 1); setPower(Math.round(Math.max(0, Math.min(100, v * 100)))); };
   G.addEventListener('pointerdown', (e) => { if (act !== null || e.button > 0 || !canAim()) return; act = e.pointerId; gdrag = true; try { G.setPointerCapture(e.pointerId); } catch (x) { /* ok */ } setP(e); e.preventDefault(); });
   G.addEventListener('pointermove', (e) => { if (e.pointerId === act && gdrag) setP(e); });
   const gend = (e) => { if (e.pointerId !== act || !gdrag) return; gdrag = false; act = null; const p = power; setPower(0); if (e.type === 'pointerup' && p >= MINP && canAim()) shoot(p); };
@@ -96,6 +96,8 @@ const setP = (e) => { let v; if (RQ.matches) v = (innerWidth - e.clientX - G.off
   addEventListener('blur', () => { keys.l = keys.r = false; });
   $('bPause').onclick = () => openModal('mPause'); $('bRules').onclick = () => openModal('mRules'); $('bRulesClose').onclick = closeModal; $('bResume').onclick = closeModal;
   $('bRestart').onclick = restart; $('bAgain').onclick = restart; $('bMenu').onclick = $('bMenu2').onclick = () => { location.href = 'index.html'; };
+  const updateVP = () => { document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); document.documentElement.style.setProperty('--vw', window.innerWidth + 'px'); };
+  updateVP(); addEventListener('resize', updateVP); addEventListener('orientationchange', updateVP);
   if (window.ResizeObserver) new ResizeObserver(() => R.resize()).observe(stage); addEventListener('resize', () => R.resize());
 
   const saved = C.loadRun(map.id, H);

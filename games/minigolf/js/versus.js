@@ -241,7 +241,7 @@
     else { try { Promise.resolve(N.F.fb.updateRoom(N.gameIdOf(cfg.roomCode), { act: { tid: S.tid, seat: me, u: seats[me].u, yaw: aim, power: p } })).catch(() => { sent = -1; }); } catch (e) { sent = -1; } }
   }
   const RQ = matchMedia('(orientation: portrait) and (max-width: 700px) and (pointer: coarse)');   // = règle de pivot de game.css
-  const setP = (e) => { let v; if (RQ.matches) v = (innerWidth - e.clientX - G.offsetTop) / G.offsetHeight; else { const r = G.getBoundingClientRect(); v = (e.clientY - r.top) / r.height; } setPower(Math.round(Math.max(0, Math.min(100, v * 100)))); };
+  const setP = (e) => { const r = G.getBoundingClientRect(), v = RQ.matches ? (r.right - e.clientX) / (r.width || 1) : (e.clientY - r.top) / (r.height || 1); setPower(Math.round(Math.max(0, Math.min(100, v * 100)))); };
   G.addEventListener('pointerdown', (e) => { if (act !== null || e.button > 0 || !canAim()) return; act = e.pointerId; gdrag = true; try { G.setPointerCapture(e.pointerId); } catch (x) { /* ok */ } setP(e); e.preventDefault(); });
   G.addEventListener('pointermove', (e) => { if (e.pointerId === act && gdrag) setP(e); });
   const gend = (e) => { if (e.pointerId !== act || !gdrag) return; gdrag = false; act = null; const p = power; setPower(0); if (e.type === 'pointerup' && p >= MINP && canAim()) shoot(p); };
@@ -263,6 +263,8 @@
   $('bRestart').onclick = () => { if (host) { closeModal(); hostInit(); } };
   $('bMenu').onclick = $('bMenu2').onclick = $('bMenu3').onclick = $('bMenu4').onclick = leave;
   $('bRank').onclick = () => { if (!host) return; closeModal(); hostInit(); };   // même porte, même map, mêmes sièges
+  const updateVP = () => { document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); document.documentElement.style.setProperty('--vw', window.innerWidth + 'px'); };
+  updateVP(); addEventListener('resize', updateVP); addEventListener('orientationchange', updateVP);
   if (window.ResizeObserver) new ResizeObserver(() => R.resize()).observe(stage); addEventListener('resize', () => R.resize());
 
   // ── room (multi) : l’hôte est le leader présent, sinon le plus ancien présent ──

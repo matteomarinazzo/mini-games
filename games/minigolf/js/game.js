@@ -70,7 +70,7 @@
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(.05, (now - last) / 1000); last = now;
     if (!modal && !R.lost) update(dt);
-    R.frame({ x: ball.x, y: ball.y, z: ball.z, cam, aim, arrow: st === 'aim', shadow: ball.ground && !ball.sunk, gy: world.hole.G(ball.x, ball.z) });
+    R.frame({ x: ball.x, y: ball.y, z: ball.z, cam, aim, arrow: st === 'aim', gy: world.hole.G(ball.x, ball.z) });
   }
 
   // entrées : un seul pointeur actif (le deuxième doigt est ignoré)

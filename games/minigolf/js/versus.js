@@ -229,7 +229,7 @@
     if (!R.lost && (online || !modal)) update(dt);
     G.hidden = !myTurn();
     const t = S.turn, sim = host && simT, pa = pos(t), others = [];
-    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, c: COL[ci[i]] }); } });
+    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, gy: world.hole.G(q.x, q.z), c: COL[ci[i]] }); } });
     R.frame({ x: pa.x, y: pa.y, z: pa.z, cam, aim: t === me ? aim : raim, arrow: S.ph === 'aim' && !simT && !iv && (t === me ? sent !== S.tid : (S.ai === 1 || !!(rAim && rAim.tid === S.tid))), shadow: sim ? ball.ground && !ball.sunk : iv ? iv.g === 1 : !S.d[t], gy: world.hole.G(pa.x, pa.z), tint: COL[ci[t]], others });
   }
 

@@ -11,7 +11,7 @@
     --transition: all .25s cubic-bezier(.4, 0, .2, 1);
     --font: 'Fredoka', 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     --hud: calc(52px + env(safe-area-inset-top, 0px));
-    --void: #121c17;
+    --void: #6aade0;
     /* = couleur de vide du rendu (gl.clearColor) */
 }
 

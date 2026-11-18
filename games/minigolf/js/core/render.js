@@ -29,6 +29,193 @@
   const SAND = [.78, .66, .42], SAND2 = [.74, .62, .38], ICE = [.74, .86, .9], ICE2 = [.68, .8, .86], BO1 = [.88, .55, .18], BO2 = [.7, .4, .12], PAD = [.93, .9, .8], WI1 = [.5, .66, .64], WI2 = [.44, .6, .58], WATER = [.16, .34, .46],
     PADA = [.5, .84, 1], PADB = [.1, .17, .42], PADF = [.92, .94, .96], BUMP = [.62, .2, .16], BUMPC = [.95, .9, .82], PCOL = [[.88, .5, .15], [.4, .62, .78], [.8, .72, .3], [.62, .38, .62]];
   const FELT = [.16, .45, .25], FELT2 = [.14, .41, .23], WT = [.62, .42, .22], WS = [.45, .28, .14], WE = [.3, .18, .09], RIM = [.92, .9, .82];
+  // ── Décor ──
+  const GR1 = [.22, .48, .18], GR2 = [.18, .42, .15], GR3 = [.26, .52, .20]; // herbe
+  const TR1 = [.38, .24, .10], TR2 = [.30, .18, .08];                         // tronc
+  const LF1 = [.18, .44, .14], LF2 = [.24, .52, .17], LF3 = [.14, .36, .10]; // feuillage
+  const SK1 = [.36, .62, .84], SK2 = [.52, .74, .92], SK3 = [.68, .84, .96]; // ciel
+  const FNC = [.70, .55, .32];                                                  // clôture
+  const ST1 = [.52, .48, .44], ST2 = [.44, .40, .36];                         // pierre
+
+  /** Génère les meshes de décor autour de h.poly (sol, arbres, buissons, clôture, dôme ciel). */
+  function buildDecor(h) {
+    const b = B(), sky = B();
+    const xs = h.poly.map((p) => p[0]), zs = h.poly.map((p) => p[1]);
+    const cx0 = Math.min(...xs), cx1 = Math.max(...xs), cz0 = Math.min(...zs), cz1 = Math.max(...zs);
+    const mx = (cx0 + cx1) / 2, mz = (cz0 + cz1) / 2;
+    const PAD_G = 18, FAR = 80; // padding sol herbe, rayon dôme ciel
+
+    // ── Sol herbeux (plan large autour du terrain) ──
+    const GX0 = mx - PAD_G, GX1 = mx + PAD_G, GZ0 = mz - PAD_G, GZ1 = mz + PAD_G;
+    const GS = 4; // dalles de 4 m
+    for (let xi = 0; xi < Math.ceil((GX1 - GX0) / GS); xi++) {
+      for (let zi = 0; zi < Math.ceil((GZ1 - GZ0) / GS); zi++) {
+        const x0 = GX0 + xi * GS, x1 = Math.min(GX1, x0 + GS), z0 = GZ0 + zi * GS, z1 = Math.min(GZ1, z0 + GS);
+        const gc = ((xi ^ zi) & 1) ? GR2 : GR1;
+        face(b, [0, 1, 0], [[x0, -.25, z0], [x1, -.25, z0], [x1, -.25, z1], [x0, -.25, z1]], gc);
+      }
+    }
+
+    // ── Dôme ciel (hémisphère basse-poly, grand rayon, sans culling côté intérieur) ──
+    const SR = FAR, SH = 32, nLat = 5, nLon = 16;
+    const skyCols = [SK3, SK2, SK2, SK1, SK1]; // base→sommet : horizon clair, zenith saturé
+    for (let i = 0; i < nLat; i++) {
+      const a0 = (i / nLat) * Math.PI / 2, a1 = ((i + 1) / nLat) * Math.PI / 2;
+      const c0 = skyCols[i], c1 = skyCols[Math.min(i + 1, skyCols.length - 1)];
+      for (let j = 0; j < nLon; j++) {
+        const t0 = (j / nLon) * 6.2832, t1 = ((j + 1) / nLon) * 6.2832;
+        const p = (a, t) => [mx + SR * Math.cos(a) * Math.cos(t), SR * Math.sin(a) - 2, mz + SR * Math.cos(a) * Math.sin(t)];
+        const P00 = p(a0, t0), P10 = p(a1, t0), P11 = p(a1, t1), P01 = p(a0, t1);
+        // normale vers l'intérieur (inward)
+        const nx = -(Math.cos(a0) * Math.cos((t0 + t1) / 2)), ny = -Math.sin(a0), nz = -(Math.cos(a0) * Math.sin((t0 + t1) / 2));
+        face(sky, [nx, ny, nz], [P00, P01, P11, P10], [c0, c0, c1, c1]);
+      }
+    }
+    // Plan horizon (anneau bas du dôme pour combler les gaps)
+    const hRing = -1.5;
+    for (let j = 0; j < nLon; j++) {
+      const t0 = (j / nLon) * 6.2832, t1 = ((j + 1) / nLon) * 6.2832;
+      const x0h = mx + SR * Math.cos(t0), z0h = mz + SR * Math.sin(t0), x1h = mx + SR * Math.cos(t1), z1h = mz + SR * Math.sin(t1);
+      face(sky, [0, 1, 0], [[mx, hRing, mz], [x0h, hRing, z0h], [x1h, hRing, z1h], [x1h, hRing, z1h]], SK1);
+    }
+
+    // ── Nuages (quelques rectangles plats blancs en altitude) ──
+    const clouds = [[-8, 22], [6, 18], [-4, 30], [9, 10], [3, 26]];
+    for (const [ox, oz] of clouds) {
+      const cw = 3 + Math.abs(ox * .2), cd = 1.2, cy = 7 + Math.abs(oz * .05);
+      const CC = [.96, .97, 1.0];
+      face(b, [0, -1, 0], [[mx + ox - cw / 2, cy, mz + oz - cd / 2], [mx + ox + cw / 2, cy, mz + oz - cd / 2], [mx + ox + cw / 2, cy, mz + oz + cd / 2], [mx + ox - cw / 2, cy, mz + oz + cd / 2]], CC);
+      face(b, [0, 1, 0], [[mx + ox - cw / 2, cy, mz + oz - cd / 2], [mx + ox + cw / 2, cy, mz + oz - cd / 2], [mx + ox + cw / 2, cy, mz + oz + cd / 2], [mx + ox - cw / 2, cy, mz + oz + cd / 2]], CC);
+    }
+
+    // ── Arbres : tronc (cyl) + sphère feuillage ──
+    // positions fixes relatives au centre du terrain, à l'extérieur du poly + marge
+    const treeSeeds = [
+      [-7, -3], [7, -2], [-8, 5], [8, 6], [-6, 11], [7, 13], [-5, 17], [9, 16],
+      [-11, 2], [11, 4], [-10, 10], [10, 10], [-9, 14], [9, 1], [-13, 7], [13, 7],
+      [0, -5], [2, 19], [-3, 20], [4, -4],
+    ];
+    for (const [ox, oz] of treeSeeds) {
+      const tx = mx + ox, tz = mz + oz;
+      // skip si trop proche du terrain
+      if (tx > cx0 - 2 && tx < cx1 + 2 && tz > cz0 - 2 && tz < cz1 + 2) continue;
+      if (tx < GX0 + 1 || tx > GX1 - 1 || tz < GZ0 + 1 || tz > GZ1 - 1) continue;
+      const th = 1.5 + Math.abs(ox * .06);  // hauteur tronc
+      const fr = .82 + Math.abs(oz * .03);   // rayon feuillage
+      // tronc : base au sol (-0.25), sommet à th
+      cyl(b, tx, tz, .09, -.25, th, TR2, TR1, 8);
+      // feuillage : base à th - fr*0.35 pour chevaucher le sommet du tronc
+      // 3 cônes superposés (pins), ou 3 niveaux de disques + manteau conique (feuillu)
+      const fb = th - fr * .28;  // y de la base du feuillage (chevauche le haut du tronc)
+      const lfc = (Math.abs(ox + oz) % 3 === 0) ? LF1 : (Math.abs(ox + oz) % 3 === 1) ? LF2 : LF3;
+      // disque bas large
+      disc(b, tx, tz, fr, () => fb, lfc, 12);
+      // disque milieu
+      disc(b, tx, tz, fr * .72, () => fb + fr * .52, lfc, 10);
+      // disque haut
+      disc(b, tx, tz, fr * .38, () => fb + fr * .92, lfc, 8);
+      // manteau conique : faces latérales reliant chaque anneau — base → milieu, milieu → haut
+      const nk = 10;
+      for (let k = 0; k < nk; k++) {
+        const a = k / nk * 6.2832, d = (k + 1) / nk * 6.2832, m = (a + d) / 2;
+        // niveau bas → milieu
+        face(b, [Math.cos(m), .4, Math.sin(m)],
+          [[tx + Math.cos(a) * fr,        fb,            tz + Math.sin(a) * fr],
+           [tx + Math.cos(d) * fr,        fb,            tz + Math.sin(d) * fr],
+           [tx + Math.cos(d) * fr * .72,  fb + fr * .52, tz + Math.sin(d) * fr * .72],
+           [tx + Math.cos(a) * fr * .72,  fb + fr * .52, tz + Math.sin(a) * fr * .72]], lfc);
+        // niveau milieu → haut
+        face(b, [Math.cos(m), .5, Math.sin(m)],
+          [[tx + Math.cos(a) * fr * .72,  fb + fr * .52, tz + Math.sin(a) * fr * .72],
+           [tx + Math.cos(d) * fr * .72,  fb + fr * .52, tz + Math.sin(d) * fr * .72],
+           [tx + Math.cos(d) * fr * .38,  fb + fr * .92, tz + Math.sin(d) * fr * .38],
+           [tx + Math.cos(a) * fr * .38,  fb + fr * .92, tz + Math.sin(a) * fr * .38]], lfc);
+      }
+      // pointe conique finale
+      for (let k = 0; k < 8; k++) {
+        const a = k / 8 * 6.2832, d = (k + 1) / 8 * 6.2832, m = (a + d) / 2;
+        face(b, [Math.cos(m), .7, Math.sin(m)],
+          [[tx + Math.cos(a) * fr * .38,  fb + fr * .92, tz + Math.sin(a) * fr * .38],
+           [tx + Math.cos(d) * fr * .38,  fb + fr * .92, tz + Math.sin(d) * fr * .38],
+           [tx, fb + fr * 1.38, tz],
+           [tx, fb + fr * 1.38, tz]], lfc);
+      }
+    }
+
+    // ── Buissons (sphère basse) ──
+    const bushSeeds = [[-5, 2], [5, 3], [-4, 8], [5, 9], [-6, 14], [6, 15], [-3, -3], [3, 18]];
+    for (const [ox, oz] of bushSeeds) {
+      const bx0 = mx + ox, bz0 = mz + oz;
+      if (bx0 > cx0 - 1.5 && bx0 < cx1 + 1.5 && bz0 > cz0 - 1.5 && bz0 < cz1 + 1.5) continue;
+      if (bx0 < GX0 + .5 || bx0 > GX1 - .5 || bz0 < GZ0 + .5 || bz0 > GZ1 - .5) continue;
+      const br = .35 + Math.abs(ox * .03);
+      const bc = (Math.abs(ox + oz) & 1) ? LF1 : LF3;
+      disc(b, bx0, bz0, br, () => -.25, bc, 8);
+      disc(b, bx0, bz0, br * .8, () => br * .4 - .25, bc, 8);
+      for (let k = 0; k < 6; k++) {
+        const a = k / 6 * 6.2832, d = (k + 1) / 6 * 6.2832, m = (a + d) / 2;
+        face(b, [Math.cos(m), .5, Math.sin(m)],
+          [[bx0 + Math.cos(a) * br, -.25, bz0 + Math.sin(a) * br],
+           [bx0 + Math.cos(d) * br, -.25, bz0 + Math.sin(d) * br],
+           [bx0 + Math.cos(d) * br * .15, br * .6 - .25, bz0 + Math.sin(d) * br * .15],
+           [bx0 + Math.cos(a) * br * .15, br * .6 - .25, bz0 + Math.sin(a) * br * .15]], bc);
+      }
+    }
+
+    // ── Clôture (piquets + planches) sur le périmètre extérieur ──
+    const FMG = 3.2; // marge depuis le bord du terrain
+    const fenceSeg = (x0f, z0f, x1f, z1f) => {
+      const dx = x1f - x0f, dz = z1f - z0f, len = Math.hypot(dx, dz);
+      const ux = dx / len, uz = dz / len, nStakes = Math.max(2, Math.ceil(len / 1.4));
+      // piquets
+      for (let k = 0; k <= nStakes; k++) {
+        const f = k / nStakes, px = x0f + ux * len * f, pz = z0f + uz * len * f;
+        box(b, px - .025, -.25, pz - .025, px + .025, .6, pz + .025, FNC, FNC);
+      }
+      // 2 planches horizontales (bas à y=0.1, haut à y=0.4)
+      const nxf = uz, nzf = -ux;  // normale de la planche (perpendiculaire au segment, dans le plan XZ)
+      const off = .015;            // léger décalage pour éviter le z-fighting avec les piquets
+      const ph = .08;              // épaisseur planche
+      for (const py of [0.1, 0.38]) {
+        const ox = nxf * off, ozz = nzf * off;
+        // face avant
+        face(b, [nxf, 0, nzf],
+          [[x0f + ox, py,      z0f + ozz],
+           [x1f + ox, py,      z1f + ozz],
+           [x1f + ox, py + ph, z1f + ozz],
+           [x0f + ox, py + ph, z0f + ozz]], FNC);
+        // face arrière
+        face(b, [-nxf, 0, -nzf],
+          [[x0f - ox, py,      z0f - ozz],
+           [x1f - ox, py,      z1f - ozz],
+           [x1f - ox, py + ph, z1f - ozz],
+           [x0f - ox, py + ph, z0f - ozz]], FNC);
+        // face dessus
+        face(b, [0, 1, 0],
+          [[x0f - ox, py + ph, z0f - ozz],
+           [x1f - ox, py + ph, z1f - ozz],
+           [x1f + ox, py + ph, z1f + ozz],
+           [x0f + ox, py + ph, z0f + ozz]], FNC);
+      }
+    };
+    // Clôture sur 4 côtés de la boîte autour du terrain
+    const fx0 = cx0 - FMG, fx1 = cx1 + FMG, fz0 = cz0 - FMG, fz1 = cz1 + FMG;
+    fenceSeg(fx0, fz0, fx1, fz0);
+    fenceSeg(fx1, fz0, fx1, fz1);
+    fenceSeg(fx1, fz1, fx0, fz1);
+    fenceSeg(fx0, fz1, fx0, fz0);
+
+    // ── Pierres décoratives ──
+    const stoneSeeds = [[-9, 3], [9, 8], [-7, 12], [8, 2]];
+    for (const [ox, oz] of stoneSeeds) {
+      const sx0 = mx + ox, sz0 = mz + oz;
+      if (sx0 > cx0 - 1 && sx0 < cx1 + 1 && sz0 > cz0 - 1 && sz0 < cz1 + 1) continue;
+      const sw = .3 + Math.abs(ox * .02), sh = .18 + Math.abs(oz * .01), sd = .25 + Math.abs((ox + oz) * .01);
+      box(b, sx0 - sw / 2, -.25, sz0 - sd / 2, sx0 + sw / 2, sh - .25, sz0 + sd / 2, ST1, ST2);
+    }
+
+    return { decor: fin(b), sky: fin(sky) };
+  }
   const B = () => ({ v: [], i: [], n: 0 }), fin = (b) => ({ v: new Float32Array(b.v), i: new Uint16Array(b.i) });
   function face(b, n, ps, c, m = 0) { ps.forEach((p, i) => { const q = typeof c[0] === 'number' ? c : c[i]; b.v.push(p[0], p[1], p[2], n[0], n[1], n[2], q[0], q[1], q[2], m); }); const k = b.n; b.i.push(k, k + 1, k + 2, k, k + 2, k + 3); b.n += 4; }
   function box(b, x0, y0, z0, x1, y1, z1, ct, cs, ce) {
@@ -238,25 +425,31 @@
       const Rn = {
         get lost() { return lost; },
         load(h) {
-          if (cur) for (const m of [cur.m, cur.r, cur.f, cur.s]) { all.splice(all.indexOf(m), 1); gl.deleteBuffer(m.b); gl.deleteBuffer(m.e); }
-          const d = build(h), fl = flow(h); cur = { m: mk(d.m), r: mk(d.r), f: mk(fl.plate), s: mk({ v: fl.sv, i: fl.si }), h, parts: fl.parts, cup: [h.cup[0], h.cup[1], M.physics.CUP_R, h.cupY] };
+          if (cur) for (const m of [cur.m, cur.r, cur.f, cur.s, cur.dc, cur.sk]) { if (!m) continue; all.splice(all.indexOf(m), 1); gl.deleteBuffer(m.b); gl.deleteBuffer(m.e); }
+          const d = build(h), fl = flow(h), deco = buildDecor(h);
+          cur = { m: mk(d.m), r: mk(d.r), f: mk(fl.plate), s: mk({ v: fl.sv, i: fl.si }), dc: mk(deco.decor), sk: mk(deco.sky), h, parts: fl.parts, cup: [h.cup[0], h.cup[1], M.physics.CUP_R, h.cupY] };
         },
         resize() { const d = Math.min(window.devicePixelRatio || 1, 2); cv.width = Math.max(2, Math.round(cv.clientWidth * d)); cv.height = Math.max(2, Math.round(cv.clientHeight * d)); },
         /** S = { x,y,z (balle), cam (yaw), aim, arrow, shadow, gy } */
         frame(S) {
           if (lost || !cur) return;
-          gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(.07, .11, .09, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(.42, .68, .88, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           const asp = cv.width / cv.height, fov = asp < 1.3 ? Math.min(2, 2 * Math.atan(Math.tan(.45) * 1.3 / asp)) : .9, pit = .5, D = 5, dx = Math.sin(S.cam), dz = Math.cos(S.cam);
           const eye = [S.x - dx * D * Math.cos(pit), S.y + D * Math.sin(pit), S.z - dz * D * Math.cos(pit)], tg = [S.x + dx * 1.2, S.y, S.z + dz * 1.2];
           const now = performance.now(), dt = Math.min(.05, (now - lt) / 1000), vp = mul(persp(fov, asp, .1, 200), look(eye, tg)); lt = now;
           gl.useProgram(pm); gl.uniformMatrix4fv(u.uVP, false, vp); gl.uniform3fv(u.uEye, eye);
+          // dôme ciel (sans depth write, dessiné en premier)
+          gl.depthMask(false); draw(cur.sk, [0, 0, 0], [1, 1, 1], 0); gl.depthMask(true);
+          // décor (sol herbe, arbres, clôture, pierres)
+          draw(cur.dc, [0, 0, 0], [1, 1, 1], 0);
           draw(cur.m, [0, 0, 0], [1, 1, 1], 0, cur.cup);
           gl.useProgram(pf); gl.uniformMatrix4fv(uf.uVP, false, vp); gl.uniform1f(uf.uT, (now / 1000) % 1000); drawFx(cur.f); gl.useProgram(pm);
           gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -2); draw(cur.r, [0, 0, 0], [1, 1, 1], 0);
-          if (S.shadow && isFinite(S.gy)) draw(shadow, [S.x, S.gy + .003, S.z], [.055, 1, .055], 0);
+          if (isFinite(S.gy)) draw(shadow, [S.x, S.gy + .003, S.z], [.055, 1, .055], 0);
           if (S.arrow && isFinite(S.gy)) draw(arrow, [S.x, S.gy + .05, S.z], [1, 1, 1], S.aim);
           gl.disable(gl.POLYGON_OFFSET_FILL);
           for (const o of S.others || []) draw(ball, [o.x, o.y, o.z], [.05, .05, .05], 0, null, o.c);
+          for (const o of S.others || []) { const ogy = isFinite(o.gy) ? o.gy : o.y - .05; draw(shadow, [o.x, ogy + .003, o.z], [.055, 1, .055], 0); }
           draw(ball, [S.x, S.y, S.z], [.05, .05, .05], 0, null, S.tint);
           if (cur.parts.length) {
             flowStep(cur.h, cur.parts, cur.s.v, dt, eye);

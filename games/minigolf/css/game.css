@@ -732,6 +732,81 @@ button {
     font-size: 18px;
 }
 
+#rMapPick {
+    margin: 8px 0 10px;
+    width: 100%;
+}
+
+.rpick-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--ui-pale);
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.rank-maps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 6px;
+    max-height: 140px;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.rmap-btn {
+    display: flex !important;
+    width: 100% !important;
+    margin: 0 !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px !important;
+    padding: 6px 4px !important;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .05) !important;
+    border: 1px solid rgba(255, 255, 255, .12) !important;
+    box-shadow: none !important;
+    color: var(--ui-pale) !important;
+    font-size: 13px !important;
+    font-weight: 600;
+    cursor: pointer;
+    transform: none !important;
+    transition: background .15s, border-color .15s, color .15s;
+}
+
+.rmap-btn:hover:not(:disabled) {
+    background: rgba(227, 176, 98, .12) !important;
+    border-color: rgba(227, 176, 98, .4) !important;
+    color: var(--ui-text) !important;
+    transform: translateY(-1px) !important;
+}
+
+.rmap-btn:active:not(:disabled) {
+    transform: translateY(0) !important;
+}
+
+.rmap-btn.on {
+    background: rgba(227, 176, 98, .22) !important;
+    border-color: var(--ui-accent) !important;
+    color: var(--ui-accent) !important;
+    font-weight: 700;
+}
+
+.rmap-btn.lock {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.rmap-btn > span {
+    font-size: 11px;
+    opacity: .75;
+    font-weight: 400;
+}
+
 .card button:disabled {
     opacity: .55;
     cursor: not-allowed;

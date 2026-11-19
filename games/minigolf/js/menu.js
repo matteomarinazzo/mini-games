@@ -2,7 +2,7 @@
 (function () {
   const M = window.Minigolf, N = M.net, C = M.career, $ = (s) => document.querySelector(s), HN = (id) => M.maps[id].holes.length;
   const cfg = N.read() || N.defaults, isOpen = (m) => C.status(m.id).open, pick0 = (id) => M.maps[id] && M.mapList.some((m) => m.id === id && isOpen(m)) ? id : 'garden';
-  let mapId = pick0(cfg.mapId), imap = mapId, rmap = mapId, aiN = cfg.aiCount, players = cfg.maxPlayers, fill = cfg.fillWithAI, tab = 'create';
+  let mapId = pick0(cfg.mapId), imap = mapId, rmap = mapId, aiN = cfg.aiCount, tab = 'create', waitAiCount = 0;
   let cur = null, unsub = null, hb = null, redirecting = false, busy = false, roomData = null;
 
   function show(v) {
@@ -39,12 +39,10 @@
 
   // ── Multijoueur : flux de room (créer, rejoindre, salle d’attente, présence, quitter, reconnexion) ──
   function multi() {
-    maps($('#rmaps'), rmap, (id) => { rmap = id; multi(); }); seg($('#pl'), players); $('#ai').checked = fill;
+    maps($('#rmaps'), rmap, (id) => { rmap = id; multi(); });
     $('#rcreate').hidden = tab !== 'create'; $('#rjoin').hidden = tab !== 'join';
     for (const b of $('#rtabs').children) b.classList.toggle('on', b.dataset.t === tab);
   }
-  for (const b of $('#pl').children) b.onclick = () => { players = +b.dataset.n; multi(); };
-  $('#ai').onchange = (e) => { fill = e.target.checked; };
   for (const b of $('#rtabs').children) b.onclick = () => { tab = b.dataset.t; multi(); };
   $('#jcode').oninput = (e) => { e.target.value = N.code(e.target.value); };
 
@@ -66,7 +64,7 @@
       let made = null;
       for (let i = 0; i < 3 && !made; i++) {
         const c = N.genCode();
-        const ok = await N.F.fb.createRoom(N.gameIdOf(c), { code: c, state: 'waiting', mapId: rmap, maxPlayers: players, fillWithAI: fill, leaderId: N.F.uid, createdAt: N.ts(), players: { [N.F.uid]: newPlayer(nm) } });
+        const ok = await N.F.fb.createRoom(N.gameIdOf(c), { code: c, state: 'waiting', mapId: rmap, maxPlayers: 8, fillWithAI: false, aiCount: 0, leaderId: N.F.uid, createdAt: N.ts(), players: { [N.F.uid]: newPlayer(nm) } });
         if (ok) made = c;
       }
       if (!made) throw new Error('createRoom');
@@ -88,7 +86,7 @@
       if (d.players && d.players[N.F.uid]) { await rejoin(code, d); st(''); return; }
       if (N.isDead(d)) { await N.F.fb.deleteRoom(id); st('Room introuvable.'); return; }
       if (d.state !== 'waiting') { st('La partie a déjà commencé.'); return; }
-      if (Object.keys(d.players || {}).length >= (d.maxPlayers || 4)) { st(`Room pleine (${d.maxPlayers || 4} joueurs).`); return; }
+      if (Object.keys(d.players || {}).length >= (d.maxPlayers || 8)) { st(`Room pleine (${d.maxPlayers || 8} joueurs).`); return; }
       const r = await N.F.fb.joinRoom(id, newPlayer(nm));
       if (r !== true) { console.warn('joinRoom', r); st('Impossible de rejoindre.'); return; }
       st(''); enter(code);
@@ -120,7 +118,7 @@
   }
   function reset(m) {
     if (unsub) unsub(); unsub = null; clearInterval(hb);
-    cur = null; roomData = null; N.clearSavedRoom(); show('multi'); st(m || '');
+    cur = null; roomData = null; waitAiCount = 0; N.clearSavedRoom(); show('multi'); st(m || '');
   }
   function go2(code, d) {
     if (redirecting) return; redirecting = true;
@@ -132,36 +130,74 @@
     if (code !== cur || redirecting) return;
     if (!d || !d.players || !d.players[N.F.uid]) { reset(d ? 'Tu as quitté la room.' : 'La room a été fermée.'); return; }
     roomData = d;
+    if (d.aiCount !== undefined && N.hostOf(d) !== N.F.uid) waitAiCount = d.aiCount;
     if (d.state === 'playing' && d.seats) { go2(code, d); return; }   // la room est prête : l’hôte a lancé
     showWait();
   }
   function showWait() {
     const d = roomData; if (!d) return;
     show('wait'); $('#wcode').textContent = cur;
-    const max = d.maxPlayers || 2, mp = M.maps[d.mapId];
-    $('#wmode').textContent = `${mp ? mp.name : 'Le jardin'} · ${max} joueurs max${d.fillWithAI ? ' · IA pour compléter' : ''}`;
-    const hum = N.order(d), chips = hum.map(([u, p]) => {
+    const mp = M.maps[d.mapId];
+    $('#wmode').textContent = `${mp ? mp.name : 'Le jardin'} · jusqu'` + "'" + `à 8 joueurs`;
+    const hum = N.order(d);
+    const isHost = N.hostOf(d) === N.F.uid;
+    const present = hum.filter(([u, p]) => u === N.F.uid || N.isPresent(p)).length;
+    const maxAi = Math.max(0, 8 - hum.length);
+    waitAiCount = Math.min(waitAiCount, maxAi);
+    const chips = hum.map(([u, p]) => {
       const c = document.createElement('div');
       c.className = 'chip' + (u === N.F.uid ? ' me' : '') + (u !== N.F.uid && !N.isPresent(p) ? ' off' : '');
-      c.textContent = (p.name || 'Joueur') + (u === d.leaderId ? ' ★' : '') + (u === N.F.uid ? ' (toi)' : '');
+      c.textContent = (p.name || 'Joueur') + (u === d.leaderId ? ' \u2605' : '') + (u === N.F.uid ? ' (toi)' : '');
       return c;
     });
-    if (d.fillWithAI) for (let i = hum.length; i < max; i++) { const c = document.createElement('div'); c.className = 'chip off'; c.textContent = 'IA'; chips.push(c); }
+    for (let i = 0; i < waitAiCount; i++) {
+      const c = document.createElement('div');
+      c.className = 'chip chip-ia';
+      c.textContent = 'IA ' + (i + 1);
+      chips.push(c);
+    }
     $('#chips').replaceChildren(...chips);
-    const present = hum.filter(([u, p]) => u === N.F.uid || N.isPresent(p)).length, host = N.hostOf(d) === N.F.uid, total = d.fillWithAI ? max : present;
-    $('#startBtn').hidden = !host; $('#startBtn').disabled = total < 2;
-    $('#whint').textContent = `${present} joueur${present > 1 ? 's' : ''} présent${present > 1 ? 's' : ''} (2 à ${max}). ` + (host ? (total < 2 ? 'Attends au moins un autre joueur, ou coche « Remplir avec des IA ».' : 'Tu peux lancer la partie.') : 'L’hôte lance la partie.');
+    const iaRow = $('#iaRow'); iaRow.hidden = !isHost;
+    if (isHost) {
+      $('#iaCount').textContent = waitAiCount + ' IA';
+      $('#iaMinus').disabled = waitAiCount <= 0;
+      $('#iaPlus').disabled = waitAiCount >= maxAi;
+    }
+    const total = present + waitAiCount;
+    $('#startBtn').hidden = !isHost;
+    $('#startBtn').disabled = total < 2;
+    $('#whint').textContent = `${present} joueur${present > 1 ? 's' : ''} présent${present > 1 ? 's' : ''} (max 8). ` +
+      (isHost ? (total < 2 ? 'Ajoute des IA ou attends un autre joueur.' : 'Tu peux lancer la partie.') : 'L\u2019h\u00f4te lance la partie.');
+
   }
   setInterval(() => { if (roomData && !$('#v-wait').hidden) showWait(); }, 5000);
+
+  $('#iaPlus').onclick = async () => {
+    if (!cur || !roomData || N.hostOf(roomData) !== N.F.uid) return;
+    const hum = N.order(roomData);
+    const maxAi = Math.max(0, 8 - hum.length);
+    if (waitAiCount >= maxAi) return;
+    waitAiCount++;
+    showWait();
+    try { await N.F.fb.updateRoom(N.gameIdOf(cur), { aiCount: waitAiCount }); } catch (e) {}
+  };
+  $('#iaMinus').onclick = async () => {
+    if (!cur || !roomData || N.hostOf(roomData) !== N.F.uid) return;
+    if (waitAiCount <= 0) return;
+    waitAiCount--;
+    showWait();
+    try { await N.F.fb.updateRoom(N.gameIdOf(cur), { aiCount: waitAiCount }); } catch (e) {}
+  };
 
   $('#startBtn').onclick = async () => {
     if (busy || !cur) return; busy = true;
     try {
       const id = N.gameIdOf(cur), d = await N.F.fb.getRoom(id);
       if (!d || d.state !== 'waiting' || N.hostOf(d) !== N.F.uid) return;
-      const ps = N.order(d), max = d.maxPlayers || 2, keep = ps.filter(([u, p]) => u === N.F.uid || N.isPresent(p)).map((x) => x[0]).sort((a, b) => (b === N.F.uid) - (a === N.F.uid)).slice(0, max);   // l’hôte qui lance = siège 0 = balle blanche
+      const ps = N.order(d), max = d.maxPlayers || 8, keep = ps.filter(([u, p]) => u === N.F.uid || N.isPresent(p)).map((x) => x[0]).sort((a, b) => (b === N.F.uid) - (a === N.F.uid)).slice(0, max);   // l’hôte qui lance = siège 0 = balle blanche
       const seats = keep.map((u) => ({ u, n: d.players[u].name || 'Joueur' }));
-      if (d.fillWithAI) for (let i = 1; seats.length < max; i++) seats.push({ u: '', n: 'IA ' + i });
+      const aiCount = Math.min(Math.max(0, d.aiCount !== undefined ? d.aiCount : waitAiCount), max - seats.length);
+      for (let i = 1; i <= aiCount; i++) seats.push({ u: '', n: 'IA ' + i });
       if (seats.length < 2) return;   // room pas prête : rien n’est lancé
       const up = { state: 'playing', leaderId: N.F.uid, seats };
       ps.forEach(([x]) => { if (!keep.includes(x)) up[`players/${x}`] = null; });

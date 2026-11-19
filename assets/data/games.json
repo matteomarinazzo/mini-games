@@ -677,7 +677,24 @@
       "path": "./games/minigolf/index.html",
       "name": "Minigolf 3D",
       "emoji": "⛳",
-      "description": "Minigolf en 3D : 12 maps variées. Seul, contre des IA ou en ligne jusqu'à 4 joueurs.",
+      "description": "Minigolf en 3D : 12 maps variées. Seul, contre des IA ou en ligne jusqu'à 8 joueurs.",
+      "tags": [
+        "sports",
+        "physics",
+        "precision",
+        "solo",
+        "multiplayer"
+      ],
+      "badge": "fun",
+      "badgeText": "Fun !",
+      "rating": "0",
+      "stars": "☆☆☆☆☆"
+    },
+    "golf": {
+      "path": "./games/golf/index.html",
+      "name": "Golf 3D",
+      "emoji": "⛳",
+      "description": "Minigolf en 3D : 12 maps variées. Seul, contre des IA ou en ligne jusqu'à 8 joueurs.",
       "tags": [
         "sports",
         "physics",

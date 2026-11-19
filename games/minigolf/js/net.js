@@ -2,13 +2,13 @@
 // Rooms : rooms/minigolf_<CODE> (préfixe propre au jeu, les autres jeux ne sont pas touchés). Les chemins d'import sont ceux de l'exemple.
 (function () {
   const M = window.Minigolf = window.Minigolf || {}, K = 'minigolf/config';
-  const D = { mode: 'solo', mapId: 'garden', aiCount: 1, roomCode: '', maxPlayers: 2, fillWithAI: false, resume: false };
+  const D = { mode: 'solo', mapId: 'garden', aiCount: 1, roomCode: '', maxPlayers: 8, fillWithAI: false, resume: false };
   const AL = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const code = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
   const norm = (o) => ({
     mode: o.mode === 'multi' || o.mode === 'ia' ? o.mode : 'solo', mapId: typeof o.mapId === 'string' ? o.mapId : D.mapId,
-    aiCount: Math.max(1, Math.min(3, parseInt(o.aiCount, 10) || 1)), roomCode: code(o.roomCode),
-    maxPlayers: Math.max(2, Math.min(4, parseInt(o.maxPlayers, 10) || 2)), fillWithAI: o.fillWithAI === true, resume: o.resume === true,
+    aiCount: Math.max(1, Math.min(7, parseInt(o.aiCount, 10) || 1)), roomCode: code(o.roomCode),
+    maxPlayers: Math.max(2, Math.min(8, parseInt(o.maxPlayers, 10) || 8)), fillWithAI: o.fillWithAI === true, resume: o.resume === true,
   });
 
   const PREFIX = 'minigolf_', SAVED = 'minigolf_room', NAME_KEY = 'mg_player_name', HB = 10000, OFF = 35000, DEAD = 5 * 60 * 1000;

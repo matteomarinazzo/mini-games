@@ -1,7 +1,14 @@
 {
-    "currentVersion": "1.63.2026-11-18",
-    "lastUpdate": "2026-11-18",
+    "currentVersion": "1.64.2026-11-19",
+    "lastUpdate": "2026-11-19",
     "history": [
+        {
+            "version": "1.64.2026-11-19",
+            "date": "2026-11-19",
+            "changes": [
+                "AYOR monde 2 : ajout des 8 premiers niveaux"
+            ]
+        },
         {
             "version": "1.63.2026-11-18",
             "date": "2026-11-18",

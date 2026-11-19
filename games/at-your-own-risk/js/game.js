@@ -7,6 +7,7 @@ const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d'), W = 800, H = 600, PW = 26, PH = 32;
 let n = Math.max(1, Math.min(COUNT, +new URLSearchParams(location.search).get('level') || 1));
 
+// TODO : Supprimer commentaires dans version en PROD
 if (!unlocked(n)) { // niveau verrouillé ou monde non publié : retour au menu
     //location.replace('index.html');
     //await new Promise(() => { });

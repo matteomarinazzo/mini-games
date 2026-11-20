@@ -140,10 +140,6 @@
                 <div id="rcreate">
                     <label>Map</label>
                     <div class="maps" id="rmaps"></div>
-                    <label>Joueurs</label>
-                    <div class="seg" id="pl"><button type="button" data-n="2">2</button><button type="button"
-                            data-n="3">3</button><button type="button" data-n="4">4</button></div>
-                    <label class="chk"><input type="checkbox" id="ai"> Remplir avec des IA</label>
                     <div class="bar"><button class="big" id="createBtn" type="button">Créer la room</button></div>
                 </div>
                 <div id="rjoin" hidden>
@@ -160,6 +156,11 @@
                 <div class="code" id="wcode">—</div>
                 <button class="big alt" id="copyBtn" type="button">Copier le code</button>
                 <div class="chips" id="chips"></div>
+                <div class="ia-row" id="iaRow" hidden>
+                    <span id="iaCount">0 IA</span>
+                    <button type="button" id="iaMinus" class="ia-btn">– IA</button>
+                    <button type="button" id="iaPlus" class="ia-btn">+ IA</button>
+                </div>
                 <p class="hint" id="whint"></p>
                 <button class="big" id="startBtn" type="button" hidden>Lancer la partie</button>
                 <button class="big alt" id="leaveBtn" type="button">Quitter la room</button>

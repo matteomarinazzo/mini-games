@@ -34,7 +34,7 @@
       const P = M.physics, h = world.hole, cup = h.cup, t0 = performance.now(), all = [], ia = world.balls.indexOf(ball), obs = world.balls.filter((x) => x !== ball).map((x) => ({ x: x.x, z: x.z }));
       const ev = (yaw, pw) => {
         pw = Math.max(8, Math.min(100, pw));
-        const bs = world.balls.map((x) => Object.assign({}, x)), b = bs[ia], w = { hole: h, balls: bs, acc: 0 }; P.hit(b, yaw, pw);   // toutes les balles : elles se percutent
+        const bs = world.balls.map((x) => Object.assign({}, x)), b = bs[ia], w = { hole: Object.assign({}, h), balls: bs, acc: 0 }; P.hit(b, yaw, pw);   // toutes les balles : elles se percutent
         for (let i = 0; i < 80 && !bs.every((x) => x.rest || x.sunk); i++) P.step(w, 1 / 6);
         const d = Math.hypot(b.x - cup[0], b.z - cup[1]);
         const c = { yaw, pw, s: b.sunk ? -1 : b.oob ? 50 + d : d + (lineOk(h, obs, [b.x, b.z], cup) ? 0 : 1.2) };   // arrêt sans ligne vers la coupe = pénalisé

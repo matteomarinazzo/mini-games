@@ -2,9 +2,11 @@
 // La coupe : feutre percé par discard dans le cylindre (uCup), paroi + fond en géométrie, bord clair en maillage à part.
 (function () {
   const M = window.Minigolf = window.Minigolf || {};
-  const VS = 'attribute vec3 aP;attribute vec3 aN;attribute vec3 aC;attribute float aM;uniform mat4 uVP;uniform vec3 uOff;uniform vec3 uSc;uniform vec2 uRot;uniform vec3 uMul;varying vec3 vC;varying vec3 vN;varying vec3 vW;varying float vM;' +
-    'void main(){vec3 p=aP*uSc,n=aN;p=vec3(uRot.x*p.x+uRot.y*p.z,p.y,uRot.x*p.z-uRot.y*p.x);n=vec3(uRot.x*n.x+uRot.y*n.z,n.y,uRot.x*n.z-uRot.y*n.x);vec3 w=p+uOff;' +
-    'float d=max(dot(n,normalize(vec3(.4,.8,.3))),0.);vC=aC*uMul*(.5+.62*d);vN=n;vW=w;vM=aM;gl_Position=uVP*vec4(w,1.);}';
+  const VS = 'attribute vec3 aP;attribute vec3 aN;attribute vec3 aC;attribute float aM;uniform mat4 uVP;uniform vec3 uOff;uniform vec3 uSc;uniform vec2 uRot;uniform vec2 uRotZ;uniform vec3 uMul;varying vec3 vC;varying vec3 vN;varying vec3 vW;varying float vM;' +
+    'void main(){vec3 p=aP*uSc,n=aN;' +
+    'p=vec3(uRotZ.x*p.x-uRotZ.y*p.y, uRotZ.y*p.x+uRotZ.x*p.y, p.z);n=vec3(uRotZ.x*n.x-uRotZ.y*n.y, uRotZ.y*n.x+uRotZ.x*n.y, n.z);' +
+    'p=vec3(uRot.x*p.x+uRot.y*p.z, p.y, uRot.x*p.z-uRot.y*p.x);n=vec3(uRot.x*n.x+uRot.y*n.z, n.y, uRot.x*n.z-uRot.y*n.x);' +
+    'vec3 w=p+uOff;float d=max(dot(n,normalize(vec3(.4,.8,.3))),0.);vC=aC*uMul*(.5+.62*d);vN=n;vW=w;vM=aM;gl_Position=uVP*vec4(w,1.);}';
   // uCup = (x, z, rayon, y du feutre) : le feutre est percé (discard) dans le cylindre de la coupe ; rayon 0 = pas de trou. vM : 1 feutre, 3 balle.
   const FS = '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n' +
     'varying vec3 vC;varying vec3 vN;varying vec3 vW;varying float vM;uniform vec4 uCup;uniform vec3 uEye;' +
@@ -29,6 +31,8 @@
   const SAND = [.78, .66, .42], SAND2 = [.74, .62, .38], ICE = [.74, .86, .9], ICE2 = [.68, .8, .86], BO1 = [.88, .55, .18], BO2 = [.7, .4, .12], PAD = [.93, .9, .8], WI1 = [.5, .66, .64], WI2 = [.44, .6, .58], WATER = [.16, .34, .46],
     PADA = [.5, .84, 1], PADB = [.1, .17, .42], PADF = [.92, .94, .96], BUMP = [.62, .2, .16], BUMPC = [.95, .9, .82], PCOL = [[.88, .5, .15], [.4, .62, .78], [.8, .72, .3], [.62, .38, .62]];
   const FELT = [.16, .45, .25], FELT2 = [.14, .41, .23], WT = [.62, .42, .22], WS = [.45, .28, .14], WE = [.3, .18, .09], RIM = [.92, .9, .82];
+  const CURB = [.78, .60, .36], CURBS = [.55, .38, .20];   // bordure basse en biseau (bois clair biseauté)
+  const MW1 = [.36, .22, .10], MW2 = [.66, .46, .24], MW3 = [.82, .65, .36];   // moulin : bois sombre / bois moyen / nervure claire
   // ── Décor ──
   const GR1 = [.22, .48, .18], GR2 = [.18, .42, .15], GR3 = [.26, .52, .20]; // herbe
   const TR1 = [.38, .24, .10], TR2 = [.30, .18, .08];                         // tronc
@@ -295,23 +299,71 @@
       face(b, [0, 0, -1], [[x0, 0, z0], [x1, 0, z0], T[1], T[0]], WS); face(b, [0, 0, 1], [[x0, 0, z1], [x1, 0, z1], T[2], T[3]], WS);
       face(b, [-1, 0, 0], [[x0, 0, z0], [x0, 0, z1], T[3], T[0]], WS); face(b, [1, 0, 0], [[x1, 0, z0], [x1, 0, z1], T[2], T[1]], WS);
     }
+    const isCurbMatch = (ux, uz, emx, emz, c) => {
+      if (!inR(emx, emz, c)) return false;
+      if (c[2] > c[3] * 1.5 && Math.abs(ux) < .5) return false;
+      if (c[3] > c[2] * 1.5 && Math.abs(uz) < .5) return false;
+      return true;
+    };
     for (const e of h.bsegs) {   // bordures : arêtes à sommet en pente continue (pas d'escalier)
       const t = .12, X = (u, o) => [e.a[0] + e.u[0] * u + e.o[0] * o, e.a[1] + e.u[1] * u + e.o[1] * o], V = (p, y) => [p[0], y, p[1]];
-      const piece = (u0, y0, u1, y1, cA, cB) => {
+      const piece = (u0, y0, u1, y1, cA, cB, isFirst, isLast, isCurbChunk) => {
         const p0 = X(u0, 0), p1 = X(u1, 0), q1 = X(u1, t), q0 = X(u0, t), s = (y1 - y0) / (u1 - u0 || 1), l = Math.hypot(s, 1);
+        if (isCurbChunk) {
+          const cw = .16;
+          let p0c = X(u0, t - cw), p1c = X(u1, t - cw);
+          let q0c = X(u0, t), q1c = X(u1, t);
+          let capA = cA || (isFirst && !e.curbCornerA), capB = cB || (isLast && !e.curbCornerB);
+          if (isFirst && e.curbCornerA) {
+            p0c = [p0c[0] + e.u[0] * (cw - t), p0c[1] + e.u[1] * (cw - t)];
+            q0c = [q0c[0] - e.u[0] * e.ea, q0c[1] - e.u[1] * e.ea];
+            capA = false;
+          }
+          if (isLast && e.curbCornerB) {
+            p1c = [p1c[0] - e.u[0] * (cw - t), p1c[1] - e.u[1] * (cw - t)];
+            q1c = [q1c[0] + e.u[0] * e.eb, q1c[1] + e.u[1] * e.eb];
+            capB = false;
+          }
+          const gy0 = Math.max(0, h.Gb(p0c[0], p0c[1])), gy1 = Math.max(0, h.Gb(p1c[0], p1c[1]));
+          const cy0 = gy0 + .065, cy1 = gy1 + .065;
+          const ny = cw / Math.hypot(cw, .065), no = -.065 / Math.hypot(cw, .065);
+          face(b, [no * e.o[0] - s * e.u[0] / l * .2, ny, no * e.o[1] - s * e.u[1] / l * .2], [V(p0c, gy0), V(p1c, gy1), V(q1c, cy1), V(q0c, cy0)], CURB);
+          face(b, [e.o[0], 0, e.o[1]], [V(q0c, 0), V(q1c, 0), V(q1c, cy1), V(q0c, cy0)], CURBS);
+          if (capA) face(b, [-e.u[0], 0, -e.u[1]], [V(p0c, 0), V(q0c, 0), V(q0c, cy0), V(p0c, gy0)], CURBS);
+          if (capB) face(b, [e.u[0], 0, e.u[1]], [V(p1c, 0), V(q1c, 0), V(q1c, cy1), V(p1c, gy1)], CURBS);
+          return;
+        }
         face(b, [-s * e.u[0] / l, 1 / l, -s * e.u[1] / l], [V(p0, y0), V(p1, y1), V(q1, y1), V(q0, y0)], WT);
         face(b, [-e.o[0], 0, -e.o[1]], [V(p0, 0), V(p1, 0), V(p1, y1), V(p0, y0)], WS); face(b, [e.o[0], 0, e.o[1]], [V(q0, 0), V(q1, 0), V(q1, y1), V(q0, y0)], WS);
         if (cA) face(b, [-e.u[0], 0, -e.u[1]], [V(p0, 0), V(q0, 0), V(q0, y0), V(p0, y0)], WS); if (cB) face(b, [e.u[0], 0, e.u[1]], [V(p1, 0), V(q1, 0), V(q1, y1), V(p1, y1)], WS);
       }, m = e.hs.length - 1;
-      if (e.ea) piece(-e.ea, e.hs[0], 0, e.hs[0], true, false); if (e.eb) piece(e.L, e.hs[m], e.L + e.eb, e.hs[m], false, true);
-      for (let j = 0; j < m;) { const sl = e.hs[j + 1] - e.hs[j]; let k = j + 1; while (k < m && Math.abs(e.hs[k + 1] - e.hs[k] - sl) < 1e-4) k++; piece(j / m * e.L, e.hs[j], k / m * e.L, e.hs[k], j === 0 && !e.ea, k === m && !e.eb); j = k; }
+      const curbSlice = [], gapSlice = [];
+      for (let k = 0; k < m; k++) {
+        const smx = e.a[0] + e.u[0] * (k + .5) / m * e.L, smz = e.a[1] + e.u[1] * (k + .5) / m * e.L;
+        curbSlice.push((e.curbs || []).some((c) => isCurbMatch(e.u[0], e.u[1], smx, smz, c)));
+        gapSlice.push((e.gaps || []).some((g) => inR(smx, smz, g)));
+      }
+      if (e.ea && !curbSlice[0]) piece(-e.ea, e.hs[0], 0, e.hs[0], true, false, false, false, false);
+      if (e.eb && !curbSlice[m - 1]) piece(e.L, e.hs[m], e.L + e.eb, e.hs[m], false, true, false, false, false);
+      for (let j = 0; j < m;) {
+        const sl = e.hs[j + 1] - e.hs[j];
+        let k = j + 1;
+        while (k < m && Math.abs(e.hs[k + 1] - e.hs[k] - sl) < 1e-4 && curbSlice[k] === curbSlice[j] && gapSlice[k] === gapSlice[j]) k++;
+        if (!gapSlice[j]) {
+          const isFirst = j === 0, isLast = k === m;
+          const cA = j > 0 || (isFirst && !e.ea), cB = k < m || (isLast && !e.eb);
+          piece(j / m * e.L, e.hs[j], k / m * e.L, e.hs[k], cA, cB, isFirst, isLast, curbSlice[j]);
+        }
+        j = k;
+      }
     }
     for (const q of h.dw) if (!q.bd) {   // murs obliques libres : prisme orienté
       const vx = -q.uz, vz = q.ux, P = (a, c) => [q.x + q.ux * a + vx * c, q.z + q.uz * a + vz * c], hl = q.l / 2, ht = q.t / 2, y0 = q.y0 || 0, c4 = [P(-hl, -ht), P(hl, -ht), P(hl, ht), P(-hl, ht)];
-      face(b, [0, 1, 0], c4.map((p) => [p[0], q.h, p[1]]), WT);
-      for (let i = 0; i < 4; i++) { const p = c4[i], s = c4[(i + 1) % 4], n = [[-vx, 0, -vz], [q.ux, 0, q.uz], [vx, 0, vz], [-q.ux, 0, -q.uz]][i]; face(b, n, [[p[0], y0, p[1]], [s[0], y0, s[1]], [s[0], q.h, s[1]], [p[0], q.h, p[1]]], WS); }
+      const tc = q.curb ? CURB : WT, sc = q.curb ? CURBS : WS;
+      face(b, [0, 1, 0], c4.map((p) => [p[0], q.h, p[1]]), tc);
+      for (let i = 0; i < 4; i++) { const p = c4[i], s = c4[(i + 1) % 4], n = [[-vx, 0, -vz], [q.ux, 0, q.uz], [vx, 0, vz], [-q.ux, 0, -q.uz]][i]; face(b, n, [[p[0], y0, p[1]], [s[0], y0, s[1]], [s[0], q.h, s[1]], [p[0], q.h, p[1]]], sc); }
     }
-    for (const w of h.walls) if (!w.bd) box(b, w[0] - w[2] / 2, w[5] || 0, w[1] - w[3] / 2, w[0] + w[2] / 2, w[4], w[1] + w[3] / 2, WT, WS, WE);
+    for (const w of h.walls) if (!w.bd) { const c = w.curb; box(b, w[0] - w[2] / 2, w[5] || 0, w[1] - w[3] / 2, w[0] + w[2] / 2, w[4], w[1] + w[3] / 2, c ? CURB : WT, c ? CURBS : WS, c ? null : WE); }
     const cx = h.cup[0], cz = h.cup[1], cy = h.cupY, r = M.physics.CUP_R, k = .018;
     pit(b, h, r);
     box(b, cx - k, cy, cz - k, cx + k, cy + 1.05, cz + k, [.82, .1, .08], [.72, .08, .06]);
@@ -319,6 +371,47 @@
     face(b, [0, 0, 1], [A, Bp, Cp, Cp], [.98, .92, .7]); face(b, [0, 0, -1], [A, Bp, Cp, Cp], [.98, .92, .7]);
     const rb = B(); ring(rb, cx, cz, r, r + .022, (x, z) => h.Gb(x, z) + .002, RIM);   // bord clair : maillage à part (polygon offset)
     h.portals.forEach((p, i) => { const c = PCOL[i % PCOL.length]; for (let k = 0; k < 2; k++) gate(b, p[k * 2], p[k * 2 + 1], h.Gb(p[k * 2], p[k * 2 + 1]), c); });
+    for (const p of h.puits || []) {
+      const ex = p.ex !== undefined ? p.ex : p[0], ez = p.ez !== undefined ? p.ez : p[1];
+      const sx = p.sx !== undefined ? p.sx : p[2], sz = p.sz !== undefined ? p.sz : p[3];
+      const fy = p.fy !== undefined ? p.fy : (p.length >= 7 ? p[6] : (p[5] !== undefined ? p[5] : 0));
+      let dx = p.dx, dz = p.dz;
+      if (dx === undefined) {
+        const dir = p[4];
+        if (typeof p[4] === 'number' && typeof p[5] === 'number' && p.length >= 7) {
+          dx = p[4]; dz = p[5];
+        } else {
+          const vx = sx - ex, vz = sz - ez, L = Math.hypot(vx, vz);
+          const ux = L > 1e-4 ? vx / L : 0, uz = L > 1e-4 ? vz / L : 1;
+          if (dir === 'derrière' || dir === 'derriere' || dir === 'back') { dx = -ux; dz = -uz; }
+          else if (dir === 'gauche' || dir === 'left') { dx = -uz; dz = ux; }
+          else if (dir === 'droite' || dir === 'right') { dx = uz; dz = -ux; }
+          else if (Array.isArray(dir)) { const dl = Math.hypot(dir[0], dir[1]) || 1; dx = dir[0] / dl; dz = dir[1] / dl; }
+          else { dx = ux; dz = uz; }
+        }
+      }
+      const ey = isFinite(h.Gb(ex, ez)) ? h.Gb(ex, ez) : 0;
+      // Trou d'entrée : identique à la coupe finale (bord clair RIM, intérieur noir dégradé), sans drapeau
+      ring(rb, ex, ez, r, r + .022, (x, z) => ey + .002, RIM);
+      disc(b, ex, ez, r, () => ey + .001, [.02, .03, .02], 24);
+      ring(b, ex, ez, r * .65, r, () => ey + .0012, [.06, .09, .06], 24);
+      disc(b, ex, ez, r * .65, () => ey + .0014, [0, 0, 0], 20);
+      // Trou de sortie : orifice circulaire vertical percé dans la paroi du mur de l'étage
+      const sy = fy + .18, tx = -dz, tz = dx, nVert = 20, vr = r * .85;
+      const P = (rad, a) => [sx + tx * rad * Math.cos(a) + dx * .002, sy + rad * Math.sin(a), sz + tz * rad * Math.cos(a) + dz * .002];
+      for (let i = 0; i < nVert; i++) {
+        const a = i / nVert * 6.2832, d = (i + 1) / nVert * 6.2832;
+        face(rb, [dx, 0, dz], [P(vr, a), P(vr + .022, a), P(vr + .022, d), P(vr, d)], RIM);
+      }
+      const cBk = [0, 0, 0], cDk = [.02, .03, .02];
+      for (let i = 0; i < nVert; i++) {
+        const a = i / nVert * 6.2832, d = (i + 1) / nVert * 6.2832;
+        const p0 = P(vr, a), p1 = P(vr, d);
+        face(b, [dx, 0, dz], [[sx + dx * .002, sy, sz + dz * .002], p0, p1, [sx + dx * .002, sy, sz + dz * .002]], cDk);
+        const q0 = [p0[0] - dx * .04, p0[1], p0[2] - dz * .04], q1 = [p1[0] - dx * .04, p1[1], p1[2] - dz * .04];
+        face(b, [dx, 0, dz], [p0, q0, q1, p1], cBk);
+      }
+    }
     return { m: fin(b), r: fin(rb) };
   }
   /** Vent et boosts : même plaque (fond bleu-vert, chevrons clairs qui défilent dans le sens du souffle) + particules de traînée. */
@@ -382,6 +475,61 @@
   }
   const mul = (A, Bm) => { const o = new Float32Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) { let s = 0; for (let k = 0; k < 4; k++) s += A[k * 4 + r] * Bm[c * 4 + k]; o[c * 4 + r] = s; } return o; };
 
+  function buildWindmillCrossH() {
+    const b = B(), Rh = .16, Tw = .07, Ty = .20, Hy = .08;   // Ty=hauteur pale, Hy=rayon moyeu en Y
+    cyl(b, 0, 0, Rh, -Hy, Hy, MW1, MW1, 8);
+    for (let k = 0; k < 4; k++) {
+      const a = k * Math.PI * .5, cos = Math.cos(a), sin = Math.sin(a);
+      const u0 = Rh, u1 = 1, w = Tw / 2, y0 = -Ty / 2, y1 = Ty / 2;
+      const p = (u, v, y) => [u * cos - v * sin, y, u * sin + v * cos];
+      face(b, [0, 1, 0], [p(u0, -w, y1), p(u1, -w, y1), p(u1, w, y1), p(u0, w, y1)], MW2);
+      face(b, [0, -1, 0], [p(u0, w, y0), p(u1, w, y0), p(u1, -w, y0), p(u0, -w, y0)], MW1);
+      face(b, [-sin, 0, cos], [p(u0, w, y0), p(u1, w, y0), p(u1, w, y1), p(u0, w, y1)], MW1);
+      face(b, [sin, 0, -cos], [p(u1, -w, y0), p(u0, -w, y0), p(u0, -w, y1), p(u1, -w, y1)], MW1);
+      face(b, [cos, 0, sin], [p(u1, -w, y0), p(u1, w, y0), p(u1, w, y1), p(u1, -w, y1)], MW3);
+      const nw = w * .18;
+      face(b, [0, 1, 0], [p(u0, -nw, y1 + .006), p(u1, -nw, y1 + .006), p(u1, nw, y1 + .006), p(u0, nw, y1 + .006)], MW3);
+      for (const fu of [.45, .75]) face(b, [0, 1, 0], [p(fu - .015, -w, y1 + .004), p(fu + .015, -w, y1 + .004), p(fu + .015, w, y1 + .004), p(fu - .015, w, y1 + .004)], MW3);
+    }
+    return fin(b);
+  }
+  function buildWindmillCrossV() {
+    const b = B(), Rh = .16, Tw = .07, Tz = .25, Hz = .08;   // Tz=profondeur pale, Hz=rayon moyeu en Z
+    for (let i = 0; i < 8; i++) {
+      const a = i / 8 * 6.2832, d = (i + 1) / 8 * 6.2832, m = (a + d) / 2;
+      face(b, [Math.cos(m), Math.sin(m), 0],
+        [[Rh * Math.cos(a), Rh * Math.sin(a), -Hz],
+         [Rh * Math.cos(d), Rh * Math.sin(d), -Hz],
+         [Rh * Math.cos(d), Rh * Math.sin(d), Hz],
+         [Rh * Math.cos(a), Rh * Math.sin(a), Hz]], MW1);
+    }
+    const kF = b.n; b.v.push(0, 0, Hz, 0, 0, 1, MW1[0], MW1[1], MW1[2], 0);
+    for (let i = 0; i < 8; i++) { const a = i / 8 * 6.2832; b.v.push(Rh * Math.cos(a), Rh * Math.sin(a), Hz, 0, 0, 1, MW1[0], MW1[1], MW1[2], 0); b.i.push(kF, kF + 1 + i, kF + 1 + (i + 1) % 8); }
+    b.n += 9;
+    const kB = b.n; b.v.push(0, 0, -Hz, 0, 0, -1, MW1[0], MW1[1], MW1[2], 0);
+    for (let i = 0; i < 8; i++) { const a = i / 8 * 6.2832; b.v.push(Rh * Math.cos(a), Rh * Math.sin(a), -Hz, 0, 0, -1, MW1[0], MW1[1], MW1[2], 0); b.i.push(kB, kB + 1 + (i + 1) % 8, kB + 1 + i); }
+    b.n += 9;
+    for (let k = 0; k < 4; k++) {
+      const a = k * Math.PI * .5, cos = Math.cos(a), sin = Math.sin(a);
+      const u0 = Rh, u1 = 1, w = Tw / 2, z0 = -Tz / 2, z1 = Tz / 2;
+      const p = (u, v, z) => [u * cos - v * sin, u * sin + v * cos, z];
+      face(b, [0, 0, 1], [p(u0, -w, z1), p(u1, -w, z1), p(u1, w, z1), p(u0, w, z1)], MW2);
+      face(b, [0, 0, -1], [p(u0, w, z0), p(u1, w, z0), p(u1, -w, z0), p(u0, -w, z0)], MW1);
+      face(b, [-sin, cos, 0], [p(u0, w, z0), p(u1, w, z0), p(u1, w, z1), p(u0, w, z1)], MW1);
+      face(b, [sin, -cos, 0], [p(u1, -w, z0), p(u0, -w, z0), p(u0, -w, z1), p(u1, -w, z1)], MW1);
+      face(b, [cos, sin, 0], [p(u1, -w, z0), p(u1, w, z0), p(u1, w, z1), p(u1, -w, z1)], MW3);
+      const nw = w * .18;
+      face(b, [0, 0, 1], [p(u0, -nw, z1 + .006), p(u1, -nw, z1 + .006), p(u1, nw, z1 + .006), p(u0, nw, z1 + .006)], MW3);
+      for (const fu of [.45, .75]) face(b, [0, 0, 1], [p(fu - .015, -w, z1 + .004), p(fu + .015, -w, z1 + .004), p(fu + .015, w, z1 + .004), p(fu - .015, w, z1 + .004)], MW3);
+    }
+    return fin(b);
+  }
+  function buildWindmillPost() {
+    const b = B();
+    box(b, -.10, 0, -.10, .10, 1, .10, MW1, MW1);
+    return fin(b);
+  }
+
   M.render = {
     build,
     create(cv) {
@@ -398,17 +546,19 @@
           return p;
         };
         pm = prog(VS, FS, ['aP', 'aN', 'aC', 'aM']); pf = prog(VSF, FSF, ['aP', 'aD', 'aR', 'aK']);
-        for (const n of ['uVP', 'uOff', 'uSc', 'uRot', 'uCup', 'uEye', 'uMul']) u[n] = gl.getUniformLocation(pm, n);
+        for (const n of ['uVP', 'uOff', 'uSc', 'uRot', 'uRotZ', 'uCup', 'uEye', 'uMul']) u[n] = gl.getUniformLocation(pm, n);
         for (const n of ['uVP', 'uT']) uf[n] = gl.getUniformLocation(pf, n);
         gl.useProgram(pm);
         gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE);
       }
       const NOCUP = [0, 0, 0, 0], ONE = [1, 1, 1];
-      function draw(m, off, sc, yaw, cup, mul) {
+      function draw(m, off, sc, yaw, cup, mul, rotZ) {
         gl.bindBuffer(gl.ARRAY_BUFFER, m.b); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.e);
         for (let a = 0; a < 3; a++) { gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 3, gl.FLOAT, false, 40, a * 12); }
         gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 40, 36);
-        gl.uniform4fv(u.uCup, cup || NOCUP); gl.uniform3fv(u.uMul, mul || ONE); gl.uniform3fv(u.uOff, off); gl.uniform3fv(u.uSc, sc); gl.uniform2f(u.uRot, Math.cos(yaw), Math.sin(yaw));
+        gl.uniform4fv(u.uCup, cup || NOCUP); gl.uniform3fv(u.uMul, mul || ONE); gl.uniform3fv(u.uOff, off); gl.uniform3fv(u.uSc, sc);
+        gl.uniform2f(u.uRot, Math.cos(yaw), Math.sin(yaw));
+        gl.uniform2f(u.uRotZ, rotZ ? Math.cos(rotZ) : 1, rotZ ? Math.sin(rotZ) : 0);
         gl.drawElements(gl.TRIANGLES, m.i.length, gl.UNSIGNED_SHORT, 0);
       }
       const FXS = [3, 2, 4, 1], FXO = [0, 12, 20, 36];
@@ -422,6 +572,7 @@
       const shadow = (() => { const b = B(); disc(b, 0, 0, 1, () => 0, [.03, .07, .05], 14); return mk(fin(b)); })();
       const arrow = (() => { const b = B(), c = [1, .93, .55]; face(b, [0, 1, 0], [[-.02, 0, .15], [.02, 0, .15], [.02, 0, .55], [-.02, 0, .55]], c); face(b, [0, 1, 0], [[-.07, 0, .55], [.07, 0, .55], [0, 0, .78], [0, 0, .78]], c); return mk(fin(b)); })();
       const ball = mk(sphere());
+      const millCrossH = mk(buildWindmillCrossH()), millCrossV = mk(buildWindmillCrossV()), millPost = mk(buildWindmillPost());
       const Rn = {
         get lost() { return lost; },
         load(h) {
@@ -443,14 +594,38 @@
           // décor (sol herbe, arbres, clôture, pierres)
           draw(cur.dc, [0, 0, 0], [1, 1, 1], 0);
           draw(cur.m, [0, 0, 0], [1, 1, 1], 0, cur.cup);
+          const wt = S.wt !== undefined ? S.wt : (now / 1000);
+          for (const m of cur.h.moulins || []) {
+            const mx = m[0], mz = m[1], L = m[2], w = m[3], pose = m[4], yc = m[5], a0 = m[6] || 0;
+            const gy = cur.h.Gb(mx, mz), y0 = isFinite(gy) ? gy : 0;
+            const ang = wt * w + a0;
+            if (pose === 'v') {
+              draw(millCrossH, [mx, y0 + .06, mz], [L, 1, L], -ang);
+            } else if (pose === 'z') {
+              draw(millPost, [mx, y0, mz], [1, yc - y0, 1], 0);
+              draw(millCrossV, [mx, yc, mz], [L, L, 1], 0, null, null, ang);
+            } else if (pose === 'x') {
+              draw(millPost, [mx, y0, mz], [1, yc - y0, 1], 0);
+              draw(millCrossV, [mx, yc, mz], [L, L, 1], Math.PI * .5, null, null, ang + Math.PI * .5);
+            }
+          }
           gl.useProgram(pf); gl.uniformMatrix4fv(uf.uVP, false, vp); gl.uniform1f(uf.uT, (now / 1000) % 1000); drawFx(cur.f); gl.useProgram(pm);
           gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -2); draw(cur.r, [0, 0, 0], [1, 1, 1], 0);
-          if (isFinite(S.gy)) draw(shadow, [S.x, S.gy + .003, S.z], [.055, 1, .055], 0);
-          if (S.arrow && isFinite(S.gy)) draw(arrow, [S.x, S.gy + .05, S.z], [1, 1, 1], S.aim);
+          const showMainShadow = S.shadow !== false && !S.shaft && isFinite(S.gy) && S.y >= S.gy - .02;
+          if (showMainShadow) draw(shadow, [S.x, S.gy + .003, S.z], [.055, 1, .055], 0);
+          if (S.arrow && isFinite(S.gy) && !S.shaft) draw(arrow, [S.x, S.gy + .05, S.z], [1, 1, 1], S.aim);
           gl.disable(gl.POLYGON_OFFSET_FILL);
-          for (const o of S.others || []) draw(ball, [o.x, o.y, o.z], [.05, .05, .05], 0, null, o.c);
-          for (const o of S.others || []) { const ogy = isFinite(o.gy) ? o.gy : o.y - .05; draw(shadow, [o.x, ogy + .003, o.z], [.055, 1, .055], 0); }
-          draw(ball, [S.x, S.y, S.z], [.05, .05, .05], 0, null, S.tint);
+          for (const o of S.others || []) {
+            const oInTunnel = o.shaft || (isFinite(o.gy) && o.y < o.gy - .02);
+            if (!oInTunnel) draw(ball, [o.x, o.y, o.z], [.05, .05, .05], 0, null, o.c);
+          }
+          for (const o of S.others || []) {
+            const ogy = isFinite(o.gy) ? o.gy : o.y - .05;
+            const showOtherShadow = o.shadow !== false && !o.shaft && isFinite(o.gy) && o.y >= o.gy - .02;
+            if (showOtherShadow) draw(shadow, [o.x, ogy + .003, o.z], [.055, 1, .055], 0);
+          }
+          const mainInTunnel = S.shaft || (isFinite(S.gy) && S.y < S.gy - .02);
+          if (!mainInTunnel) draw(ball, [S.x, S.y, S.z], [.05, .05, .05], 0, null, S.tint);
           if (cur.parts.length) {
             flowStep(cur.h, cur.parts, cur.s.v, dt, eye);
             gl.useProgram(pf); gl.bindBuffer(gl.ARRAY_BUFFER, cur.s.b); gl.bufferData(gl.ARRAY_BUFFER, cur.s.v, gl.DYNAMIC_DRAW);

@@ -7,6 +7,7 @@ const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d'), W = 800, H = 600, PW = 26, PH = 32;
 let n = Math.max(1, Math.min(COUNT, +new URLSearchParams(location.search).get('level') || 1));
 
+// TODO : Supprimer commentaires dans version en PROD
 if (!unlocked(n)) { // niveau verrouillé ou monde non publié : retour au menu
     //location.replace('index.html');
     //await new Promise(() => { });
@@ -47,9 +48,11 @@ const visible = o => !o.hidden && !L.hidePortal && o.x + o.w > 0 && o.x < W && o
 
 function reset() {
     const b = L.build();
+    const initF = b.f ? { ...b.f } : {};
     S = {
-        ...b, E: Object.fromEntries(b.ents.map(e => [e.id, e])), f: {}, parts: [], mode: 'play', t: 0, wt: 0, b: [...L.bounds], clip: b.portal.y + b.portal.h, hit, die, SL: b.ents.find(e => e.k === 'slope'), // [V3] sol penché (opt-in)
-        p: { x: L.start.x, y: L.start.y, vy: 0, g: false, fall: false, f: 1, run: 0, mv: false, coy: 0 }
+        ...b, E: Object.fromEntries(b.ents.map(e => [e.id, e])), f: initF, parts: [], mode: 'play', t: 0, wt: 0, b: [...L.bounds], clip: b.portal.y + b.portal.h, hit, die, SL: b.ents.find(e => e.k === 'slope'), // [V3] sol penché (opt-in)
+        p: { x: L.start.x, y: L.start.y, vy: 0, g: false, fall: false, f: 1, run: 0, mv: false, coy: 0 },
+        rot: initF.rot ?? initF.rotation ?? initF.angle ?? 0
     };
     $('dead').hidden = true;
 }
@@ -57,7 +60,7 @@ const hit = e => { const p = S.p; return p.x + 4 < e.x + e.w && p.x + 22 > e.x &
 function die() {
     if (S.mode !== 'play') return;
     S.mode = 'dead'; S.t = 0; fails = addTry(n); $('hudFails').textContent = 'Échec N°' + fails;
-    const p = S.p;
+    const p = S.p; p.jCharge = 0;
     for (let i = 0; i < 20; i++) S.parts.push({ x: p.x + 13, y: p.y + 16, vx: (Math.random() - .5) * 8, vy: -Math.random() * 7, l: 70 });
 }
 // [NEW] Centre Y actuel d'une scie : enterrée sous la ligne fy (out=0) -> à e.y (out=1)
@@ -68,6 +71,19 @@ const slopeY = (e, x) => x < e.x1 || x > e.x2 ? null : e.y1 + (e.y2 - e.y1) * (x
 const blocks = e => e.k === 'solid' && e.on !== false && !e.oneWay && e.solid !== false;
 function step() {
     const s = S, p = s.p; s.t++;
+    // [V6] Rotation de la vue (s.f.rot / s.f.rotation / s.f.angle : 90, 180, 270)
+    const targetRot = s.f.rot ?? s.f.rotation ?? s.f.angle ?? 0;
+    if (s.f.rotDirect) {
+        s.rot = targetRot;
+    } else {
+        if (s.rot === undefined) s.rot = targetRot;
+        else if (s.rot !== targetRot) {
+            let diff = targetRot - s.rot;
+            diff = ((diff + 180) % 360 + 360) % 360 - 180;
+            if (Math.abs(diff) < 0.2) s.rot = targetRot;
+            else s.rot += diff * (s.f.rotSpeed ?? 0.15);
+        }
+    }
     for (const e of s.ents) if (e.push) e.ox = e.x; // position du mur avant cette frame
     for (const q of s.parts) { q.x += q.vx; q.y += q.vy; q.vy += .4; q.l--; }
     if (s.mode === 'dead') { if (s.t === 35) $('dead').hidden = false; return; }
@@ -97,9 +113,37 @@ function step() {
         p.x = Math.max(s.b[0], Math.min(s.b[1], p.x + dx)); p.f = dx > 0 ? 1 : -1; p.run++;
         if (!was && ov()) p.x = px;
     }
-    // Saut + "coyote time" : on peut sauter encore 6 frames après avoir quitté le bord d'un sol
-    if (p.g) p.coy = 6; else if (p.coy > 0) p.coy--;
-    if (keys.j && (p.g || p.coy > 0) && !p.fall) { p.vy = -6; p.coy = 0; }
+    // [V5] Coyote time : marge accrue si le saut chargé est actif (14 frames au lieu de 6)
+    const isCJ = !!(s.f.chargeJump || s.f.cj);
+    const maxCoy = s.f.coyMargin ?? (isCJ ? 14 : 6);
+    if (p.g) p.coy = maxCoy; else if (p.coy > 0) p.coy--;
+
+    // [V5] Saut chargé : si s.f.chargeJump, maintien = saut modulé entre bornes (défaut : -13.5 tap -> -2.5 maintien 2s)
+    // Configurable via s.f.jumpMax / s.f.jumpMin (ou s.f.cjMax / s.f.cjMin, s.f.jumpTap / s.f.jumpHold)
+    // Mode inverse (maintenir pour sauter haut) : s.f.jumpInv / s.f.cjInv / s.f.chargeJump === -1 (ou jumpTap < jumpHold)
+    if (s.f.chargeJump || s.f.cj) {
+        const maxF = s.f.chargeTime ?? s.f.jumpTime ?? 120;
+        if (keys.j && (p.g || p.coy > 0) && !p.fall) {
+            p.jCharge = Math.min(maxF, (p.jCharge || 0) + 1);
+        } else if (!keys.j && p.jCharge > 0) {
+            const hold = Math.min(p.jCharge, maxF);
+            const frac = hold / maxF;
+            const toNeg = v => v != null ? -Math.abs(v) : null;
+            const jTap = toNeg(s.f.jumpTap ?? s.f.cjTap);
+            const jHold = toNeg(s.f.jumpHold ?? s.f.cjHold);
+            const jMax = toNeg(s.f.jumpMax ?? s.f.cjMax ?? s.f.chargeJumpMax) ?? -13.5;
+            const jMin = toNeg(s.f.jumpMin ?? s.f.cjMin ?? s.f.chargeJumpMin) ?? -2.5;
+            const isInv = s.f.chargeJump === -1 || s.f.jumpInv || s.f.cjInv || (jTap !== null && jHold !== null && Math.abs(jTap) < Math.abs(jHold));
+            const v0 = jTap ?? (isInv ? jMin : jMax);
+            const v1 = jHold ?? (isInv ? jMax : jMin);
+            p.vy = v0 + (v1 - v0) * frac;
+            p.coy = 0; p.jCharge = 0; p.fall = false;
+        } else if (!p.g && p.coy === 0) {
+            p.jCharge = 0;
+        }
+    } else {
+        if (keys.j && (p.g || p.coy > 0) && !p.fall) { p.vy = -6; p.coy = 0; }
+    }
     // Gravité + atterrissage : 'floor'/'solid' (mv:1 = surface mobile, tolérance 12 px), sauf au-dessus d'un 'gap' actif
     const pb = p.y + PH, fx = p.x + 13;
     const wasSl = p.sl; // [V3] posé sur la pente à la frame précédente
@@ -121,14 +165,18 @@ function step() {
         const q = slopeY(s.SL, fx), nb = p.y + PH;
         if (q !== null && ((nb >= q && pb <= q + 1 + 3 * Math.abs((s.SL.y2 - s.SL.y1) / (s.SL.x2 - s.SL.x1))) || (wasSl && nb < q && q - nb <= 8))) { p.y = q - PH; p.vy = 0; p.g = true; p.sl = true; }
     }
-    if (gp && !p.g && p.y + PH > gp.y + 2) p.fall = true;
+    // [V5] Chute dans un trou : vy >= 0 (ne bloque jamais un joueur en train de monter lors d'un saut)
+    // et marge accrue de chute (24 px au lieu de 2 px) si le saut chargé est actif
+    const fallMargin = s.f.fallMargin ?? (isCJ ? 24 : 2);
+    const gapTop = gp ? (gp.pf ? Math.max(gp.y, 400) : gp.y) : 0;
+    if (gp && !p.g && p.vy >= 0 && p.y + PH > gapTop + fallMargin) p.fall = true;
     // Animation vers une cible (x/y et largeur). Arrive pile sur la cible (plus de décalage de quelques px).
     const eas = (a, b, k) => { const d = (b - a) * k; return Math.abs(d) < 1 ? b : a + Math.trunc(d); };
     for (const e of s.ents) {
         if (e.tx !== undefined) { e.x = eas(e.x, e.tx, e.tk); e.y = eas(e.y, e.ty, e.tk); }
         if (e.tw !== undefined) e.w = eas(e.w, e.tw, e.tk || .2);
     }
-    for (const r of s.rules) if (!r.d && r.if(s)) { r.do(s); if (r.once !== false) r.d = 1; }
+    for (const r of s.rules) if (!r.d && (!r.if || r.if(s))) { r.do(s); if (r.once !== false) r.d = 1; }
 
     // Mur poussoir : s'il a bougé et chevauche le joueur, il le pousse dans SON sens de déplacement
     for (const e of s.ents) if (e.push && e.on !== false) {
@@ -211,6 +259,13 @@ function draw() {
     const s = S, p = s.p, k = zoomK(s), o = s.portal;
     ctx.fillStyle = col(L.bg); ctx.fillRect(0, 0, W, H); // [NEW] col()
     ctx.save();
+    // [V6] Rotation de la vue autour du centre de l'écran (400, 300)
+    const rot = s.rot ?? (s.f.rot ?? s.f.rotation ?? s.f.angle ?? 0);
+    if (rot) {
+        ctx.translate(W / 2, H / 2);
+        ctx.rotate(-rot * Math.PI / 180);
+        ctx.translate(-W / 2, -H / 2);
+    }
     if (k) {
         // Zoom ancré au pied du portail (il reste au sol). Portail invisible/hors écran : on zoome depuis le centre de l'écran.
         const vis = visible(o), zx = vis ? o.x + o.w / 2 : W / 2, zy = vis ? o.y + o.h : H / 2, sc = Math.exp(Math.log(ZOOM) * k);
@@ -235,6 +290,21 @@ function draw() {
     if (s.mode === 'play' || s.mode === 'intro') {
         ctx.save(); ctx.translate(p.x + 13, p.y); ctx.scale(p.f, 1);
         ctx.drawImage(IM.run[!p.g ? 1 : p.mv ? (p.run >> 2) % 3 : 0], -13, 0, PW, PH); ctx.restore();
+        // [V5] Indicateur visuel de la charge du saut
+        if ((s.f.chargeJump || s.f.cj) && p.jCharge > 0) {
+            const maxF = s.f.chargeTime ?? s.f.jumpTime ?? 120;
+            const frac = Math.min(1, p.jCharge / maxF);
+            const toNeg = v => v != null ? -Math.abs(v) : null;
+            const jTap = toNeg(s.f.jumpTap ?? s.f.cjTap);
+            const jHold = toNeg(s.f.jumpHold ?? s.f.cjHold);
+            const isInv = s.f.chargeJump === -1 || s.f.jumpInv || s.f.cjInv || (jTap !== null && jHold !== null && Math.abs(jTap) < Math.abs(jHold));
+            const bx = p.x - 2, by = p.y - 12, bw = 30, bh = 6;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(bx, by, bw, bh);
+            ctx.fillStyle = '#222'; ctx.fillRect(bx + 1, by + 1, bw - 2, bh - 2);
+            const hue = isInv ? (1 - frac) * 120 : frac * 120;
+            ctx.fillStyle = `hsl(${hue}, 95%, 50%)`;
+            ctx.fillRect(bx + 1, by + 1, (bw - 2) * frac, bh - 2);
+        }
     }
     // Piques : r = rotation (0 haut, 1 droite, 2 bas, 3 gauche) ; w/h = boîte occupée
     for (const e of s.ents) if (e.k === 'spike' && e.on !== false) {

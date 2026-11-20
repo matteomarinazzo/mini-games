@@ -1,7 +1,23 @@
 {
-    "currentVersion": "1.63.2026-11-18",
-    "lastUpdate": "2026-11-18",
+    "currentVersion": "1.65.2026-11-20",
+    "lastUpdate": "2026-11-20",
     "history": [
+        {
+            "version": "1.65.2026-11-20",
+            "date": "2026-11-20",
+            "changes": [
+                "Minigolf 3D : Map 13 (Le Moulin) et map 14 (Les Étages) — bordures pentues continues et biseautage propre des coins adjacents (trou 4 coin arrière-droit pentu)",
+                "Minigolf 3D : découpage précis des tronçons de bordure mixte (murs verticaux et bordures pentues alternés) sans boîte résiduelle"
+            ]
+        },
+        {
+            "version": "1.64.2026-11-19",
+            "date": "2026-11-19",
+            "changes": [
+                "AYOR monde 2 : ajout des 8 premiers niveaux",
+                "Correction de Minigolf 3D : refonte du menu de création et de fin de partie multijoueur"
+            ]
+        },
         {
             "version": "1.63.2026-11-18",
             "date": "2026-11-18",

@@ -6,12 +6,12 @@
   if (!cfg || cfg.mode === 'solo' || !M.maps[cfg.mapId]) return;   // game.js renvoie au menu
   const online = cfg.mode === 'multi';
   if (online ? !N.validCode(cfg.roomCode) : cfg.resume) { location.replace('index.html'); return; }
-  const map = M.maps[cfg.mapId], H = map.holes.length, MAXS = 8, MINP = 8, cv = $('gl'), stage = $('stage'), G = $('gauge');
+  let map = M.maps[cfg.mapId], H = map.holes.length, rankMapId = cfg.mapId; const MAXS = 8, MINP = 8, cv = $('gl'), stage = $('stage'), G = $('gauge');
   let R = null; try { R = M.render.create(cv); } catch (e) { R = null; }
   if (!R) { document.body.innerHTML = '<p style="color:#f4ecd8;padding:2em;font:16px sans-serif">WebGL indisponible sur cet appareil.</p>'; return; }
   if (!online) N.write({ resume: true });   // rafraîchir une partie IA renvoie au menu
 
-  const COL = [[1, 1, 1], [.86, .45, .34], [.46, .62, .84], [.92, .74, .34]], HEX = ['#ffffff', '#dc7357', '#759fd6', '#ebbd57'];
+  const COL = [[1, 1, 1], [.86, .45, .34], [.46, .62, .84], [.92, .74, .34], [.37, .96, .63], [.70, .53, 1], [1, .42, .55], [.30, .82, .88]], HEX = ['#ffffff', '#dc7357', '#759fd6', '#ebbd57', '#5ef5a0', '#b387ff', '#ff6b8d', '#4dd1e0'];
   let seats = [], me = 0, ci = [], S = null, world = null, ball = null, curH = -1, vis = [], host = !online, room = null, unsub = null, hbT = null, back = false;
   let simT = false, simC = 0, sunkT = 0, nextT = 0, endT = null, ended = false, aiT = null, aiPlan = null, aim = 0, dAim = 0, cam = 0, power = 0, act = null, gdrag = false, cdrag = false, cx = 0, modal = null, tt = 0, sent = -1, lastV = -1;
   let snaps = [], iv = null, rAim = null, raim = 0, raimTid = -1, aimT = 0, aimSentTid = -1, aimSent = 0, liveT = 0, liveK = 0, liveKr = -1, hh = null;   // flux temps réel : visée (aim) et trajectoire (live)
@@ -22,7 +22,7 @@
   function setSeats(list) {
     let na = 0; seats = list.map((s) => { const ai = !s.u; return { u: s.u || '', n: ai ? (++na === 1 ? 'IA' : 'IA ' + na) : String(s.n || 'Joueur'), ai }; });
     me = online ? seats.findIndex((s) => s.u === N.F.uid) : 0;
-    ci = seats.map((_, i) => i % 4);   // couleur = siège (siège 0 = hôte = blanc) : identique pour tous les joueurs
+    ci = seats.map((_, i) => i % COL.length);   // couleur = siège (siège 0 = hôte = blanc) : identique pour tous les joueurs
   }
   const auto = (i) => {   // joué par l’IA : siège IA, ou humain parti / hors ligne
     const s = seats[i]; if (s.ai) return true; if (!online) return false;
@@ -65,13 +65,15 @@
   }
   function pub() {
     S.v++; lastV = S.v; if (S.ev) toast(S.ev, 1700);
-    upd(S.ph === 'end' ? { st: S, state: 'ended' } : { st: S, state: 'playing' });
+    const u = S.ph === 'end' ? { st: S, state: 'ended' } : { st: S, state: 'playing' };
+    if (online) u.mapId = cfg.mapId;
+    upd(u);
   }
   function loadHole(h) { curH = h; world = P.createWorld(map.holes[h]); R.load(world.hole); vis = S.p.map((p) => ({ x: p[0], z: p[1] })); }
   function onState(r) {   // clients (et hôte qui reprend) : afficher, ne pas resimuler
     const s2 = norm(r); if (S && s2.v <= lastV) return;
     const old = S; lastV = s2.v; S = s2;
-    if (S.ph !== 'end' && ended) { ended = false; endT = null; if (modal === 'mRank') closeModal(); }   // la partie a été relancée
+    if (S.ph !== 'end' && ended) { ended = false; endT = null; if (modal === 'mRank') closeModal(); curH = -1; }   // la partie a été relancée
     if (S.h !== curH) loadHole(S.h);
     if (!old || old.tid !== S.tid) { snaps = []; liveKr = -1; dAim = defAim(S.turn); myAim(); }
     if (S.ph === 'end' && endT === null && !ended) endT = 1.8;
@@ -151,7 +153,7 @@
     if (pg.childElementCount !== H) pg.innerHTML = '<i></i>'.repeat(H);
     Array.prototype.forEach.call(pg.children, (e, k) => { e.className = k < S.h ? 'done' : k === S.h ? 'cur' : ''; });
     $('bRestart').hidden = online && !host;
-    const ba = $('bRank'); ba.disabled = online && !host; ba.textContent = ba.disabled ? 'En attente de l’hôte' : 'Rejouer';
+    const ba = $('bRank'); ba.disabled = online && !host; ba.textContent = ba.disabled ? 'En attente de l’hôte' : (rankMapId !== cfg.mapId && M.maps[rankMapId] ? `Jouer sur ${M.maps[rankMapId].name}` : 'Rejouer');
     const row = (cls, a, b, c, d) => { const r = document.createElement('div'); r.className = cls; const dot = document.createElement('i'); if (a) dot.style.background = a; const n = document.createElement('span'), e = document.createElement('em'), t = document.createElement('b'); n.textContent = b; e.textContent = c; t.textContent = d; r.append(dot, n, e, t); return r; };
     $('board').replaceChildren(row('hd', '', 'Joueur', 'Trou', 'Total'), ...seats.map((s, i) => row((i === S.turn && S.ph !== 'end' ? 'on' : '') + (S.d[i] ? ' dn' : ''), HEX[ci[i]], s.n, S.c[i], sum(S.s[i]) + (S.ph === 'aim' ? Math.min(S.c[i], MAXS) : 0))));
   }
@@ -181,7 +183,40 @@
     const info = [[win.length > 1 ? 'Résultat' : 'Vainqueur', win.length > 1 ? 'Égalité' : win[0]], ['Ton total', cp(mine)], ['Écart avec le premier', mine === best ? 'Premier' : '+' + cp(mine - best)],
     ['Ton meilleur · ton pire trou', hs.length ? `Meilleur : trou ${bi + 1} · ${cp(hs[bi])}\nPire : trou ${wi + 1} · ${cp(hs[wi])}` : '–']];
     $('rInfo').replaceChildren(...info.map(([l, v]) => { const d = el('div', 'ri'); d.append(el('small', '', l), el('b', '', v)); return d; }));
+    const rMapPick = $('rMapPick');
+    if (rMapPick) {
+      rMapPick.hidden = !host;
+      if (host) {
+        rankMapId = cfg.mapId;
+        renderRankMaps();
+      }
+    }
     hud(); openModal('mRank');
+  }
+  function renderRankMaps() {
+    const el = $('rankMaps'); if (!el) return;
+    el.innerHTML = '';
+    M.mapList.forEach((m) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      const isOpen = M.career ? M.career.status(m.id).open : true;
+      b.className = 'rmap-btn' + (rankMapId === m.id ? ' on' : '') + (!isOpen ? ' lock' : '');
+      const numH = (M.maps[m.id] && M.maps[m.id].holes ? M.maps[m.id].holes.length : 9);
+      b.innerHTML = `<i>${isOpen ? (m.icon || '⛳') : '🔒'}</i><b>${m.name}</b><span>${isOpen ? numH + ' trous' : 'Verrouillé'}</span>`;
+      if (isOpen) {
+        b.onclick = () => {
+          rankMapId = m.id;
+          renderRankMaps();
+          const br = $('bRank');
+          if (br && !br.disabled) {
+            br.textContent = rankMapId !== cfg.mapId ? `Jouer sur ${M.maps[rankMapId].name}` : 'Rejouer';
+          }
+        };
+      } else {
+        b.disabled = true;
+      }
+      el.append(b);
+    });
   }
   function bye(msg) {
     N.clearSavedRoom(); if (unsub) unsub(); unsub = null; clearInterval(hbT);
@@ -199,6 +234,7 @@
 
   // ── boucle ──
   function update(dt) {
+    if (world && (!host || !simT)) world.hole.wt += dt;
     if (host) {
       if (S.ph === 'aim') {
         if (simT) simStep(dt);
@@ -229,8 +265,8 @@
     if (!R.lost && (online || !modal)) update(dt);
     G.hidden = !myTurn();
     const t = S.turn, sim = host && simT, pa = pos(t), others = [];
-    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, gy: world.hole.G(q.x, q.z), c: COL[ci[i]] }); } });
-    R.frame({ x: pa.x, y: pa.y, z: pa.z, cam, aim: t === me ? aim : raim, arrow: S.ph === 'aim' && !simT && !iv && (t === me ? sent !== S.tid : (S.ai === 1 || !!(rAim && rAim.tid === S.tid))), shadow: sim ? ball.ground && !ball.sunk : iv ? iv.g === 1 : !S.d[t], gy: world.hole.G(pa.x, pa.z), tint: COL[ci[t]], others });
+    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, gy: world.hole.G(q.x, q.z), shaft: wb[i] ? !!wb[i].shaft : false, c: COL[ci[i]] }); } });
+    R.frame({ x: pa.x, y: pa.y, z: pa.z, cam, aim: t === me ? aim : raim, arrow: S.ph === 'aim' && !simT && !iv && (t === me ? sent !== S.tid : (S.ai === 1 || !!(rAim && rAim.tid === S.tid))), shadow: (sim ? ball.ground && !ball.sunk : iv ? iv.g === 1 : !S.d[t]) && !ball.shaft, gy: world.hole.G(pa.x, pa.z), shaft: !!ball.shaft, tint: COL[ci[t]], others, wt: world ? world.hole.wt : 0 });
   }
 
   // ── entrées : un seul pointeur actif ──
@@ -262,7 +298,21 @@
   $('bPause').onclick = () => openModal('mPause'); $('bRules').onclick = () => openModal('mRules'); $('bRulesClose').onclick = closeModal; $('bResume').onclick = closeModal;
   $('bRestart').onclick = () => { if (host) { closeModal(); hostInit(); } };
   $('bMenu').onclick = $('bMenu2').onclick = $('bMenu3').onclick = $('bMenu4').onclick = leave;
-  $('bRank').onclick = () => { if (!host) return; closeModal(); hostInit(); };   // même porte, même map, mêmes sièges
+  $('bRank').onclick = async () => {
+    if (!host) return;
+    if (rankMapId !== cfg.mapId && M.maps[rankMapId]) {
+      cfg.mapId = rankMapId;
+      map = M.maps[rankMapId];
+      H = map.holes.length;
+      curH = -1;
+      N.write({ mapId: rankMapId });
+      if (online) {
+        try { await upd({ mapId: rankMapId }); } catch (e) {}
+      }
+    }
+    closeModal();
+    hostInit();
+  };
   const updateVP = () => { document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); document.documentElement.style.setProperty('--vw', window.innerWidth + 'px'); };
   updateVP(); addEventListener('resize', updateVP); addEventListener('orientationchange', updateVP);
   if (window.ResizeObserver) new ResizeObserver(() => R.resize()).observe(stage); addEventListener('resize', () => R.resize());
@@ -272,6 +322,15 @@
     if (!d) return bye('La room a été fermée.');
     if (!d.players || !d.players[N.F.uid]) return bye('Tu as quitté la room.');
     room = d; rAim = d.aim || null;
+    if (d.mapId && d.mapId !== cfg.mapId && M.maps[d.mapId]) {
+      cfg.mapId = d.mapId;
+      rankMapId = d.mapId;
+      map = M.maps[d.mapId];
+      H = map.holes.length;
+      curH = -1;
+      N.write({ mapId: d.mapId });
+      $('rMap').textContent = map.name;
+    }
     if (!seats.length) {
       const sl = A(d.seats); if (!sl.length) return;
       setSeats(sl); if (me < 0) return bye('Tu n’es pas dans cette partie.');

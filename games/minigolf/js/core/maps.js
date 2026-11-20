@@ -213,6 +213,64 @@
     IH({ name: 'Le tunnel de glace', cup: [1, 31], poly: bx(4, 33), walls: [rock(1.2, 19), rock(-.8, 24), rock(.8, 28)] }, mix({}, tun(-1, 10, 12, -2, 2, { fz: 1.2 }))),
     H0({ name: 'Le grand parcours', start: [0, .8], cup: [8.5, 19.4], poly: [[-1.5, 0], [1.5, 0], [1.5, 6], [8, 6], [10, 8], [10, 21], [7, 21], [7, 9], [-1.5, 9]], sand: [R4(3, 6, 5, 9)], bumpers: [BP(9.2, 17, .3, 1.1)] }, mix({}, tun(8.5, 12, 14, 7, 10, { fz: 1.4 }))),
   ];
+  // ── Map 13 · Le Moulin : pales tournantes en bois, bordures basses en biseau (franchissables si trop fort), brèches dans le mur ──
+  const ML = (x, z, L, w, pose = 'v', yc, a0 = 0) => [x, z, L, w, pose, yc, a0];
+  const CB = (x0, z0, x1, z1) => R4(x0, z0, x1, z1);
+  const GP = (x0, z0, x1, z1) => R4(x0, z0, x1, z1);
+  const moulin = [
+    // 1. Les ailes du vent : couloir droit, moulin vertical 'z' en travers (timing entre pales), bordure basse sur tout le mur du fond
+    H0({ name: 'Les ailes du vent', cup: [0, 9.6], poly: bx(2.8, 11), moulins: [ML(0, 5.5, 1.2, 1.8, 'z', 1.25)], curbs: [CB(-1.4, 10.8, 1.4, 11.2)] }),
+    // 2. Le guichet bas : épingle en U avec moulin au sol, mur du fond et muret côté trou en biseau
+    H0({ name: 'Le guichet bas', start: [-1.4, 1], cup: [1.4, 1.8], poly: [[-2.4, 0], [-.4, 0], [-.4, 7], [.4, 7], [.4, 0], [2.4, 0], [2.4, 9], [-2.4, 9]], curbs: [CB(.25, .1, .55, 6.9), CB(-2.2, 8.8, 2.2, 9.2)], moulins: [ML(1.4, 4.5, .9, -2.2, 'v')] }),
+    // 3. Le rotor au sol : rotor horizontal balayant entre deux bacs à sable, mur du fond en bordure basse
+    H0({ name: 'Le rotor au sol', cup: [0, 10.6], poly: bx(3.2, 12), sand: [R4(-1.6, 4.4, -.8, 6.6), R4(.8, 4.4, 1.6, 6.6)], moulins: [ML(0, 5.5, 1.1, 2.4, 'v')], curbs: [CB(-1.6, 11.8, 1.6, 12.2)] }),
+    // 4. La brèche de la meule : chicane avec bordure basse à gauche, à droite dans le virage et dans le coin avec le mur du fond
+    H0({ name: 'La brèche de la meule', cup: [0, 12.2], poly: bx(3.4, 13.5), moulins: [ML(0, 6, 1.1, -2.0, 'z', 1.15)], curbs: [CB(-1.9, 4.5, -1.5, 7.5), CB(1.5, 4.5, 1.9, 13.7), CB(-1.85, 13.3, 1.85, 13.7)] }),
+    // 5. La montée du moulin : rampe montant à un plateau surélevé, moulin vertical 'z' au sommet, mur du fond en bordure basse
+    H0({ name: 'La montée du moulin', cup: [0, 10.2], poly: bx(2.8, 11.5), ramps: [JP(-1.4, 3, 1.4, 5.8, .35), FL(-1.4, 5.8, 1.4, 11.5, .35)], moulins: [ML(0, 6.5, 1.1, 2.0, 'z', 1.5)], curbs: [CB(-1.4, 11.3, 1.4, 11.7)] }),
+    // 6. Le pont du bief : plan d'eau traversé par un ponton étroit où tourne un rotor au sol, mur du fond bas
+    H0({ name: 'Le pont du bief', cup: [0, 10.8], poly: bx(3.4, 12), water: [R4(-1.7, 3.2, 1.7, 7.8)], ramps: [PR(-.6, 3.2, .6, 7.8)], moulins: [ML(0, 5.5, .95, 2.8, 'v')], curbs: [CB(-1.7, 11.8, 1.7, 12.2)] }),
+    // 7. Le tunnel sous les pales : moulin vertical devant un tunnel, mur du fond bas derrière la sortie
+    H0({ name: 'Le tunnel sous les pales', cup: [0, 11.4], poly: bx(3, 12.5), moulins: [ML(0, 3.8, 1.1, -2.2, 'z', 1.15)], curbs: [CB(-1.5, 12.3, 1.5, 12.7)] }, mix({}, tun(0, 5, 7.5, -1.5, 1.5, { fz: 1.2 }))),
+    // 8. Le virage du meunier : virage à 90°, moulin vertical latéral 'x', bordure basse tout droit et mur du fond bas à droite
+    H0({ name: 'Le virage du meunier', cup: [5.8, 6.5], poly: [[-1.2, 0], [1.2, 0], [1.2, 5.3], [7, 5.3], [7, 7.7], [-1.2, 7.7]], moulins: [ML(1.8, 6.5, 1.1, 2.2, 'x', 1.15)], curbs: [CB(-1.4, 5.5, -1.0, 7.7), CB(6.8, 5.3, 7.2, 7.7)] }),
+    // 9. Le saut des deux moulins : premier moulin vertical devant le tremplin, second au sol sur la réception, mur du fond en biseau bas
+    H0({ name: 'Le saut des deux moulins', cup: [0, 12.8], poly: bx(3.2, 14), ramps: [JP(-1.6, 2.8, 1.6, 5.2, .36)], voids: [R4(-1.6, 5.2, 1.6, 7.8)], moulins: [ML(0, 3.2, 1.1, 2.0, 'z', 1.15), ML(0, 9.8, 1.0, -2.2, 'v')], curbs: [CB(-1.6, 13.8, 1.6, 14.2)] }),
+    // 10. L’écluse : bassin d'eau, moulin vertical 'z', mur du fond bas derrière le trou
+    H0({ name: 'L’écluse', cup: [1.5, 11.4], poly: [[-1.5, 0], [1.5, 0], [1.5, 5], [2.8, 5], [2.8, 12.5], [-1.5, 12.5]], water: [R4(-1.5, 3.2, .2, 8.5)], moulins: [ML(1.5, 6.5, 1.0, -2.4, 'z', 1.15)], curbs: [CB(-1.5, 12.3, 2.8, 12.7)] }),
+    // 11. Les doubles pales croisées : deux rotors au sol tournant en sens inverse, bac à sable central et muret de fond bas
+    H0({ name: 'Les doubles pales croisées', cup: [0, 12.2], poly: bx(3.6, 13.5), sand: [R4(-.5, 6, .5, 7.5)], moulins: [ML(-.8, 5.5, 1.0, 2.5, 'v'), ML(.8, 7.5, 1.0, -2.5, 'v')], curbs: [CB(-1.8, 13.3, 1.8, 13.7)] }),
+    // 12. Le grand moulin : moulin vertical à la montée, tunnel de meule, puis deux rotors au sol synchronisés qui se chevauchent, mur du fond biseauté
+    H0({ name: 'Le grand moulin', start: [0, .8], cup: [0, 16.5], poly: bx(3.8, 18), ramps: [JP(-1.9, 2.6, 1.9, 5.4, .35), FL(-1.9, 5.4, 1.9, 11.5, .35), DN(-1.9, 11.5, 1.9, 13.5, .35, 0)], moulins: [ML(0, 5.8, 1.25, 1.8, 'z', 1.6), ML(-.75, 14.8, 1.05, -2.2, 'v', undefined, 0), ML(.75, 14.8, 1.05, 2.2, 'v', undefined, Math.PI * .25)], curbs: [CB(-1.9, 17.8, 1.9, 18.2)] }, mix({}, tun(0, 8.5, 11, -1.9, 1.9, { y: .35, fz: 1.2 }))),
+  ];
+  // ── Map 14 · Les Étages : parcours multi-niveaux, puits gravitaires forcés, tremplins et terrasses ──
+  const PW = (ex, ez, sx, sz, dir, fy) => [ex, ez, sx, sz, dir, fy];
+  const etages = [
+    // 1. L’entrée du puits : couloir haut avec trou d'entrée contre le mur frontal, sortie verticale sur la face du mur vers l'étage bas
+    H0({ name: 'L’entrée du puits', start: [0, 1], cup: [0, 10.5], poly: bx(2.6, 12), ramps: [FL(-1.3, 0, 1.3, 5, .45)], walls: [[0, 5.1, 2.6, .2, .75]], puits: [PW(0, 4.6, 0, 5.2, 'devant', 0)] }),
+    // 2. Le passage du mur : départ haut avec trou d'entrée à portée devant à droite contre le mur, ou rampe descendante à gauche
+    H0({ name: 'Le passage du mur', start: [0, 1], cup: [0, 11.5], poly: bx(3.4, 13), ramps: [FL(-1.7, 0, 1.7, 5, .4), DN(-1.7, 5, 0, 8, .4, 0)], walls: [[.8, 5.1, 1.8, .2, .7]], puits: [PW(.8, 4.6, .8, 5.2, 'devant', 0)] }),
+    // 3. Le tremplin d’étage : tremplin qui propulse sur la terrasse haute, mur du fond biseauté
+    H0({ name: 'Le tremplin d’étage', start: [0, 1], cup: [0, 10.5], poly: bx(2.8, 12), pads: [R4(-1.4, 2.5, 1.4, 4)], voids: [R4(-1.4, 4, 1.4, 5.5)], ramps: [FL(-1.4, 5.5, 1.4, 12, .4)], curbs: [CB(-1.4, 11.8, 1.4, 12.2)] }),
+    // 4. Le palier d’angle : parcours à étages pur sans puits, rampe descendante et chicane
+    H0({ name: 'Le palier d’angle', start: [0, 1], cup: [0, 11], poly: bx(3.2, 12.5), ramps: [FL(-1.6, 0, 1.6, 4.5, .35), DN(-1.6, 4.5, 0, 7.5, .35, 0)], walls: [[.8, 6, 1.6, .3, .65]], curbs: [CB(-1.6, 12.3, 1.6, 12.7)] }),
+    // 5. La falaise d’eau : balcon supérieur contre le mur de falaise, lac décalé à gauche et masqué depuis le départ
+    H0({ name: 'La falaise d’eau', start: [0, 1], cup: [0, 11.5], poly: bx(3.2, 13), water: [R4(-1.6, 6.5, -.4, 8.0)], ramps: [FL(-1.6, 0, 1.6, 5, .4)], walls: [[-.8, 5.1, 1.6, .2, .7]], puits: [PW(-.8, 4.6, -.8, 5.2, 'devant', 0)] }),
+    // 6. L’abri sous roche : coursive haute évitant le sable avec trou contre le mur du fond, sortie verticale sur le mur
+    H0({ name: 'L’abri sous roche', start: [-1, 1], cup: [.6, 11.5], poly: bx(3.4, 13), sand: [R4(-.3, 4.5, 1.7, 7.5)], ramps: [JP(-1.7, 2, -.4, 4.5, .38), FL(-1.7, 4.5, -.4, 7.5, .38)], walls: [[-1.0, 7.6, 1.4, .2, .7]], puits: [PW(-1.0, 7.1, -1.0, 7.7, 'devant', 0)] }),
+    // 7. Les pales du plateau : rampe montante menant à un plateau haut sous un moulin vertical
+    H0({ name: 'Les pales du plateau', start: [0, 1], cup: [0, 11.2], poly: bx(3, 13), ramps: [JP(-1.5, 2.5, 1.5, 5.5, .4), FL(-1.5, 5.5, 1.5, 13, .4)], moulins: [ML(0, 7.5, 1.15, 2.0, 'z', 1.55)] }),
+    // 8. Les trois terrasses : 3 niveaux, deux puits avec sorties verticales sur les parois des murs de soutènement
+    H0({ name: 'Les trois terrasses', start: [0, 1], cup: [0, 14.5], poly: bx(3.2, 16), ramps: [FL(-1.6, 0, 1.6, 4.5, .7), DN(-1.6, 4.5, -.2, 6.5, .7, .35), FL(-1.6, 6.5, 1.6, 10, .35), DN(.2, 10, 1.6, 12, .35, 0)], walls: [[.7, 4.6, 1.4, .2, 1.05], [-.7, 10.1, 1.4, .2, .7]], puits: [PW(.7, 4.1, .7, 4.7, 'devant', .35), PW(-.7, 9.6, -.7, 10.2, 'devant', 0)] }),
+    // 9. Le saut du rempart : tremplin calibré atteignant facilement la terrasse haute (0.30m), trou contre le mur et sortie verticale
+    H0({ name: 'Le saut du rempart', start: [0, 1], cup: [0, 13.5], poly: bx(3.2, 15), pads: [R4(-1.6, 2.2, 1.6, 3.8)], ramps: [FL(-1.6, 4.8, 1.6, 8.5, .3)], walls: [[0, 8.6, 2.6, .2, .65]], puits: [PW(0, 8.1, 0, 8.7, 'devant', 0)] }),
+    // 10. La patinoire suspendue : rampe montant à une terrasse de glace vive glissante avec rochers
+    H0({ name: 'La patinoire suspendue', start: [0, 1], cup: [0, 11.5], poly: bx(2.8, 13), rest: .85, ramps: [JP(-1.4, 2.5, 1.4, 5, .4), FL(-1.4, 5, 1.4, 13, .4)], ice: [R4(-1.4, 5, 1.4, 13)], walls: [[-.5, 8, .3, .3, .65, .4], [.5, 9.5, .3, .3, .65, .4]] }),
+    // 11. Le rempart percé : terrasse haute avec brèche sans mur à droite, puits avec sortie verticale sur le mur de soutènement
+    H0({ name: 'Le rempart percé', start: [0, 1], cup: [0, 12.5], poly: bx(3.2, 14), ramps: [FL(-1.6, 0, 1.6, 7, .4), DN(0, 7, 1.6, 9.5, .4, 0)], walls: [[-.8, 7.1, 1.4, .2, .7]], gaps: [GP(1.4, 5.5, 1.8, 8.5)], puits: [PW(-.8, 6.6, -.8, 7.2, 'devant', 0)] }),
+    // 12. La grande descente : grand final 3 niveaux, rampe, tremplin vers sommet, puits avec sortie verticale sur le mur
+    H0({ name: 'La grande descente', start: [0, 1], cup: [0, 17.5], poly: bx(3.8, 19), water: [R4(-1.9, 12.5, 1.9, 14.5)], sand: [R4(-1.9, 15.5, -.3, 16.5)], ramps: [JP(-1.9, 2.5, -.2, 5, .35), FL(-1.9, 5, -.2, 9, .35), FL(-1.7, 8.5, -.4, 11.5, .6), DN(-1.9, 9, -.2, 12, .35, 0), PR(.8, 12.5, 1.9, 14.5)], pads: [R4(-1.7, 6, -.4, 7.5)], walls: [[-1.0, 11.6, 1.6, .2, .95]], puits: [PW(-1.0, 11.1, -1.0, 11.7, 'devant', 0)] }),
+  ];
   const LIST = [   // id, nom, trous, icône, thème, total cumulé requis (meilleurs scores des maps précédentes)
     ['garden', 'Le jardin', holes, '⛳', 'Feutre et rampes', 0],
     ['clos', 'Le clos', clos, '🚪', 'Tunnels, ponts, sauts', 36],
@@ -226,6 +284,8 @@
     ['circuit', 'Le circuit', circuit, '🏁', 'Virages biseautés, chicanes', 470],
     ['galeries', 'Les galeries', galeries, '🚇', 'Tunnels étroits, montées', 530],
     ['huit', 'L’odyssée', huit, '🧭', 'Très longs parcours, tous les obstacles', 595],
+    ['moulin', 'Le Moulin', moulin, '⚙️', 'Pales tournantes, murs bas, brèches', 660],
+    ['etages', 'Les Étages', etages, '🏗️', 'Étages et puits', 720],
   ].filter((e) => e[2]);
   M.maps = {}; M.mapList = [];
   for (const [id, name, hs, icon, theme, need] of LIST) {

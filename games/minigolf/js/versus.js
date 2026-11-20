@@ -234,6 +234,7 @@
 
   // ── boucle ──
   function update(dt) {
+    if (world && (!host || !simT)) world.hole.wt += dt;
     if (host) {
       if (S.ph === 'aim') {
         if (simT) simStep(dt);
@@ -264,8 +265,8 @@
     if (!R.lost && (online || !modal)) update(dt);
     G.hidden = !myTurn();
     const t = S.turn, sim = host && simT, pa = pos(t), others = [];
-    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, gy: world.hole.G(q.x, q.z), c: COL[ci[i]] }); } });
-    R.frame({ x: pa.x, y: pa.y, z: pa.z, cam, aim: t === me ? aim : raim, arrow: S.ph === 'aim' && !simT && !iv && (t === me ? sent !== S.tid : (S.ai === 1 || !!(rAim && rAim.tid === S.tid))), shadow: sim ? ball.ground && !ball.sunk : iv ? iv.g === 1 : !S.d[t], gy: world.hole.G(pa.x, pa.z), tint: COL[ci[t]], others });
+    seats.forEach((_, i) => { if (i !== t && !S.d[i]) { const q = pos(i); others.push({ x: q.x, y: q.y, z: q.z, gy: world.hole.G(q.x, q.z), shaft: wb[i] ? !!wb[i].shaft : false, c: COL[ci[i]] }); } });
+    R.frame({ x: pa.x, y: pa.y, z: pa.z, cam, aim: t === me ? aim : raim, arrow: S.ph === 'aim' && !simT && !iv && (t === me ? sent !== S.tid : (S.ai === 1 || !!(rAim && rAim.tid === S.tid))), shadow: (sim ? ball.ground && !ball.sunk : iv ? iv.g === 1 : !S.d[t]) && !ball.shaft, gy: world.hole.G(pa.x, pa.z), shaft: !!ball.shaft, tint: COL[ci[t]], others, wt: world ? world.hole.wt : 0 });
   }
 
   // ── entrées : un seul pointeur actif ──

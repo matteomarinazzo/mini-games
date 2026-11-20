@@ -119,7 +119,6 @@ export default {
                         s.f.fallLeft = 1;
                         s.E.saw.hidden = false;
                         s.E.saw.still = true;
-                        s.E.saw.vx = 0;
                     }
                 }
             },
@@ -148,7 +147,7 @@ export default {
                 do: s => {
                     s.f.jumpLeft = 1;
                     s.E.saw.hidden = false;
-                    s.E.saw.still = false;
+                    s.E.saw.still = true;
                 }
             },
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mini-games-cache-v1.64.2026-11-19.0";
+const CACHE_NAME = "mini-games-cache-v1.66.2026-11-20.4";
 
 const ASSETS_TO_CACHE = [
     '',
@@ -416,6 +416,20 @@ const ASSETS_TO_CACHE = [
     'games/at-your-own-risk/js/levels/world2/level25.js',
     'games/at-your-own-risk/js/levels/world2/level26.js',
     'games/at-your-own-risk/js/levels/world2/level27.js',
+    'games/at-your-own-risk/js/levels/world2/level28.js',
+    'games/at-your-own-risk/js/levels/world2/level27.js',
+    'games/at-your-own-risk/js/levels/world2/level29.js',
+    'games/at-your-own-risk/js/levels/world2/level30.js',
+    'games/at-your-own-risk/js/levels/world2/level31.js',
+    'games/at-your-own-risk/js/levels/world2/level32.js',
+    'games/at-your-own-risk/js/levels/world2/level33.js',
+    'games/at-your-own-risk/js/levels/world2/level34.js',
+    'games/at-your-own-risk/js/levels/world2/level35.js',
+    'games/at-your-own-risk/js/levels/world2/level36.js',
+    'games/at-your-own-risk/js/levels/world2/level37.js',
+    'games/at-your-own-risk/js/levels/world2/level38.js',
+    'games/at-your-own-risk/js/levels/world2/level39.js',
+    'games/at-your-own-risk/js/levels/world2/level40.js',
     'games/at-your-own-risk/images/buttons/jump.svg',
     'games/at-your-own-risk/images/buttons/left.svg',
     'games/at-your-own-risk/images/buttons/right.svg',

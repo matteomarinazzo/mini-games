@@ -3,6 +3,7 @@
 
 
 * Utiliser CountplayedTime comme pont -> faire maj cache + toast partout dans le site
+* Controler tous les daily challenge (surtout snow digger) et en ajouter pour en avoir dans tous les jeux
 
 
 
@@ -24,8 +25,10 @@
 
 
 
-* Monde 2 : niveau 5-20 à faire
-* monde 3 : lasers
+* Monde 2 : niveau 9-20 à faire (niv20 idée : à l'envers, touche inversé, + charge de saut inversé, scies qui suivent. des btns qui tuent, inversent les touches / le saut / rotation de l'écran)
+* Monde 3 : lasers
+* game.js : lire commentaire TODO
+* refaire niv 31 -> c'était un test
 
 
 
@@ -95,12 +98,24 @@
 
 
 
+#### Menu
+
+
+
+* Quand on réussi une map, le score s'affiche, mais on perd le detail de ce que y a dans la map (nb trous, obstacles, etc)
+
+
+
 #### Contenu
 
 
 
-* Ajouter des map. idées ?
+* Ajouter des maps. idées ? 
+
+  * \-> mur arrondi / même pas de mur -> on tire trop fort, on sort.
+  * \-> plusieurs niveaux : commence a un étage, trou / entonoir/ pente nous fait descendre d un niveau etc. tremplin / pente pour nous faire remonté à des endroit (mur autour de chaque etage supérieur s'il faut viser un trou pour descendre ! puis suite soit en face, a gauche ou a droite)
 * Ajouter une boutique ? (-> balles / putt) -> moins de friction, plus legere, plus de force etc ? mais putt pas visible..
+* &#x20;
 
 
 
@@ -108,43 +123,7 @@
 
 
 
-* Modale de fin : permettre de changer de map sans devoir quitter la room !
-* Création : ne pas choisir le nb de joueur ni choisir de remplir avce des IA à la place : dans la modale de config UNE FOIS la room créé, on laisse les joueurs rejoindre et on commence quand on veut ! (limite joueur : 8) et cliquer sur un btn pour ajouter/supprimer un ia. on peut cliquer 3 fois sur ajouter pour en ajouter 3
-
-
-
-
-
-### GOLF
-
-
-
-#### Contenu
-
-
-
-* gestion du vent 
-* ajouter des maps
-* ajouter des clubs
-* boutique avec achats de clubs ?
-* Gestion deplaceemnt avec voiturette pour aller chercher la balle
-
-
-
-#### Multijoueur
-
-
-
-* Faire contre Ia
-* Faire en ligne
-
-
-
-#### Graphisme
-
-&#x20;
-
-* Optimisation
+* Room : faire comme little turismo : room publique / privée
 
 
 

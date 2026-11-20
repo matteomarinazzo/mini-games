@@ -53,7 +53,7 @@
   const canAim = () => st === 'aim' && !modal;
 
   function update(dt) {
-    if (st === 'aim') aim += ((keys.l ? 1 : 0) - (keys.r ? 1 : 0)) * 1.5 * dt;
+    if (st === 'aim') { world.hole.wt += dt; aim += ((keys.l ? 1 : 0) - (keys.r ? 1 : 0)) * 1.5 * dt; }
     else if (st === 'roll') {
       P.step(world, dt);
       if (ball.sunk) { st = 'sunk'; timer = .7; }
@@ -70,7 +70,7 @@
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(.05, (now - last) / 1000); last = now;
     if (!modal && !R.lost) update(dt);
-    R.frame({ x: ball.x, y: ball.y, z: ball.z, cam, aim, arrow: st === 'aim', gy: world.hole.G(ball.x, ball.z) });
+    R.frame({ x: ball.x, y: ball.y, z: ball.z, cam, aim, arrow: st === 'aim', gy: world.hole.G(ball.x, ball.z), shaft: !!ball.shaft, wt: world.hole.wt });
   }
 
   // entrées : un seul pointeur actif (le deuxième doigt est ignoré)
